@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS players (
+  telegram_id BIGINT PRIMARY KEY,
+  username TEXT,
+  first_name TEXT,
+  coins INTEGER NOT NULL DEFAULT 1000,
+  gems INTEGER NOT NULL DEFAULT 50,
+  energy INTEGER NOT NULL DEFAULT 100,
+  level INTEGER NOT NULL DEFAULT 1,
+  xp INTEGER NOT NULL DEFAULT 0,
+  power INTEGER NOT NULL DEFAULT 10,
+  territory INTEGER NOT NULL DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS inventory (
+  telegram_id BIGINT NOT NULL REFERENCES players(telegram_id) ON DELETE CASCADE,
+  item_id TEXT NOT NULL,
+  amount INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (telegram_id, item_id)
+);
+
+CREATE TABLE IF NOT EXISTS battles (
+  id BIGSERIAL PRIMARY KEY,
+  telegram_id BIGINT NOT NULL REFERENCES players(telegram_id) ON DELETE CASCADE,
+  enemy_hp INTEGER NOT NULL,
+  reward_coins INTEGER NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS players_level_idx ON players(level DESC, xp DESC);
