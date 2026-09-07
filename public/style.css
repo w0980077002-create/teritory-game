@@ -1,1 +1,468 @@
-:root{--bg:#071b28;--panel:#0b2d3e;--gold:#ffd34d;--muted:#94aeb9}*{box-sizing:border-box}body{margin:0;background:#03121b;color:#fff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}.app{max-width:720px;min-height:100vh;margin:auto;background:linear-gradient(#07516d,#082b3b 65%,#06151e);padding-bottom:84px}header{height:65px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;background:#061d2bdd;position:sticky;top:0;z-index:5;backdrop-filter:blur(8px)}.brand{display:flex;gap:8px;align-items:center}.logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#ffe26b,#f07b24);color:#321800;font-weight:1000;font-size:22px}.brand small{display:block;color:var(--muted);font-size:10px}.res{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.res span{background:#061019dd;border:1px solid #ffffff12;border-radius:10px;padding:6px;font-size:11px}.screen{padding:10px 12px}.notice{height:0;overflow:hidden;text-align:center}.hero{display:flex;justify-content:space-between;align-items:center;padding:8px 4px 10px}.hero small{color:#a9c1c9;font-size:10px;letter-spacing:1px}.hero h1{font-size:22px;margin:3px 0}.hero p{margin:0;color:#9eb5bd;font-size:12px}.shield{font-size:50px}.map{height:380px;border:3px solid #153d4c;border-radius:24px;overflow:hidden;position:relative;background:linear-gradient(#72cad8 0 43%,#177181 44% 100%);box-shadow:inset 0 -100px 100px #052d3d66}.map:before{content:"";position:absolute;inset:42% 0 0;background:repeating-linear-gradient(172deg,#ffffff18 0 2px,transparent 2px 25px)}.cloud{position:absolute;background:#ffffff66;width:80px;height:25px;border-radius:30px;filter:blur(1px)}.c1{left:8%;top:15%}.c2{right:8%;top:9%}.land{position:absolute;font-size:55px;filter:drop-shadow(0 10px 3px #0005)}.l1{left:6%;top:28%}.l2{right:5%;top:36%}.ship{position:absolute;font-size:100px;left:37%;bottom:8%;transform:scaleX(-1);filter:drop-shadow(0 12px 4px #0008)}.herochar,.enemy{position:absolute;font-size:70px;bottom:29%;filter:drop-shadow(0 8px 3px #0008)}.herochar{left:21%}.enemy{right:20%}.route{position:absolute;width:45%;border-top:3px dashed #ffe27b88;left:31%;top:52%;transform:rotate(12deg)}.battle{padding-top:8px}.enemyname{text-align:center;font-size:12px;color:#d7e4e8}.bar{height:16px;background:#37171a;border:2px solid #142026;border-radius:10px;overflow:hidden;margin:5px 0}.bar i{display:block;width:100%;height:100%;background:linear-gradient(90deg,#ff3f4d,#ffb52f);transition:.2s}.powers{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}.skill{min-height:64px;border:2px solid #7040ae;border-radius:13px;background:linear-gradient(#4a217e,#211536);color:white;font-size:25px}.skill small{display:block;font-size:9px;margin-top:2px}.skill.active{outline:3px solid var(--gold)}.attack{display:block;width:70%;margin:9px auto 0;border:0;border-radius:14px;padding:13px;background:linear-gradient(#ffdd61,#e99220);box-shadow:0 4px 0 #75420b;color:#2b1700;font-weight:1000;font-size:15px}nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(720px,100%);height:72px;background:#06131deF;border-top:1px solid #34515d;display:grid;grid-template-columns:repeat(4,1fr);z-index:10}.tab{border:0;background:transparent;color:#8fa6af;font-size:21px}.tab small{display:block;font-size:10px}.tab.active{color:var(--gold)}button{font-family:inherit;cursor:pointer}@media(min-width:721px){nav{bottom:12px;border-radius:16px}.app{margin-top:12px;border-radius:20px;min-height:calc(100vh - 24px)}}
+:root{
+  --bg:#071b28;
+  --panel:#0b2d3e;
+  --gold:#d6a32a;
+  --gold2:#f0c04a;
+  --text:#f4f7f8;
+  --muted:#9eabb2;
+  --purple:#321052;
+  --purple2:#6b2ca0;
+  --danger:#ff3434;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  background:#07131c;
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  overflow-x:hidden;
+}
+
+button{
+  font:inherit;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.app{
+  width:100%;
+  max-width:900px;
+  min-height:100vh;
+  margin:auto;
+  background:var(--bg);
+  overflow:hidden;
+}
+
+/* Верхняя панель */
+
+header{
+  min-height:150px;
+  padding:28px 28px 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  background:#061a27;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.logo{
+  width:96px;
+  height:96px;
+  border-radius:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(145deg,#ffd45b,#e49b20);
+  color:#111;
+  font-size:54px;
+  font-weight:900;
+  box-shadow:0 8px 25px rgba(0,0,0,.3);
+}
+
+.brand strong{
+  display:block;
+  font-size:34px;
+  letter-spacing:.5px;
+}
+
+.brand small{
+  display:block;
+  margin-top:4px;
+  color:#9aa9b2;
+  font-size:21px;
+}
+
+.resources{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.resource{
+  min-width:115px;
+  padding:14px 18px;
+  border-radius:28px;
+  background:#07131f;
+  border:1px solid rgba(255,255,255,.08);
+  font-size:23px;
+  font-weight:700;
+  text-align:center;
+}
+
+/* Экран */
+
+.screen{
+  padding:25px 28px 150px;
+}
+
+.notice{
+  display:none;
+  margin-bottom:18px;
+  padding:15px 18px;
+  border-radius:15px;
+  background:#fff;
+  color:#222;
+  font-size:18px;
+}
+
+.hero{
+  margin-bottom:20px;
+}
+
+.hero small{
+  color:#aab7bd;
+  font-size:20px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+}
+
+.hero h1{
+  margin:8px 0 4px;
+  font-size:42px;
+  line-height:1.05;
+}
+
+.hero p{
+  margin:0;
+  color:#aebbc1;
+  font-size:22px;
+}
+
+/* Карта */
+
+.map{
+  position:relative;
+  width:100%;
+  height:600px;
+  margin-top:25px;
+  overflow:hidden;
+  border-radius:32px;
+  background:
+    linear-gradient(
+      to bottom,
+      #66c7d8 0%,
+      #3aa7bb 52%,
+      #12677a 53%,
+      #074052 100%
+    );
+  border:5px solid #0a3443;
+  box-shadow:
+    inset 0 0 50px rgba(0,0,0,.15),
+    0 10px 35px rgba(0,0,0,.25);
+}
+
+.map:before{
+  content:"";
+  position:absolute;
+  left:-10%;
+  right:-10%;
+  bottom:40px;
+  height:280px;
+  background:repeating-linear-gradient(
+    -8deg,
+    transparent 0 45px,
+    rgba(255,255,255,.09) 46px 49px
+  );
+}
+
+.cloud{
+  position:absolute;
+  width:190px;
+  height:55px;
+  border-radius:40px;
+  background:rgba(255,255,255,.65);
+  filter:blur(5px);
+}
+
+.cloud.c1{
+  top:75px;
+  left:8%;
+}
+
+.cloud.c2{
+  top:45px;
+  right:8%;
+}
+
+/* Бой */
+
+.battle{
+  position:absolute;
+  inset:0;
+}
+
+.enemy{
+  position:absolute;
+  right:18%;
+  bottom:145px;
+  font-size:100px;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.35));
+}
+
+.player{
+  position:absolute;
+  left:23%;
+  bottom:145px;
+  font-size:100px;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.35));
+}
+
+.ship{
+  position:absolute;
+  left:50%;
+  bottom:25px;
+  transform:translateX(-50%);
+  font-size:145px;
+  filter:drop-shadow(0 10px 8px rgba(0,0,0,.35));
+}
+
+/* HP */
+
+.hp-title{
+  margin:18px 0 12px;
+  text-align:center;
+  color:#c8d1d5;
+  font-size:22px;
+}
+
+.hp{
+  width:100%;
+  height:28px;
+  overflow:hidden;
+  border-radius:20px;
+  background:#4a1720;
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.hp-bar{
+  width:100%;
+  height:100%;
+  border-radius:20px;
+  background:linear-gradient(90deg,#ff3131,#ff8a35,#ffc02e);
+  transition:width .3s ease;
+}
+
+/* Навыки */
+
+.skills{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-top:22px;
+}
+
+.skill{
+  min-height:125px;
+  border:3px solid #47206d;
+  border-radius:25px;
+  background:linear-gradient(145deg,#24103c,#32134f);
+  color:#fff;
+  cursor:pointer;
+  transition:.15s;
+}
+
+.skill:active{
+  transform:scale(.96);
+}
+
+.skill.active{
+  border-color:#d4a62e;
+  box-shadow:0 0 0 3px rgba(212,166,46,.15);
+}
+
+.skill-icon{
+  display:block;
+  margin:8px auto 3px;
+  font-size:48px;
+}
+
+.skill span:last-child{
+  display:block;
+  color:#c4c4c8;
+  font-size:18px;
+}
+
+/* Кнопка атаки */
+
+.attack{
+  display:block;
+  width:70%;
+  min-height:90px;
+  margin:28px auto 0;
+  border:0;
+  border-radius:30px;
+  background:linear-gradient(#dcb23b,#996514);
+  color:#17100a;
+  font-size:30px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 8px 0 #633f0b;
+}
+
+.attack:active{
+  transform:translateY(5px);
+  box-shadow:0 3px 0 #633f0b;
+}
+
+.attack:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+/* Нижнее меню */
+
+nav{
+  position:fixed;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  z-index:50;
+  width:100%;
+  max-width:900px;
+  height:120px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  background:#06131e;
+  border-top:2px solid rgba(255,255,255,.08);
+}
+
+.tab{
+  border:0;
+  background:transparent;
+  color:#8d979d;
+  cursor:pointer;
+  font-size:18px;
+}
+
+.tab-icon{
+  display:block;
+  font-size:42px;
+  margin-bottom:5px;
+}
+
+.tab.active{
+  color:#d8ad39;
+}
+
+/* Адаптация телефона */
+
+@media(max-width:600px){
+
+  header{
+    min-height:125px;
+    padding:18px 16px;
+  }
+
+  .logo{
+    width:70px;
+    height:70px;
+    border-radius:22px;
+    font-size:40px;
+  }
+
+  .brand{
+    gap:12px;
+  }
+
+  .brand strong{
+    font-size:24px;
+  }
+
+  .brand small{
+    font-size:16px;
+  }
+
+  .resources{
+    gap:6px;
+  }
+
+  .resource{
+    min-width:auto;
+    padding:9px 10px;
+    font-size:15px;
+  }
+
+  .screen{
+    padding:18px 16px 135px;
+  }
+
+  .hero h1{
+    font-size:31px;
+  }
+
+  .hero small{
+    font-size:15px;
+  }
+
+  .hero p{
+    font-size:18px;
+  }
+
+  .map{
+    height:430px;
+    border-radius:24px;
+  }
+
+  .enemy,
+  .player{
+    font-size:72px;
+    bottom:115px;
+  }
+
+  .ship{
+    font-size:100px;
+    bottom:18px;
+  }
+
+  .skills{
+    gap:7px;
+  }
+
+  .skill{
+    min-height:105px;
+    border-radius:18px;
+  }
+
+  .skill-icon{
+    font-size:36px;
+  }
+
+  .skill span:last-child{
+    font-size:14px;
+  }
+
+  .attack{
+    width:82%;
+    min-height:72px;
+    font-size:23px;
+  }
+
+  nav{
+    height:92px;
+  }
+
+  .tab{
+    font-size:14px;
+  }
+
+  .tab-icon{
+    font-size:30px;
+  }
+}
