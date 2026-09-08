@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-version="103">
+<html lang="ru" data-version="105">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -125,7 +125,7 @@
       </div>
     </div>
 
-    <!-- 4. ЭКРАН РАЙОНОВ (ОЖИВЛЕННЫЙ ВЫБОР ВРАГОВ) -->
+    <!-- 4. ЭКРАН РАЙОНОВ (ВЫБОР ВРАГОВ) -->
     <div id="page-map" class="game-page" style="display: none;">
       <div class="hero">
         <div>
@@ -136,34 +136,28 @@
       </div>
       
       <div class="district-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <!-- Враг 1 -->
         <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <h3 style="font-size: 14px;">🐾 Бродячая крыса</h3>
-            <small style="color: #8a8a93;">Здоровье: 40 HP • Легкий урон</small><br>
-            <small style="color: #f1c40f;">Награда: +60 🪙</small>
+            <small style="color: #8a8a93;">40 HP • Награда: +60 🪙</small>
           </div>
-          <button class="select-enemy" data-type="rat" style="background: #e74c3c; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #fff;">В БОЙ</button>
+          <button onclick="changeEnemy('Бродячая крыса', 40, 2, 60)" style="background: #e74c3c; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #fff;">В БОЙ</button>
         </div>
 
-        <!-- Враг 2 -->
         <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <h3 style="font-size: 14px;">🥊 Местный хулиган</h3>
-            <small style="color: #8a8a93;">Здоровье: 100 HP • Средний урон</small><br>
-            <small style="color: #f1c40f;">Награда: +200 🪙</small>
+            <small style="color: #8a8a93;">100 HP • Награда: +200 🪙</small>
           </div>
-          <button class="select-enemy" data-type="thug" style="background: #e74c3c; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #fff;">В БОЙ</button>
+          <button onclick="changeEnemy('Местный хулиган', 100, 4, 200)" style="background: #e74c3c; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #fff;">В БОЙ</button>
         </div>
 
-        <!-- Враг 3 -->
-        <div id="boss-container" style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-color: #f1c40f;">
+        <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-color: #f1c40f;">
           <div>
             <h3 style="font-size: 14px; color: #f1c40f;">👹 Главарь промзоны [БОСС]</h3>
-            <small style="color: #8a8a93;">Здоровье: 220 HP • Высокий урон</small><br>
-            <small style="color: #f1c40f;">Награда: +600 🪙</small>
+            <small style="color: #8a8a93;">220 HP • Награда: +600 🪙</small>
           </div>
-          <button class="select-enemy" data-type="boss" style="background: #f1c40f; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #121216;">В БОЙ</button>
+          <button onclick="changeEnemy('Главарь промзоны [БОСС]', 220, 9, 600)" style="background: #f1c40f; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #121216;">В БОЙ</button>
         </div>
       </div>
     </div>
@@ -177,7 +171,6 @@
   </nav>
 
   <script>
-    // Начальные параметры
     var playerHp = 120;
     var playerMaxHp = 120;
     var enemyHp = 100;
@@ -192,8 +185,6 @@
     var weaponName = "Кулаки";
     var freePoints = 0;     
 
-    // Параметры текущего противника
-    var currentEnemyType = "thug";
     var enemyName = "Местный хулиган";
     var enemyPower = 4;
     var enemyPrize = 200;
@@ -202,7 +193,7 @@
     var selectedBlock = null;
 
     try {
-      var saved = localStorage.getItem("territory_save_v3");
+      var saved = localStorage.getItem("territory_save_v4");
       if (saved) {
         var p = JSON.parse(saved);
         if (p && typeof p.basePower === "number") {
@@ -210,10 +201,9 @@
           level = p.level; victories = p.victories; basePower = p.basePower;
           agility = p.agility; weaponBonus = p.weaponBonus; weaponName = p.weaponName;
           freePoints = p.freePoints;
-          if(p.currentEnemyType) {
-            currentEnemyType = p.currentEnemyType; enemyName = p.enemyName;
-            enemyHp = p.enemyHp; enemyMaxHp = p.enemyMaxHp; enemyPower = p.enemyPower;
-            enemyPrize = p.enemyPrize;
+          if (p.enemyName) {
+            enemyName = p.enemyName; enemyHp = p.enemyHp; enemyMaxHp = p.enemyMaxHp;
+            enemyPower = p.enemyPower; enemyPrize = p.enemyPrize;
           }
         }
       }
@@ -222,3 +212,13 @@
     function saveGame() {
       try {
         var data = {
+          playerHp: playerHp, playerMaxHp: playerMaxHp, coins: coins,
+          level: level, victories: victories, basePower: basePower,
+          agility: agility, weaponBonus: weaponBonus, weaponName: weaponName,
+          freePoints: freePoints, enemyName: enemyName, enemyHp: enemyHp,
+          enemyMaxHp: enemyMaxHp, enemyPower: enemyPower, enemyPrize: enemyPrize
+        };
+        localStorage.setItem("territory_save_v4", JSON.stringify(data));
+      } catch(e) {}
+    }
+
