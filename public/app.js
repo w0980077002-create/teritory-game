@@ -1,4 +1,4 @@
-// Состояние персонажа и врага (точно как в твоем коде)
+// Состояние персонажа и врага
 var p = { hp: 120, maxHp: 120, coins: 1000, level: 1, freePoints: 0 };
 var e = { name: "Местный хулиган", hp: 100, maxHp: 100 };
 
@@ -17,23 +17,30 @@ function save() {
 
 // Запуск при полной загрузке страницы
 document.addEventListener("DOMContentLoaded", () => {
-    initTabs();        // Навигация по вкладкам (Арена, Рынок и т.д.)
+    initTabs();        // Навигация по вкладкам
     initBattleUI();    // Логика боевых кнопок
-    updateUI();        // Первичное обновление экрана
+    updateUI();        // Обновляем текст и полоски на старте
 });
 
 // 1. НАВИГАЦИЯ ПО ВКЛАДКАМ
 function initTabs() {
     var tabs = document.querySelectorAll(".tab");
-    var screens = document.querySelectorAll(".game-page, [id^='page-']");
+    // Находим все экраны игры по их ID
+    var screens = [
+        document.getElementById("page-home"),    // Арена
+        document.getElementById("page-map"),     // Районы
+        document.getElementById("page-shop"),    // Рынок
+        document.getElementById("page-profile")  // Персонаж
+    ];
 
     tabs.forEach(function(t, idx) {
         t.onclick = function() {
             tabs.forEach(tab => tab.classList.remove("active"));
             t.classList.add("active");
             
-            // Скрываем все экраны и показываем нужный
-            screens.forEach(scr => scr.style.display = "none");
+            screens.forEach(scr => {
+                if (scr) scr.style.display = "none";
+            });
             if (screens[idx]) screens[idx].style.display = "block";
         };
     });
@@ -41,31 +48,38 @@ function initTabs() {
 
 // 2. БОЕВАЯ СИСТЕМА
 function initBattleUI() {
-    // Находим все кнопки внутри блоков КУДА АТАКУЕМ и ЧТО БЛОКИРУЕМ
+    // Находим все блоки выбора зон
     var powersBlocks = document.querySelectorAll(".powers");
-    if (powersBlocks.length < 2) return;
+    if (powersBlocks.length < 2) {
+        console.error("Не найдены блоки .powers для Атаки и Блока!");
+        return;
+    }
 
+    // Первые три кнопки — это АТАКА, вторые три — БЛОК
     var attackBtns = powersBlocks[0].querySelectorAll("button");
     var blockBtns = powersBlocks[1].querySelectorAll("button");
-    var turnBtn = document.getElementById("attack"); // Твоя желтая кнопка "СДЕЛАТЬ ХОД"
+    var turnBtn = document.getElementById("attack"); // Желтая кнопка "СДЕЛАТЬ ХОД"
 
     var zones = ["head", "body", "legs"];
+    var zoneText = { "head": "Голову", "body": "Корпус", "legs": "Ноги" };
 
-    // Клик по кнопкам атаки
+    // Клик по кнопкам АТАКИ
     attackBtns.forEach(function(b, idx) {
         b.onclick = function() {
             attackBtns.forEach(btn => btn.classList.remove("zone-btn-active"));
             b.classList.add("zone-btn-active");
             selA = zones[idx];
+            console.log("Игрок выбрал атаку в:", selA);
         };
     });
 
-    // Клик по кнопкам блока
+    // Клик по кнопкам БЛОКА
     blockBtns.forEach(function(b, idx) {
         b.onclick = function() {
             blockBtns.forEach(btn => btn.classList.remove("zone-btn-active"));
             b.classList.add("zone-btn-active");
             selB = zones[idx];
+            console.log("Игрок выбрал блок:", selB);
         };
     });
 
@@ -81,7 +95,6 @@ function initBattleUI() {
             var enemyA = zones[Math.floor(Math.random() * 3)];
             var enemyB = zones[Math.floor(Math.random() * 3)];
             
-            var zoneText = { "head": "Голову", "body": "Корпус", "legs": "Ноги" };
             var logs = [];
             var dmg = 15;
 
@@ -101,7 +114,7 @@ function initBattleUI() {
                 logs.push(`🥊 Хулиган нанес вам удар в <b>${zoneText[enemyA]}</b>. Урон: -${dmg}.`);
             }
 
-            // Вывод лога в твой log-container
+            // Вывод лога в блок истории боя
             var logBox = document.querySelector(".log-container div") || document.querySelector(".log-container");
             if (logBox) {
                 if (logBox.innerHTML.includes("Ожидание хода...")) logBox.innerHTML = "";
@@ -122,7 +135,7 @@ function initBattleUI() {
                 save();
             }
 
-            // Сброс выбора
+            // Сброс выбора для следующего раунда
             selA = null; selB = null;
             attackBtns.forEach(btn => btn.classList.remove("zone-btn-active"));
             blockBtns.forEach(btn => btn.classList.remove("zone-btn-active"));
@@ -142,20 +155,19 @@ function showNotice(t) {
 }
 
 // 4. ОБНОВЛЕНИЕ ЗДОРОВЬЯ И МОНЕТ НА ЭКРАНЕ
-// 4. ОБНОВЛЕНИЕ ЗДОРОВЬЯ И МОНЕТ НА ЭКРАНЕ
 function updateUI() {
     // Обновляем золото в шапке
     var coinsEl = document.getElementById("coins");
     if (coinsEl) coinsEl.innerText = p.coins;
 
-    // 1. Обновляем текстовые показатели HP (цифры)
+    // Обновляем текстовые показатели HP
     var playerText = document.getElementById("hp-text-player");
     var enemyText = document.getElementById("hp-text-enemy");
     
-    if (playerText) playerText.innerText = `${p.hp}/${p.maxHp}`;
-    if (enemyText) enemyText.innerText = `${e.hp}/${e.maxHp}`;
+    if (playerText) playerText.innerText = p.hp + "/" + p.maxHp;
+    if (enemyText) enemyText.innerText = e.hp + "/" + e.maxHp;
 
-    // 2. Изменяем ширину графических полосок (в процентах)
+    // Изменяем ширину графических полосок
     var playerFill = document.getElementById("hp-fill-player");
     var enemyFill = document.getElementById("hp-fill-enemy");
 
