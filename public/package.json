@@ -1,7 +1,7 @@
 {
-  "name": "territory-rpg-2004",
+  "name": "territory-classic-rpg",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,13 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^4.6.0",
-    "@tailwindcss/vite": "^4.1.13",
-    "tailwindcss": "^4.1.13",
-    "vite": "^7.1.5",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "lucide-react": "^0.468.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
 }
