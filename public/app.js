@@ -1,13 +1,8 @@
 import * as THREE from "three";
-/* =========================================================
-   TERRITORY
-   Игровая логика + 3D арена Three.js
-   ========================================================= */
 
-
-/* =========================================================
-   ДАННЫЕ ИГРОКА
-   ========================================================= */
+/* =========================
+   TERRITORY — GAME STATE
+========================= */
 
 var p = {
     hp: 120,
@@ -32,618 +27,460 @@ var e = {
 var selA = null;
 var selB = null;
 
-
-/* =========================================================
-   ЗАГРУЗКА СОХРАНЕНИЯ
-   ========================================================= */
-
 try {
-    var s = localStorage.getItem("territory_save");
-
-    if (s) {
-        p = JSON.parse(s);
+    var saved = localStorage.getItem("territory_save");
+    if (saved) {
+        var parsed = JSON.parse(saved);
+        if (parsed) p = Object.assign(p, parsed);
     }
-
 } catch (err) {}
 
-
-/* =========================================================
-   СОХРАНЕНИЕ
-   ========================================================= */
-
 function save() {
-
     try {
-        localStorage.setItem(
-            "territory_save",
-            JSON.stringify(p)
-        );
-
-    } catch (e) {}
-
+        localStorage.setItem("territory_save", JSON.stringify(p));
+    } catch (err) {}
 }
 
 
-/* =========================================================
-   3D ARENA
-   ========================================================= */
+/* =========================
+   3D BATTLE
+========================= */
 
 var battle3D = {
+    container: null,
     scene: null,
     camera: null,
     renderer: null,
-
     player: null,
     enemy: null,
-
-    playerGroup: null,
-    enemyGroup: null,
-
-    playerBody: null,
-    enemyBody: null,
-
-    playerArmL: null,
-    playerArmR: null,
-    enemyArmL: null,
-    enemyArmR: null,
-
-    playerLegL: null,
-    playerLegR: null,
-    enemyLegL: null,
-    enemyLegR: null,
-
+    playerParts: null,
+    enemyParts: null,
+    playerBase: null,
+    enemyBase: null,
     initialized: false,
-
-    playerAction: "idle",
-    enemyAction: "idle",
-
-    actionTime: 0
+    playerAnimating: false,
+    enemyAnimating: false
 };
 
 
-/* =========================================================
-   СОЗДАНИЕ 3D ПЕРСОНАЖА
-   ========================================================= */
+/* =========================
+   MATERIALS
+========================= */
+
+function mat(color, roughness) {
+    return new THREE.MeshStandardMaterial({
+        color: color,
+        roughness: roughness || 0.7,
+        metalness: 0.05
+    });
+}
+
+
+/* =========================
+   CREATE FIGHTER
+========================= */
 
 function createFighter(isPlayer) {
 
     var group = new THREE.Group();
 
-    var bodyMaterial = new THREE.MeshStandardMaterial({
-        color: isPlayer ? 0x246bfe : 0x9e3028,
-        roughness: 0.65,
-        metalness: 0.05
-    });
+    var skin = mat(0xf0b48a);
+    var shirt = mat(isPlayer ? 0x2468ff : 0x9b2929);
+    var pants = mat(isPlayer ? 0x202636 : 0x181818);
+    var shoes = mat(0x090909);
+    var hair = mat(0x17120f);
 
-    var skinMaterial = new THREE.MeshStandardMaterial({
-        color: 0xd99a72,
-        roughness: 0.8
-    });
+    /* Legs */
 
-    var darkMaterial = new THREE.MeshStandardMaterial({
-        color: 0x181820,
-        roughness: 0.8
-    });
-
-
-    /* ТУЛОВИЩЕ */
-
-    var bodyGeometry = new THREE.BoxGeometry(
-        0.85,
-        1.15,
-        0.55
+    var leftLeg = new THREE.Mesh(
+        new THREE.BoxGeometry(0.42, 1.15, 0.42),
+        pants
     );
+
+    var rightLeg = new THREE.Mesh(
+        new THREE.BoxGeometry(0.42, 1.15, 0.42),
+        pants
+    );
+
+    leftLeg.position.set(-0.25, 0.65, 0);
+    rightLeg.position.set(0.25, 0.65, 0);
+
+    group.add(leftLeg);
+    group.add(rightLeg);
+
+    /* Shoes */
+
+    var leftShoe = new THREE.Mesh(
+        new THREE.BoxGeometry(0.48, 0.25, 0.75),
+        shoes
+    );
+
+    var rightShoe = new THREE.Mesh(
+        new THREE.BoxGeometry(0.48, 0.25, 0.75),
+        shoes
+    );
+
+    leftShoe.position.set(-0.25, 0.08, 0.12);
+    rightShoe.position.set(0.25, 0.08, 0.12);
+
+    group.add(leftShoe);
+    group.add(rightShoe);
+
+    /* Body */
 
     var body = new THREE.Mesh(
-        bodyGeometry,
-        bodyMaterial
+        new THREE.BoxGeometry(1.0, 1.25, 0.58),
+        shirt
     );
 
-    body.position.y = 1.45;
+    body.position.y = 1.65;
 
     group.add(body);
 
-
-    /* ГОЛОВА */
-
-    var headGeometry = new THREE.SphereGeometry(
-        0.36,
-        20,
-        20
-    );
+    /* Head */
 
     var head = new THREE.Mesh(
-        headGeometry,
-        skinMaterial
+        new THREE.SphereGeometry(0.48, 20, 16),
+        skin
     );
 
-    head.position.y = 2.35;
+    head.position.y = 2.62;
 
     group.add(head);
 
+    /* Hair */
 
-    /* ВОЛОСЫ */
-
-    var hairGeometry = new THREE.SphereGeometry(
-        0.37,
-        20,
-        10,
-        0,
-        Math.PI * 2,
-        0,
-        Math.PI * 0.55
+    var hairMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.49, 20, 12),
+        hair
     );
 
-    var hair = new THREE.Mesh(
-        hairGeometry,
-        darkMaterial
+    hairMesh.scale.set(1, 0.42, 1);
+    hairMesh.position.set(0, 2.92, -0.02);
+
+    group.add(hairMesh);
+
+    /* Arms */
+
+    var leftArm = new THREE.Mesh(
+        new THREE.BoxGeometry(0.30, 1.0, 0.30),
+        skin
     );
 
-    hair.position.y = 2.43;
-
-    group.add(hair);
-
-
-    /* ЛЕВАЯ РУКА */
-
-    var armGeometry = new THREE.BoxGeometry(
-        0.22,
-        0.85,
-        0.22
+    var rightArm = new THREE.Mesh(
+        new THREE.BoxGeometry(0.30, 1.0, 0.30),
+        skin
     );
 
-    var armL = new THREE.Mesh(
-        armGeometry,
-        bodyMaterial
+    leftArm.position.set(-0.68, 1.72, 0);
+    rightArm.position.set(0.68, 1.72, 0);
+
+    group.add(leftArm);
+    group.add(rightArm);
+
+    /* Fists */
+
+    var leftFist = new THREE.Mesh(
+        new THREE.SphereGeometry(0.20, 14, 10),
+        skin
     );
 
-    armL.position.set(
-        -0.58,
-        1.55,
-        0
+    var rightFist = new THREE.Mesh(
+        new THREE.SphereGeometry(0.20, 14, 10),
+        skin
     );
 
-    group.add(armL);
+    leftFist.position.set(-0.68, 1.18, 0);
+    rightFist.position.set(0.68, 1.18, 0);
 
+    group.add(leftFist);
+    group.add(rightFist);
 
-    /* ПРАВАЯ РУКА */
-
-    var armR = new THREE.Mesh(
-        armGeometry,
-        bodyMaterial
-    );
-
-    armR.position.set(
-        0.58,
-        1.55,
-        0
-    );
-
-    group.add(armR);
-
-
-    /* ЛЕВАЯ НОГА */
-
-    var legGeometry = new THREE.BoxGeometry(
-        0.28,
-        0.85,
-        0.28
-    );
-
-    var legL = new THREE.Mesh(
-        legGeometry,
-        darkMaterial
-    );
-
-    legL.position.set(
-        -0.23,
-        0.48,
-        0
-    );
-
-    group.add(legL);
-
-
-    /* ПРАВАЯ НОГА */
-
-    var legR = new THREE.Mesh(
-        legGeometry,
-        darkMaterial
-    );
-
-    legR.position.set(
-        0.23,
-        0.48,
-        0
-    );
-
-    group.add(legR);
-
-
-    /* КИСТИ */
-
-    var fistGeometry = new THREE.SphereGeometry(
-        0.16,
-        12,
-        12
-    );
-
-    var fistL = new THREE.Mesh(
-        fistGeometry,
-        skinMaterial
-    );
-
-    fistL.position.set(
-        -0.58,
-        1.08,
-        0
-    );
-
-    group.add(fistL);
-
-
-    var fistR = new THREE.Mesh(
-        fistGeometry,
-        skinMaterial
-    );
-
-    fistR.position.set(
-        0.58,
-        1.08,
-        0
-    );
-
-    group.add(fistR);
-
-
-    return {
-        group: group,
+    group.userData = {
         body: body,
-        armL: armL,
-        armR: armR,
-        legL: legL,
-        legR: legR
+        head: head,
+        leftArm: leftArm,
+        rightArm: rightArm,
+        leftLeg: leftLeg,
+        rightLeg: rightLeg,
+        leftFist: leftFist,
+        rightFist: rightFist,
+        originalRotation: group.rotation.clone(),
+        originalPosition: group.position.clone()
     };
+
+    return group;
 }
 
 
-/* =========================================================
-   3D ARENA ИНИЦИАЛИЗАЦИЯ
-   ========================================================= */
+/* =========================
+   INIT 3D ARENA
+========================= */
 
 function init3DArena() {
 
     var container = document.getElementById("battle-3d");
 
     if (!container) {
+        console.log("3D container not found");
         return;
     }
 
-    if (typeof THREE === "undefined") {
-        console.log("Three.js не загрузился.");
-        return;
-    }
+    battle3D.container = container;
 
-    if (battle3D.initialized) {
-        return;
-    }
+    /* Scene */
 
+    var scene = new THREE.Scene();
 
-    /* СЦЕНА */
+    scene.background = new THREE.Color(0x090a12);
 
-    battle3D.scene = new THREE.Scene();
+    battle3D.scene = scene;
 
-    battle3D.scene.background =
-        new THREE.Color(0x08080f);
+    /* Camera */
 
-
-    /* КАМЕРА */
-
-    battle3D.camera =
-        new THREE.PerspectiveCamera(
-            45,
-            container.clientWidth /
-            container.clientHeight,
-            0.1,
-            100
-        );
-
-    battle3D.camera.position.set(
-        0,
-        2.5,
-        7
+    var camera = new THREE.PerspectiveCamera(
+        42,
+        container.clientWidth / Math.max(container.clientHeight, 1),
+        0.1,
+        100
     );
 
-    battle3D.camera.lookAt(
-        0,
-        1.35,
-        0
-    );
+    camera.position.set(0, 3.2, 7.6);
+    camera.lookAt(0, 1.5, 0);
 
+    battle3D.camera = camera;
 
-    /* РЕНДЕР */
+    /* Renderer */
 
-    battle3D.renderer =
-        new THREE.WebGLRenderer({
+    var renderer;
+
+    try {
+
+        renderer = new THREE.WebGLRenderer({
             antialias: true,
-            alpha: false
+            alpha: false,
+            powerPreference: "high-performance"
         });
 
-    battle3D.renderer.setPixelRatio(
-        Math.min(window.devicePixelRatio, 2)
+    } catch (err) {
+
+        console.log("WebGL error:", err);
+
+        container.innerHTML =
+            "<div style='height:100%;display:flex;align-items:center;justify-content:center;color:#777;font-size:14px;text-align:center;padding:20px'>" +
+            "3D-графика недоступна на этом устройстве" +
+            "</div>";
+
+        return;
+    }
+
+    renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio || 1, 1.5)
     );
 
-    battle3D.renderer.setSize(
+    renderer.setSize(
         container.clientWidth,
-        container.clientHeight
+        container.clientHeight,
+        false
     );
+
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     container.innerHTML = "";
+    container.appendChild(renderer.domElement);
 
-    container.appendChild(
-        battle3D.renderer.domElement
+    battle3D.renderer = renderer;
+
+
+    /* =========================
+       LIGHT
+    ========================= */
+
+    var hemi = new THREE.HemisphereLight(
+        0xffffff,
+        0x161622,
+        2.2
     );
 
-
-    /* СВЕТ */
-
-    var ambient =
-        new THREE.HemisphereLight(
-            0xffffff,
-            0x202030,
-            2
-        );
-
-    battle3D.scene.add(ambient);
+    scene.add(hemi);
 
 
-    var mainLight =
-        new THREE.DirectionalLight(
-            0xffffff,
-            2.5
-        );
-
-    mainLight.position.set(
-        -3,
-        6,
-        5
+    var mainLight = new THREE.DirectionalLight(
+        0xffffff,
+        3
     );
 
-    battle3D.scene.add(mainLight);
+    mainLight.position.set(3, 7, 5);
+
+    scene.add(mainLight);
 
 
-    var redLight =
-        new THREE.PointLight(
-            0xe74c3c,
-            5,
-            8
-        );
-
-    redLight.position.set(
-        3,
-        3,
-        2
+    var redLight = new THREE.PointLight(
+        0xff2222,
+        5,
+        10
     );
 
-    battle3D.scene.add(redLight);
+    redLight.position.set(0, 3, -3);
+
+    scene.add(redLight);
 
 
-    /* ПОЛ АРЕНЫ */
+    var blueLight = new THREE.PointLight(
+        0x2255ff,
+        4,
+        8
+    );
 
-    var floorGeometry =
-        new THREE.CylinderGeometry(
-            3.8,
-            3.8,
-            0.25,
-            48
-        );
+    blueLight.position.set(-4, 2, 2);
 
-    var floorMaterial =
-        new THREE.MeshStandardMaterial({
-            color: 0x171720,
-            roughness: 0.85
-        });
+    scene.add(blueLight);
 
-    var floor =
-        new THREE.Mesh(
-            floorGeometry,
-            floorMaterial
-        );
+
+    /* =========================
+       FLOOR
+    ========================= */
+
+    var floor = new THREE.Mesh(
+        new THREE.CylinderGeometry(4.3, 4.3, 0.25, 48),
+        mat(0x181923)
+    );
 
     floor.position.y = -0.15;
 
-    battle3D.scene.add(floor);
+    scene.add(floor);
 
 
-    /* КРУГ НА ПОЛУ */
+    /* Ring */
 
-    var ringGeometry =
-        new THREE.TorusGeometry(
-            3.1,
-            0.035,
-            8,
-            64
-        );
-
-    var ringMaterial =
-        new THREE.MeshBasicMaterial({
-            color: 0xe74c3c
-        });
-
-    var ring =
-        new THREE.Mesh(
-            ringGeometry,
-            ringMaterial
-        );
-
-    ring.rotation.x =
-        Math.PI / 2;
-
-    ring.position.y = 0.01;
-
-    battle3D.scene.add(ring);
-
-
-    /* ЗАДНЯЯ СТЕНА */
-
-    var wallGeometry =
-        new THREE.PlaneGeometry(
-            12,
-            7
-        );
-
-    var wallMaterial =
-        new THREE.MeshStandardMaterial({
-            color: 0x0e0e16,
-            roughness: 1
-        });
-
-    var wall =
-        new THREE.Mesh(
-            wallGeometry,
-            wallMaterial
-        );
-
-    wall.position.set(
-        0,
-        2.4,
-        -2
+    var ring = new THREE.Mesh(
+        new THREE.TorusGeometry(3.5, 0.07, 10, 64),
+        mat(0xe74c3c, 0.45)
     );
 
-    battle3D.scene.add(wall);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = 0.02;
+
+    scene.add(ring);
 
 
-    /* ИГРОК */
+    /* Inner ring */
 
-    var player =
-        createFighter(true);
-
-    player.group.position.set(
-        -1.45,
-        0,
-        0
+    var ring2 = new THREE.Mesh(
+        new THREE.TorusGeometry(2.7, 0.035, 8, 64),
+        mat(0x555566, 0.5)
     );
 
-    player.group.rotation.y =
-        -Math.PI / 8;
+    ring2.rotation.x = Math.PI / 2;
+    ring2.position.y = 0.025;
 
-    battle3D.scene.add(
-        player.group
+    scene.add(ring2);
+
+
+    /* Back wall */
+
+    var wall = new THREE.Mesh(
+        new THREE.BoxGeometry(12, 6, 0.3),
+        mat(0x11121b)
     );
 
-    battle3D.playerGroup =
-        player.group;
+    wall.position.set(0, 2.7, -2.8);
 
-    battle3D.playerBody =
-        player.body;
-
-    battle3D.playerArmL =
-        player.armL;
-
-    battle3D.playerArmR =
-        player.armR;
-
-    battle3D.playerLegL =
-        player.legL;
-
-    battle3D.playerLegR =
-        player.legR;
+    scene.add(wall);
 
 
-    /* ВРАГ */
+    /* =========================
+       FIGHTERS
+    ========================= */
 
-    var enemy =
-        createFighter(false);
+    var player = createFighter(true);
+    var enemy = createFighter(false);
 
-    enemy.group.position.set(
-        1.45,
-        0,
-        0
-    );
+    player.position.set(-1.75, 0, 0.3);
+    enemy.position.set(1.75, 0, -0.2);
 
-    enemy.group.rotation.y =
-        Math.PI + Math.PI / 8;
+    /* Player faces enemy */
 
-    battle3D.scene.add(
-        enemy.group
-    );
+    player.rotation.y = -0.25;
 
-    battle3D.enemyGroup =
-        enemy.group;
+    /* Enemy faces player */
 
-    battle3D.enemyBody =
-        enemy.body;
+    enemy.rotation.y = Math.PI + 0.25;
 
-    battle3D.enemyArmL =
-        enemy.armL;
+    scene.add(player);
+    scene.add(enemy);
 
-    battle3D.enemyArmR =
-        enemy.armR;
+    battle3D.player = player;
+    battle3D.enemy = enemy;
 
-    battle3D.enemyLegL =
-        enemy.legL;
+    battle3D.playerParts = player.userData;
+    battle3D.enemyParts = enemy.userData;
 
-    battle3D.enemyLegR =
-        enemy.legR;
+    battle3D.playerBase = player.position.clone();
+    battle3D.enemyBase = enemy.position.clone();
+
+    battle3D.initialized = true;
 
 
-    /* РАЗМЕР ПРИ ПОВОРОТЕ ТЕЛЕФОНА */
+    /* Resize */
+
+    resize3DArena();
 
     window.addEventListener(
         "resize",
         resize3DArena
     );
 
-
-    battle3D.initialized = true;
+    /* Start animation */
 
     animate3DArena();
 }
 
 
-/* =========================================================
+/* =========================
    RESIZE
-   ========================================================= */
+========================= */
 
 function resize3DArena() {
 
-    var container =
-        document.getElementById(
-            "battle-3d"
-        );
-
     if (
-        !container ||
+        !battle3D.container ||
         !battle3D.camera ||
         !battle3D.renderer
     ) {
         return;
     }
 
-    battle3D.camera.aspect =
-        container.clientWidth /
-        container.clientHeight;
+    var width = battle3D.container.clientWidth;
+    var height = battle3D.container.clientHeight;
 
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+
+    battle3D.camera.aspect = width / height;
     battle3D.camera.updateProjectionMatrix();
 
     battle3D.renderer.setSize(
-        container.clientWidth,
-        container.clientHeight
+        width,
+        height,
+        false
     );
 }
 
 
-/* =========================================================
-   3D АНИМАЦИЯ
-   ========================================================= */
+/* =========================
+   IDLE ANIMATION
+========================= */
+
+var animationClock = new THREE.Clock();
 
 function animate3DArena() {
 
-    requestAnimationFrame(
-        animate3DArena
-    );
+    requestAnimationFrame(animate3DArena);
 
     if (
+        !battle3D.initialized ||
         !battle3D.renderer ||
         !battle3D.scene ||
         !battle3D.camera
@@ -651,137 +488,29 @@ function animate3DArena() {
         return;
     }
 
+    var t = animationClock.getElapsedTime();
 
-    var time =
-        performance.now() * 0.002;
+    /* Player idle */
 
+    if (!battle3D.playerAnimating && battle3D.player) {
 
-    /* IDLE ИГРОКА */
+        battle3D.player.position.y =
+            Math.sin(t * 2) * 0.025;
 
-    if (battle3D.playerGroup) {
-
-        if (
-            battle3D.playerAction === "idle"
-        ) {
-
-            battle3D.playerGroup.position.y =
-                Math.sin(time * 1.5) * 0.025;
-
-            battle3D.playerArmL.rotation.z =
-                Math.sin(time * 1.5) * 0.04;
-
-            battle3D.playerArmR.rotation.z =
-                -Math.sin(time * 1.5) * 0.04;
-        }
+        battle3D.player.rotation.z =
+            Math.sin(t * 1.5) * 0.015;
     }
 
+    /* Enemy idle */
 
-    /* IDLE ВРАГА */
+    if (!battle3D.enemyAnimating && battle3D.enemy) {
 
-    if (battle3D.enemyGroup) {
+        battle3D.enemy.position.y =
+            Math.sin(t * 2 + 1) * 0.025;
 
-        if (
-            battle3D.enemyAction === "idle"
-        ) {
-
-            battle3D.enemyGroup.position.y =
-                Math.sin(time * 1.3 + 1) * 0.025;
-
-            battle3D.enemyArmL.rotation.z =
-                -Math.sin(time * 1.3) * 0.04;
-
-            battle3D.enemyArmR.rotation.z =
-                Math.sin(time * 1.3) * 0.04;
-        }
+        battle3D.enemy.rotation.z =
+            Math.sin(t * 1.4 + 1) * 0.015;
     }
-
-
-    /* АТАКА ИГРОКА */
-
-    if (
-        battle3D.playerAction === "attack"
-    ) {
-
-        battle3D.playerGroup.position.x =
-            -1.45 +
-            Math.sin(
-                battle3D.actionTime * Math.PI
-            ) * 0.65;
-
-        battle3D.playerArmR.rotation.z =
-            -Math.sin(
-                battle3D.actionTime * Math.PI
-            ) * 1.4;
-
-        battle3D.actionTime += 0.035;
-
-        if (
-            battle3D.actionTime >= 1
-        ) {
-
-            battle3D.actionTime = 0;
-
-            battle3D.playerAction =
-                "idle";
-
-            battle3D.playerGroup.position.x =
-                -1.45;
-
-            battle3D.playerArmR.rotation.z =
-                0;
-        }
-    }
-
-
-    /* АТАКА ВРАГА */
-
-    if (
-        battle3D.enemyAction === "attack"
-    ) {
-
-        battle3D.enemyGroup.position.x =
-            1.45 -
-            Math.sin(
-                battle3D.actionTime * Math.PI
-            ) * 0.65;
-
-        battle3D.enemyArmL.rotation.z =
-            Math.sin(
-                battle3D.actionTime * Math.PI
-            ) * 1.4;
-
-        battle3D.actionTime += 0.035;
-
-        if (
-            battle3D.actionTime >= 1
-        ) {
-
-            battle3D.actionTime = 0;
-
-            battle3D.enemyAction =
-                "idle";
-
-            battle3D.enemyGroup.position.x =
-                1.45;
-
-            battle3D.enemyArmL.rotation.z =
-                0;
-        }
-    }
-
-
-    /* ПОКЛАЖИВАЕМ КАМЕРУ */
-
-    battle3D.camera.position.y =
-        2.5 +
-        Math.sin(time * 0.5) * 0.025;
-
-    battle3D.camera.lookAt(
-        0,
-        1.35,
-        0
-    );
-
 
     battle3D.renderer.render(
         battle3D.scene,
@@ -790,467 +519,431 @@ function animate3DArena() {
 }
 
 
-/* =========================================================
-   ЗАПУСК 3D АТАКИ
-   ========================================================= */
+/* =========================
+   PLAYER ATTACK
+========================= */
 
 function playPlayerAttack() {
 
-    if (!battle3D.initialized) {
+    if (!battle3D.initialized || !battle3D.player) {
         return;
     }
 
-    battle3D.playerAction =
-        "attack";
+    var fighter = battle3D.player;
+    var parts = battle3D.playerParts;
 
-    battle3D.enemyAction =
-        "idle";
+    battle3D.playerAnimating = true;
 
-    battle3D.actionTime = 0;
+    var start = performance.now();
+
+    function frame(now) {
+
+        var elapsed = now - start;
+        var duration = 480;
+        var progress = Math.min(elapsed / duration, 1);
+
+        var punch;
+
+        if (progress < 0.5) {
+            punch = progress / 0.5;
+        } else {
+            punch = 1 - ((progress - 0.5) / 0.5);
+        }
+
+        parts.rightArm.rotation.z =
+            -punch * 1.6;
+
+        parts.rightArm.rotation.x =
+            -punch * 0.8;
+
+        parts.rightFist.position.z =
+            punch * 0.55;
+
+        fighter.position.z =
+            battle3D.playerBase.z + punch * 0.35;
+
+        if (progress < 1) {
+
+            requestAnimationFrame(frame);
+
+        } else {
+
+            parts.rightArm.rotation.set(0, 0, 0);
+            parts.rightFist.position.set(
+                0.68,
+                1.18,
+                0
+            );
+
+            fighter.position.copy(
+                battle3D.playerBase
+            );
+
+            battle3D.playerAnimating = false;
+        }
+    }
+
+    requestAnimationFrame(frame);
 }
 
 
-/* =========================================================
-   ЗАПУСК АТАКИ ВРАГА
-   ========================================================= */
+/* =========================
+   ENEMY ATTACK
+========================= */
 
 function playEnemyAttack() {
 
-    if (!battle3D.initialized) {
+    if (!battle3D.initialized || !battle3D.enemy) {
         return;
     }
 
-    battle3D.enemyAction =
-        "attack";
+    var fighter = battle3D.enemy;
+    var parts = battle3D.enemyParts;
 
-    battle3D.playerAction =
-        "idle";
+    battle3D.enemyAnimating = true;
 
-    battle3D.actionTime = 0;
+    var start = performance.now();
+
+    function frame(now) {
+
+        var elapsed = now - start;
+        var duration = 480;
+        var progress = Math.min(elapsed / duration, 1);
+
+        var punch;
+
+        if (progress < 0.5) {
+            punch = progress / 0.5;
+        } else {
+            punch = 1 - ((progress - 0.5) / 0.5);
+        }
+
+        parts.leftArm.rotation.z =
+            punch * 1.6;
+
+        parts.leftArm.rotation.x =
+            -punch * 0.8;
+
+        parts.leftFist.position.z =
+            -punch * 0.55;
+
+        fighter.position.z =
+            battle3D.enemyBase.z - punch * 0.35;
+
+        if (progress < 1) {
+
+            requestAnimationFrame(frame);
+
+        } else {
+
+            parts.leftArm.rotation.set(0, 0, 0);
+
+            parts.leftFist.position.set(
+                -0.68,
+                1.18,
+                0
+            );
+
+            fighter.position.copy(
+                battle3D.enemyBase
+            );
+
+            battle3D.enemyAnimating = false;
+        }
+    }
+
+    requestAnimationFrame(frame);
 }
 
 
-/* =========================================================
-   ПОКАЗ УДАРА
-   ========================================================= */
+/* =========================
+   HIT EFFECT
+========================= */
 
-function show3DHit(isEnemy) {
+function show3DHit(isPlayerTarget) {
 
     if (!battle3D.initialized) {
         return;
     }
 
     var target =
-        isEnemy
-            ? battle3D.enemyGroup
-            : battle3D.playerGroup;
+        isPlayerTarget
+            ? battle3D.player
+            : battle3D.enemy;
 
-    if (!target) {
-        return;
+    if (!target) return;
+
+    var start = performance.now();
+
+    function flash(now) {
+
+        var progress =
+            Math.min((now - start) / 220, 1);
+
+        var scale =
+            1 + Math.sin(progress * Math.PI) * 0.12;
+
+        target.scale.set(
+            scale,
+            scale,
+            scale
+        );
+
+        if (progress < 1) {
+
+            requestAnimationFrame(flash);
+
+        } else {
+
+            target.scale.set(1, 1, 1);
+        }
     }
 
-    var oldX =
-        target.position.x;
-
-    var oldZ =
-        target.position.z;
-
-    var direction =
-        isEnemy ? 1 : -1;
-
-    target.position.x +=
-        direction * 0.12;
-
-    setTimeout(function() {
-
-        if (!target) {
-            return;
-        }
-
-        target.position.x =
-            oldX;
-
-        target.position.z =
-            oldZ;
-
-    }, 90);
-
+    requestAnimationFrame(flash);
 }
 
 
-/* =========================================================
-   DOM ГОТОВ
-   ========================================================= */
+/* =========================
+   DOM READY
+========================= */
 
 document.addEventListener(
     "DOMContentLoaded",
-    function() {
+    function () {
+
+        /* Start 3D */
+
+        setTimeout(function () {
+            init3DArena();
+        }, 100);
 
 
-        /* =================================================
-           ВКЛАДКИ
-           ================================================= */
+        /* =========================
+           TABS
+        ========================= */
 
         var tArena =
-            document.getElementById(
-                "tab-arena"
-            );
+            document.getElementById("tab-arena");
 
         var tShop =
-            document.getElementById(
-                "tab-shop"
-            );
+            document.getElementById("tab-shop");
 
         var tMap =
-            document.getElementById(
-                "tab-map"
-            );
+            document.getElementById("tab-map");
 
         var tProfile =
-            document.getElementById(
-                "tab-profile"
-            );
+            document.getElementById("tab-profile");
 
 
         var pArena =
-            document.getElementById(
-                "page-home"
-            );
+            document.getElementById("page-home");
 
         var pShop =
-            document.getElementById(
-                "page-shop"
-            );
+            document.getElementById("page-shop");
 
         var pMap =
-            document.getElementById(
-                "page-map"
-            );
+            document.getElementById("page-map");
 
         var pProfile =
-            document.getElementById(
-                "page-profile"
-            );
+            document.getElementById("page-profile");
 
 
-        /* =================================================
-           ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ
-           ================================================= */
+        function showPage(tab, page) {
 
-        function showPage(
-            tab,
-            page
-        ) {
+            if (pArena) pArena.style.display = "none";
+            if (pShop) pShop.style.display = "none";
+            if (pMap) pMap.style.display = "none";
+            if (pProfile) pProfile.style.display = "none";
 
-            if (pArena)
-                pArena.style.display =
-                    "none";
+            if (tArena) tArena.classList.remove("active");
+            if (tShop) tShop.classList.remove("active");
+            if (tMap) tMap.classList.remove("active");
+            if (tProfile) tProfile.classList.remove("active");
 
-            if (pShop)
-                pShop.style.display =
-                    "none";
-
-            if (pMap)
-                pMap.style.display =
-                    "none";
-
-            if (pProfile)
-                pProfile.style.display =
-                    "none";
-
-
-            if (tArena)
-                tArena.classList.remove(
-                    "active"
-                );
-
-            if (tShop)
-                tShop.classList.remove(
-                    "active"
-                );
-
-            if (tMap)
-                tMap.classList.remove(
-                    "active"
-                );
-
-            if (tProfile)
-                tProfile.classList.remove(
-                    "active"
-                );
-
-
-            if (page)
-                page.style.display =
-                    "block";
-
-            if (tab)
-                tab.classList.add(
-                    "active"
-                );
-
+            if (page) page.style.display = "block";
+            if (tab) tab.classList.add("active");
 
             updateUI();
 
-
-            /* Когда возвращаемся на арену */
-            if (
-                page === pArena &&
-                battle3D.initialized
-            ) {
-                resize3DArena();
-            }
+            setTimeout(
+                resize3DArena,
+                50
+            );
         }
 
 
-        if (tArena)
+        if (tArena) {
             tArena.addEventListener(
                 "click",
-                function() {
-                    showPage(
-                        tArena,
-                        pArena
-                    );
+                function () {
+                    showPage(tArena, pArena);
                 }
             );
+        }
 
-
-        if (tShop)
+        if (tShop) {
             tShop.addEventListener(
                 "click",
-                function() {
-                    showPage(
-                        tShop,
-                        pShop
-                    );
+                function () {
+                    showPage(tShop, pShop);
                 }
             );
+        }
 
-
-        if (tMap)
+        if (tMap) {
             tMap.addEventListener(
                 "click",
-                function() {
-                    showPage(
-                        tMap,
-                        pMap
-                    );
+                function () {
+                    showPage(tMap, pMap);
                 }
             );
+        }
 
-
-        if (tProfile)
+        if (tProfile) {
             tProfile.addEventListener(
                 "click",
-                function() {
-                    showPage(
-                        tProfile,
-                        pProfile
-                    );
+                function () {
+                    showPage(tProfile, pProfile);
                 }
             );
+        }
 
 
-        /* =================================================
-           КНОПКИ АТАКИ
-           ================================================= */
+        /* =========================
+           ATTACK / BLOCK ZONES
+        ========================= */
 
         var attHead =
-            document.getElementById(
-                "btn-att-head"
-            );
+            document.getElementById("btn-att-head");
 
         var attBody =
-            document.getElementById(
-                "btn-att-body"
-            );
+            document.getElementById("btn-att-body");
 
         var attLegs =
-            document.getElementById(
-                "btn-att-legs"
-            );
+            document.getElementById("btn-att-legs");
 
 
         var blkHead =
-            document.getElementById(
-                "btn-blk-head"
-            );
+            document.getElementById("btn-blk-head");
 
         var blkBody =
-            document.getElementById(
-                "btn-blk-body"
-            );
+            document.getElementById("btn-blk-body");
 
         var blkLegs =
-            document.getElementById(
-                "btn-blk-legs"
-            );
+            document.getElementById("btn-blk-legs");
 
 
         function clearAtt() {
 
             if (attHead)
-                attHead.classList.remove(
-                    "zone-btn-active"
-                );
+                attHead.classList.remove("zone-btn-active");
 
             if (attBody)
-                attBody.classList.remove(
-                    "zone-btn-active"
-                );
+                attBody.classList.remove("zone-btn-active");
 
             if (attLegs)
-                attLegs.classList.remove(
-                    "zone-btn-active"
-                );
+                attLegs.classList.remove("zone-btn-active");
         }
 
 
         function clearBlk() {
 
             if (blkHead)
-                blkHead.classList.remove(
-                    "zone-btn-active"
-                );
+                blkHead.classList.remove("zone-btn-active");
 
             if (blkBody)
-                blkBody.classList.remove(
-                    "zone-btn-active"
-                );
+                blkBody.classList.remove("zone-btn-active");
 
             if (blkLegs)
-                blkLegs.classList.remove(
-                    "zone-btn-active"
-                );
+                blkLegs.classList.remove("zone-btn-active");
         }
 
 
-        /* АТАКА: ГОЛОВА */
-
-        if (attHead)
+        if (attHead) {
             attHead.addEventListener(
                 "click",
-                function() {
-
+                function () {
                     clearAtt();
-
-                    attHead.classList.add(
-                        "zone-btn-active"
-                    );
-
+                    attHead.classList.add("zone-btn-active");
                     selA = "head";
                 }
             );
+        }
 
 
-        /* АТАКА: КОРПУС */
-
-        if (attBody)
+        if (attBody) {
             attBody.addEventListener(
                 "click",
-                function() {
-
+                function () {
                     clearAtt();
-
-                    attBody.classList.add(
-                        "zone-btn-active"
-                    );
-
+                    attBody.classList.add("zone-btn-active");
                     selA = "body";
                 }
             );
+        }
 
 
-        /* АТАКА: НОГИ */
-
-        if (attLegs)
+        if (attLegs) {
             attLegs.addEventListener(
                 "click",
-                function() {
-
+                function () {
                     clearAtt();
-
-                    attLegs.classList.add(
-                        "zone-btn-active"
-                    );
-
+                    attLegs.classList.add("zone-btn-active");
                     selA = "legs";
                 }
             );
+        }
 
 
-        /* БЛОК: ГОЛОВА */
-
-        if (blkHead)
+        if (blkHead) {
             blkHead.addEventListener(
                 "click",
-                function() {
-
+                function () {
                     clearBlk();
-
-                    blkHead.classList.add(
-                        "zone-btn-active"
-                    );
-
+                    blkHead.classList.add("zone-btn-active");
                     selB = "head";
                 }
             );
+        }
 
 
-        /* БЛОК: КОРПУС */
-
-        if (blkBody)
+        if (blkBody) {
             blkBody.addEventListener(
                 "click",
-                function() {
-
+                function () {
                     clearBlk();
-
-                    blkBody.classList.add(
-                        "zone-btn-active"
-                    );
-
+                    blkBody.classList.add("zone-btn-active");
                     selB = "body";
                 }
             );
+        }
 
 
-        /* БЛОК: НОГИ */
-
-        if (blkLegs)
+        if (blkLegs) {
             blkLegs.addEventListener(
                 "click",
-                function() {
-
+                function () {
                     clearBlk();
-
-                    blkLegs.classList.add(
-                        "zone-btn-active"
-                    );
-
+                    blkLegs.classList.add("zone-btn-active");
                     selB = "legs";
                 }
             );
+        }
 
 
-        /* =================================================
-           КНОПКА СДЕЛАТЬ ХОД
-           ================================================= */
+        /* =========================
+           BATTLE
+        ========================= */
 
         var turnBtn =
-            document.getElementById(
-                "attack"
-            );
+            document.getElementById("attack");
 
 
         if (turnBtn) {
 
             turnBtn.addEventListener(
                 "click",
-                function() {
-
-
-                    /* Проверка выбора */
+                function () {
 
                     if (!selA || !selB) {
 
@@ -1270,13 +963,11 @@ document.addEventListener(
 
 
                     var zoneText = {
-                        "head": "Голову",
-                        "body": "Корпус",
-                        "legs": "Ноги"
+                        head: "Голову",
+                        body: "Корпус",
+                        legs: "Ноги"
                     };
 
-
-                    /* ВРАГ ВЫБИРАЕТ АТАКУ И БЛОК */
 
                     var enemyA =
                         zones[
@@ -1298,25 +989,16 @@ document.addEventListener(
 
 
                     var dmg =
-                        15 +
-                        p.bonusDamage;
+                        15 + p.bonusDamage;
 
 
                     var baseEnemyDmg =
-                        15 +
-                        (p.level * 2);
+                        15 + (p.level * 2);
 
 
-                    /* =================================================
-                       АТАКА ИГРОКА
-                       ================================================= */
+                    /* Player attack */
 
-                    playPlayerAttack();
-
-
-                    if (
-                        selA === enemyB
-                    ) {
+                    if (selA === enemyB) {
 
                         logs.push(
                             "🛡️ Вы ударили в <b>" +
@@ -1340,12 +1022,19 @@ document.addEventListener(
                         e.hp =
                             Math.max(
                                 0,
-                                e.hp -
-                                finalPlayerDmg
+                                e.hp - finalPlayerDmg
                             );
 
 
-                        show3DHit(true);
+                        playPlayerAttack();
+
+
+                        setTimeout(
+                            function () {
+                                show3DHit(false);
+                            },
+                            250
+                        );
 
 
                         if (isCrit) {
@@ -1371,29 +1060,9 @@ document.addEventListener(
                     }
 
 
-                    /* =================================================
-                       АТАКА ВРАГА
-                       ================================================= */
+                    /* Enemy attack */
 
-                    setTimeout(
-                        function() {
-
-                            if (
-                                p.hp > 0 &&
-                                e.hp > 0
-                            ) {
-
-                                playEnemyAttack();
-                            }
-
-                        },
-                        180
-                    );
-
-
-                    if (
-                        enemyA === selB
-                    ) {
+                    if (enemyA === selB) {
 
                         logs.push(
                             "🛡️ Хулиган метил в <b>" +
@@ -1421,12 +1090,17 @@ document.addEventListener(
                             p.hp =
                                 Math.max(
                                     0,
-                                    p.hp -
-                                    baseEnemyDmg
+                                    p.hp - baseEnemyDmg
                                 );
 
 
-                            show3DHit(false);
+                            setTimeout(
+                                function () {
+                                    playEnemyAttack();
+                                    show3DHit(true);
+                                },
+                                180
+                            );
 
 
                             logs.push(
@@ -1440,9 +1114,7 @@ document.addEventListener(
                     }
 
 
-                    /* =================================================
-                       ЛОГ
-                       ================================================= */
+                    /* Log */
 
                     var logBox =
                         document.querySelector(
@@ -1457,9 +1129,7 @@ document.addEventListener(
                                 "Ожидание хода..."
                             )
                         ) {
-
-                            logBox.innerHTML =
-                                "";
+                            logBox.innerHTML = "";
                         }
 
 
@@ -1470,17 +1140,14 @@ document.addEventListener(
                     }
 
 
-                    /* =================================================
-                       КОНЕЦ БОЯ
-                       ================================================= */
+                    /* End battle */
 
                     if (
                         p.hp <= 0 ||
                         e.hp <= 0
                     ) {
 
-                        turnBtn.disabled =
-                            true;
+                        turnBtn.disabled = true;
 
 
                         if (
@@ -1488,155 +1155,132 @@ document.addEventListener(
                             e.hp <= 0
                         ) {
 
-                            logBox.innerHTML =
-                                "<b>⚔️ Ничья!</b><br>" +
-                                logBox.innerHTML;
+                            if (logBox) {
+                                logBox.innerHTML =
+                                    "<b>⚔️ Ничья!</b><br>" +
+                                    logBox.innerHTML;
+                            }
 
-                        } else if (
-                            e.hp <= 0
-                        ) {
+                        } else if (e.hp <= 0) {
 
                             p.coins +=
-                                200 +
-                                p.level * 20;
-
+                                200 + p.level * 20;
 
                             p.exp += 40;
 
 
-                            logBox.innerHTML =
-                                "<b>🎉 Победа! Награда получена!</b><br>" +
-                                logBox.innerHTML;
-
-
-                            if (
-                                p.exp >=
-                                p.maxExp
-                            ) {
-
-                                p.level += 1;
-
-                                p.exp -=
-                                    p.maxExp;
-
-                                p.maxExp =
-                                    Math.floor(
-                                        p.maxExp *
-                                        1.3
-                                    );
-
-                                p.freePoints +=
-                                    3;
-
-                                p.maxHp +=
-                                    20;
-
+                            if (logBox) {
 
                                 logBox.innerHTML =
-                                    `<b style="color:#f1c40f;">🌟 ЛЕВЕЛ АП! Получен ${p.level} уровень!</b><br>` +
+                                    "<b>🎉 Победа! Награда получена!</b><br>" +
                                     logBox.innerHTML;
                             }
 
-                        } else {
 
-                            logBox.innerHTML =
-                                "<b>💀 Поражение. Восстановление...</b><br>" +
-                                logBox.innerHTML;
-                        }
+                            if (p.exp >= p.maxExp) {
 
+                                p.level += 1;
 
-                        setTimeout(
-                            function() {
+                                p.exp -= p.maxExp;
 
-                                p.hp =
-                                    p.maxHp;
+                                p.maxExp =
+                                    Math.floor(
+                                        p.maxExp * 1.3
+                                    );
 
+                                p.freePoints += 3;
 
-                                e.hp =
-                                    e.maxHp +
-                                    (p.level * 10);
-
-
-                                turnBtn.disabled =
-                                    false;
+                                p.maxHp += 20;
 
 
                                 if (logBox) {
 
                                     logBox.innerHTML =
+                                        "<b style='color:#f1c40f;'>🌟 ЛЕВЕЛ АП! Получен " +
+                                        p.level +
+                                        " уровень!</b><br>" +
+                                        logBox.innerHTML;
+                                }
+                            }
+
+                        } else {
+
+                            if (logBox) {
+
+                                logBox.innerHTML =
+                                    "<b>💀 Поражение. Восстановление...</b><br>" +
+                                    logBox.innerHTML;
+                            }
+                        }
+
+
+                        setTimeout(
+                            function () {
+
+                                p.hp = p.maxHp;
+
+                                e.hp =
+                                    e.maxHp +
+                                    (p.level * 10);
+
+                                turnBtn.disabled = false;
+
+                                if (logBox) {
+                                    logBox.innerHTML =
                                         "Ожидание хода...";
                                 }
 
-
                                 updateUI();
-
                                 save();
-
                             },
                             4000
                         );
                     }
 
 
-                    /* СБРОС ВЫБОРА */
-
                     selA = null;
-
                     selB = null;
 
                     clearAtt();
-
                     clearBlk();
 
                     updateUI();
-
                     save();
-
                 }
             );
         }
 
 
-        /* =================================================
-           МАГАЗИН
-           ================================================= */
+        /* =========================
+           SHOP
+        ========================= */
 
         var buyBrass =
-            document.getElementById(
-                "buy-brass"
-            );
-
+            document.getElementById("buy-brass");
 
         var buyKnife =
-            document.getElementById(
-                "buy-knife"
-            );
+            document.getElementById("buy-knife");
 
 
         if (buyBrass) {
 
             buyBrass.addEventListener(
                 "click",
-                function() {
+                function () {
 
-                    if (
-                        p.coins >= 150
-                    ) {
+                    if (p.coins >= 150) {
 
                         p.coins -= 150;
 
-                        p.weapon =
-                            "Кастеты";
+                        p.weapon = "Кастеты";
 
-                        p.bonusDamage =
-                            5;
+                        p.bonusDamage = 5;
 
                         showNotice(
                             "Куплены Кастеты!"
                         );
 
                         updateUI();
-
                         save();
 
                     } else {
@@ -1654,26 +1298,22 @@ document.addEventListener(
 
             buyKnife.addEventListener(
                 "click",
-                function() {
+                function () {
 
-                    if (
-                        p.coins >= 400
-                    ) {
+                    if (p.coins >= 400) {
 
                         p.coins -= 400;
 
                         p.weapon =
                             "Охотничий нож";
 
-                        p.bonusDamage =
-                            12;
+                        p.bonusDamage = 12;
 
                         showNotice(
                             "Куплен Нож!"
                         );
 
                         updateUI();
-
                         save();
 
                     } else {
@@ -1687,65 +1327,48 @@ document.addEventListener(
         }
 
 
-        /* =================================================
-           ПРОКАЧКА СИЛЫ
-           ================================================= */
+        /* =========================
+           STATS
+        ========================= */
 
         var addStr =
-            document.getElementById(
-                "add-str"
-            );
+            document.getElementById("add-str");
+
+        var addAgi =
+            document.getElementById("add-agi");
 
 
         if (addStr) {
 
             addStr.addEventListener(
                 "click",
-                function() {
+                function () {
 
-                    if (
-                        p.freePoints > 0
-                    ) {
+                    if (p.freePoints > 0) {
 
                         p.freePoints--;
-
                         p.strength++;
 
                         updateUI();
-
                         save();
                     }
                 }
             );
         }
-
-
-        /* =================================================
-           ПРОКАЧКА ЛОВКОСТИ
-           ================================================= */
-
-        var addAgi =
-            document.getElementById(
-                "add-agi"
-            );
 
 
         if (addAgi) {
 
             addAgi.addEventListener(
                 "click",
-                function() {
+                function () {
 
-                    if (
-                        p.freePoints > 0
-                    ) {
+                    if (p.freePoints > 0) {
 
                         p.freePoints--;
-
                         p.agility++;
 
                         updateUI();
-
                         save();
                     }
                 }
@@ -1753,92 +1376,55 @@ document.addEventListener(
         }
 
 
-        /* =================================================
-           UI
-           ================================================= */
-
         updateUI();
-
-
-        /* =================================================
-           ЗАПУСК 3D
-           ================================================= */
-
-        setTimeout(
-            function() {
-
-                init3DArena();
-
-            },
-            100
-        );
-
     }
 );
 
 
-/* =========================================================
-   УВЕДОМЛЕНИЕ
-   ========================================================= */
+/* =========================
+   NOTICE
+========================= */
 
-function showNotice(t) {
+function showNotice(text) {
 
     var n =
-        document.getElementById(
-            "notice"
-        );
+        document.getElementById("notice");
 
+    if (!n) return;
 
-    if (!n) {
-        return;
-    }
+    n.innerText = text;
 
-
-    n.innerText = t;
-
-    n.style.display =
-        "block";
+    n.style.display = "block";
 
 
     setTimeout(
-        function() {
-
-            n.style.display =
-                "none";
-
+        function () {
+            n.style.display = "none";
         },
         2000
     );
 }
 
 
-/* =========================================================
-   ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
-   ========================================================= */
+/* =========================
+   UPDATE UI
+========================= */
 
 function updateUI() {
 
     var coinsEl =
-        document.getElementById(
-            "coins"
-        );
-
+        document.getElementById("coins");
 
     if (coinsEl)
-        coinsEl.innerText =
-            p.coins;
+        coinsEl.innerText = p.coins;
 
 
     var lvlEl =
-        document.getElementById(
-            "header-level"
-        );
-
+        document.getElementById("header-level");
 
     if (lvlEl)
         lvlEl.innerText =
-            "Уровень " +
-            p.level;
+            "Уровень " + p.level;
 
 
     var pTxt =
@@ -1846,12 +1432,9 @@ function updateUI() {
             "hp-text-player"
         );
 
-
     if (pTxt)
         pTxt.innerText =
-            p.hp +
-            "/" +
-            p.maxHp;
+            p.hp + "/" + p.maxHp;
 
 
     var eTxt =
@@ -1859,12 +1442,9 @@ function updateUI() {
             "hp-text-enemy"
         );
 
-
     if (eTxt)
         eTxt.innerText =
-            e.hp +
-            "/" +
-            e.maxHp;
+            e.hp + "/" + e.maxHp;
 
 
     var pFill =
@@ -1872,11 +1452,9 @@ function updateUI() {
             "hp-fill-player"
         );
 
-
     if (pFill)
         pFill.style.width =
-            ((p.hp / p.maxHp) * 100) +
-            "%";
+            ((p.hp / p.maxHp) * 100) + "%";
 
 
     var eFill =
@@ -1884,11 +1462,9 @@ function updateUI() {
             "hp-fill-enemy"
         );
 
-
     if (eFill)
         eFill.style.width =
-            ((e.hp / e.maxHp) * 100) +
-            "%";
+            ((e.hp / e.maxHp) * 100) + "%";
 
 
     var prLvl =
@@ -1896,10 +1472,8 @@ function updateUI() {
             "prof-level"
         );
 
-
     if (prLvl)
-        prLvl.innerText =
-            p.level;
+        prLvl.innerText = p.level;
 
 
     var prWpn =
@@ -1907,10 +1481,8 @@ function updateUI() {
             "prof-weapon"
         );
 
-
     if (prWpn)
-        prWpn.innerText =
-            p.weapon;
+        prWpn.innerText = p.weapon;
 
 
     var prDmg =
@@ -1918,11 +1490,9 @@ function updateUI() {
             "prof-damage"
         );
 
-
     if (prDmg)
         prDmg.innerText =
-            15 +
-            p.bonusDamage;
+            15 + p.bonusDamage;
 
 
     var prMhp =
@@ -1930,18 +1500,15 @@ function updateUI() {
             "prof-maxhp"
         );
 
-
     if (prMhp)
         prMhp.innerText =
-            p.maxHp +
-            " HP";
+            p.maxHp + " HP";
 
 
     var prStr =
         document.getElementById(
             "prof-str"
         );
-
 
     if (prStr)
         prStr.innerText =
@@ -1953,7 +1520,6 @@ function updateUI() {
             "prof-agi"
         );
 
-
     if (prAgi)
         prAgi.innerText =
             p.agility;
@@ -1964,25 +1530,20 @@ function updateUI() {
             "prof-free"
         );
 
-
     if (prFre)
         prFre.innerText =
             p.freePoints;
 
-
-    /* ОЧКИ ПРОКАЧКИ */
 
     var fBlock =
         document.getElementById(
             "free-points-block"
         );
 
-
     var btnS =
         document.getElementById(
             "add-str"
         );
-
 
     var btnA =
         document.getElementById(
@@ -1992,18 +1553,14 @@ function updateUI() {
 
     if (fBlock) {
 
-        if (
-            p.freePoints > 0
-        ) {
+        if (p.freePoints > 0) {
 
             fBlock.style.display =
                 "block";
 
-
             if (btnS)
                 btnS.style.display =
                     "inline-block";
-
 
             if (btnA)
                 btnA.style.display =
@@ -2014,11 +1571,9 @@ function updateUI() {
             fBlock.style.display =
                 "none";
 
-
             if (btnS)
                 btnS.style.display =
                     "none";
-
 
             if (btnA)
                 btnA.style.display =
@@ -2027,13 +1582,10 @@ function updateUI() {
     }
 
 
-    /* ОПЫТ */
-
     var expTxt =
         document.getElementById(
             "exp-text"
         );
-
 
     if (expTxt)
         expTxt.innerText =
@@ -2043,14 +1595,13 @@ function updateUI() {
             " XP";
 
 
-    var expFil =
+    var expFill =
         document.getElementById(
             "exp-fill"
         );
 
-
-    if (expFil)
-        expFil.style.width =
+    if (expFill)
+        expFill.style.width =
             ((p.exp / p.maxExp) * 100) +
             "%";
 }
