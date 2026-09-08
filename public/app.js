@@ -1,4 +1,4 @@
-// Состояние игры (добавили опыт, статы, свободные очки и максимальное здоровье персонажа)
+// Состояние игры
 var p = { 
     hp: 120, 
     maxHp: 120, 
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
     initTabs();        
     initBattleUI();    
     initShopUI(); 
-    initStatsUI(); // Инициализируем кнопки прокачки статов
+    initStatsUI(); 
     updateUI();        
 });
 
@@ -69,22 +69,17 @@ function initTabs() {
     if (btnProfile) { btnProfile.addEventListener("click", function() { switchPage(btnProfile, pageProfile); }); }
 }
 
-// 2. БОЕВАЯ СИСТЕМА (С расчетом Критов и Уворотов)
+// 2. БОЕВАЯ СИСТЕМА (С точной привязкой по специальным классам)
 function initBattleUI() {
-    var allButtons = Array.from(document.querySelectorAll("button"));
-    
-    var zoneButtons = allButtons.filter(function(btn) {
-        var txt = btn.innerText.trim();
-        return txt === "Голова" || txt === "Корпус" || txt === "Ноги";
-    });
-
-    var attackBtns = zoneButtons.slice(0, 3);
-    var blockBtns = zoneButtons.slice(3, 6);
+    // Находим кнопки атаки и блока по их новым точным классам
+    var attackBtns = document.querySelectorAll(".attack-zone-btn");
+    var blockBtns = document.querySelectorAll(".block-zone-btn");
     var turnBtn = document.getElementById("attack");
 
     var zones = ["head", "body", "legs"];
     var zoneText = { "head": "Голову", "body": "Корпус", "legs": "Ноги" };
 
+    // Клик по кнопкам атаки
     attackBtns.forEach(function(b, idx) {
         b.addEventListener("click", function() {
             attackBtns.forEach(function(btn) { btn.classList.remove("zone-btn-active"); });
@@ -93,6 +88,7 @@ function initBattleUI() {
         });
     });
 
+    // Клик по кнопкам блока
     blockBtns.forEach(function(b, idx) {
         b.addEventListener("click", function() {
             blockBtns.forEach(function(btn) { btn.classList.remove("zone-btn-active"); });
@@ -112,31 +108,28 @@ function initBattleUI() {
             var enemyB = zones[Math.floor(Math.random() * 3)];
             
             var logs = [];
-            
-            // Расчет базового урона
-            var basePlayerDmg = 15 + p.bonusDamage; 
-            var baseEnemyDmg = 15 + (p.level * 2); // С каждым твоим уровнем хулиган чуть сильнее
+            var dmg = 15 + p.bonusDamage; 
+            var baseEnemyDmg = 15 + (p.level * 2);
 
-            // Шансы на крит и уворот (зависят от статов персонажа)
-            var critChance = p.strength * 3; // Сила 5 = 15% крита
-            var dodgeChance = p.agility * 3; // Ловкость 5 = 15% уворота
+            var critChance = p.strength * 3; 
+            var dodgeChance = p.agility * 3; 
 
-            // --- ТВОЙ УДАР ПО ХУЛИГАНУ ---
+            // Наш удар
             if (selA === enemyB) {
                 logs.push(`🛡️ Вы ударили в <b>${zoneText[selA]}</b>, но Хулиган заблокировал удар.`);
             } else {
                 var isCrit = Math.random() * 100 < critChance;
-                var finalPlayerDmg = isCrit ? basePlayerDmg * 2 : basePlayerDmg;
+                var finalPlayerDmg = isCrit ? dmg * 2 : dmg;
                 e.hp = Math.max(0, e.hp - finalPlayerDmg);
                 
                 if (isCrit) {
                     logs.push(`⚡💥 <b>КРИТИЧЕСКИЙ УДАР!</b> Вы жестко пробили Хулигана в <b>${zoneText[selA]}</b>! Урон: -${finalPlayerDmg}.`);
                 } else {
-                    logs.push(`💥 Вы успешно пробили Хулигана in <b>${zoneText[selA]}</b>! Урон: -${finalPlayerDmg}.`);
+                    logs.push(`💥 Вы успешно пробили Хулигана в <b>${zoneText[selA]}</b>! Урон: -${finalPlayerDmg}.`);
                 }
             }
 
-            // --- УДАР ХУЛИГАНА ПО ТЕБЕ ---
+            // Удар хулигана
             if (enemyA === selB) {
                 logs.push(`🛡️ Хулиган метил в <b>${zoneText[enemyA]}</b>, но вы заблокировали его.`);
             } else {
@@ -155,37 +148,35 @@ function initBattleUI() {
                 logBox.innerHTML = logs.join("<br>") + "<br><hr style='border-color:#2a2a2a'><br>" + logBox.innerHTML;
             }
 
-            // Конец боя
+            // Исход боя
             if (p.hp <= 0 || e.hp <= 0) {
                 turnBtn.disabled = true;
                 if (p.hp <= 0 && e.hp <= 0) {
                     logBox.innerHTML = "<b>⚔️ Ничья! Оба упали без сил.</b><br>" + logBox.innerHTML;
                 } else if (e.hp <= 0) {
                     var rewardCoins = 200 + (p.level * 20);
-                    var rewardExp = 40; // Даем 40 опыта за победу
+                    var rewardExp = 40; 
                     
                     p.coins += rewardCoins;
                     p.exp += rewardExp;
                     
                     logBox.innerHTML = `<b>🎉 Победа! Местный хулиган повержен. Награда: +${rewardCoins} монет, +${rewardExp} опыта!</b><br>` + logBox.innerHTML;
                     
-                    // Проверяем поднятие уровня (Level Up)
                     if (p.exp >= p.maxExp) {
                         p.level += 1;
                         p.exp = p.exp - p.maxExp;
-                        p.maxExp = Math.floor(p.maxExp * 1.3); // Следующий уровень требует больше опыта
-                        p.freePoints += 3; // Даем 3 очка прокачки характеристик!
-                        p.maxHp += 20; // Увеличиваем макс здоровье персонажа
+                        p.maxExp = Math.floor(p.maxExp * 1.3); 
+                        p.freePoints += 3; 
+                        p.maxHp += 20; 
                         logBox.innerHTML = `<b style="color: #f1c40f;">🌟 ПОЗДРАВЛЯЕМ! Вы получили ${p.level} уровень! Получено 3 очка характеристик.</b><br>` + logBox.innerHTML;
                     }
                 } else {
                     logBox.innerHTML = "<b>💀 Поражение. Вас унесли в госпиталь. Восстановление...</b><br>" + logBox.innerHTML;
                 }
                 
-                // Автоматическое воскрешение/сброс боя через 4 секунды
                 setTimeout(function() {
                     p.hp = p.maxHp;
-                    e.hp = e.maxHp + (p.level * 10); // Враг тоже растет в силе со временем
+                    e.hp = e.maxHp + (p.level * 10); 
                     turnBtn.disabled = false;
                     if (logBox) logBox.innerHTML = "Ожидание хода...";
                     updateUI();
@@ -239,7 +230,7 @@ function initShopUI() {
     }
 }
 
-// 4. ПРОКАЧКА ХАРАКТЕРИСТИК (СТАТОВ)
+// 4. ПРОКАЧКА СТАТОВ
 function initStatsUI() {
     var addStr = document.getElementById("add-str");
     var addAgi = document.getElementById("add-agi");
@@ -251,3 +242,36 @@ function initStatsUI() {
                 p.strength++;
                 updateUI();
                 save();
+            }
+        });
+    }
+
+    if (addAgi) {
+        addAgi.addEventListener("click", function() {
+            if (p.freePoints > 0) {
+                p.freePoints--;
+                p.agility++;
+                updateUI();
+                save();
+            }
+        });
+    }
+}
+
+// 5. УВЕДОМЛЕНИЯ
+function showNotice(t) {
+    var n = document.getElementById("notice");
+    if (!n) return;
+    n.innerText = t;
+    n.style.display = "block";
+    setTimeout(function() { n.style.display = "none"; }, 2500);
+}
+
+// 6. СИНХРОНИЗАЦИЯ ИНТЕРФЕЙСА
+function updateUI() {
+    var coinsEl = document.getElementById("coins");
+    if (coinsEl) coinsEl.innerText = p.coins;
+
+    var levelEl = document.getElementById("header-level");
+    if (levelEl) levelEl.innerText = "Уровень " + p.level;
+
