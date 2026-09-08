@@ -1,543 +1,309 @@
-:root{
-  --bg:#071b28;
-  --panel:#0b2d3e;
-  --gold:#d6a32a;
-  --gold2:#f0c04a;
-  --text:#f4f7f8;
-  --muted:#9eabb2;
-  --purple:#321052;
-  --purple2:#6b2ca0;
-  --danger:#ff3434;
+/* Общие настройки темы (Темный урбан-стиль оригинальной Территории) */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
 }
 
-*{
-  box-sizing:border-box;
+body {
+  background-color: #121216;
+  color: #f5f5f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
 }
 
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
-  background:#07131c;
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
+.app {
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #18181c;
+  position: relative;
 }
 
-body{
-  overflow-x:hidden;
+/* Верхняя панель (Шапка) */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #1f1f24;
+  border-bottom: 1px solid #2b2b33;
 }
 
-button{
-  font:inherit;
-  -webkit-tap-highlight-color:transparent;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.app{
-  width:100%;
-  max-width:900px;
-  min-height:100vh;
-  margin:auto;
-  background:var(--bg);
-  overflow:hidden;
-}
-
-/* Верхняя панель */
-
-header{
-  min-height:150px;
-  padding:28px 28px 22px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-  background:#061a27;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:18px;
-}
-
-.logo{
-  width:96px;
-  height:96px;
-  border-radius:28px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(145deg,#ffd45b,#e49b20);
-  color:#111;
-  font-size:54px;
-  font-weight:900;
-  box-shadow:0 8px 25px rgba(0,0,0,.3);
-}
-
-.brand strong{
-  display:block;
-  font-size:34px;
-  letter-spacing:.5px;
-}
-
-.brand small{
-  display:block;
-  margin-top:4px;
-  color:#9aa9b2;
-  font-size:21px;
-}
-
-.resources{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-
-.resource{
-  min-width:115px;
-  padding:14px 18px;
-  border-radius:28px;
-  background:#07131f;
-  border:1px solid rgba(255,255,255,.08);
-  font-size:23px;
-  font-weight:700;
-  text-align:center;
-}
-
-/* Экран */
-
-.screen{
-  padding:25px 28px 150px;
-}
-
-.notice{
-  display:none;
-  margin-bottom:18px;
-  padding:15px 18px;
-  border-radius:15px;
-  background:#fff;
-  color:#222;
-  font-size:18px;
-}
-
-.hero{
-  margin-bottom:20px;
-}
-
-.hero small{
-  color:#aab7bd;
-  font-size:20px;
-  text-transform:uppercase;
-  letter-spacing:2px;
-}
-
-.hero h1{
-  margin:8px 0 4px;
-  font-size:42px;
-  line-height:1.05;
-}
-
-.hero p{
-  margin:0;
-  color:#aebbc1;
-  font-size:22px;
-}
-
-/* Карта */
-
-.map{
-  position:relative;
-  width:100%;
-  height:600px;
-  margin-top:25px;
-  overflow:hidden;
-  border-radius:32px;
-  background:
-    linear-gradient(
-      to bottom,
-      #66c7d8 0%,
-      #3aa7bb 52%,
-      #12677a 53%,
-      #074052 100%
-    );
-  border:5px solid #0a3443;
-  box-shadow:
-    inset 0 0 50px rgba(0,0,0,.15),
-    0 10px 35px rgba(0,0,0,.25);
-}
-
-.map:before{
-  content:"";
-  position:absolute;
-  left:-10%;
-  right:-10%;
-  bottom:40px;
-  height:280px;
-  background:repeating-linear-gradient(
-    -8deg,
-    transparent 0 45px,
-    rgba(255,255,255,.09) 46px 49px
-  );
-}
-
-.cloud{
-  position:absolute;
-  width:190px;
-  height:55px;
-  border-radius:40px;
-  background:rgba(255,255,255,.65);
-  filter:blur(5px);
-}
-
-.cloud.c1{
-  top:75px;
-  left:8%;
-}
-
-.cloud.c2{
-  top:45px;
-  right:8%;
-}
-
-/* Бой */
-
-.battle{
-  position:absolute;
-  inset:0;
-}
-
-.enemy{
-  position:absolute;
-  right:18%;
-  bottom:145px;
-  font-size:100px;
-  filter:drop-shadow(0 8px 8px rgba(0,0,0,.35));
-}
-
-.player{
-  position:absolute;
-  left:23%;
-  bottom:145px;
-  font-size:100px;
-  filter:drop-shadow(0 8px 8px rgba(0,0,0,.35));
-}
-
-.ship{
-  position:absolute;
-  left:50%;
-  bottom:25px;
-  transform:translateX(-50%);
-  font-size:145px;
-  filter:drop-shadow(0 10px 8px rgba(0,0,0,.35));
-}
-
-/* HP */
-
-.hp-title{
-  margin:18px 0 12px;
-  text-align:center;
-  color:#c8d1d5;
-  font-size:22px;
-}
-
-.hp{
-  width:100%;
-  height:28px;
-  overflow:hidden;
-  border-radius:20px;
-  background:#4a1720;
-  border:1px solid rgba(255,255,255,.12);
-}
-
-.hp-bar{
-  width:100%;
-  height:100%;
-  border-radius:20px;
-  background:linear-gradient(90deg,#ff3131,#ff8a35,#ffc02e);
-  transition:width .3s ease;
-}
-
-/* Навыки */
-
-.skills{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-top:22px;
-}
-
-.skill{
-  min-height:125px;
-  border:3px solid #47206d;
-  border-radius:25px;
-  background:linear-gradient(145deg,#24103c,#32134f);
-  color:#fff;
-  cursor:pointer;
-  transition:.15s;
-}
-
-.skill:active{
-  transform:scale(.96);
-}
-
-.skill.active{
-  border-color:#d4a62e;
-  box-shadow:0 0 0 3px rgba(212,166,46,.15);
-}
-
-.skill-icon{
-  display:block;
-  margin:8px auto 3px;
-  font-size:48px;
-}
-
-.skill span:last-child{
-  display:block;
-  color:#c4c4c8;
-  font-size:18px;
-}
-
-/* Кнопка атаки */
-
-.attack{
-  display:block;
-  width:70%;
-  min-height:90px;
-  margin:28px auto 0;
-  border:0;
-  border-radius:30px;
-  background:linear-gradient(#dcb23b,#996514);
-  color:#17100a;
-  font-size:30px;
-  font-weight:900;
-  cursor:pointer;
-  box-shadow:0 8px 0 #633f0b;
-}
-
-.attack:active{
-  transform:translateY(5px);
-  box-shadow:0 3px 0 #633f0b;
-}
-
-.attack:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-/* Нижнее меню */
-
-nav{
-  position:fixed;
-  left:50%;
-  bottom:0;
-  transform:translateX(-50%);
-  z-index:50;
-  width:100%;
-  max-width:900px;
-  height:120px;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  background:#06131e;
-  border-top:2px solid rgba(255,255,255,.08);
-}
-
-.tab{
-  border:0;
-  background:transparent;
-  color:#8d979d;
-  cursor:pointer;
-  font-size:18px;
-}
-
-.tab-icon{
-  display:block;
-  font-size:42px;
-  margin-bottom:5px;
-}
-
-.tab.active{
-  color:#d8ad39;
-}
-
-/* Адаптация телефона */
-
-@media(max-width:600px){
-
-  header{
-    min-height:125px;
-    padding:18px 16px;
-  }
-
-  .logo{
-    width:70px;
-    height:70px;
-    border-radius:22px;
-    font-size:40px;
-  }
-
-  .brand{
-    gap:12px;
-  }
-
-  .brand strong{
-    font-size:24px;
-  }
-
-  .brand small{
-    font-size:16px;
-  }
-
-  .resources{
-    gap:6px;
-  }
-
-  .resource{
-    min-width:auto;
-    padding:9px 10px;
-    font-size:15px;
-  }
-
-  .screen{
-    padding:18px 16px 135px;
-  }
-
-  .hero h1{
-    font-size:31px;
-  }
-
-  .hero small{
-    font-size:15px;
-  }
-
-  .hero p{
-    font-size:18px;
-  }
-
-  .map{
-    height:430px;
-    border-radius:24px;
-  }
-
-  .enemy,
-  .player{
-    font-size:72px;
-    bottom:115px;
-  }
-
-  .ship{
-    font-size:100px;
-    bottom:18px;
-  }
-
-  .skills{
-    gap:7px;
-  }
-
-  .skill{
-    min-height:105px;
-    border-radius:18px;
-  }
-
-  .skill-icon{
-    font-size:36px;
-  }
-
-  .skill span:last-child{
-    font-size:14px;
-  }
-
-  .attack{
-    width:82%;
-    min-height:72px;
-    font-size:23px;
-  }
-
-  nav{
-    height:92px;
-  }
-
-  .tab{
-    font-size:14px;
-  }
-
-  .tab-icon{
-    font-size:30px;
-  }
-}
-.zone-title {
-  font-size: 11px;
+.logo {
+  background: #e74c3c;
+  color: #fff;
   font-weight: bold;
-  color: #aaa;
-  margin: 10px 0 4px 0;
-  text-align: left;
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.brand b {
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
+.brand small {
+  color: #8a8a93;
+  font-size: 11px;
+}
+
+.res {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Главный контейнер экрана */
+.screen {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 80px; /* Чтобы нижнее меню не перекрывало контент */
+}
+
+/* Информационная карточка поединка */
+.hero {
+  background: linear-gradient(135deg, #23232a 0%, #1a1a20 100%);
+  border: 1px solid #2b2b33;
+  padding: 14px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero small {
+  color: #e74c3c;
+  font-weight: bold;
+  font-size: 10px;
   letter-spacing: 1px;
 }
 
-.attack-zone, .block-zone {
-  background: #2a2a32;
-  color: #fff;
-  border: 1px solid #444;
+.hero h1 {
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.shield {
+  font-size: 28px;
+}
+
+/* Блок поединка */
+.battle {
+  background: #1f1f24;
+  border: 1px solid #2b2b33;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.enemyname {
+  font-size: 14px;
+  font-weight: bold;
+  color: #f5f5f7;
+}
+
+/* Полоски здоровья */
+.bars-container {
+  background: rgba(0, 0, 0, 0.2);
   padding: 10px;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bar-label {
+  font-size: 11px;
+  color: #a0a0ab;
+}
+
+.bar {
+  background: #2b2b33;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Зоны Атаки и Блока */
+.zone-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #8a8a93;
+  margin-top: 4px;
+  letter-spacing: 0.5px;
+}
+
+.powers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.attack-zone, .block-zone {
+  background: #27272e;
+  color: #f5f5f7;
+  border: 1px solid #3a3a44;
+  padding: 10px 4px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.attack-zone:active, .block-zone:active {
+  transform: scale(0.96);
 }
 
 .attack-zone.active {
   background: #e74c3c !important;
   border-color: #ff6b6b;
-  box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+  color: #fff;
 }
 
 .block-zone.active {
   background: #2ecc71 !important;
-  border-color: #2ecc71;
-  box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+  border-color: #58d68d;
+  color: #fff;
 }
 
-.bars-container {
-  background: rgba(0,0,0,0.2);
-  padding: 8px;
-  border-radius: 6px;
-  margin-bottom: 10px;
-  font-size: 12px;
+/* Кнопка действия */
+.attack {
+  background: linear-gradient(180deg, #f1c40f 0%, #d4ac0d 100%);
+  color: #121216;
+  border: none;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 6px;
+  box-shadow: 0 4px 12px rgba(212, 172, 13, 0.2);
+  transition: all 0.2s;
 }
-.bar-label { margin-top: 3px; color: #bbb; text-align: left;}
 
-.player-hp-bar, .enemy-hp-bar {
-  display: block;
-  height: 100%;
-  transition: width 0.3s ease;
+.attack:active {
+  transform: scale(0.98);
+  box-shadow: none;
 }
 
+/* Текстовый лог боя */
 .log-container {
-  margin-top: 15px;
-  background: #1e1e24;
-  border-radius: 8px;
-  padding: 10px;
-  border: 1px solid #333;
+  background: #1f1f24;
+  border: 1px solid #2b2b33;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
+
 .log-title {
   font-size: 12px;
-  color: #888;
-  border-bottom: 1px solid #333;
-  padding-bottom: 4px;
-  margin-bottom: 6px;
-  text-align: left;
+  color: #8a8a93;
+  font-weight: bold;
+  border-bottom: 1px solid #2b2b33;
+  padding-bottom: 6px;
 }
+
 .battle-log {
-  max-height: 150px;
+  max-height: 160px;
   overflow-y: auto;
-  font-size: 13px;
-  text-align: left;
-  line-height: 1.4;
+  font-size: 12px;
+  line-height: 1.5;
 }
+
 .battle-log p {
-  margin: 4px 0;
-  border-bottom: 1px dashed #2a2a32;
-  padding-bottom: 4px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #2b2b33;
 }
-.system-msg { color: #888; font-style: italic; }
+
+.system-msg {
+  color: #8a8a93;
+  font-style: italic;
+}
+
+/* Нижняя навигация */
+nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: #1f1f24;
+  border-top: 1px solid #2b2b33;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom); /* Поддержка экранов iPhone/Android с полосой внизу */
+}
+
+.tab {
+  background: none;
+  border: none;
+  color: #8a8a93;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  flex: 1;
+}
+
+.tab small {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.tab.active {
+  color: #e74c3c;
+}
+
+/* Уведомления */
+.notice {
+  display: none;
+  background: #e74c3c;
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+}
