@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <title>Territory</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://telegram.org"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,52 +25,106 @@
 
   <section class="screen">
     <div id="notice" class="notice"></div>
-    
-    <div class="hero">
-      <div>
-        <small>БОЙЦОВСКАЯ АРЕНА</small>
-        <h1>Уличный поединок</h1>
+
+    <!-- 1. ЭКРАН БОЯ (АРЕНА) -->
+    <div id="page-home" class="game-page">
+      <div class="hero">
+        <div>
+          <small>БОЙЦОВСКАЯ АРЕНА</small>
+          <h1>Уличный поединок</h1>
+        </div>
+        <div class="shield">🥊</div>
       </div>
-      <div class="shield">🥊</div>
+
+      <div class="battle">
+        <div class="enemyname">⚔️ Противник: <span id="enemyhp">100/100</span></div>
+        <div class="bars-container">
+          <div class="bar-label">Вы:</div>
+          <div class="bar"><i class="player-hp-bar" style="width: 100%; background: #2ecc71;"></i></div>
+          <div class="bar-label">Враг:</div>
+          <div class="bar"><i class="enemy-hp-bar" style="width: 100%; background: #e74c3c;"></i></div>
+        </div>
+
+        <div class="zone-title">КУДА АТАКУЕМ:</div>
+        <div class="powers">
+          <button class="attack-zone" data-zone="head">👤 Голова</button>
+          <button class="attack-zone" data-zone="torso">👕 Корпус</button>
+          <button class="attack-zone" data-zone="legs">👖 Ноги</button>
+        </div>
+
+        <div class="zone-title">ЧТО БЛОКИРУЕМ:</div>
+        <div class="powers">
+          <button class="block-zone" data-zone="head">👤 Голова</button>
+          <button class="block-zone" data-zone="torso">👕 Корпус</button>
+          <button class="block-zone" data-zone="legs">👖 Ноги</button>
+        </div>
+
+        <button id="attack" class="attack">⚔️ СДЕЛАТЬ ХОД</button>
+      </div>
+
+      <div class="log-container">
+        <div class="log-title">История боя:</div>
+        <div id="battle-log" class="battle-log">
+          <p class="system-msg">Ожидание вашего хода...</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Блок Боя в стиле оригинальной Территории -->
-    <div class="battle">
-      <div class="enemyname">⚔️ Противник: <span id="enemyhp">100/100</span></div>
-      
-      <!-- Полоски здоровья -->
-      <div class="bars-container">
-        <div class="bar-label">Вы:</div>
-        <div class="bar"><i class="player-hp-bar" style="width: 100%; background: #2ecc71;"></i></div>
-        <div class="bar-label">Враг:</div>
-        <div class="bar"><i class="enemy-hp-bar" style="width: 100%; background: #e74c3c;"></i></div>
+    <!-- 2. ЭКРАН МАГАЗИНА (РЫНОК) -->
+    <div id="page-shop" class="game-page" style="display: none;">
+      <div class="hero">
+        <div>
+          <small>ОРУЖЕЙНАЯ ЛАВКА</small>
+          <h1>Рынок Территории</h1>
+        </div>
+        <div class="shield">🛒</div>
       </div>
-
-      <!-- Выбор зоны Атаки -->
-      <div class="zone-title">КУДА АТАКУЕМ:</div>
-      <div class="powers">
-        <button class="attack-zone" data-zone="head">👤 Голова</button>
-        <button class="attack-zone" data-zone="torso">👕 Корпус</button>
-        <button class="attack-zone" data-zone="legs">👖 Ноги</button>
+      <div class="shop-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+        <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 style="font-size: 14px;">🥊 Кожаные кастеты</h3>
+            <small style="color: #2ecc71;">+3 к Силе удара</small>
+          </div>
+          <button id="buy-knuckles" style="background: #f1c40f; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #121216;">500 🪙</button>
+        </div>
+        <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 style="font-size: 14px;">🔪 Охотничий нож</h3>
+            <small style="color: #2ecc71;">+8 к Силе удара</small>
+          </div>
+          <button id="buy-knife" style="background: #f1c40f; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #121216;">1200 🪙</button>
+        </div>
       </div>
-
-      <!-- Выбор зоны Блока -->
-      <div class="zone-title">ЧТО БЛОКИРУЕМ:</div>
-      <div class="powers">
-        <button class="block-zone" data-zone="head">👤 Голова</button>
-        <button class="block-zone" data-zone="torso">👕 Корпус</button>
-        <button class="block-zone" data-zone="legs">👖 Ноги</button>
-      </div>
-
-      <button id="attack" class="attack">⚔️ СДЕЛАТЬ ХОД</button>
     </div>
 
-    <!-- Текстовый лог боя, как в оригинале 2004 года -->
-    <div class="log-container">
-      <div class="log-title">История боя:</div>
-      <div id="battle-log" class="battle-log">
-        <p class="system-msg">🔄 Ожидание вашего хода...</p>
+    <!-- 3. ЭКРАН ПЕРСОНАЖА (ПРОФИЛЬ) -->
+    <div id="page-profile" class="game-page" style="display: none;">
+      <div class="hero">
+        <div>
+          <small>ЛИЧНОЕ ДЕЛО</small>
+          <h1>Ваш Боец</h1>
+        </div>
+        <div class="shield">👤</div>
       </div>
+      <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 14px; border-radius: 12px; margin-top: 10px; display: flex; flex-direction: column; gap: 12px;">
+        <p>🏆 Всего побед: <b id="prof-victories">0</b></p>
+        <p>💪 Базовая Сила: <b id="prof-power">5</b></p>
+        <p>⚡ Ловкость (Крит): <b id="prof-agility">5</b></p>
+        <p>🎒 Экипировано: <b id="prof-weapon">Кулаки</b></p>
+        <button id="reset-progress" style="background: #e74c3c; border: none; color: white; padding: 10px; border-radius: 8px; font-weight: bold; margin-top: 10px; font-size: 12px;">Обнулить прогресс</button>
+      </div>
+    </div>
+
+    <!-- 4. ЭКРАН РАЙОНОВ -->
+    <div id="page-map" class="game-page" style="display: none;">
+      <div class="hero">
+        <div>
+          <small>КАРТА ГОРОДА</small>
+          <h1>Районы Территории</h1>
+        </div>
+        <div class="shield">🗺️</div>
+      </div>
+      <p style="text-align: center; color: #8a8a93; margin-top: 40px; font-style: italic;">Новые криминальные районы откроются на 3 уровне...</p>
     </div>
   </section>
 
@@ -79,8 +133,9 @@
     <button class="tab" data-tab="map">🗺️<small>Районы</small></button>
     <button class="tab" data-tab="shop">🛒<small>Рынок</small></button>
     <button class="tab" data-tab="profile">👤<small>Персонаж</small></button>
-</nav>
- <script src="app.js?v=100"></script>
+  </nav>
+
+  <script src="app.js?v=101"></script>
 </main>
- </body>
- </html>
+</body>
+</html>
