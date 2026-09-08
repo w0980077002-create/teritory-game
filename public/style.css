@@ -4,37 +4,347 @@
     padding: 0;
 }
 
+html,
 body {
-    background: #0d1117;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    background: #080b10;
     color: #ffffff;
     font-family: Arial, sans-serif;
-    min-height: 100vh;
+    overflow-x: hidden;
 }
 
 button {
     font-family: inherit;
     cursor: pointer;
+    color: inherit;
+    border: 0;
+    -webkit-tap-highlight-color: transparent;
 }
+
+button:active {
+    transform: scale(0.97);
+}
+
+
+/* =========================================
+   ОСНОВА ИГРЫ
+   ========================================= */
 
 .game {
     width: 100%;
-    max-width: 600px;
+    max-width: 720px;
     min-height: 100vh;
-    margin: auto;
-    background: #111821;
-    padding-bottom: 80px;
+    margin: 0 auto;
+    background: #0d1117;
+    padding-bottom: 90px;
+}
+
+main {
+    width: 100%;
+}
+
+.screen {
+    display: none;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 15px 14px 95px;
+}
+
+.screen.active {
+    display: block;
+}
+
+.game-page {
+    display: none;
+    width: 100%;
+}
+
+.game-page.active {
+    display: block;
 }
 
 
-/* ВЕРХ */
+/* =========================================
+   ВЕРХНЯЯ ПАНЕЛЬ
+   ========================================= */
 
-.topbar {
-    height: 70px;
-    background: #171f2b;
-    border-bottom: 1px solid #293444;
+.topbar,
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    width: 100%;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 8px 14px;
+
+    background: #11161e;
+    border-bottom: 1px solid #292f39;
+
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+.logo,
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.logo {
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+}
+
+.logo-icon {
+    font-size: 23px;
+}
+
+.logo-badge {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #e74c3c, #92261c);
+
+    font-size: 21px;
+    font-weight: 900;
+
+    box-shadow: 0 5px 18px rgba(231, 76, 60, 0.25);
+}
+
+.brand-info h1 {
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.brand-info small {
+    display: block;
+    margin-top: 2px;
+    color: #858e9c;
+    font-size: 10px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.money,
+.coins {
+    padding: 7px 10px;
+
+    border-radius: 10px;
+
+    background: #1b212a;
+    border: 1px solid #303743;
+
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.level,
+.level-badge {
+    padding: 7px 9px;
+
+    border-radius: 10px;
+
+    background: #242b35;
+    border: 1px solid #353e4b;
+
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+
+/* =========================================
+   ЗАГОЛОВКИ
+   ========================================= */
+
+h1 {
+    font-size: 23px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+}
+
+h2 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.page-title {
+    margin: 5px 0 3px;
+
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.page-subtitle {
+    margin-bottom: 15px;
+
+    color: #8c96a5;
+    font-size: 13px;
+}
+
+.hero {
+    margin-bottom: 13px;
+    padding: 17px;
+
+    border-radius: 17px;
+
+    background: linear-gradient(
+        135deg,
+        #191f28,
+        #11151b
+    );
+
+    border: 1px solid #2a313d;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.hero-title {
+    font-size: 21px;
+    font-weight: 900;
+}
+
+.hero-subtitle {
+    margin-top: 5px;
+
+    color: #8c96a5;
+    font-size: 13px;
+}
+
+
+/* =========================================
+   КАРТОЧКИ
+   ========================================= */
+
+.character-card,
+.character-level-card,
+.character-preview-card,
+.battle-card,
+.battle,
+.stat-panel,
+.stats,
+.points-card,
+.inventory-info,
+.log-container {
+
+    width: 100%;
+
+    background: #12171f;
+
+    border: 1px solid #29313c;
+
+    border-radius: 16px;
+
+    padding: 14px;
+
+    box-shadow: 0 7px 24px rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================
+   ПЕРСОНАЖ
+   ========================================= */
+
+.avatar {
+    text-align: center;
+    padding: 8px;
+    margin-bottom: 12px;
+}
+
+.avatar-head {
+    font-size: 76px;
+}
+
+.avatar-name,
+.character-name {
+    font-size: 19px;
+    font-weight: 900;
+}
+
+.character-level {
+    margin-top: 4px;
+
+    color: #8d97a5;
+    font-size: 12px;
+}
+
+.level-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.level-number {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #272e39;
+    border: 1px solid #424b59;
+
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.exp-info {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+
+    margin-top: 12px;
+    margin-bottom: 5px;
+
+    color: #8f99a8;
+    font-size: 11px;
+}
+
+.exp-bar {
+    width: 100%;
+    height: 9px;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background: #292e37;
+}
+
+.exp-fill {
+    height: 100%;
+    width: 0;
+
+    border-radius: inherit;
+
+    background: #8d63ff;
+
+    transition: width 0.25s    align-items: center;
     padding: 0 18px;
 }
 
