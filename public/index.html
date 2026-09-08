@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-version="202">
+<html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -25,7 +25,7 @@
   <section class="screen">
     <div id="notice" class="notice"></div>
 
-    <!-- 1. ЭКРАН БОЯ (АРЕНА) -->
+    <!-- 1. ЭКРАН БОЯ -->
     <div id="page-home" class="game-page">
       <div class="hero">
         <div>
@@ -34,7 +34,6 @@
         </div>
         <div class="shield">🥊</div>
       </div>
-
       <div class="battle">
         <div class="enemyname">⚔️ Противник: <span id="enemyhp">100/100</span></div>
         <div class="bars-container">
@@ -43,120 +42,84 @@
           <div class="bar-label">Враг:</div>
           <div class="bar"><i class="enemy-hp-bar" style="width: 100%; background: #e74c3c; display: block; height: 100%;"></i></div>
         </div>
-
         <div class="zone-title">КУДА АТАКУЕМ:</div>
         <div class="powers">
           <button class="attack-zone" data-zone="head">Голова</button>
           <button class="attack-zone" data-zone="torso">Корпус</button>
           <button class="attack-zone" data-zone="legs">Ноги</button>
         </div>
-
         <div class="zone-title">ЧТО БЛОКИРУЕМ:</div>
         <div class="powers">
           <button class="block-zone" data-zone="head">Голова</button>
           <button class="block-zone" data-zone="torso">Корпус</button>
           <button class="block-zone" data-zone="legs">Ноги</button>
         </div>
-
         <button id="attack" class="attack">⚔️ СДЕЛАТЬ ХОД</button>
       </div>
-
       <div class="log-container">
         <div class="log-title">История боя:</div>
-        <div id="battle-log" class="battle-log">
-          <p>Ожидание вашего хода...</p>
-        </div>
+        <div id="battle-log" class="battle-log"><p>Ожидание вашего хода...</p></div>
       </div>
     </div>
-    <!-- 2. ЭКРАН МАГАЗИНА (РЫНОК) -->
+
+    <!-- 2. ЭКРАН МАГАЗИНА -->
     <div id="page-shop" class="game-page" style="display: none;">
       <div class="hero">
-        <div>
-          <small>ОРУЖЕЙНАЯ ЛАВКА</small>
-          <h1>Рынок Территории</h1>
-        </div>
+        <div><small>ОРУЖЕЙНАЯ ЛАВКА</small><h1>Рынок</h1></div>
         <div class="shield">🛒</div>
       </div>
       <div class="shop-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h3 style="font-size: 14px;">🥊 Кожаные кастеты</h3>
-            <small style="color: #2ecc71;">+3 к Силе удара</small>
-          </div>
-          <button id="buy-knuckles" style="background: #f1c40f; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #121216;">500 🪙</button>
+        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+          <div><h3>🥊 Кожаные кастеты</h3><small style="color:#2ecc71">+3 к Силе</small></div>
+          <button id="buy-knuckles" style="background:#f1c40f; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#121216">500 🪙</button>
         </div>
-        <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h3 style="font-size: 14px;"🔪 Охотничий нож</h3>
-            <small style="color: #2ecc71;">+8 к Силе удара</small>
-          </div>
-          <button id="buy-knife" style="background: #f1c40f; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #121216;">1200 🪙</button>
+        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+          <div><h3>🔪 Охотничий нож</h3><small style="color:#2ecc71">+8 к Силе</small></div>
+          <button id="buy-knife" style="background:#f1c40f; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#121216">1200 🪙</button>
         </div>
       </div>
     </div>
 
-    <!-- 3. ЭКРАН ПЕРСОНАЖА (ПРОФИЛЬ) -->
+    <!-- 3. ЭКРАН ПЕРСОНАЖА -->
     <div id="page-profile" class="game-page" style="display: none;">
       <div class="hero">
-        <div>
-          <small>ЛИЧНОЕ ДЕЛО</small>
-          <h1>Ваш Боец</h2>
-        </div>
+        <div><small>ЛИЧНОЕ ДЕЛО</small><h1>Ваш Боец</h1></div>
         <div class="shield">👤</div>
       </div>
-      <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 14px; border-radius: 12px; margin-top: 10px; display: flex; flex-direction: column; gap: 12px;">
-        <p style="color: #f1c40f; font-weight: bold; display: none;" id="prof-points-box">✨ Свободные очки: <span id="prof-points">0</span></p>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2b2b33; padding-bottom: 6px;">
+      <div style="background:#1f1f24; border:1px solid #2b2b33; padding:14px; border-radius:12px; margin-top:10px; display:flex; flex-direction:column; gap:12px;">
+        <p style="color:#f1c40f; font-weight:bold; display:none;" id="prof-points-box">✨ Очки прокачки: <span id="prof-points">0</span></p>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2b2b33; padding-bottom:6px;">
           <span>💪 Сила: <b id="prof-power">5</b></span>
-          <button id="up-power" style="display: none; background: #2ecc71; border: none; color: white; width: 28px; height: 28px; font-weight: bold; border-radius: 6px; font-size: 16px;">+</button>
+          <button id="up-power" style="display:none; background:#2ecc71; border:none; color:white; width:28px; height:28px; font-weight:bold; border-radius:6px;">+</button>
         </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2b2b33; padding-bottom: 6px;">
-          <span>⚡ Ловкость (Крит): <b id="prof-agility">5</b></span>
-          <button id="up-agility" style="display: none; background: #2ecc71; border: none; color: white; width: 28px; height: 28px; font-weight: bold; border-radius: 6px; font-size: 16px;">+</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2b2b33; padding-bottom:6px;">
+          <span>⚡ Ловкость: <b id="prof-agility">5</b></span>
+          <button id="up-agility" style="display:none; background:#2ecc71; border:none; color:white; width:28px; height:28px; font-weight:bold; border-radius:6px;">+</button>
         </div>
-
-        <p>🎒 Экипировано: <b id="prof-weapon">Кулаки</b></p>
-        <p>🏆 Всего побед: <b id="prof-victories">0</b></p>
-        
-        <button id="reset-progress" style="background: #e74c3c; border: none; color: white; padding: 10px; border-radius: 8px; font-weight: bold; margin-top: 10px; font-size: 12px;">Обнулить прогресс</button>
+        <p>🎒 Оружие: <b id="prof-weapon">Кулаки</b></p>
+        <p>🏆 Побед: <b id="prof-victories">0</b></p>
+        <button id="reset-progress" style="background:#e74c3c; border:none; color:white; padding:10px; border-radius:8px; font-weight:bold; font-size:12px">Сбросить игру</button>
       </div>
     </div>
 
-    <!-- 4. ЭКРАН РАЙОНОВ (ВЫБОР ВРАГОВ) -->
+    <!-- 4. ЭКРАН РАЙОНОВ -->
     <div id="page-map" class="game-page" style="display: none;">
       <div class="hero">
-        <div>
-          <small>КАРТА ГОРОДА</small>
-          <h1>Районы Территории</h1>
-        </div>
+        <div><small>КАРТА ГОРОДА</small><h1>Районы</h1></div>
         <div class="shield">🗺️</div>
       </div>
-      
       <div class="district-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h3 style="font-size: 14px;">🐾 Бродячая крыса</h3>
-            <small style="color: #8a8a93;">40 HP • Награда: +60 🪙</small>
-          </div>
-          <button onclick="changeEnemy('Бродячая крыса', 40, 2, 60)" style="background: #e74c3c; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #fff;">В БОЙ</button>
+        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+          <div><h3>🐾 Бродячая крыса</h3><small style="color:#8a8a93">40 HP • Награда: +60 🪙</small></div>
+          <button class="select-enemy" data-type="rat" style="background:#e74c3c; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#fff">В БОЙ</button>
         </div>
-
-        <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h3 style="font-size: 14px;">🥊 Местный хулиган</h3>
-            <small style="color: #8a8a93;">100 HP • Награда: +200 🪙</small>
-          </div>
-          <button onclick="changeEnemy('Местный хулиган', 100, 4, 200)" style="background: #e74c3c; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #fff;">В БОЙ</button>
+        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+          <div><h3>🥊 Местный хулиган</h3><small style="color:#8a8a93">100 HP • Награда: +200 🪙</small></div>
+          <button class="select-enemy" data-type="thug" style="background:#e74c3c; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#fff">В БОЙ</button>
         </div>
-
-        <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-color: #f1c40f;">
-          <div>
-            <h3 style="font-size: 14px; color: #f1c40f;">👹 Главарь промзоны [БОСС]</h3>
-            <small style="color: #8a8a93;">220 HP • Награда: +600 🪙</small>
-          </div>
-          <button onclick="changeEnemy('Главарь промзоны [БОСС]', 220, 9, 600)" style="background: #f1c40f; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #121216;">В БОЙ</button>
+        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; border-color:#f1c40f">
+          <div><h3 style="color:#f1c40f">👹 Главарь промзоны [БОСС]</h3><small style="color:#8a8a93">220 HP • Награда: +600 🪙</small></div>
+          <button class="select-enemy" data-type="boss" style="background:#f1c40f; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#121216">В БОЙ</button>
         </div>
       </div>
     </div>
@@ -168,253 +131,8 @@
     <button class="tab" data-tab="shop">🛒<small>Рынок</small></button>
     <button class="tab" data-tab="profile">👤<small>Персонаж</small></button>
   </nav>
-  <script>
-    var playerHp = 120;
-    var playerMaxHp = 120;
-    var enemyHp = 100;
-    var enemyMaxHp = 100;
-    var coins = 1000;
-    
-    var level = 1;
-    var victories = 0;
-    var basePower = 5;      
-    var agility = 5;        
-    var weaponBonus = 0;    
-    var weaponName = "Кулаки";
-    var freePoints = 0;     
 
-    var enemyName = "Местный хулиган";
-    var enemyPower = 4;
-    var enemyPrize = 200;
-
-    var selectedAttack = null;
-    var selectedBlock = null;
-
-    try {
-      var saved = localStorage.getItem("territory_save_v5");
-      if (saved) {
-        var p = JSON.parse(saved);
-        if (p && typeof p.basePower === "number") {
-          playerHp = p.playerHp; playerMaxHp = p.playerMaxHp; coins = p.coins;
-          level = p.level; victories = p.victories; basePower = p.basePower;
-          agility = p.agility; weaponBonus = p.weaponBonus; weaponName = p.weaponName;
-          freePoints = p.freePoints;
-          if (p.enemyName) {
-            enemyName = p.enemyName; enemyHp = p.enemyHp; enemyMaxHp = p.enemyMaxHp;
-            enemyPower = p.enemyPower; enemyPrize = p.enemyPrize;
-          }
-        }
-      }
-    } catch(e) {}
-
-    function saveGame() {
-      try {
-        var data = {
-          playerHp: playerHp, playerMaxHp: playerMaxHp, coins: coins,
-          level: level, victories: victories, basePower: basePower,
-          agility: agility, weaponBonus: weaponBonus, weaponName: weaponName,
-          freePoints: freePoints, enemyName: enemyName, enemyHp: enemyHp,
-          enemyMaxHp: enemyMaxHp, enemyPower: enemyPower, enemyPrize: enemyPrize
-        };
-        localStorage.setItem("territory_save_v5", JSON.stringify(data));
-      } catch(e) {}
-    }
-
-    function showNotice(text) {
-      var n = document.getElementById("notice");
-      if (n) {
-        n.textContent = text; n.style.display = "block";
-        setTimeout(function() { n.style.display = "none"; }, 2000);
-      }
-    }
-
-    function updateUI() {
-      document.getElementById("playerhp").textContent = playerHp + "/" + playerMaxHp;
-      document.getElementById("enemyhp").textContent = enemyHp + "/" + enemyMaxHp;
-      document.getElementById("coins").textContent = coins;
-      document.getElementById("level").textContent = "Уровень " + level;
-      
-      var aTitle = document.getElementById("arena-title");
-      if (aTitle) aTitle.textContent = enemyName;
-
-      var nameLabel = document.querySelector(".enemyname");
-      if (nameLabel) nameLabel.innerHTML = "⚔️ Противник: <span>" + enemyHp + "/" + enemyMaxHp + "</span>";
-
-      document.getElementById("prof-victories").textContent = victories;
-      document.getElementById("prof-power").textContent = basePower + " (+" + weaponBonus + ")";
-      document.getElementById("prof-agility").textContent = agility;
-      document.getElementById("prof-weapon").textContent = weaponName;
-
-      var ptsBox = document.getElementById("prof-points-box");
-      var btnP = document.getElementById("up-power");
-      var btnA = document.getElementById("up-agility");
-      
-      if (freePoints > 0) {
-        if (ptsBox) ptsBox.style.display = "block";
-        document.getElementById("prof-points").textContent = freePoints;
-        if (btnP) btnP.style.display = "block";
-        if (btnA) btnA.style.display = "block";
-      } else {
-        if (ptsBox) ptsBox.style.display = "none";
-        if (btnP) btnP.style.display = "none";
-        if (btnA) btnA.style.display = "none";
-      }
-
-      var pPhp = document.querySelector(".player-hp-bar");
-      if (pPhp) pPhp.style.width = ((playerHp / playerMaxHp) * 100) + "%";
-
-      var pEhp = document.querySelector(".enemy-hp-bar");
-      if (pEhp) pEhp.style.width = ((enemyHp / enemyMaxHp) * 100) + "%";
-    }
-
-    var tabs = document.querySelectorAll(".tab");
-    tabs.forEach(function(tab) {
-      tab.onclick = function() {
-        tabs.forEach(function(x) { x.classList.remove("active"); });
-        tab.classList.add("active");
-
-        document.querySelectorAll(".game-page").forEach(function(page) {
-          page.style.display = "none";
-        });
-        
-        var targetPage = "page-" + tab.getAttribute("data-tab");
-        if (document.getElementById(targetPage)) {
-          document.getElementById(targetPage).style.display = "block";
-        }
-        updateUI();
-      };
-    });
-
-    window.changeEnemy = function(name, hp, power, prize) {
-      enemyName = name; enemyHp = hp; enemyMaxHp = hp; enemyPower = power; enemyPrize = prize;
-      saveGame(); updateUI();
-      tabs.forEach(function(x) { x.classList.remove("active"); });
-      document.querySelector("[data-tab='home']").classList.add("active");
-      document.querySelectorAll(".game-page").forEach(function(p) { p.style.display = "none"; });
-      document.getElementById("page-home").style.display = "block";
-      var logBox = document.getElementById("battle-log");
-      if (logBox) logBox.innerHTML = "<p>Вы выследили новую цель: " + name + ". Бой начался!</p>";
-      showNotice("🎯 Цель выбрана!");
-    };
-
-    var attackBtns = document.querySelectorAll(".attack-zone");
-    attackBtns.forEach(function(btn) {
-      btn.onclick = function() {
-        attackBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
-        btn.style.backgroundColor = "#e74c3c";
-        selectedAttack = btn.getAttribute("data-zone");
-      };
-    });
-
-    var blockBtns = document.querySelectorAll(".block-zone");
-    blockBtns.forEach(function(btn) {
-      btn.onclick = function() {
-        blockBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
-        btn.style.backgroundColor = "#2ecc71";
-        selectedBlock = btn.getAttribute("data-zone");
-      };
-    });
-
-    document.getElementById("attack").onclick = function() {
-      if (!selectedAttack || !selectedBlock) {
-        alert("Выберите зоны Атаки и Блока!"); return;
-      }
-      if (playerHp <= 0 || enemyHp <= 0) {
-        alert("Поединок завершен!"); return;
-      }
-
-      var zones = ["head", "torso", "legs"];
-      var zoneNames = { head: "Голову", torso: "Корпус", legs: "Ноги" };
-      var enemyAttack = zones[Math.floor(Math.random() * zones.length)];
-      var enemyBlock = zones[Math.floor(Math.random() * zones.length)];
-      var logText = "<b>--- Раунд ---</b><br>";
-
-      if (selectedAttack === enemyBlock) {
-        logText += "🛡️ Враг заблокировал ваш удар.<br>";
-      } else {
-        var dmg = Math.floor(Math.random() * 5) + basePower + weaponBonus;
-        if (Math.random() * 100 < (agility * 2.5)) {
-          dmg = Math.floor(dmg * 1.5);
-          logText += "💥 Критический удар! Пробита " + zoneNames[selectedAttack] + " на <b>-" + dmg + " HP</b>.<br>";
-        } else {
-          logText += "⚔️ Вы нанесли удар в " + zoneNames[selectedAttack] + " на <b>-" + dmg + " HP</b>.<br>";
-        }
-        enemyHp = Math.max(enemyHp - dmg, 0);
-      }
-
-      if (enemyAttack === selectedBlock) {
-        logText += "🛡️ Вы заблокировали удар противника.<br>";
-      } else {
-        var finalEnemyDmg = Math.floor(Math.random() * 4) + enemyPower;
-        playerHp = Math.max(playerHp - finalEnemyDmg, 0);
-        logText += "🩸 Враг провел атаку в " + zoneNames[enemyAttack] + " на <b>-" + finalEnemyDmg + " HP</b>.<br>";
-      }
-
-      var p = document.createElement("p");
-      p.innerHTML = logText;
-      var logBox = document.getElementById("battle-log");
-      if (logBox) logBox.insertBefore(p, logBox.firstChild);
-
-      updateUI();
-
-      if (enemyHp <= 0) {
-        victories++; coins += enemyPrize;
-        addSystemMessage("<br>🏆 <b>Победа! Получено +" + enemyPrize + " 🪙</b>");
-        if (victories % 3 === 0) {
-          level++; freePoints += 3; playerMaxHp += 15;
-          addSystemMessage("<br>⬆️ <b>Новый Уровень: " + level + "! Получено 3 очка характеристик. Загляните в меню Персонаж!</b>");
-        }
-        autoResetBattle();
-      } else if (playerHp <= 0) {
-        addSystemMessage("<br>☠️ <b>Вы проиграли этот бой. Восстановление...</b>");
-        autoResetBattle();
-      }
-
-      selectedAttack = null; selectedBlock = null;
-      attackBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
-      blockBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
-      saveGame();
-    };
-
-    function addSystemMessage(htmlText) {
-      var p = document.createElement("p"); p.innerHTML = htmlText;
-      var logBox = document.getElementById("battle-log");
-      if (logBox) logBox.insertBefore(p, logBox.firstChild);
-    }
-
-    function autoResetBattle() {
-      saveGame();
-      setTimeout(function() {
-        playerHp = playerMaxHp; enemyHp = enemyMaxHp; 
-        var logBox = document.getElementById("battle-log");
-        if (logBox) logBox.innerHTML = "<p>Ожидание вашего хода...</p>";
-        updateUI();
-      }, 3500);
-    }
-
-    document.getElementById("buy-knuckles").onclick = function() {
-      if (coins >= 500) {
-        coins -= 500; weaponName = "Кожаные кастеты"; weaponBonus = 3;
-        saveGame(); updateUI(); showNotice("🥊 Кастеты куплены!");
-      } else { showNotice("❌ Недостаточно монет!"); }
-    };
-
-    document.getElementById("buy-knife").onclick = function() {
-      if (coins >= 1200) {
-        coins -= 1200; weaponName = "Охотничий нож"; weaponBonus = 8;
-        saveGame(); updateUI(); showNotice("🔪 Нож куплен!");
-      } else { showNotice("❌ Недостаточно монет!"); }
-    };
-
-    document.getElementById("up-power").onclick = function() {
-      if (freePoints > 0) { freePoints--; basePower++; saveGame(); updateUI(); }
-    };
-
-    document.getElementById("up-agility").onclick = function() {
-      if (freePoints > 0) { freePoints--; agility++; saveGame(); updateUI(); }
-    };
-
-    document.getElementById("reset-progress").onclick = function() {
-      if (confirm("Вы точно хотите обнулить весь прогресс?")) {
-        localStorage.clear();
-        playerHp = 120; playerMaxHp = 120; enemyHp = 100; enemyMaxHp = 100; coins = 1000;
+  <script src="app.js?v=205"></script>
+</main>
+</body>
+</html>
