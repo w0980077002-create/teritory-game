@@ -1,19 +1,85 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Teritory</title><script src="https://telegram.org/js/telegram-web-app.js"></script><link rel="stylesheet" href="style.css">
-</head><link rel="stylesheet" href="style.css">
-<body><main class="app">
-<header><div class="brand"><div class="logo">T</div><div><b>TERITORY</b><small id="level">Уровень 1</small></div></div><div class="res"><span>🪙 <b id="coins">1000</b></span><span>💎 <b id="gems">50</b></span><span>⚡ <b id="energy">100</b></span></div></header>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Territory</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">T</div>
+      <div>
+        <b>TERRITORY</b>
+        <small id="level">Уровень 1</small>
+      </div>
+    </div>
+    <div class="res">
+      <span>🪙 <b id="coins">1000</b></span>
+      <span>🩸 <b id="playerhp">120/120</b></span>
+    </div>
+  </header>
 
-<section class="screen">
-<div id="notice" class="notice"></div>
-<div class="hero"><div><small>ТВОЯ ТЕРРИТОРИЯ</small><h1>Порт Территории</h1><p>Уровень <b id="territory">1</b> • Сила <b id="power">10</b></p></div><div class="shield">🛡️</div></div>
-<div class="map"><div class="cloud c1"></div><div class="cloud c2"></div><div class="land l1">🏝️</div><div class="land l2">🌴</div><div class="ship">⛵</div><div class="herochar">🧙</div><div class="enemy">👹</div><div class="route"></div></div>
-<div class="battle"><div class="enemyname">⚔️ Вражеский остров <span id="enemyhp">100</span> HP</div><div class="bar"><i id="hpbar"></i></div><div class="powers">
-<button class="skill active" data-damage="10">🏹<small>Выстрел</small></button><button class="skill" data-damage="15">🌀<small>Шторм</small></button><button class="skill" data-damage="20">🔥<small>Огонь</small></button><button class="skill" data-damage="25">💥<small>Удар</small></button>
-</div><button id="attack" class="attack">⚔ АТАКОВАТЬ</button></div>
-</section>
-<nav><button class="tab active" data-tab="home">⚓<small>Порт</small></button><button class="tab" data-tab="map">🗺️<small>Территории</small></button><button class="tab" data-tab="shop">🛒<small>Магазин</small></button><button class="tab" data-tab="profile">👤<small>Профиль</small></button></nav>
-</main><script src="app.js"></script></body></html>
+  <section class="screen">
+    <div id="notice" class="notice"></div>
+    
+    <div class="hero">
+      <div>
+        <small>БОЙЦОВСКАЯ АРЕНА</small>
+        <h1>Уличный поединок</h1>
+      </div>
+      <div class="shield">🥊</div>
+    </div>
+
+    <!-- Блок Боя в стиле оригинальной Территории -->
+    <div class="battle">
+      <div class="enemyname">⚔️ Противник: <span id="enemyhp">100/100</span></div>
+      
+      <!-- Полоски здоровья -->
+      <div class="bars-container">
+        <div class="bar-label">Вы:</div>
+        <div class="bar"><i class="player-hp-bar" style="width: 100%; background: #2ecc71;"></i></div>
+        <div class="bar-label">Враг:</div>
+        <div class="bar"><i class="enemy-hp-bar" style="width: 100%; background: #e74c3c;"></i></div>
+      </div>
+
+      <!-- Выбор зоны Атаки -->
+      <div class="zone-title">КУДА АТАКУЕМ:</div>
+      <div class="powers">
+        <button class="attack-zone" data-zone="head">👤 Голова</button>
+        <button class="attack-zone" data-zone="torso">👕 Корпус</button>
+        <button class="attack-zone" data-zone="legs">👖 Ноги</button>
+      </div>
+
+      <!-- Выбор зоны Блока -->
+      <div class="zone-title">ЧТО БЛОКИРУЕМ:</div>
+      <div class="powers">
+        <button class="block-zone" data-zone="head">👤 Голова</button>
+        <button class="block-zone" data-zone="torso">👕 Корпус</button>
+        <button class="block-zone" data-zone="legs">👖 Ноги</button>
+      </div>
+
+      <button id="attack" class="attack">⚔️ СДЕЛАТЬ ХОД</button>
+    </div>
+
+    <!-- Текстовый лог боя, как в оригинале 2004 года -->
+    <div class="log-container">
+      <div class="log-title">История боя:</div>
+      <div id="battle-log" class="battle-log">
+        <p class="system-msg">🔄 Ожидание вашего хода...</p>
+      </div>
+    </div>
+  </section>
+
+  <nav>
+    <button class="tab active" data-tab="home">🥊<small>Арена</small></button>
+    <button class="tab" data-tab="map">🗺️<small>Районы</small></button>
+    <button class="tab" data-tab="shop">🛒<small>Рынок</small></button>
+    <button class="tab" data-tab="profile">👤<small>Персонаж</small></button>
+  </nav>
+</main>
+</body>
+</html>
