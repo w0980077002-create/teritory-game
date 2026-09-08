@@ -1,107 +1,129 @@
-import * as THREE from "three";
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const cors = require('cors');
+const path = require('path');
 
-/* =========================================================
-   TERRITORY
-   Персонаж + инвентарь + экипировка + 3D + бой + магазин
-   ========================================================= */
+const app = express();
+const PORT = process.env.PORT || 3000;
 
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-/* =========================================================
-   НАСТРОЙКИ
-   ========================================================= */
+// Подключение базы данных SQLite
+const db = new sqlite3.Database('./game.db', (err) => {
+    if (err) console.error('Ошибка БД:', err.message);
+    console.log('База данных Territory подключена.');
+});
 
-const SAVE_KEY = "territory_save";
+// Создание таблиц при запуске
+db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+        tg_id INTEGER PRIMARY KEY,
+        username TEXT,
+        lvl INTEGER DEFAULT 1,
+        exp INTEGER DEFAULT 0,
+        coins INTEGER DEFAULT 300,
+        hp_max INTEGER DEFAULT 120,
+        damage_bonus INTEGER DEFAULT 0
+    )`);
+});
 
-const $ = (id) => document.getElementById(id);
+// Список товаров для Магазина
+const SHOP_ITEMS = [
+    { id: 'brass_knuckles', name: 'Стальной кастет', price: 200, bonus: 5, icon: '👊' },
+    { id: 'tactical_knife', name: 'Охотничий нож', price: 500, bonus: 12, icon: '🔪' },
+    { id: 'baton', name: 'Дубинка', price: 1000, bonus: 25, icon: '🥖' }
+];
 
+// 1. Авторизация игрока
+app.post('/api/auth', (req, res) => {
+    const { tg_id, username } = req.body;
+    if (!tg_id) return res.status(400).json({ error: 'No Telegram ID' });
 
-/* =========================================================
-   ПРЕДМЕТЫ
-   ========================================================= */
+    db.get(`SELECT * FROM users WHERE tg_id = ?`, [tg_id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (row) {
+            res.json({ user: row });
+        } else {
+            db.run(`INSERT INTO users (tg_id, username) VALUES (?, ?)`, [tg_id, username || 'Игрок'], function(err) {
+                if (err) return res.status(500).json({ error: err.message });
+                db.get(`SELECT * FROM users WHERE tg_id = ?`, [tg_id], (err, newRow) => {
+                    res.json({ user: newRow });
+                });
+            });
+        }
+    });
+});
 
-const ITEMS = {
+// 2. Расчет раунда боя (Атака + Блок)
+app.post('/api/battle/turn', (req, res) => {
+    const { tg_id, attackZone, defendZone, enemyHpCurrent, playerHpCurrent } = req.body;
 
-  fists: {
-    id: "fists",
-    name: "Кулаки",
-    icon: "👊",
-    type: "weapon",
-    slot: "hand",
-    damage: 0,
-    weight: 0,
-    price: 0,
-    description: "Твои руки. Всегда с тобой."
-  },
+    db.get(`SELECT * FROM users WHERE tg_id = ?`, [tg_id], (err, user) => {
+        if (err || !user) return res.status(404).json({ error: 'Игрок не найден' });
 
-  brass: {
-    id: "brass",
-    name: "Кастеты",
-    icon: "🥊",
-    type: "weapon",
-    slot: "hand",
-    damage: 5,
-    weight: 1,
-    price: 150,
-    description: "+5 к урону"
-  },
+        const zones = ['head', 'body', 'legs'];
+        const enemyAttack = zones[Math.floor(Math.random() * 3)];
+        const enemyDefend = zones[Math.floor(Math.random() * 3)];
 
-  knife: {
-    id: "knife",
-    name: "Нож",
-    icon: "🔪",
-    type: "weapon",
-    slot: "hand",
-    damage: 12,
-    crit: 5,
-    weight: 1,
-    price: 400,
-    description: "+12 урона, +5% крит"
-  },
+        // Базовый урон + бонус от купленного оружия
+        let pDamage = Math.floor(Math.random() * 11) + 10 + user.damage_bonus; 
+        let eDamage = Math.floor(Math.random() * 9) + 8;
 
-  cap: {
-    id: "cap",
-    name: "Кепка",
-    icon: "🧢",
-    type: "armor",
-    slot: "head",
-    defense: 2,
-    agility: 1,
-    weight: 0.3,
-    price: 120,
-    description: "+2 защита, +1 ловкость"
-  },
+        let pSuccess = true;
+        let eSuccess = true;
 
-  hoodie: {
-    id: "hoodie",
-    name: "Худи",
-    icon: "🧥",
-    type: "armor",
-    slot: "body",
-    defense: 5,
-    maxHp: 10,
-    weight: 1.2,
-    price: 250,
-    description: "+5 защита, +10 макс. HP"
-  },
+        // Проверка блока врага
+        if (attackZone === enemyDefend) { pDamage = 0; pSuccess = false; }
+        else if (attackZone === 'head') { pDamage = Math.floor(pDamage * 1.5); }
 
-  pants: {
-    id: "pants",
-    name: "Тактические штаны",
-    icon: "👖",
-    type: "armor",
-    slot: "legs",
-    defense: 3,
-    strength: 1,
-    weight: 0.8,
-    price: 180,
-    description: "+3 защита, +1 сила"
-  },
+        // Проверка блока игрока
+        if (enemyAttack === defendZone) { eDamage = 0; eSuccess = false; }
+        else if (enemyAttack === 'head') { eDamage = Math.floor(eDamage * 1.5); }
 
-  shoes: {
-    id: "shoes",
-    name: "Кроссовки",
-    icon: "👟",
-    type: "armor",
+        const nextEnemyHp = Math.max(0, enemyHpCurrent - pDamage);
+        const nextPlayerHp = Math.max(0, playerHpCurrent - eDamage);
+
+        let battleOver = false;
+        let winner = null;
+        let reward = 0;
+
+        if (nextEnemyHp <= 0 && nextPlayerHp <= 0) { battleOver = true; winner = 'draw'; }
+        else if (nextEnemyHp <= 0) {
+            battleOver = true; winner = 'player';
+            reward = Math.floor(Math.random() * 40) + 20;
+            db.run(`UPDATE users SET coins = coins + ? WHERE tg_id = ?`, [reward, tg_id]);
+        } else if (nextPlayerHp <= 0) { battleOver = true; winner = 'enemy'; }
+
+        res.json({
+            pSuccess, pDamage, eSuccess, eDamage,
+            enemyAction: { attack: enemyAttack, defend: enemyDefend },
+            nextEnemyHp, nextPlayerHp, battleOver, winner, reward
+        });
+    });
+});
+
+// 3. Получить товары рынка
+app.get('/api/shop', (req, res) => res.json(SHOP_ITEMS));
+
+// 4. Купить оружие
+app.post('/api/shop/buy', (req, res) => {
+    const { tg_id, item_id } = req.body;
+    const item = SHOP_ITEMS.find(i => i.id === item_id);
+    if (!item) return res.status(404).json({ error: 'Item not found' });
+
+    db.get(`SELECT coins FROM users WHERE tg_id = ?`, [tg_id], (err, user) => {
+        if (user.coins < item.price) return res.status(400).json({ error: 'Недостаточно монет!' });
+
+        db.run(`UPDATE users SET coins = coins - ?, damage_bonus = damage_bonus + ? WHERE tg_id = ?`, 
+            [item.price, item.bonus, tg_id], () => {
+                res.json({ success: true, newCoins: user.coins - item.price, bonus: item.bonus, name: item.name });
+            });
+    });
+});
+
+app.listen(PORT, () => console.log(`Сервер работает на порту ${PORT}`));
     slot: "feet",
     defense: 2,
     agility: 2,
