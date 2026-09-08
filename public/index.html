@@ -17,7 +17,7 @@
             <div class="logo-badge">T</div>
             <div class="brand-info">
                 <h1>TERRITORY</h1>
-                <small>Уровень 1</small>
+                <small id="header-level">Уровень 1</small>
             </div>
         </div>
         <div class="res">
@@ -114,10 +114,39 @@
             <div class="hero">
                 <div class="battle-title">Характеристики</div>
                 <div class="enemyname">Ваш Персонаж <span>👤</span></div>
-                <p style="margin-top: 12px; font-size: 15px;">Уровень: <span style="float: right; font-weight: bold; color: #f1c40f;">1</span></p>
+                
+                <!-- Полоска Опыта -->
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 12px; color: #8a8a93; margin-bottom: 4px;">
+                        Опыт: <span id="exp-text" style="float: right; color: #f1c40f; font-weight: bold;">0 / 100 XP</span>
+                    </div>
+                    <div class="hp-bar-bg" style="height: 6px;">
+                        <div id="exp-fill" style="height: 100%; width: 0%; background-color: #f1c40f; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+
+                <p style="margin-top: 10px; font-size: 15px;">Уровень: <span id="prof-level" style="float: right; font-weight: bold; color: #f1c40f;">1</span></p>
                 <p style="margin-top: 10px; font-size: 15px;">Оружие в руках: <span id="prof-weapon" style="float: right; font-weight: bold; color: #e74c3c;">Кулаки</span></p>
                 <p style="margin-top: 10px; font-size: 15px;">Текущий урон: <span id="prof-damage" style="float: right; font-weight: bold;">15</span></p>
-                <p style="margin-top: 10px; font-size: 15px;">Макс. здоровье: <span style="float: right; color: #2ecc71; font-weight: bold;">120 HP</span></p>
+                <p style="margin-top: 10px; font-size: 15px;">Макс. здоровье: <span id="prof-maxhp" style="float: right; color: #2ecc71; font-weight: bold;">120 HP</span></p>
+                
+                <hr style="border-color: #252533; margin: 14px 0;">
+                
+                <!-- Уведомление о свободных очках -->
+                <div id="free-points-block" style="background-color: rgba(241, 196, 15, 0.1); border: 1px dashed #f1c40f; border-radius: 6px; padding: 8px; margin-bottom: 12px; display: none; text-align: center; color: #f1c40f;">
+                    Доступно очков прокачки: <b id="prof-free">0</b>
+                </div>
+
+                <!-- Сила и Ловкость с кнопками прокачки -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 15px;">
+                    <span>💪 Сила (Криты): <b id="prof-str" style="color: #fff; margin-left: 6px;">5</b></span>
+                    <button id="add-str" class="add-stat-btn" style="padding: 2px 10px; font-weight: bold; background-color: #f1c40f; color: #111; border: none; display: none;">+</button>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 15px;">
+                    <span>💨 Ловкость (Увороты): <b id="prof-agi" style="color: #fff; margin-left: 6px;">5</b></span>
+                    <button id="add-agi" class="add-stat-btn" style="padding: 2px 10px; font-weight: bold; background-color: #f1c40f; color: #111; border: none; display: none;">+</button>
+                </div>
             </div>
         </div>
 
