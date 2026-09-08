@@ -19,9 +19,16 @@
       <div class="battle">
         <div class="enemyname">⚔️ Противник: <span id="enemyhp">100/100</span></div>
         <div class="bars-container">
-          <div class="bar-label">Вы:</div><div class="bar"><i class="player-hp-bar" style="width:100%;background:#2ecc71;display:block;height:100%"></i></div>
-          <div class="bar-label">Враг:</div><div class="bar"><i class="enemy-hp-bar" style="width:100%;background:#e74c3c;display:block;height:100%"></i></div>
-        </div>
+    <div class="bar-label">
+        Вы: <span id="hp-text-player">120/120</span>
+        <div class="hp-bar-bg"><div id="hp-fill-player" class="hp-fill player-hp" style="width: 100%;"></div></div>
+    </div>
+    <div class="bar-label">
+        Враг: <span id="hp-text-enemy">100/100</span>
+        <div class="hp-bar-bg"><div id="hp-fill-enemy" class="hp-fill enemy-hp" style="width: 100%;"></div></div>
+    </div>
+</div>
+
         <div class="zone-title">КУДА АТАКУЕМ:</div>
         <div class="powers"><button class="attack-zone" data-zone="head">Голова</button><button class="attack-zone" data-zone="torso">Корпус</button><button class="attack-zone" data-zone="legs">Ноги</button></div>
         <div class="zone-title">ЧТО БЛОКИРУЕМ:</div>
