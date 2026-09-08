@@ -466,3 +466,78 @@ nav{
     font-size:30px;
   }
 }
+.zone-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #aaa;
+  margin: 10px 0 4px 0;
+  text-align: left;
+  letter-spacing: 1px;
+}
+
+.attack-zone, .block-zone {
+  background: #2a2a32;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.attack-zone.active {
+  background: #e74c3c !important;
+  border-color: #ff6b6b;
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+}
+
+.block-zone.active {
+  background: #2ecc71 !important;
+  border-color: #2ecc71;
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+}
+
+.bars-container {
+  background: rgba(0,0,0,0.2);
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+.bar-label { margin-top: 3px; color: #bbb; text-align: left;}
+
+.player-hp-bar, .enemy-hp-bar {
+  display: block;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.log-container {
+  margin-top: 15px;
+  background: #1e1e24;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #333;
+}
+.log-title {
+  font-size: 12px;
+  color: #888;
+  border-bottom: 1px solid #333;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+  text-align: left;
+}
+.battle-log {
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 13px;
+  text-align: left;
+  line-height: 1.4;
+}
+.battle-log p {
+  margin: 4px 0;
+  border-bottom: 1px dashed #2a2a32;
+  padding-bottom: 4px;
+}
+.system-msg { color: #888; font-style: italic; }
