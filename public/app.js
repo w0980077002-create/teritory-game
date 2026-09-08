@@ -1,8 +1,9 @@
 import * as THREE from "three";
 
-/* =========================
-   TERRITORY — GAME STATE
-========================= */
+/* =========================================
+   TERRITORY
+   3D BATTLE + GAME LOGIC
+========================================= */
 
 var p = {
     hp: 120,
@@ -29,45 +30,61 @@ var selB = null;
 
 try {
     var saved = localStorage.getItem("territory_save");
+
     if (saved) {
         var parsed = JSON.parse(saved);
-        if (parsed) p = Object.assign(p, parsed);
+
+        if (parsed) {
+            p = Object.assign(p, parsed);
+        }
     }
 } catch (err) {}
 
 function save() {
     try {
-        localStorage.setItem("territory_save", JSON.stringify(p));
+        localStorage.setItem(
+            "territory_save",
+            JSON.stringify(p)
+        );
     } catch (err) {}
 }
 
 
-/* =========================
-   3D BATTLE
-========================= */
+/* =========================================
+   3D STATE
+========================================= */
 
 var battle3D = {
     container: null,
     scene: null,
     camera: null,
     renderer: null,
+
     player: null,
     enemy: null,
+
     playerParts: null,
     enemyParts: null,
+
     playerBase: null,
     enemyBase: null,
+
     initialized: false,
+
     playerAnimating: false,
-    enemyAnimating: false
+    enemyAnimating: false,
+
+    cameraShake: 0,
+    cameraShakePower: 0
 };
 
 
-/* =========================
-   MATERIALS
-========================= */
+/* =========================================
+   MATERIAL
+========================================= */
 
-function mat(color, roughness) {
+function makeMaterial(color, roughness) {
+
     return new THREE.MeshStandardMaterial({
         color: color,
         roughness: roughness || 0.7,
@@ -76,60 +93,105 @@ function mat(color, roughness) {
 }
 
 
-/* =========================
-   CREATE FIGHTER
-========================= */
+/* =========================================
+   FIGHTER
+========================================= */
 
 function createFighter(isPlayer) {
 
     var group = new THREE.Group();
 
-    var skin = mat(0xf0b48a);
-    var shirt = mat(isPlayer ? 0x2468ff : 0x9b2929);
-    var pants = mat(isPlayer ? 0x202636 : 0x181818);
-    var shoes = mat(0x090909);
-    var hair = mat(0x17120f);
+    var skin = makeMaterial(0xf0b48a);
+    var shirt = makeMaterial(
+        isPlayer ? 0x2468ff : 0xb52d2d
+    );
+    var pants = makeMaterial(
+        isPlayer ? 0x202636 : 0x171717
+    );
+    var shoes = makeMaterial(0x080808);
+    var hair = makeMaterial(0x15110e);
+
 
     /* Legs */
 
     var leftLeg = new THREE.Mesh(
-        new THREE.BoxGeometry(0.42, 1.15, 0.42),
+        new THREE.BoxGeometry(
+            0.42,
+            1.15,
+            0.42
+        ),
         pants
     );
 
     var rightLeg = new THREE.Mesh(
-        new THREE.BoxGeometry(0.42, 1.15, 0.42),
+        new THREE.BoxGeometry(
+            0.42,
+            1.15,
+            0.42
+        ),
         pants
     );
 
-    leftLeg.position.set(-0.25, 0.65, 0);
-    rightLeg.position.set(0.25, 0.65, 0);
+    leftLeg.position.set(
+        -0.25,
+        0.65,
+        0
+    );
+
+    rightLeg.position.set(
+        0.25,
+        0.65,
+        0
+    );
 
     group.add(leftLeg);
     group.add(rightLeg);
 
+
     /* Shoes */
 
     var leftShoe = new THREE.Mesh(
-        new THREE.BoxGeometry(0.48, 0.25, 0.75),
+        new THREE.BoxGeometry(
+            0.48,
+            0.25,
+            0.75
+        ),
         shoes
     );
 
     var rightShoe = new THREE.Mesh(
-        new THREE.BoxGeometry(0.48, 0.25, 0.75),
+        new THREE.BoxGeometry(
+            0.48,
+            0.25,
+            0.75
+        ),
         shoes
     );
 
-    leftShoe.position.set(-0.25, 0.08, 0.12);
-    rightShoe.position.set(0.25, 0.08, 0.12);
+    leftShoe.position.set(
+        -0.25,
+        0.08,
+        0.12
+    );
+
+    rightShoe.position.set(
+        0.25,
+        0.08,
+        0.12
+    );
 
     group.add(leftShoe);
     group.add(rightShoe);
 
+
     /* Body */
 
     var body = new THREE.Mesh(
-        new THREE.BoxGeometry(1.0, 1.25, 0.58),
+        new THREE.BoxGeometry(
+            1,
+            1.25,
+            0.58
+        ),
         shirt
     );
 
@@ -137,10 +199,15 @@ function createFighter(isPlayer) {
 
     group.add(body);
 
+
     /* Head */
 
     var head = new THREE.Mesh(
-        new THREE.SphereGeometry(0.48, 20, 16),
+        new THREE.SphereGeometry(
+            0.48,
+            20,
+            16
+        ),
         skin
     );
 
@@ -148,107 +215,181 @@ function createFighter(isPlayer) {
 
     group.add(head);
 
+
     /* Hair */
 
     var hairMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.49, 20, 12),
+        new THREE.SphereGeometry(
+            0.49,
+            20,
+            12
+        ),
         hair
     );
 
-    hairMesh.scale.set(1, 0.42, 1);
-    hairMesh.position.set(0, 2.92, -0.02);
+    hairMesh.scale.set(
+        1,
+        0.42,
+        1
+    );
+
+    hairMesh.position.set(
+        0,
+        2.92,
+        -0.02
+    );
 
     group.add(hairMesh);
+
 
     /* Arms */
 
     var leftArm = new THREE.Mesh(
-        new THREE.BoxGeometry(0.30, 1.0, 0.30),
+        new THREE.BoxGeometry(
+            0.30,
+            1,
+            0.30
+        ),
         skin
     );
 
     var rightArm = new THREE.Mesh(
-        new THREE.BoxGeometry(0.30, 1.0, 0.30),
+        new THREE.BoxGeometry(
+            0.30,
+            1,
+            0.30
+        ),
         skin
     );
 
-    leftArm.position.set(-0.68, 1.72, 0);
-    rightArm.position.set(0.68, 1.72, 0);
+    leftArm.position.set(
+        -0.68,
+        1.72,
+        0
+    );
+
+    rightArm.position.set(
+        0.68,
+        1.72,
+        0
+    );
 
     group.add(leftArm);
     group.add(rightArm);
 
+
     /* Fists */
 
     var leftFist = new THREE.Mesh(
-        new THREE.SphereGeometry(0.20, 14, 10),
+        new THREE.SphereGeometry(
+            0.20,
+            14,
+            10
+        ),
         skin
     );
 
     var rightFist = new THREE.Mesh(
-        new THREE.SphereGeometry(0.20, 14, 10),
+        new THREE.SphereGeometry(
+            0.20,
+            14,
+            10
+        ),
         skin
     );
 
-    leftFist.position.set(-0.68, 1.18, 0);
-    rightFist.position.set(0.68, 1.18, 0);
+    leftFist.position.set(
+        -0.68,
+        1.18,
+        0
+    );
+
+    rightFist.position.set(
+        0.68,
+        1.18,
+        0
+    );
 
     group.add(leftFist);
     group.add(rightFist);
 
+
     group.userData = {
+
         body: body,
         head: head,
+
         leftArm: leftArm,
         rightArm: rightArm,
+
         leftLeg: leftLeg,
         rightLeg: rightLeg,
+
         leftFist: leftFist,
-        rightFist: rightFist,
-        originalRotation: group.rotation.clone(),
-        originalPosition: group.position.clone()
+        rightFist: rightFist
     };
+
 
     return group;
 }
 
 
-/* =========================
-   INIT 3D ARENA
-========================= */
+/* =========================================
+   INIT 3D
+========================================= */
 
 function init3DArena() {
 
-    var container = document.getElementById("battle-3d");
+    var container =
+        document.getElementById("battle-3d");
 
     if (!container) {
-        console.log("3D container not found");
         return;
     }
 
     battle3D.container = container;
 
+
     /* Scene */
 
     var scene = new THREE.Scene();
 
-    scene.background = new THREE.Color(0x090a12);
+    scene.background =
+        new THREE.Color(0x090a12);
 
     battle3D.scene = scene;
 
+
     /* Camera */
 
-    var camera = new THREE.PerspectiveCamera(
-        42,
-        container.clientWidth / Math.max(container.clientHeight, 1),
-        0.1,
-        100
+    var width =
+        container.clientWidth || 320;
+
+    var height =
+        container.clientHeight || 270;
+
+    var camera =
+        new THREE.PerspectiveCamera(
+            42,
+            width / height,
+            0.1,
+            100
+        );
+
+    camera.position.set(
+        0,
+        3.2,
+        7.6
     );
 
-    camera.position.set(0, 3.2, 7.6);
-    camera.lookAt(0, 1.5, 0);
+    camera.lookAt(
+        0,
+        1.5,
+        0
+    );
 
     battle3D.camera = camera;
+
 
     /* Renderer */
 
@@ -256,95 +397,126 @@ function init3DArena() {
 
     try {
 
-        renderer = new THREE.WebGLRenderer({
-            antialias: true,
-            alpha: false,
-            powerPreference: "high-performance"
-        });
+        renderer =
+            new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: false,
+                powerPreference:
+                    "high-performance"
+            });
 
     } catch (err) {
 
-        console.log("WebGL error:", err);
-
         container.innerHTML =
-            "<div style='height:100%;display:flex;align-items:center;justify-content:center;color:#777;font-size:14px;text-align:center;padding:20px'>" +
-            "3D-графика недоступна на этом устройстве" +
+            "<div style='height:100%;display:flex;align-items:center;justify-content:center;color:#777;text-align:center;font-size:14px;padding:20px'>" +
+            "3D-графика недоступна" +
             "</div>";
 
         return;
     }
 
+
     renderer.setPixelRatio(
-        Math.min(window.devicePixelRatio || 1, 1.5)
+        Math.min(
+            window.devicePixelRatio || 1,
+            1.5
+        )
     );
 
     renderer.setSize(
-        container.clientWidth,
-        container.clientHeight,
+        width,
+        height,
         false
     );
 
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
 
     container.innerHTML = "";
-    container.appendChild(renderer.domElement);
+
+    container.appendChild(
+        renderer.domElement
+    );
 
     battle3D.renderer = renderer;
 
 
-    /* =========================
+    /* =====================================
        LIGHT
-    ========================= */
+    ===================================== */
 
-    var hemi = new THREE.HemisphereLight(
-        0xffffff,
-        0x161622,
-        2.2
-    );
+    var hemi =
+        new THREE.HemisphereLight(
+            0xffffff,
+            0x141421,
+            2.2
+        );
 
     scene.add(hemi);
 
 
-    var mainLight = new THREE.DirectionalLight(
-        0xffffff,
-        3
-    );
+    var mainLight =
+        new THREE.DirectionalLight(
+            0xffffff,
+            3
+        );
 
-    mainLight.position.set(3, 7, 5);
+    mainLight.position.set(
+        3,
+        7,
+        5
+    );
 
     scene.add(mainLight);
 
 
-    var redLight = new THREE.PointLight(
-        0xff2222,
-        5,
-        10
-    );
+    var redLight =
+        new THREE.PointLight(
+            0xff2222,
+            5,
+            10
+        );
 
-    redLight.position.set(0, 3, -3);
+    redLight.position.set(
+        0,
+        3,
+        -3
+    );
 
     scene.add(redLight);
 
 
-    var blueLight = new THREE.PointLight(
-        0x2255ff,
-        4,
-        8
-    );
+    var blueLight =
+        new THREE.PointLight(
+            0x2255ff,
+            4,
+            8
+        );
 
-    blueLight.position.set(-4, 2, 2);
+    blueLight.position.set(
+        -4,
+        2,
+        2
+    );
 
     scene.add(blueLight);
 
 
-    /* =========================
+    /* =====================================
        FLOOR
-    ========================= */
+    ===================================== */
 
-    var floor = new THREE.Mesh(
-        new THREE.CylinderGeometry(4.3, 4.3, 0.25, 48),
-        mat(0x181923)
-    );
+    var floor =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                4.3,
+                4.3,
+                0.25,
+                48
+            ),
+            makeMaterial(0x181923)
+        );
 
     floor.position.y = -0.15;
 
@@ -353,12 +525,23 @@ function init3DArena() {
 
     /* Ring */
 
-    var ring = new THREE.Mesh(
-        new THREE.TorusGeometry(3.5, 0.07, 10, 64),
-        mat(0xe74c3c, 0.45)
-    );
+    var ring =
+        new THREE.Mesh(
+            new THREE.TorusGeometry(
+                3.5,
+                0.07,
+                10,
+                64
+            ),
+            makeMaterial(
+                0xe74c3c,
+                0.45
+            )
+        );
 
-    ring.rotation.x = Math.PI / 2;
+    ring.rotation.x =
+        Math.PI / 2;
+
     ring.position.y = 0.02;
 
     scene.add(ring);
@@ -366,63 +549,102 @@ function init3DArena() {
 
     /* Inner ring */
 
-    var ring2 = new THREE.Mesh(
-        new THREE.TorusGeometry(2.7, 0.035, 8, 64),
-        mat(0x555566, 0.5)
-    );
+    var ring2 =
+        new THREE.Mesh(
+            new THREE.TorusGeometry(
+                2.7,
+                0.035,
+                8,
+                64
+            ),
+            makeMaterial(
+                0x555566,
+                0.5
+            )
+        );
 
-    ring2.rotation.x = Math.PI / 2;
-    ring2.position.y = 0.025;
+    ring2.rotation.x =
+        Math.PI / 2;
+
+    ring2.position.y =
+        0.025;
 
     scene.add(ring2);
 
 
-    /* Back wall */
+    /* Wall */
 
-    var wall = new THREE.Mesh(
-        new THREE.BoxGeometry(12, 6, 0.3),
-        mat(0x11121b)
+    var wall =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                12,
+                6,
+                0.3
+            ),
+            makeMaterial(0x11121b)
+        );
+
+    wall.position.set(
+        0,
+        2.7,
+        -2.8
     );
-
-    wall.position.set(0, 2.7, -2.8);
 
     scene.add(wall);
 
 
-    /* =========================
+    /* =====================================
        FIGHTERS
-    ========================= */
+    ===================================== */
 
-    var player = createFighter(true);
-    var enemy = createFighter(false);
+    var player =
+        createFighter(true);
 
-    player.position.set(-1.75, 0, 0.3);
-    enemy.position.set(1.75, 0, -0.2);
+    var enemy =
+        createFighter(false);
 
-    /* Player faces enemy */
 
-    player.rotation.y = -0.25;
+    player.position.set(
+        -1.75,
+        0,
+        0.3
+    );
 
-    /* Enemy faces player */
+    enemy.position.set(
+        1.75,
+        0,
+        -0.2
+    );
 
-    enemy.rotation.y = Math.PI + 0.25;
+
+    player.rotation.y =
+        -0.25;
+
+    enemy.rotation.y =
+        Math.PI + 0.25;
+
 
     scene.add(player);
     scene.add(enemy);
 
+
     battle3D.player = player;
     battle3D.enemy = enemy;
 
-    battle3D.playerParts = player.userData;
-    battle3D.enemyParts = enemy.userData;
+    battle3D.playerParts =
+        player.userData;
 
-    battle3D.playerBase = player.position.clone();
-    battle3D.enemyBase = enemy.position.clone();
+    battle3D.enemyParts =
+        enemy.userData;
+
+    battle3D.playerBase =
+        player.position.clone();
+
+    battle3D.enemyBase =
+        enemy.position.clone();
 
     battle3D.initialized = true;
 
-
-    /* Resize */
 
     resize3DArena();
 
@@ -431,15 +653,14 @@ function init3DArena() {
         resize3DArena
     );
 
-    /* Start animation */
 
     animate3DArena();
 }
 
 
-/* =========================
+/* =========================================
    RESIZE
-========================= */
+========================================= */
 
 function resize3DArena() {
 
@@ -451,14 +672,22 @@ function resize3DArena() {
         return;
     }
 
-    var width = battle3D.container.clientWidth;
-    var height = battle3D.container.clientHeight;
+    var width =
+        battle3D.container.clientWidth;
 
-    if (width <= 0 || height <= 0) {
+    var height =
+        battle3D.container.clientHeight;
+
+    if (
+        width <= 0 ||
+        height <= 0
+    ) {
         return;
     }
 
-    battle3D.camera.aspect = width / height;
+    battle3D.camera.aspect =
+        width / height;
+
     battle3D.camera.updateProjectionMatrix();
 
     battle3D.renderer.setSize(
@@ -469,30 +698,36 @@ function resize3DArena() {
 }
 
 
-/* =========================
-   IDLE ANIMATION
-========================= */
+/* =========================================
+   ANIMATION LOOP
+========================================= */
 
-var animationClock = new THREE.Clock();
+var clock =
+    new THREE.Clock();
 
 function animate3DArena() {
 
-    requestAnimationFrame(animate3DArena);
+    requestAnimationFrame(
+        animate3DArena
+    );
 
     if (
         !battle3D.initialized ||
-        !battle3D.renderer ||
-        !battle3D.scene ||
-        !battle3D.camera
+        !battle3D.renderer
     ) {
         return;
     }
 
-    var t = animationClock.getElapsedTime();
+    var t =
+        clock.getElapsedTime();
 
-    /* Player idle */
 
-    if (!battle3D.playerAnimating && battle3D.player) {
+    /* Idle player */
+
+    if (
+        !battle3D.playerAnimating &&
+        battle3D.player
+    ) {
 
         battle3D.player.position.y =
             Math.sin(t * 2) * 0.025;
@@ -501,9 +736,13 @@ function animate3DArena() {
             Math.sin(t * 1.5) * 0.015;
     }
 
-    /* Enemy idle */
 
-    if (!battle3D.enemyAnimating && battle3D.enemy) {
+    /* Idle enemy */
+
+    if (
+        !battle3D.enemyAnimating &&
+        battle3D.enemy
+    ) {
 
         battle3D.enemy.position.y =
             Math.sin(t * 2 + 1) * 0.025;
@@ -512,6 +751,37 @@ function animate3DArena() {
             Math.sin(t * 1.4 + 1) * 0.015;
     }
 
+
+    /* =====================================
+       CAMERA SHAKE
+    ===================================== */
+
+    if (
+        battle3D.cameraShake > 0
+    ) {
+
+        battle3D.cameraShake -= 0.025;
+
+        var power =
+            battle3D.cameraShakePower *
+            battle3D.cameraShake;
+
+        battle3D.camera.position.x =
+            Math.sin(t * 55) *
+            power;
+
+        battle3D.camera.position.y =
+            3.2 +
+            Math.cos(t * 50) *
+            power;
+
+    } else {
+
+        battle3D.camera.position.x = 0;
+        battle3D.camera.position.y = 3.2;
+    }
+
+
     battle3D.renderer.render(
         battle3D.scene,
         battle3D.camera
@@ -519,48 +789,135 @@ function animate3DArena() {
 }
 
 
-/* =========================
+/* =========================================
+   CAMERA SHAKE
+========================================= */
+
+function shakeCamera(power) {
+
+    battle3D.cameraShake =
+        1;
+
+    battle3D.cameraShakePower =
+        power || 0.08;
+}
+
+
+/* =========================================
    PLAYER ATTACK
-========================= */
+========================================= */
 
-function playPlayerAttack() {
+function playPlayerAttack(
+    zone,
+    damage
+) {
 
-    if (!battle3D.initialized || !battle3D.player) {
+    if (
+        !battle3D.initialized ||
+        !battle3D.player
+    ) {
         return;
     }
 
-    var fighter = battle3D.player;
-    var parts = battle3D.playerParts;
+    var fighter =
+        battle3D.player;
 
-    battle3D.playerAnimating = true;
+    var parts =
+        battle3D.playerParts;
 
-    var start = performance.now();
+    battle3D.playerAnimating =
+        true;
+
+
+    var start =
+        performance.now();
+
+    var duration = 550;
+
 
     function frame(now) {
 
-        var elapsed = now - start;
-        var duration = 480;
-        var progress = Math.min(elapsed / duration, 1);
+        var progress =
+            Math.min(
+                (now - start) /
+                duration,
+                1
+            );
+
+
+        /* Punch */
 
         var punch;
 
-        if (progress < 0.5) {
-            punch = progress / 0.5;
+        if (progress < 0.35) {
+
+            punch =
+                progress / 0.35;
+
+        } else if (progress < 0.65) {
+
+            punch = 1;
+
         } else {
-            punch = 1 - ((progress - 0.5) / 0.5);
+
+            punch =
+                1 -
+                (
+                    (progress - 0.65) /
+                    0.35
+                );
         }
 
-        parts.rightArm.rotation.z =
-            -punch * 1.6;
 
-        parts.rightArm.rotation.x =
-            -punch * 0.8;
+        /* Attack zone */
 
-        parts.rightFist.position.z =
-            punch * 0.55;
+        if (zone === "head") {
+
+            parts.rightArm.rotation.z =
+                -punch * 1.8;
+
+            parts.rightArm.rotation.x =
+                -punch * 1.0;
+
+            parts.rightFist.position.y =
+                1.18 +
+                punch * 0.9;
+
+            parts.rightFist.position.z =
+                punch * 0.55;
+
+        } else if (zone === "legs") {
+
+            parts.rightArm.rotation.z =
+                -punch * 0.7;
+
+            parts.rightArm.rotation.x =
+                punch * 0.8;
+
+            parts.rightFist.position.y =
+                1.18 -
+                punch * 0.65;
+
+            parts.rightFist.position.z =
+                punch * 0.55;
+
+        } else {
+
+            parts.rightArm.rotation.z =
+                -punch * 1.6;
+
+            parts.rightArm.rotation.x =
+                -punch * 0.8;
+
+            parts.rightFist.position.z =
+                punch * 0.65;
+        }
+
 
         fighter.position.z =
-            battle3D.playerBase.z + punch * 0.35;
+            battle3D.playerBase.z +
+            punch * 0.45;
+
 
         if (progress < 1) {
 
@@ -568,7 +925,12 @@ function playPlayerAttack() {
 
         } else {
 
-            parts.rightArm.rotation.set(0, 0, 0);
+            parts.rightArm.rotation.set(
+                0,
+                0,
+                0
+            );
+
             parts.rightFist.position.set(
                 0.68,
                 1.18,
@@ -579,56 +941,126 @@ function playPlayerAttack() {
                 battle3D.playerBase
             );
 
-            battle3D.playerAnimating = false;
+            battle3D.playerAnimating =
+                false;
         }
     }
+
 
     requestAnimationFrame(frame);
 }
 
 
-/* =========================
+/* =========================================
    ENEMY ATTACK
-========================= */
+========================================= */
 
-function playEnemyAttack() {
+function playEnemyAttack(
+    zone
+) {
 
-    if (!battle3D.initialized || !battle3D.enemy) {
+    if (
+        !battle3D.initialized ||
+        !battle3D.enemy
+    ) {
         return;
     }
 
-    var fighter = battle3D.enemy;
-    var parts = battle3D.enemyParts;
+    var fighter =
+        battle3D.enemy;
 
-    battle3D.enemyAnimating = true;
+    var parts =
+        battle3D.enemyParts;
 
-    var start = performance.now();
+    battle3D.enemyAnimating =
+        true;
+
+
+    var start =
+        performance.now();
+
+    var duration = 550;
+
 
     function frame(now) {
 
-        var elapsed = now - start;
-        var duration = 480;
-        var progress = Math.min(elapsed / duration, 1);
+        var progress =
+            Math.min(
+                (now - start) /
+                duration,
+                1
+            );
+
 
         var punch;
 
-        if (progress < 0.5) {
-            punch = progress / 0.5;
+        if (progress < 0.35) {
+
+            punch =
+                progress / 0.35;
+
+        } else if (progress < 0.65) {
+
+            punch = 1;
+
         } else {
-            punch = 1 - ((progress - 0.5) / 0.5);
+
+            punch =
+                1 -
+                (
+                    (progress - 0.65) /
+                    0.35
+                );
         }
 
-        parts.leftArm.rotation.z =
-            punch * 1.6;
 
-        parts.leftArm.rotation.x =
-            -punch * 0.8;
+        if (zone === "head") {
 
-        parts.leftFist.position.z =
-            -punch * 0.55;
+            parts.leftArm.rotation.z =
+                punch * 1.8;
+
+            parts.leftArm.rotation.x =
+                -punch;
+
+            parts.leftFist.position.y =
+                1.18 +
+                punch * 0.9;
+
+            parts.leftFist.position.z =
+                -punch * 0.55;
+
+        } else if (zone === "legs") {
+
+            parts.leftArm.rotation.z =
+                punch * 0.7;
+
+            parts.leftArm.rotation.x =
+                punch * 0.8;
+
+            parts.leftFist.position.y =
+                1.18 -
+                punch * 0.65;
+
+            parts.leftFist.position.z =
+                -punch * 0.55;
+
+        } else {
+
+            parts.leftArm.rotation.z =
+                punch * 1.6;
+
+            parts.leftArm.rotation.x =
+                -punch * 0.8;
+
+            parts.leftFist.position.z =
+                -punch * 0.65;
+        }
+
 
         fighter.position.z =
-            battle3D.enemyBase.z - punch * 0.35;
+            battle3D.enemyBase.z -
+            punch * 0.45;
+
 
         if (progress < 1) {
 
@@ -636,7 +1068,11 @@ function playEnemyAttack() {
 
         } else {
 
-            parts.leftArm.rotation.set(0, 0, 0);
+            parts.leftArm.rotation.set(
+                0,
+                0,
+                0
+            );
 
             parts.leftFist.position.set(
                 -0.68,
@@ -648,19 +1084,25 @@ function playEnemyAttack() {
                 battle3D.enemyBase
             );
 
-            battle3D.enemyAnimating = false;
+            battle3D.enemyAnimating =
+                false;
         }
     }
+
 
     requestAnimationFrame(frame);
 }
 
 
-/* =========================
-   HIT EFFECT
-========================= */
+/* =========================================
+   HIT REACTION
+========================================= */
 
-function show3DHit(isPlayerTarget) {
+function show3DHit(
+    isPlayerTarget,
+    damage,
+    critical
+) {
 
     if (!battle3D.initialized) {
         return;
@@ -671,99 +1113,589 @@ function show3DHit(isPlayerTarget) {
             ? battle3D.player
             : battle3D.enemy;
 
-    if (!target) return;
 
-    var start = performance.now();
+    if (!target) {
+        return;
+    }
+
+
+    /* Camera */
+
+    shakeCamera(
+        critical ? 0.16 : 0.09
+    );
+
+
+    /* Flash */
+
+    var originalScale =
+        target.scale.clone();
+
+    var start =
+        performance.now();
+
+    var duration = 300;
+
 
     function flash(now) {
 
         var progress =
-            Math.min((now - start) / 220, 1);
+            Math.min(
+                (now - start) /
+                duration,
+                1
+            );
 
-        var scale =
-            1 + Math.sin(progress * Math.PI) * 0.12;
+
+        var hit =
+            Math.sin(
+                progress * Math.PI
+            );
+
 
         target.scale.set(
-            scale,
-            scale,
-            scale
+            originalScale.x *
+                (1 + hit * 0.12),
+
+            originalScale.y *
+                (1 - hit * 0.06),
+
+            originalScale.z *
+                (1 + hit * 0.12)
         );
+
+
+        /* Knockback */
+
+        var base =
+            isPlayerTarget
+                ? battle3D.playerBase
+                : battle3D.enemyBase;
+
+        var direction =
+            isPlayerTarget
+                ? -1
+                : 1;
+
+        target.position.x =
+            base.x +
+            hit *
+            direction *
+            0.18;
+
 
         if (progress < 1) {
 
-            requestAnimationFrame(flash);
+            requestAnimationFrame(
+                flash
+            );
 
         } else {
 
-            target.scale.set(1, 1, 1);
+            target.scale.copy(
+                originalScale
+            );
+
+            target.position.copy(
+                base
+            );
         }
     }
 
+
     requestAnimationFrame(flash);
+
+
+    /* Damage number */
+
+    createDamageText(
+        target,
+        damage,
+        critical
+    );
 }
 
 
-/* =========================
+/* =========================================
+   3D DAMAGE NUMBER
+========================================= */
+
+function createDamageText(
+    target,
+    damage,
+    critical
+) {
+
+    if (!battle3D.scene) {
+        return;
+    }
+
+
+    var canvas =
+        document.createElement("canvas");
+
+    canvas.width = 256;
+    canvas.height = 128;
+
+
+    var ctx =
+        canvas.getContext("2d");
+
+
+    ctx.clearRect(
+        0,
+        0,
+        256,
+        128
+    );
+
+
+    ctx.textAlign =
+        "center";
+
+    ctx.font =
+        critical
+            ? "bold 54px Arial"
+            : "bold 46px Arial";
+
+
+    ctx.fillStyle =
+        critical
+            ? "#ffd21c"
+            : "#ffffff";
+
+
+    ctx.strokeStyle =
+        "#111111";
+
+    ctx.lineWidth = 8;
+
+
+    var text =
+        critical
+            ? "КРИТ! -" + damage
+            : "-" + damage;
+
+
+    ctx.strokeText(
+        text,
+        128,
+        70
+    );
+
+    ctx.fillText(
+        text,
+        128,
+        70
+    );
+
+
+    var texture =
+        new THREE.CanvasTexture(
+            canvas
+        );
+
+    texture.needsUpdate = true;
+
+
+    var material =
+        new THREE.SpriteMaterial({
+            map: texture,
+            transparent: true,
+            depthTest: false
+        });
+
+
+    var sprite =
+        new THREE.Sprite(material);
+
+
+    sprite.scale.set(
+        1.8,
+        0.9,
+        1
+    );
+
+
+    sprite.position.copy(
+        target.position
+    );
+
+    sprite.position.y =
+        3.4;
+
+
+    battle3D.scene.add(sprite);
+
+
+    var start =
+        performance.now();
+
+    var duration = 900;
+
+
+    function animateText(now) {
+
+        var progress =
+            Math.min(
+                (now - start) /
+                duration,
+                1
+            );
+
+
+        sprite.position.y =
+            3.4 +
+            progress * 1.2;
+
+
+        material.opacity =
+            1 - progress;
+
+
+        sprite.scale.set(
+            1.8 +
+            progress * 0.5,
+            0.9 +
+            progress * 0.25,
+            1
+        );
+
+
+        if (progress < 1) {
+
+            requestAnimationFrame(
+                animateText
+            );
+
+        } else {
+
+            battle3D.scene.remove(
+                sprite
+            );
+
+            texture.dispose();
+            material.dispose();
+        }
+    }
+
+
+    requestAnimationFrame(
+        animateText
+    );
+}
+
+
+/* =========================================
+   BLOCK EFFECT
+========================================= */
+
+function showBlockEffect(
+    isPlayer
+) {
+
+    if (!battle3D.initialized) {
+        return;
+    }
+
+
+    var target =
+        isPlayer
+            ? battle3D.player
+            : battle3D.enemy;
+
+
+    if (!target) {
+        return;
+    }
+
+
+    var start =
+        performance.now();
+
+
+    var duration = 350;
+
+
+    function animateBlock(now) {
+
+        var progress =
+            Math.min(
+                (now - start) /
+                duration,
+                1
+            );
+
+
+        var hit =
+            Math.sin(
+                progress * Math.PI
+            );
+
+
+        target.rotation.z =
+            hit * 0.15;
+
+
+        target.scale.set(
+            1 + hit * 0.08,
+            1 - hit * 0.04,
+            1 + hit * 0.08
+        );
+
+
+        if (progress < 1) {
+
+            requestAnimationFrame(
+                animateBlock
+            );
+
+        } else {
+
+            target.rotation.z = 0;
+
+            target.scale.set(
+                1,
+                1,
+                1
+            );
+        }
+    }
+
+
+    requestAnimationFrame(
+        animateBlock
+    );
+
+
+    shakeCamera(0.045);
+}
+
+
+/* =========================================
+   DODGE EFFECT
+========================================= */
+
+function showDodgeEffect(
+    isPlayer
+) {
+
+    if (!battle3D.initialized) {
+        return;
+    }
+
+
+    var target =
+        isPlayer
+            ? battle3D.player
+            : battle3D.enemy;
+
+
+    if (!target) {
+        return;
+    }
+
+
+    var base =
+        isPlayer
+            ? battle3D.playerBase
+            : battle3D.enemyBase;
+
+
+    var start =
+        performance.now();
+
+    var duration = 400;
+
+
+    function dodge(now) {
+
+        var progress =
+            Math.min(
+                (now - start) /
+                duration,
+                1
+            );
+
+
+        var move;
+
+        if (progress < 0.5) {
+
+            move =
+                progress / 0.5;
+
+        } else {
+
+            move =
+                1 -
+                (
+                    (progress - 0.5) /
+                    0.5
+                );
+        }
+
+
+        target.position.x =
+            base.x +
+            move *
+            (
+                isPlayer
+                    ? -0.5
+                    : 0.5
+            );
+
+
+        target.rotation.z =
+            move *
+            (
+                isPlayer
+                    ? -0.18
+                    : 0.18
+            );
+
+
+        if (progress < 1) {
+
+            requestAnimationFrame(
+                dodge
+            );
+
+        } else {
+
+            target.position.copy(
+                base
+            );
+
+            target.rotation.z = 0;
+        }
+    }
+
+
+    requestAnimationFrame(dodge);
+}
+
+
+/* =========================================
    DOM READY
-========================= */
+========================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     function () {
 
+
         /* Start 3D */
 
-        setTimeout(function () {
-            init3DArena();
-        }, 100);
+        setTimeout(
+            function () {
+                init3DArena();
+            },
+            100
+        );
 
 
-        /* =========================
+        /* =================================
            TABS
-        ========================= */
+        ================================= */
 
         var tArena =
-            document.getElementById("tab-arena");
+            document.getElementById(
+                "tab-arena"
+            );
 
         var tShop =
-            document.getElementById("tab-shop");
+            document.getElementById(
+                "tab-shop"
+            );
 
         var tMap =
-            document.getElementById("tab-map");
+            document.getElementById(
+                "tab-map"
+            );
 
         var tProfile =
-            document.getElementById("tab-profile");
+            document.getElementById(
+                "tab-profile"
+            );
 
 
         var pArena =
-            document.getElementById("page-home");
+            document.getElementById(
+                "page-home"
+            );
 
         var pShop =
-            document.getElementById("page-shop");
+            document.getElementById(
+                "page-shop"
+            );
 
         var pMap =
-            document.getElementById("page-map");
+            document.getElementById(
+                "page-map"
+            );
 
         var pProfile =
-            document.getElementById("page-profile");
+            document.getElementById(
+                "page-profile"
+            );
 
 
-        function showPage(tab, page) {
+        function showPage(
+            tab,
+            page
+        ) {
 
-            if (pArena) pArena.style.display = "none";
-            if (pShop) pShop.style.display = "none";
-            if (pMap) pMap.style.display = "none";
-            if (pProfile) pProfile.style.display = "none";
+            if (pArena)
+                pArena.style.display =
+                    "none";
 
-            if (tArena) tArena.classList.remove("active");
-            if (tShop) tShop.classList.remove("active");
-            if (tMap) tMap.classList.remove("active");
-            if (tProfile) tProfile.classList.remove("active");
+            if (pShop)
+                pShop.style.display =
+                    "none";
 
-            if (page) page.style.display = "block";
-            if (tab) tab.classList.add("active");
+            if (pMap)
+                pMap.style.display =
+                    "none";
+
+            if (pProfile)
+                pProfile.style.display =
+                    "none";
+
+
+            if (tArena)
+                tArena.classList.remove(
+                    "active"
+                );
+
+            if (tShop)
+                tShop.classList.remove(
+                    "active"
+                );
+
+            if (tMap)
+                tMap.classList.remove(
+                    "active"
+                );
+
+            if (tProfile)
+                tProfile.classList.remove(
+                    "active"
+                );
+
+
+            if (page)
+                page.style.display =
+                    "block";
+
+            if (tab)
+                tab.classList.add(
+                    "active"
+                );
+
 
             updateUI();
+
 
             setTimeout(
                 resize3DArena,
@@ -773,98 +1705,149 @@ document.addEventListener(
 
 
         if (tArena) {
+
             tArena.addEventListener(
                 "click",
                 function () {
-                    showPage(tArena, pArena);
+                    showPage(
+                        tArena,
+                        pArena
+                    );
                 }
             );
         }
 
+
         if (tShop) {
+
             tShop.addEventListener(
                 "click",
                 function () {
-                    showPage(tShop, pShop);
+                    showPage(
+                        tShop,
+                        pShop
+                    );
                 }
             );
         }
 
+
         if (tMap) {
+
             tMap.addEventListener(
                 "click",
                 function () {
-                    showPage(tMap, pMap);
+                    showPage(
+                        tMap,
+                        pMap
+                    );
                 }
             );
         }
 
+
         if (tProfile) {
+
             tProfile.addEventListener(
                 "click",
                 function () {
-                    showPage(tProfile, pProfile);
+                    showPage(
+                        tProfile,
+                        pProfile
+                    );
                 }
             );
         }
 
 
-        /* =========================
-           ATTACK / BLOCK ZONES
-        ========================= */
+        /* =================================
+           ATTACK ZONES
+        ================================= */
 
         var attHead =
-            document.getElementById("btn-att-head");
+            document.getElementById(
+                "btn-att-head"
+            );
 
         var attBody =
-            document.getElementById("btn-att-body");
+            document.getElementById(
+                "btn-att-body"
+            );
 
         var attLegs =
-            document.getElementById("btn-att-legs");
+            document.getElementById(
+                "btn-att-legs"
+            );
 
+
+        /* BLOCK ZONES */
 
         var blkHead =
-            document.getElementById("btn-blk-head");
+            document.getElementById(
+                "btn-blk-head"
+            );
 
         var blkBody =
-            document.getElementById("btn-blk-body");
+            document.getElementById(
+                "btn-blk-body"
+            );
 
         var blkLegs =
-            document.getElementById("btn-blk-legs");
+            document.getElementById(
+                "btn-blk-legs"
+            );
 
 
         function clearAtt() {
 
             if (attHead)
-                attHead.classList.remove("zone-btn-active");
+                attHead.classList.remove(
+                    "zone-btn-active"
+                );
 
             if (attBody)
-                attBody.classList.remove("zone-btn-active");
+                attBody.classList.remove(
+                    "zone-btn-active"
+                );
 
             if (attLegs)
-                attLegs.classList.remove("zone-btn-active");
+                attLegs.classList.remove(
+                    "zone-btn-active"
+                );
         }
 
 
         function clearBlk() {
 
             if (blkHead)
-                blkHead.classList.remove("zone-btn-active");
+                blkHead.classList.remove(
+                    "zone-btn-active"
+                );
 
             if (blkBody)
-                blkBody.classList.remove("zone-btn-active");
+                blkBody.classList.remove(
+                    "zone-btn-active"
+                );
 
             if (blkLegs)
-                blkLegs.classList.remove("zone-btn-active");
+                blkLegs.classList.remove(
+                    "zone-btn-active"
+                );
         }
 
 
         if (attHead) {
+
             attHead.addEventListener(
                 "click",
                 function () {
+
                     clearAtt();
-                    attHead.classList.add("zone-btn-active");
+
+                    attHead.classList.add(
+                        "zone-btn-active"
+                    );
+
                     selA = "head";
                 }
             );
@@ -872,11 +1855,17 @@ document.addEventListener(
 
 
         if (attBody) {
+
             attBody.addEventListener(
                 "click",
                 function () {
+
                     clearAtt();
-                    attBody.classList.add("zone-btn-active");
+
+                    attBody.classList.add(
+                        "zone-btn-active"
+                    );
+
                     selA = "body";
                 }
             );
@@ -884,11 +1873,17 @@ document.addEventListener(
 
 
         if (attLegs) {
+
             attLegs.addEventListener(
                 "click",
                 function () {
+
                     clearAtt();
-                    attLegs.classList.add("zone-btn-active");
+
+                    attLegs.classList.add(
+                        "zone-btn-active"
+                    );
+
                     selA = "legs";
                 }
             );
@@ -896,11 +1891,17 @@ document.addEventListener(
 
 
         if (blkHead) {
+
             blkHead.addEventListener(
                 "click",
                 function () {
+
                     clearBlk();
-                    blkHead.classList.add("zone-btn-active");
+
+                    blkHead.classList.add(
+                        "zone-btn-active"
+                    );
+
                     selB = "head";
                 }
             );
@@ -908,11 +1909,17 @@ document.addEventListener(
 
 
         if (blkBody) {
+
             blkBody.addEventListener(
                 "click",
                 function () {
+
                     clearBlk();
-                    blkBody.classList.add("zone-btn-active");
+
+                    blkBody.classList.add(
+                        "zone-btn-active"
+                    );
+
                     selB = "body";
                 }
             );
@@ -920,23 +1927,31 @@ document.addEventListener(
 
 
         if (blkLegs) {
+
             blkLegs.addEventListener(
                 "click",
                 function () {
+
                     clearBlk();
-                    blkLegs.classList.add("zone-btn-active");
+
+                    blkLegs.classList.add(
+                        "zone-btn-active"
+                    );
+
                     selB = "legs";
                 }
             );
         }
 
 
-        /* =========================
-           BATTLE
-        ========================= */
+        /* =================================
+           BATTLE BUTTON
+        ================================= */
 
         var turnBtn =
-            document.getElementById("attack");
+            document.getElementById(
+                "attack"
+            );
 
 
         if (turnBtn) {
@@ -963,6 +1978,7 @@ document.addEventListener(
 
 
                     var zoneText = {
+
                         head: "Голову",
                         body: "Корпус",
                         legs: "Ноги"
@@ -989,16 +2005,27 @@ document.addEventListener(
 
 
                     var dmg =
-                        15 + p.bonusDamage;
+                        15 +
+                        p.bonusDamage;
 
 
-                    var baseEnemyDmg =
-                        15 + (p.level * 2);
+                    var enemyDamage =
+                        15 +
+                        (p.level * 2);
 
 
-                    /* Player attack */
+                    /* =================================
+                       PLAYER ATTACK
+                    ================================= */
 
-                    if (selA === enemyB) {
+                    if (
+                        selA === enemyB
+                    ) {
+
+                        showBlockEffect(
+                            false
+                        );
+
 
                         logs.push(
                             "🛡️ Вы ударили в <b>" +
@@ -1009,11 +2036,15 @@ document.addEventListener(
                     } else {
 
                         var isCrit =
-                            (Math.random() * 100) <
-                            (p.strength * 3);
+                            (
+                                Math.random() * 100
+                            ) <
+                            (
+                                p.strength * 3
+                            );
 
 
-                        var finalPlayerDmg =
+                        var finalDamage =
                             isCrit
                                 ? dmg * 2
                                 : dmg;
@@ -1022,18 +2053,28 @@ document.addEventListener(
                         e.hp =
                             Math.max(
                                 0,
-                                e.hp - finalPlayerDmg
+                                e.hp -
+                                finalDamage
                             );
 
 
-                        playPlayerAttack();
+                        playPlayerAttack(
+                            selA,
+                            finalDamage
+                        );
 
 
                         setTimeout(
                             function () {
-                                show3DHit(false);
+
+                                show3DHit(
+                                    false,
+                                    finalDamage,
+                                    isCrit
+                                );
+
                             },
-                            250
+                            260
                         );
 
 
@@ -1043,7 +2084,7 @@ document.addEventListener(
                                 "⚡💥 <b>КРИТ!</b> Вы пробили Хулигана в <b>" +
                                 zoneText[selA] +
                                 "</b>! Урон: -" +
-                                finalPlayerDmg +
+                                finalDamage +
                                 "."
                             );
 
@@ -1053,16 +2094,25 @@ document.addEventListener(
                                 "💥 Вы успешно пробили Хулигана в <b>" +
                                 zoneText[selA] +
                                 "</b>! Урон: -" +
-                                finalPlayerDmg +
+                                finalDamage +
                                 "."
                             );
                         }
                     }
 
 
-                    /* Enemy attack */
+                    /* =================================
+                       ENEMY ATTACK
+                    ================================= */
 
-                    if (enemyA === selB) {
+                    if (
+                        enemyA === selB
+                    ) {
+
+                        showBlockEffect(
+                            true
+                        );
+
 
                         logs.push(
                             "🛡️ Хулиган метил в <b>" +
@@ -1073,11 +2123,20 @@ document.addEventListener(
                     } else {
 
                         var isDodge =
-                            (Math.random() * 100) <
-                            (p.agility * 3);
+                            (
+                                Math.random() * 100
+                            ) <
+                            (
+                                p.agility * 3
+                            );
 
 
                         if (isDodge) {
+
+                            showDodgeEffect(
+                                true
+                            );
+
 
                             logs.push(
                                 "💨 <b>УВОРОТ!</b> Вы уклонились от удара в <b>" +
@@ -1090,14 +2149,24 @@ document.addEventListener(
                             p.hp =
                                 Math.max(
                                     0,
-                                    p.hp - baseEnemyDmg
+                                    p.hp -
+                                    enemyDamage
                                 );
 
 
                             setTimeout(
                                 function () {
-                                    playEnemyAttack();
-                                    show3DHit(true);
+
+                                    playEnemyAttack(
+                                        enemyA
+                                    );
+
+                                    show3DHit(
+                                        true,
+                                        enemyDamage,
+                                        false
+                                    );
+
                                 },
                                 180
                             );
@@ -1107,14 +2176,16 @@ document.addEventListener(
                                 "🥊 Хулиган нанес вам удар в <b>" +
                                 zoneText[enemyA] +
                                 "</b>. Урон: -" +
-                                baseEnemyDmg +
+                                enemyDamage +
                                 "."
                             );
                         }
                     }
 
 
-                    /* Log */
+                    /* =================================
+                       LOG
+                    ================================= */
 
                     var logBox =
                         document.querySelector(
@@ -1129,7 +2200,9 @@ document.addEventListener(
                                 "Ожидание хода..."
                             )
                         ) {
-                            logBox.innerHTML = "";
+
+                            logBox.innerHTML =
+                                "";
                         }
 
 
@@ -1140,14 +2213,17 @@ document.addEventListener(
                     }
 
 
-                    /* End battle */
+                    /* =================================
+                       END BATTLE
+                    ================================= */
 
                     if (
                         p.hp <= 0 ||
                         e.hp <= 0
                     ) {
 
-                        turnBtn.disabled = true;
+                        turnBtn.disabled =
+                            true;
 
 
                         if (
@@ -1156,15 +2232,19 @@ document.addEventListener(
                         ) {
 
                             if (logBox) {
+
                                 logBox.innerHTML =
                                     "<b>⚔️ Ничья!</b><br>" +
                                     logBox.innerHTML;
                             }
 
-                        } else if (e.hp <= 0) {
+                        } else if (
+                            e.hp <= 0
+                        ) {
 
                             p.coins +=
-                                200 + p.level * 20;
+                                200 +
+                                p.level * 20;
 
                             p.exp += 40;
 
@@ -1177,20 +2257,27 @@ document.addEventListener(
                             }
 
 
-                            if (p.exp >= p.maxExp) {
+                            if (
+                                p.exp >=
+                                p.maxExp
+                            ) {
 
                                 p.level += 1;
 
-                                p.exp -= p.maxExp;
+                                p.exp -=
+                                    p.maxExp;
 
                                 p.maxExp =
                                     Math.floor(
-                                        p.maxExp * 1.3
+                                        p.maxExp *
+                                        1.3
                                     );
 
-                                p.freePoints += 3;
+                                p.freePoints +=
+                                    3;
 
-                                p.maxHp += 20;
+                                p.maxHp +=
+                                    20;
 
 
                                 if (logBox) {
@@ -1217,21 +2304,30 @@ document.addEventListener(
                         setTimeout(
                             function () {
 
-                                p.hp = p.maxHp;
+                                p.hp =
+                                    p.maxHp;
 
                                 e.hp =
                                     e.maxHp +
-                                    (p.level * 10);
+                                    (
+                                        p.level *
+                                        10
+                                    );
 
-                                turnBtn.disabled = false;
+                                turnBtn.disabled =
+                                    false;
+
 
                                 if (logBox) {
+
                                     logBox.innerHTML =
                                         "Ожидание хода...";
                                 }
 
+
                                 updateUI();
                                 save();
+
                             },
                             4000
                         );
@@ -1251,15 +2347,19 @@ document.addEventListener(
         }
 
 
-        /* =========================
+        /* =================================
            SHOP
-        ========================= */
+        ================================= */
 
         var buyBrass =
-            document.getElementById("buy-brass");
+            document.getElementById(
+                "buy-brass"
+            );
 
         var buyKnife =
-            document.getElementById("buy-knife");
+            document.getElementById(
+                "buy-knife"
+            );
 
 
         if (buyBrass) {
@@ -1272,9 +2372,11 @@ document.addEventListener(
 
                         p.coins -= 150;
 
-                        p.weapon = "Кастеты";
+                        p.weapon =
+                            "Кастеты";
 
-                        p.bonusDamage = 5;
+                        p.bonusDamage =
+                            5;
 
                         showNotice(
                             "Куплены Кастеты!"
@@ -1307,7 +2409,8 @@ document.addEventListener(
                         p.weapon =
                             "Охотничий нож";
 
-                        p.bonusDamage = 12;
+                        p.bonusDamage =
+                            12;
 
                         showNotice(
                             "Куплен Нож!"
@@ -1327,15 +2430,19 @@ document.addEventListener(
         }
 
 
-        /* =========================
+        /* =================================
            STATS
-        ========================= */
+        ================================= */
 
         var addStr =
-            document.getElementById("add-str");
+            document.getElementById(
+                "add-str"
+            );
 
         var addAgi =
-            document.getElementById("add-agi");
+            document.getElementById(
+                "add-agi"
+            );
 
 
         if (addStr) {
@@ -1344,7 +2451,9 @@ document.addEventListener(
                 "click",
                 function () {
 
-                    if (p.freePoints > 0) {
+                    if (
+                        p.freePoints > 0
+                    ) {
 
                         p.freePoints--;
                         p.strength++;
@@ -1363,7 +2472,9 @@ document.addEventListener(
                 "click",
                 function () {
 
-                    if (p.freePoints > 0) {
+                    if (
+                        p.freePoints > 0
+                    ) {
 
                         p.freePoints--;
                         p.agility++;
@@ -1381,50 +2492,68 @@ document.addEventListener(
 );
 
 
-/* =========================
+/* =========================================
    NOTICE
-========================= */
+========================================= */
 
 function showNotice(text) {
 
     var n =
-        document.getElementById("notice");
+        document.getElementById(
+            "notice"
+        );
 
-    if (!n) return;
+    if (!n) {
+        return;
+    }
+
 
     n.innerText = text;
 
-    n.style.display = "block";
+    n.style.display =
+        "block";
 
 
     setTimeout(
         function () {
-            n.style.display = "none";
+
+            n.style.display =
+                "none";
+
         },
         2000
     );
 }
 
 
-/* =========================
-   UPDATE UI
-========================= */
+/* =========================================
+   UI UPDATE
+========================================= */
 
 function updateUI() {
 
     var coinsEl =
-        document.getElementById("coins");
+        document.getElementById(
+            "coins"
+        );
 
-    if (coinsEl)
-        coinsEl.innerText = p.coins;
+    if (coinsEl) {
+        coinsEl.innerText =
+            p.coins;
+    }
 
 
     var lvlEl =
-        document.getElementById("header-level");
+        document.getElementById(
+            "header-level"
+        );
 
-    if (lvlEl)
+    if (lvlEl) {
+
         lvlEl.innerText =
-            "Уровень " + p.level;
+            "Уровень " +
+            p.level;
+    }
 
 
     var pTxt =
@@ -1432,9 +2561,13 @@ function updateUI() {
             "hp-text-player"
         );
 
-    if (pTxt)
+    if (pTxt) {
+
         pTxt.innerText =
-            p.hp + "/" + p.maxHp;
+            p.hp +
+            "/" +
+            p.maxHp;
+    }
 
 
     var eTxt =
@@ -1442,9 +2575,13 @@ function updateUI() {
             "hp-text-enemy"
         );
 
-    if (eTxt)
+    if (eTxt) {
+
         eTxt.innerText =
-            e.hp + "/" + e.maxHp;
+            e.hp +
+            "/" +
+            e.maxHp;
+    }
 
 
     var pFill =
@@ -1452,9 +2589,16 @@ function updateUI() {
             "hp-fill-player"
         );
 
-    if (pFill)
+    if (pFill) {
+
         pFill.style.width =
-            ((p.hp / p.maxHp) * 100) + "%";
+            (
+                p.hp /
+                p.maxHp *
+                100
+            ) +
+            "%";
+    }
 
 
     var eFill =
@@ -1462,9 +2606,16 @@ function updateUI() {
             "hp-fill-enemy"
         );
 
-    if (eFill)
+    if (eFill) {
+
         eFill.style.width =
-            ((e.hp / e.maxHp) * 100) + "%";
+            (
+                e.hp /
+                e.maxHp *
+                100
+            ) +
+            "%";
+    }
 
 
     var prLvl =
@@ -1472,8 +2623,10 @@ function updateUI() {
             "prof-level"
         );
 
-    if (prLvl)
-        prLvl.innerText = p.level;
+    if (prLvl) {
+        prLvl.innerText =
+            p.level;
+    }
 
 
     var prWpn =
@@ -1481,8 +2634,10 @@ function updateUI() {
             "prof-weapon"
         );
 
-    if (prWpn)
-        prWpn.innerText = p.weapon;
+    if (prWpn) {
+        prWpn.innerText =
+            p.weapon;
+    }
 
 
     var prDmg =
@@ -1490,9 +2645,12 @@ function updateUI() {
             "prof-damage"
         );
 
-    if (prDmg)
+    if (prDmg) {
+
         prDmg.innerText =
-            15 + p.bonusDamage;
+            15 +
+            p.bonusDamage;
+    }
 
 
     var prMhp =
@@ -1500,9 +2658,12 @@ function updateUI() {
             "prof-maxhp"
         );
 
-    if (prMhp)
+    if (prMhp) {
+
         prMhp.innerText =
-            p.maxHp + " HP";
+            p.maxHp +
+            " HP";
+    }
 
 
     var prStr =
@@ -1510,9 +2671,10 @@ function updateUI() {
             "prof-str"
         );
 
-    if (prStr)
+    if (prStr) {
         prStr.innerText =
             p.strength;
+    }
 
 
     var prAgi =
@@ -1520,9 +2682,10 @@ function updateUI() {
             "prof-agi"
         );
 
-    if (prAgi)
+    if (prAgi) {
         prAgi.innerText =
             p.agility;
+    }
 
 
     var prFre =
@@ -1530,9 +2693,10 @@ function updateUI() {
             "prof-free"
         );
 
-    if (prFre)
+    if (prFre) {
         prFre.innerText =
             p.freePoints;
+    }
 
 
     var fBlock =
@@ -1553,7 +2717,9 @@ function updateUI() {
 
     if (fBlock) {
 
-        if (p.freePoints > 0) {
+        if (
+            p.freePoints > 0
+        ) {
 
             fBlock.style.display =
                 "block";
@@ -1587,12 +2753,14 @@ function updateUI() {
             "exp-text"
         );
 
-    if (expTxt)
+    if (expTxt) {
+
         expTxt.innerText =
             p.exp +
             " / " +
             p.maxExp +
             " XP";
+    }
 
 
     var expFill =
@@ -1600,8 +2768,14 @@ function updateUI() {
             "exp-fill"
         );
 
-    if (expFill)
+    if (expFill) {
+
         expFill.style.width =
-            ((p.exp / p.maxExp) * 100) +
+            (
+                p.exp /
+                p.maxExp *
+                100
+            ) +
             "%";
+    }
 }
