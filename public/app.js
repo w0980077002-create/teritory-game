@@ -142,13 +142,30 @@ function showNotice(t) {
 }
 
 // 4. ОБНОВЛЕНИЕ ЗДОРОВЬЯ И МОНЕТ НА ЭКРАНЕ
+// 4. ОБНОВЛЕНИЕ ЗДОРОВЬЯ И МОНЕТ НА ЭКРАНЕ
 function updateUI() {
-    // Обновляем золото (твой b id="coins" из шапки)
+    // Обновляем золото в шапке
     var coinsEl = document.getElementById("coins");
     if (coinsEl) coinsEl.innerText = p.coins;
 
-    // Обновление полосок HP (если у тебя есть классы или id на них)
-    // Ищем контейнеры с текстом Вы: и Враг:
-    var bars = document.querySelectorAll(".bars-container div");
-    // Здесь мы добавим логику изменения ширины, как только проверим разметку полосок в html
+    // 1. Обновляем текстовые показатели HP (цифры)
+    var playerText = document.getElementById("hp-text-player");
+    var enemyText = document.getElementById("hp-text-enemy");
+    
+    if (playerText) playerText.innerText = `${p.hp}/${p.maxHp}`;
+    if (enemyText) enemyText.innerText = `${e.hp}/${e.maxHp}`;
+
+    // 2. Изменяем ширину графических полосок (в процентах)
+    var playerFill = document.getElementById("hp-fill-player");
+    var enemyFill = document.getElementById("hp-fill-enemy");
+
+    if (playerFill) {
+        var playerPct = (p.hp / p.maxHp) * 100;
+        playerFill.style.width = playerPct + "%";
+    }
+    
+    if (enemyFill) {
+        var enemyPct = (e.hp / e.maxHp) * 100;
+        enemyFill.style.width = enemyPct + "%";
+    }
 }
