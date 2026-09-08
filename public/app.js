@@ -1,40 +1,1148 @@
-const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
-const cors = require('cors');
-const path = require('path');
+/* =========================================
+   TERITORY
+   СИСТЕМА ПЕРСОНАЖА
+   ========================================= */
 
-const app = express();
-const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+const player = {
 
-// Подключение базы данных SQLite
-const db = new sqlite3.Database('./game.db', (err) => {
-    if (err) console.error('Ошибка БД:', err.message);
-    console.log('База данных Territory подключена.');
-});
+    name: "Игрок",
 
-// Создание таблиц при запуске
-db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-        tg_id INTEGER PRIMARY KEY,
-        username TEXT,
-        lvl INTEGER DEFAULT 1,
-        exp INTEGER DEFAULT 0,
-        coins INTEGER DEFAULT 300,
-        hp_max INTEGER DEFAULT 120,
-        damage_bonus INTEGER DEFAULT 0
-    )`);
-});
+    level: 1,
 
-// Список товаров для Магазина
-const SHOP_ITEMS = [
-    { id: 'brass_knuckles', name: 'Стальной кастет', price: 200, bonus: 5, icon: '👊' },
-    { id: 'tactical_knife', name: 'Охотничий нож', price: 500, bonus: 12, icon: '🔪' },
-    { id: 'baton', name: 'Дубинка', price: 1000, bonus: 25, icon: '🥖' }
+    experience: 0,
+
+    money: 1000,
+
+    hp: 100,
+
+    maxHp: 100,
+
+    energy: 100,
+
+    maxEnergy: 100,
+
+    baseStats: {
+
+        strength: 10,
+
+        agility: 10,
+
+        defense: 5,
+
+        damage: 5,
+
+        accuracy: 50,
+
+        critical: 5
+
+    },
+
+    equipment: {
+
+        head: null,
+
+        body: null,
+
+        weapon: null,
+
+        secondary: null,
+
+        clothes: null,
+
+        feet: null
+
+    },
+
+    inventory: []
+
+};
+
+
+/* =========================================
+   ПРЕДМЕТЫ
+   ========================================= */
+
+const items = {
+
+    pistol: {
+
+        id: "pistol",
+
+        name: "Пистолет",
+
+        icon: "🔫",
+
+        type: "weapon",
+
+        slot: "weapon",
+
+        description: "Надёжный пистолет для ближнего боя.",
+
+        stats: {
+
+            damage: 15,
+
+            accuracy: 10,
+
+            critical: 3
+
+        }
+
+    },
+
+
+    knife: {
+
+        id: "knife",
+
+        name: "Нож",
+
+        icon: "🔪",
+
+        type: "secondary",
+
+        slot: "secondary",
+
+        description: "Простой боевой нож.",
+
+        stats: {
+
+            damage: 7,
+
+            critical: 5
+
+        }
+
+    },
+
+
+    helmet: {
+
+        id: "helmet",
+
+        name: "Тактический шлем",
+
+        icon: "🪖",
+
+        type: "armor",
+
+        slot: "head",
+
+        description: "Защищает голову.",
+
+        stats: {
+
+            defense: 8
+
+        }
+
+    },
+
+
+    armor: {
+
+        id: "armor",
+
+        name: "Бронежилет",
+
+        icon: "🛡️",
+
+        type: "armor",
+
+        slot: "body",
+
+        description: "Укреплённый бронежилет.",
+
+        stats: {
+
+            defense: 20,
+
+            agility: -1
+
+        }
+
+    },
+
+
+    jacket: {
+
+        id: "jacket",
+
+        name: "Кожаная куртка",
+
+        icon: "🧥",
+
+        type: "clothes",
+
+        slot: "clothes",
+
+        description: "Стильная и прочная куртка.",
+
+        stats: {
+
+            defense: 3,
+
+            agility: 2
+
+        }
+
+    },
+
+
+    boots: {
+
+        id: "boots",
+
+        name: "Тактические ботинки",
+
+        icon: "🥾",
+
+        type: "feet",
+
+        slot: "feet",
+
+        description: "Удобные ботинки для быстрого передвижения.",
+
+        stats: {
+
+            agility: 4
+
+        }
+
+    },
+
+
+    medkit: {
+
+        id: "medkit",
+
+        name: "Аптечка",
+
+        icon: "🩹",
+
+        type: "medical",
+
+        slot: null,
+
+        description: "Восстанавливает 40 единиц здоровья.",
+
+        heal: 40
+
+    },
+
+
+    energyDrink: {
+
+        id: "energyDrink",
+
+        name: "Энергетик",
+
+        icon: "🥤",
+
+        type: "food",
+
+        slot: null,
+
+        description: "Восстанавливает 30 энергии.",
+
+        energy: 30
+
+    }
+
+};
+
+
+/* =========================================
+   НАЧАЛЬНЫЙ ИНВЕНТАРЬ
+   ========================================= */
+
+player.inventory = [
+
+    items.pistol,
+
+    items.knife,
+
+    items.helmet,
+
+    items.armor,
+
+    items.jacket,
+
+    items.boots,
+
+    items.medkit,
+
+    items.medkit,
+
+    items.energyDrink
+
 ];
+
+
+/* =========================================
+   ПОЛУЧЕНИЕ ХАРАКТЕРИСТИК
+   ========================================= */
+
+function getStats() {
+
+    const stats = {
+
+        strength: player.baseStats.strength,
+
+        agility: player.baseStats.agility,
+
+        defense: player.baseStats.defense,
+
+        damage: player.baseStats.damage,
+
+        accuracy: player.baseStats.accuracy,
+
+        critical: player.baseStats.critical
+
+    };
+
+
+    Object.values(player.equipment).forEach(item => {
+
+        if (!item || !item.stats) return;
+
+        Object.keys(item.stats).forEach(stat => {
+
+            if (stats[stat] !== undefined) {
+
+                stats[stat] += item.stats[stat];
+
+            }
+
+        });
+
+    });
+
+
+    return stats;
+
+}
+
+
+/* =========================================
+   ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
+   ========================================= */
+
+function updateUI() {
+
+    const stats = getStats();
+
+
+    document.getElementById("playerName").textContent =
+        player.name;
+
+    document.getElementById("playerLevel").textContent =
+        player.level;
+
+    document.getElementById("money").textContent =
+        player.money;
+
+
+    document.getElementById("hp").textContent =
+        player.hp;
+
+    document.getElementById("maxHp").textContent =
+        player.maxHp;
+
+    document.getElementById("energy").textContent =
+        player.energy;
+
+    document.getElementById("maxEnergy").textContent =
+        player.maxEnergy;
+
+
+    document.getElementById("hpBar").style.width =
+        (player.hp / player.maxHp * 100) + "%";
+
+    document.getElementById("energyBar").style.width =
+        (player.energy / player.maxEnergy * 100) + "%";
+
+
+    document.getElementById("strength").textContent =
+        stats.strength;
+
+    document.getElementById("agility").textContent =
+        stats.agility;
+
+    document.getElementById("defense").textContent =
+        stats.defense;
+
+    document.getElementById("damage").textContent =
+        stats.damage;
+
+    document.getElementById("accuracy").textContent =
+        stats.accuracy;
+
+    document.getElementById("critical").textContent =
+        stats.critical + "%";
+
+
+    updateEquipment();
+
+    renderInventory();
+
+}
+
+
+/* =========================================
+   ЭКИПИРОВКА
+   ========================================= */
+
+function updateEquipment() {
+
+    const slots = [
+
+        "head",
+
+        "body",
+
+        "weapon",
+
+        "secondary",
+
+        "clothes",
+
+        "feet"
+
+    ];
+
+
+    slots.forEach(slot => {
+
+        const element =
+            document.getElementById("slot-" + slot);
+
+        const item =
+            player.equipment[slot];
+
+
+        if (item) {
+
+            element.textContent =
+                item.icon + " " + item.name;
+
+        } else {
+
+            element.textContent = "Пусто";
+
+        }
+
+    });
+
+}
+
+
+/* =========================================
+   ИНВЕНТАРЬ
+   ========================================= */
+
+function renderInventory() {
+
+    const container =
+        document.getElementById("inventory");
+
+
+    container.innerHTML = "";
+
+
+    document.getElementById("inventoryCount").textContent =
+        player.inventory.length;
+
+
+    if (player.inventory.length === 0) {
+
+        container.innerHTML = `
+            <div style="
+                grid-column:1/-1;
+                text-align:center;
+                padding:40px;
+                color:#7f8b99;
+            ">
+                🎒<br><br>
+                Рюкзак пуст
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    player.inventory.forEach((item, index) => {
+
+        const div =
+            document.createElement("div");
+
+        div.className = "item";
+
+
+        div.innerHTML = `
+
+            <div>
+
+                <div class="item-icon">
+                    ${item.icon}
+                </div>
+
+                <div class="item-name">
+                    ${item.name}
+                </div>
+
+                <div class="item-type">
+                    ${getItemType(item)}
+                </div>
+
+            </div>
+
+            <button
+                class="item-button"
+                onclick="openItem(${index})">
+
+                ОТКРЫТЬ
+
+            </button>
+        `;
+
+
+        container.appendChild(div);
+
+    });
+
+}
+
+
+function getItemType(item) {
+
+    switch (item.type) {
+
+        case "weapon":
+            return "Оружие";
+
+        case "secondary":
+            return "Вторичное оружие";
+
+        case "armor":
+            return "Броня";
+
+        case "clothes":
+            return "Одежда";
+
+        case "feet":
+            return "Обувь";
+
+        case "medical":
+            return "Медицина";
+
+        case "food":
+            return "Расходник";
+
+        default:
+            return "Предмет";
+
+    }
+
+}
+
+
+/* =========================================
+   МОДАЛЬНОЕ ОКНО
+   ========================================= */
+
+let selectedItemIndex = null;
+
+
+function openItem(index) {
+
+    selectedItemIndex = index;
+
+
+    const item =
+        player.inventory[index];
+
+
+    document.getElementById("modalIcon").textContent =
+        item.icon;
+
+    document.getElementById("modalName").textContent =
+        item.name;
+
+    document.getElementById("modalDescription").textContent =
+        item.description;
+
+
+    const stats =
+        document.getElementById("modalStats");
+
+
+    stats.innerHTML = "";
+
+
+    if (item.stats) {
+
+        Object.keys(item.stats).forEach(stat => {
+
+            const value =
+                item.stats[stat];
+
+
+            const div =
+                document.createElement("div");
+
+            div.className = "modal-stat";
+
+
+            div.innerHTML = `
+
+                <span>${getStatName(stat)}</span>
+
+                <b>
+                    ${value > 0 ? "+" : ""}
+                    ${value}
+                </b>
+
+            `;
+
+
+            stats.appendChild(div);
+
+        });
+
+    }
+
+
+    if (item.heal) {
+
+        stats.innerHTML += `
+
+            <div class="modal-stat">
+
+                <span>❤️ Лечение</span>
+
+                <b>+${item.heal}</b>
+
+            </div>
+
+        `;
+
+    }
+
+
+    if (item.energy) {
+
+        stats.innerHTML += `
+
+            <div class="modal-stat">
+
+                <span>⚡ Энергия</span>
+
+                <b>+${item.energy}</b>
+
+            </div>
+
+        `;
+
+    }
+
+
+    const equipButton =
+        document.getElementById("equipButton");
+
+    const useButton =
+        document.getElementById("useButton");
+
+
+    if (item.slot) {
+
+        equipButton.style.display =
+            "block";
+
+    } else {
+
+        equipButton.style.display =
+            "none";
+
+    }
+
+
+    if (item.heal || item.energy) {
+
+        useButton.style.display =
+            "block";
+
+    } else {
+
+        useButton.style.display =
+            "none";
+
+    }
+
+
+    document
+        .getElementById("itemModal")
+        .classList.add("active");
+
+}
+
+
+function getStatName(stat) {
+
+    const names = {
+
+        strength: "💪 Сила",
+
+        agility: "🏃 Ловкость",
+
+        defense: "🛡 Защита",
+
+        damage: "⚔️ Урон",
+
+        accuracy: "🎯 Точность",
+
+        critical: "💥 Крит"
+
+    };
+
+
+    return names[stat] || stat;
+
+}
+
+
+/* =========================================
+   ЗАКРЫТЬ ОКНО
+   ========================================= */
+
+function closeModal() {
+
+    document
+        .getElementById("itemModal")
+        .classList.remove("active");
+
+    selectedItemIndex = null;
+
+}
+
+
+/* =========================================
+   НАДЕТЬ
+   ========================================= */
+
+function equipSelectedItem() {
+
+    if (selectedItemIndex === null)
+        return;
+
+
+    const item =
+        player.inventory[selectedItemIndex];
+
+
+    if (!item.slot)
+        return;
+
+
+    const slot =
+        item.slot;
+
+
+    /* Если в слоте уже что-то есть,
+       возвращаем старую вещь в рюкзак */
+
+    if (player.equipment[slot]) {
+
+        player.inventory.push(
+            player.equipment[slot]
+        );
+
+    }
+
+
+    player.equipment[slot] =
+        item;
+
+
+    player.inventory.splice(
+        selectedItemIndex,
+        1
+    );
+
+
+    closeModal();
+
+    updateUI();
+
+}
+
+
+/* =========================================
+   СНЯТЬ ЭКИПИРОВКУ
+   ========================================= */
+
+function unequip(slot) {
+
+    const item =
+        player.equipment[slot];
+
+
+    if (!item)
+        return;
+
+
+    if (player.inventory.length >= 30) {
+
+        alert("Рюкзак переполнен!");
+
+        return;
+
+    }
+
+
+    player.inventory.push(item);
+
+    player.equipment[slot] = null;
+
+
+    updateUI();
+
+}
+
+
+/* =========================================
+   ВЫБРОСИТЬ
+   ========================================= */
+
+function dropSelectedItem() {
+
+    if (selectedItemIndex === null)
+        return;
+
+
+    const item =
+        player.inventory[selectedItemIndex];
+
+
+    const confirmDrop =
+        confirm(
+            "Выбросить " +
+            item.name +
+            "?"
+        );
+
+
+    if (!confirmDrop)
+        return;
+
+
+    player.inventory.splice(
+        selectedItemIndex,
+        1
+    );
+
+
+    closeModal();
+
+    updateUI();
+
+}
+
+
+/* =========================================
+   ИСПОЛЬЗОВАТЬ
+   ========================================= */
+
+function useSelectedItem() {
+
+    if (selectedItemIndex === null)
+        return;
+
+
+    const item =
+        player.inventory[selectedItemIndex];
+
+
+    if (item.heal) {
+
+        player.hp =
+            Math.min(
+                player.maxHp,
+                player.hp + item.heal
+            );
+
+    }
+
+
+    if (item.energy) {
+
+        player.energy =
+            Math.min(
+                player.maxEnergy,
+                player.energy + item.energy
+            );
+
+    }
+
+
+    if (item.heal || item.energy) {
+
+        player.inventory.splice(
+            selectedItemIndex,
+            1
+        );
+
+    }
+
+
+    closeModal();
+
+    updateUI();
+
+}
+
+
+/* =========================================
+   ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ
+   ========================================= */
+
+function showScreen(screenId) {
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(screen => {
+
+            screen.classList.remove("active");
+
+        });
+
+
+    document
+        .getElementById(screenId)
+        .classList.add("active");
+
+}
+
+
+/* =========================================
+   БОЕВАЯ СИСТЕМА
+   ========================================= */
+
+let enemy = {
+
+    hp: 100,
+
+    maxHp: 100
+
+};
+
+
+function attack() {
+
+    if (enemy.hp <= 0) {
+
+        return;
+
+    }
+
+
+    const stats =
+        getStats();
+
+
+    let damage =
+        stats.damage;
+
+
+    /* Бонус от силы */
+
+    damage +=
+        Math.floor(
+            stats.strength / 2
+        );
+
+
+    /* Критический удар */
+
+    const critical =
+        Math.random() * 100 <
+        stats.critical;
+
+
+    if (critical) {
+
+        damage *= 2;
+
+    }
+
+
+    damage =
+        Math.floor(damage);
+
+
+    enemy.hp =
+        Math.max(
+            0,
+            enemy.hp - damage
+        );
+
+
+    document.getElementById(
+        "enemyHp"
+    ).textContent =
+        enemy.hp;
+
+
+    document.getElementById(
+        "enemyBar"
+    ).style.width =
+        (enemy.hp / enemy.maxHp * 100) + "%";
+
+
+    let message =
+        "Вы нанесли " +
+        damage +
+        " урона.";
+
+
+    if (critical) {
+
+        message =
+            "💥 КРИТИЧЕСКИЙ УДАР! " +
+            message;
+
+    }
+
+
+    document.getElementById(
+        "battleLog"
+    ).textContent =
+        message;
+
+
+    if (enemy.hp <= 0) {
+
+        document.getElementById(
+            "battleLog"
+        ).textContent =
+            "🏆 Враг повержен! Вы получили награду.";
+
+        player.money += 100;
+
+        player.experience += 50;
+
+        updateUI();
+
+        setTimeout(resetEnemy, 1500);
+
+        return;
+
+    }
+
+
+    enemyAttack();
+
+}
+
+
+function enemyAttack() {
+
+    setTimeout(() => {
+
+        const stats =
+            getStats();
+
+
+        const enemyDamage =
+            Math.max(
+                1,
+                12 - stats.defense
+            );
+
+
+        player.hp =
+            Math.max(
+                0,
+                player.hp - enemyDamage
+            );
+
+
+        document.getElementById(
+            "battleLog"
+        ).textContent +=
+            " Бандит нанёс " +
+            enemyDamage +
+            " урона.";
+
+
+        updateUI();
+
+
+        if (player.hp <= 0) {
+
+            document.getElementById(
+                "battleLog"
+            ).textContent =
+                "💀 Вы проиграли бой.";
+
+        }
+
+    }, 400);
+
+}
+
+
+function resetEnemy() {
+
+    enemy.hp =
+        enemy.maxHp;
+
+
+    document.getElementById(
+        "enemyHp"
+    ).textContent =
+        enemy.hp;
+
+
+    document.getElementById(
+        "enemyBar"
+    ).style.width =
+        "100%";
+
+
+    document.getElementById(
+        "battleLog"
+    ).textContent =
+        "Новый противник появился.";
+
+}
+
+
+/* =========================================
+   КЛИК ПО МОДАЛЬНОМУ ФОНУ
+   ========================================= */
+
+document
+    .getElementById("itemModal")
+    .addEventListener("click", function(event) {
+
+        if (event.target === this) {
+
+            closeModal();
+
+        }
+
+    });
+
+
+/* =========================================
+   ЗАПУСК
+   ========================================= */
+
+updateUI();];
 
 // 1. Авторизация игрока
 app.post('/api/auth', (req, res) => {
