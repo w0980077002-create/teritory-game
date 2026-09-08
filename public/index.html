@@ -1,138 +1,97 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Territory</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Territory</title><link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main class="app">
   <header>
-    <div class="brand">
-      <div class="logo">T</div>
-      <div>
-        <b>TERRITORY</b>
-        <small id="level">Уровень 1</small>
-      </div>
-    </div>
-    <div class="res">
-      <span>🪙 <b id="coins">1000</b></span>
-      <span>🩸 <b id="playerhp">120/120</b></span>
-    </div>
+    <div class="brand"><div class="logo">T</div><div><b>TERRITORY</b><small id="level">Уровень 1</small></div></div>
+    <div class="res"><span>🪙 <b id="coins">1000</b></span><span>🩸 <b id="playerhp">120/120</b></span></div>
   </header>
-
   <section class="screen">
     <div id="notice" class="notice"></div>
-
-    <!-- 1. ЭКРАН БОЯ -->
+    <!-- 1. АРЕНА -->
     <div id="page-home" class="game-page">
-      <div class="hero">
-        <div>
-          <small>БОЙЦОВСКАЯ АРЕНА</small>
-          <h1 id="arena-title">Уличный поединок</h1>
-        </div>
-        <div class="shield">🥊</div>
-      </div>
+      <div class="hero"><div><small>БОЙЦОВСКАЯ АРЕНА</small><h1 id="arena-title">Местный хулиган</h1></div><div class="shield">🥊</div></div>
       <div class="battle">
         <div class="enemyname">⚔️ Противник: <span id="enemyhp">100/100</span></div>
         <div class="bars-container">
-          <div class="bar-label">Вы:</div>
-          <div class="bar"><i class="player-hp-bar" style="width: 100%; background: #2ecc71; display: block; height: 100%;"></i></div>
-          <div class="bar-label">Враг:</div>
-          <div class="bar"><i class="enemy-hp-bar" style="width: 100%; background: #e74c3c; display: block; height: 100%;"></i></div>
+          <div class="bar-label">Вы:</div><div class="bar"><i class="player-hp-bar" style="width:100%;background:#2ecc71;display:block;height:100%"></i></div>
+          <div class="bar-label">Враг:</div><div class="bar"><i class="enemy-hp-bar" style="width:100%;background:#e74c3c;display:block;height:100%"></i></div>
         </div>
         <div class="zone-title">КУДА АТАКУЕМ:</div>
-        <div class="powers">
-          <button class="attack-zone" data-zone="head">Голова</button>
-          <button class="attack-zone" data-zone="torso">Корпус</button>
-          <button class="attack-zone" data-zone="legs">Ноги</button>
-        </div>
+        <div class="powers"><button class="attack-zone" data-zone="head">Голова</button><button class="attack-zone" data-zone="torso">Корпус</button><button class="attack-zone" data-zone="legs">Ноги</button></div>
         <div class="zone-title">ЧТО БЛОКИРУЕМ:</div>
-        <div class="powers">
-          <button class="block-zone" data-zone="head">Голова</button>
-          <button class="block-zone" data-zone="torso">Корпус</button>
-          <button class="block-zone" data-zone="legs">Ноги</button>
-        </div>
+        <div class="powers"><button class="block-zone" data-zone="head">Голова</button><button class="block-zone" data-zone="torso">Корпус</button><button class="block-zone" data-zone="legs">Ноги</button></div>
         <button id="attack" class="attack">⚔️ СДЕЛАТЬ ХОД</button>
       </div>
-      <div class="log-container">
-        <div class="log-title">История боя:</div>
-        <div id="battle-log" class="battle-log"><p>Ожидание вашего хода...</p></div>
-      </div>
+      <div class="log-container"><div class="log-title">История боя:</div><div id="battle-log" class="battle-log"><p>Ожидание хода...</p></div></div>
     </div>
-
-    <!-- 2. ЭКРАН МАГАЗИНА -->
-    <div id="page-shop" class="game-page" style="display: none;">
-      <div class="hero">
-        <div><small>ОРУЖЕЙНАЯ ЛАВКА</small><h1>Рынок</h1></div>
-        <div class="shield">🛒</div>
-      </div>
-      <div class="shop-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-          <div><h3>🥊 Кожаные кастеты</h3><small style="color:#2ecc71">+3 к Силе</small></div>
-          <button id="buy-knuckles" style="background:#f1c40f; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#121216">500 🪙</button>
+    <!-- 2. РЫНОК -->
+    <div id="page-shop" class="game-page" style="display:none">
+      <div class="hero"><div><small>ОРУЖЕЙНАЯ ЛАВКА</small><h1>Рынок</h1></div><div class="shield">🛒</div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
+          <div><h3>🥊 Кастеты</h3><small style="color:#2ecc71">+3 к Силе</small></div><button id="buy-knuckles" style="background:#f1c40f;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#121216">500 🪙</button>
         </div>
-        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-          <div><h3>🔪 Охотничий нож</h3><small style="color:#2ecc71">+8 к Силе</small></div>
-          <button id="buy-knife" style="background:#f1c40f; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#121216">1200 🪙</button>
+        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
+          <div><h3>🔪 Нож</h3><small style="color:#2ecc71">+8 к Силе</small></div><button id="buy-knife" style="background:#f1c40f;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#121216">1200 🪙</button>
         </div>
       </div>
     </div>
-
-    <!-- 3. ЭКРАН ПЕРСОНАЖА -->
-    <div id="page-profile" class="game-page" style="display: none;">
-      <div class="hero">
-        <div><small>ЛИЧНОЕ ДЕЛО</small><h1>Ваш Боец</h1></div>
-        <div class="shield">👤</div>
-      </div>
-      <div style="background:#1f1f24; border:1px solid #2b2b33; padding:14px; border-radius:12px; margin-top:10px; display:flex; flex-direction:column; gap:12px;">
-        <p style="color:#f1c40f; font-weight:bold; display:none;" id="prof-points-box">✨ Очки прокачки: <span id="prof-points">0</span></p>
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2b2b33; padding-bottom:6px;">
-          <span>💪 Сила: <b id="prof-power">5</b></span>
-          <button id="up-power" style="display:none; background:#2ecc71; border:none; color:white; width:28px; height:28px; font-weight:bold; border-radius:6px;">+</button>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2b2b33; padding-bottom:6px;">
-          <span>⚡ Ловкость: <b id="prof-agility">5</b></span>
-          <button id="up-agility" style="display:none; background:#2ecc71; border:none; color:white; width:28px; height:28px; font-weight:bold; border-radius:6px;">+</button>
-        </div>
-        <p>🎒 Оружие: <b id="prof-weapon">Кулаки</b></p>
-        <p>🏆 Побед: <b id="prof-victories">0</b></p>
-        <button id="reset-progress" style="background:#e74c3c; border:none; color:white; padding:10px; border-radius:8px; font-weight:bold; font-size:12px">Сбросить игру</button>
+    <!-- 3. ПЕРСОНАЖ -->
+    <div id="page-profile" class="game-page" style="display:none">
+      <div class="hero"><div><small>ЛИЧНОЕ ДЕЛО</small><h1>Ваш Боец</h1></div><div class="shield">👤</div></div>
+      <div style="background:#1f1f24;border:1px solid #2b2b33;padding:14px;border-radius:12px;margin-top:10px;display:flex;flex-direction:column;gap:12px">
+        <p style="color:#f1c40f;font-weight:bold;display:none" id="prof-points-box">✨ Очки прокачки: <span id="prof-points">0</span></p>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2b2b33;padding-bottom:6px"><span>💪 Сила: <b id="prof-power">5</b></span><button id="up-power" style="display:none;background:#2ecc71;border:none;color:white;width:28px;height:28px;font-weight:bold;border-radius:6px">+</button></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2b2b33;padding-bottom:6px"><span>⚡ Ловкость: <b id="prof-agility">5</b></span><button id="up-agility" style="display:none;background:#2ecc71;border:none;color:white;width:28px;height:28px;font-weight:bold;border-radius:6px">+</button></div>
+        <p>🎒 Оружие: <b id="prof-weapon">Кулаки</b></p><p>🏆 Побед: <b id="prof-victories">0</b></p>
+        <button id="reset-progress" style="background:#e74c3c;border:none;color:white;padding:10px;border-radius:8px;font-weight:bold;font-size:12px">Сбросить игру</button>
       </div>
     </div>
-
-    <!-- 4. ЭКРАН РАЙОНОВ -->
-    <div id="page-map" class="game-page" style="display: none;">
-      <div class="hero">
-        <div><small>КАРТА ГОРОДА</small><h1>Районы</h1></div>
-        <div class="shield">🗺️</div>
-      </div>
-      <div class="district-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-          <div><h3>🐾 Бродячая крыса</h3><small style="color:#8a8a93">40 HP • Награда: +60 🪙</small></div>
-          <button class="select-enemy" data-type="rat" style="background:#e74c3c; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#fff">В БОЙ</button>
+    <!-- 4. РАЙОНЫ -->
+    <div id="page-map" class="game-page" style="display:none">
+      <div class="hero"><div><small>КАРТА ГОРОДА</small><h1>Районы</h1></div><div class="shield">🗺️</div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
+          <div><h3>🐾 Бродячая крыса</h3><small style="color:#8a8a93">40 HP • Награда: +60 🪙</small></div><button class="select-enemy" data-type="rat" style="background:#e74c3c;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#fff">В БОЙ</button>
         </div>
-        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-          <div><h3>🥊 Местный хулиган</h3><small style="color:#8a8a93">100 HP • Награда: +200 🪙</small></div>
-          <button class="select-enemy" data-type="thug" style="background:#e74c3c; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#fff">В БОЙ</button>
+        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
+          <div><h3>🥊 Местный хулиган</h3><small style="color:#8a8a93">100 HP • Награда: +200 🪙</small></div><button class="select-enemy" data-type="thug" style="background:#e74c3c;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#fff">В БОЙ</button>
         </div>
-        <div style="background:#1f1f24; border:1px solid #2b2b33; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; border-color:#f1c40f">
-          <div><h3 style="color:#f1c40f">👹 Главарь промзоны [БОСС]</h3><small style="color:#8a8a93">220 HP • Награда: +600 🪙</small></div>
-          <button class="select-enemy" data-type="boss" style="background:#f1c40f; border:none; padding:8px 12px; font-weight:bold; border-radius:6px; color:#121216">В БОЙ</button>
+        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;border-color:#f1c40f">
+          <div><h3 style="color:#f1c40f">👹 Главарь промзоны [БОСС]</h3><small style="color:#8a8a93">220 HP • Награда: +600 🪙</small></div><button class="select-enemy" data-type="boss" style="background:#f1c40f;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#121216">В БОЙ</button>
         </div>
       </div>
     </div>
   </section>
-
   <nav>
-    <button class="tab active" data-tab="home">🥊<small>Арена</small></button>
-    <button class="tab" data-tab="map">🗺️<small>Районы</small></button>
-    <button class="tab" data-tab="shop">🛒<small>Рынок</small></button>
-    <button class="tab" data-tab="profile">👤<small>Персонаж</small></button>
+    <button class="tab active" data-tab="home">🥊<small>Арена</small></button><button class="tab" data-tab="map">🗺️<small>Районы</small></button><button class="tab" data-tab="shop">🛒<small>Рынок</small></button><button class="tab" data-tab="profile">👤<small>Персонаж</small></button>
   </nav>
-
-  <script src="app.js?v=205"></script>
-</main>
-</body>
-</html>
+  <script>
+    var p={hp:120,maxHp:120,coins:1000,level:1,power:5,agility:5,victories:0,weaponBonus:0,weaponName:"Кулаки",freePoints:0};
+    var e={name:"Местный хулиган",hp:100,maxHp:100,power:4,prize:200,type:"thug"};
+    var selA=null,selB=null;
+    try{var s=localStorage.getItem("t_save_v10");if(s){var parsed=JSON.parse(s);if(parsed&&typeof parsed.power==="number")p=parsed;}}catch(err){}
+    function save(){try{localStorage.setItem("t_save_v10",JSON.stringify(p));}catch(err){}}
+    function showNotice(t){var n=document.getElementById("notice");if(n){n.textContent=t;n.style.display="block";setTimeout(function(){n.style.display="none"},2000)}}
+    function updateUI(){
+      document.getElementById("playerhp").textContent=p.hp+"/"+p.maxHp;document.getElementById("enemyhp").textContent=e.hp+"/"+e.maxHp;
+      document.getElementById("coins").textContent=p.coins;document.getElementById("level").textContent="Уровень "+p.level;
+      if(document.getElementById("arena-title"))document.getElementById("arena-title").textContent=e.name;
+      var nl=document.querySelector(".enemyname");if(nl)nl.innerHTML="⚔️ Противник: <span>"+e.hp+"/"+e.maxHp+"</span>";
+      document.getElementById("prof-victories").textContent=p.victories;document.getElementById("prof-power").textContent=p.power+" (+"+p.weaponBonus+")";
+      document.getElementById("prof-agility").textContent=p.agility;document.getElementById("prof-weapon").textContent=p.weaponName;
+      var pb=document.getElementById("prof-points-box"),bp=document.getElementById("up-power"),ba=document.getElementById("up-agility");
+      if(p.freePoints>0){if(pb)pb.style.display="block";document.getElementById("prof-points").textContent=p.freePoints;if(bp)bp.style.display="block";if(ba)ba.style.display="block"}
+      else{if(pb)pb.style.display="none";if(bp)bp.style.display="none";if(ba)ba.style.display="none"}
+      var h1=document.querySelector(".player-hp-bar");if(h1)h1.style.width=((p.hp/p.maxHp)*100)+"%";
+      var h2=document.querySelector(".enemy-hp-bar");if(h2)h2.style.width=((e.hp/e.maxHp)*100)+"%"
+    }
+    var tabs=document.querySelectorAll(".tab");
+    tabs.forEach(function(t){t.onclick=function(){tabs.forEach(function(x){x.classList.remove("active")});t.classList.add("active");document.querySelectorAll(".game-page").forEach(function(pg){pg.style.display="none"});var target="page-"+t.getAttribute("data-tab");if(document.getElementById(target))document.getElementById(target).style.display="block";updateUI()}});
+    var eb=document.querySelectorAll(".select-enemy");
+    eb.forEach(function(b){b.onclick=function(){var t=b.getAttribute("data-type");e.type=t;if(t==="rat"){e.name="Бродячая крыса";e.maxHp=40;e.hp=40;e.power=2;e.prize=60}else if(t==="thug"){e.name="Местный хулиган";e.maxHp=100;e.hp=100;e.power=4;e.prize=200}else if(t==="boss"){e.name="Главарь промзоны [БОСС]";e.maxHp=220;e.hp=220;e.power=9;e.prize=600}updateUI();tabs.forEach(function(x){x.classList.remove("active")});document.querySelector("[data-tab='home']").classList.add("active");document.querySelectorAll(".game-page").forEach(function(p){p.style.display="none"});document.getElementById("page-home").style.display="block";var lb=document.getElementById("battle-log");if(lb)lb.innerHTML="<p>Вы нашли цель: "+e.name+"!</p>";showNotice("🎯 Цель выбрана!")}});
