@@ -1,10 +1,11 @@
-/* Общие настройки темы (Темный урбан-стиль оригинальной Территории) */
+/* Полный сброс и базовая настройка под экраны смартфонов */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 body {
@@ -27,7 +28,7 @@ body {
   position: relative;
 }
 
-/* Верхняя панель (Шапка) */
+/* Верхняя панель */
 header {
   display: flex;
   justify-content: space-between;
@@ -35,6 +36,7 @@ header {
   padding: 12px 16px;
   background: #1f1f24;
   border-bottom: 1px solid #2b2b33;
+  z-index: 10;
 }
 
 .brand {
@@ -74,7 +76,7 @@ header {
   font-weight: bold;
 }
 
-/* Главный контейнер экрана */
+/* Главный контейнер прокрутки */
 .screen {
   flex: 1;
   overflow-y: auto;
@@ -82,10 +84,20 @@ header {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding-bottom: 80px; /* Чтобы нижнее меню не перекрывало контент */
+  padding-bottom: 90px;
+  position: relative;
+  z-index: 5;
 }
 
-/* Информационная карточка поединка */
+/* Страницы игры */
+.game-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Карточки информации */
 .hero {
   background: linear-gradient(135deg, #23232a 0%, #1a1a20 100%);
   border: 1px solid #2b2b33;
@@ -112,7 +124,7 @@ header {
   font-size: 28px;
 }
 
-/* Блок поединка */
+/* Блок боя */
 .battle {
   background: #1f1f24;
   border: 1px solid #2b2b33;
@@ -126,12 +138,11 @@ header {
 .enemyname {
   font-size: 14px;
   font-weight: bold;
-  color: #f5f5f7;
 }
 
-/* Полоски здоровья */
+/* Полоски жизни */
 .bars-container {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.4);
   padding: 10px;
   border-radius: 8px;
   display: flex;
@@ -146,17 +157,10 @@ header {
 
 .bar {
   background: #2b2b33;
-  height: 8px;
+  height: 10px;
   border-radius: 4px;
   overflow: hidden;
   width: 100%;
-}
-
-.bar i {
-  display: block;
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s ease;
 }
 
 /* Зоны Атаки и Блока */
@@ -165,7 +169,6 @@ header {
   font-weight: bold;
   color: #8a8a93;
   margin-top: 4px;
-  letter-spacing: 0.5px;
 }
 
 .powers {
@@ -174,63 +177,42 @@ header {
   gap: 8px;
 }
 
+/* ПРИНУДИТЕЛЬНО ВКЛЮЧАЕМ КЛИКИ ДЛЯ КНОПОК */
+.attack-zone, .block-zone, .attack, .tab, button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  touch-action: manipulation;
+}
+
 .attack-zone, .block-zone {
   background: #27272e;
   color: #f5f5f7;
   border: 1px solid #3a3a44;
-  padding: 10px 4px;
+  padding: 12px 4px;
   border-radius: 8px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-size: 13px;
+  font-weight: bold;
+  transition: background 0.1s ease;
 }
 
-.attack-zone:active, .block-zone:active {
-  transform: scale(0.96);
-}
-
-.attack-zone.active {
-  background: #e74c3c !important;
-  border-color: #ff6b6b;
-  color: #fff;
-}
-
-.block-zone.active {
-  background: #2ecc71 !important;
-  border-color: #58d68d;
-  color: #fff;
-}
-
-/* Кнопка действия */
+/* Желтая кнопка «СДЕЛАТЬ ХОД» */
 .attack {
-  background: linear-gradient(180deg, #f1c40f 0%, #d4ac0d 100%);
+  background: #f1c40f;
   color: #121216;
   border: none;
   padding: 14px;
   font-size: 15px;
   font-weight: bold;
   border-radius: 10px;
-  cursor: pointer;
   margin-top: 6px;
-  box-shadow: 0 4px 12px rgba(212, 172, 13, 0.2);
-  transition: all 0.2s;
 }
 
-.attack:active {
-  transform: scale(0.98);
-  box-shadow: none;
-}
-
-/* Текстовый лог боя */
+/* История боя */
 .log-container {
   background: #1f1f24;
   border: 1px solid #2b2b33;
   border-radius: 12px;
   padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .log-title {
@@ -239,12 +221,13 @@ header {
   font-weight: bold;
   border-bottom: 1px solid #2b2b33;
   padding-bottom: 6px;
+  margin-bottom: 6px;
 }
 
 .battle-log {
   max-height: 160px;
   overflow-y: auto;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -254,12 +237,7 @@ header {
   border-bottom: 1px dashed #2b2b33;
 }
 
-.system-msg {
-  color: #8a8a93;
-  font-style: italic;
-}
-
-/* Нижняя навигация */
+/* Нижнее меню навигации */
 nav {
   position: absolute;
   bottom: 0;
@@ -271,7 +249,8 @@ nav {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding-bottom: env(safe-area-inset-bottom); /* Поддержка экранов iPhone/Android с полосой внизу */
+  z-index: 20;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .tab {
@@ -282,14 +261,13 @@ nav {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  cursor: pointer;
-  font-size: 18px;
   flex: 1;
+  height: 100%;
+  justify-content: center;
 }
 
 .tab small {
   font-size: 10px;
-  font-weight: 500;
 }
 
 .tab.active {
