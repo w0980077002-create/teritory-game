@@ -285,3 +285,9 @@ nav {
   font-size: 13px;
   font-weight: bold;
 }
+/* Состояние кнопок зон при выборе (атака и блок) */
+.zone-btn-active {
+    border: 1px solid #e74c3c !important; /* Красная рамка в тон активной вкладки */
+    background-color: rgba(231, 76, 60, 0.1) !important; /* Легкая красная подсветка фона */
+    color: #fff !important; /* Делаем текст ярче при выборе */
+}
