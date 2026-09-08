@@ -1,11 +1,16 @@
-// Состояние игры (добавили инвентарь и силу)
+// Состояние игры (добавили опыт, статы, свободные очки и максимальное здоровье персонажа)
 var p = { 
     hp: 120, 
     maxHp: 120, 
     coins: 1000, 
     level: 1, 
+    exp: 0,
+    maxExp: 100,
     weapon: "Кулаки", 
-    bonusDamage: 0 
+    bonusDamage: 0,
+    strength: 5,
+    agility: 5,
+    freePoints: 0
 };
 var e = { name: "Местный хулиган", hp: 100, maxHp: 100 };
 
@@ -26,7 +31,8 @@ function save() {
 document.addEventListener("DOMContentLoaded", function() {
     initTabs();        
     initBattleUI();    
-    initShopUI(); // Инициализируем рынок
+    initShopUI(); 
+    initStatsUI(); // Инициализируем кнопки прокачки статов
     updateUI();        
 });
 
@@ -54,7 +60,6 @@ function initTabs() {
         if (activePage) activePage.style.display = "block";
         if (activeButton) activeButton.classList.add("active");
         
-        // При переходе на вкладку персонажа обновляем его инфо
         updateUI();
     }
 
@@ -64,7 +69,7 @@ function initTabs() {
     if (btnProfile) { btnProfile.addEventListener("click", function() { switchPage(btnProfile, pageProfile); }); }
 }
 
-// 2. БОЕВАЯ СИСТЕМА
+// 2. БОЕВАЯ СИСТЕМА (С расчетом Критов и Уворотов)
 function initBattleUI() {
     var allButtons = Array.from(document.querySelectorAll("button"));
     
@@ -107,24 +112,41 @@ function initBattleUI() {
             var enemyB = zones[Math.floor(Math.random() * 3)];
             
             var logs = [];
-            // Твой базовый урон 15 + бонус от купленного оружия!
-            var dmg = 15 + p.bonusDamage; 
-            var enemyDmg = 15;
+            
+            // Расчет базового урона
+            var basePlayerDmg = 15 + p.bonusDamage; 
+            var baseEnemyDmg = 15 + (p.level * 2); // С каждым твоим уровнем хулиган чуть сильнее
 
-            // Урон по хулигану
+            // Шансы на крит и уворот (зависят от статов персонажа)
+            var critChance = p.strength * 3; // Сила 5 = 15% крита
+            var dodgeChance = p.agility * 3; // Ловкость 5 = 15% уворота
+
+            // --- ТВОЙ УДАР ПО ХУЛИГАНУ ---
             if (selA === enemyB) {
                 logs.push(`🛡️ Вы ударили в <b>${zoneText[selA]}</b>, но Хулиган заблокировал удар.`);
             } else {
-                e.hp = Math.max(0, e.hp - dmg);
-                logs.push(`💥 Вы успешно пробили Хулигана в <b>${zoneText[selA]}</b>! Урон: -${dmg}.`);
+                var isCrit = Math.random() * 100 < critChance;
+                var finalPlayerDmg = isCrit ? basePlayerDmg * 2 : basePlayerDmg;
+                e.hp = Math.max(0, e.hp - finalPlayerDmg);
+                
+                if (isCrit) {
+                    logs.push(`⚡💥 <b>КРИТИЧЕСКИЙ УДАР!</b> Вы жестко пробили Хулигана в <b>${zoneText[selA]}</b>! Урон: -${finalPlayerDmg}.`);
+                } else {
+                    logs.push(`💥 Вы успешно пробили Хулигана in <b>${zoneText[selA]}</b>! Урон: -${finalPlayerDmg}.`);
+                }
             }
 
-            // Урон по игроку
+            // --- УДАР ХУЛИГАНА ПО ТЕБЕ ---
             if (enemyA === selB) {
                 logs.push(`🛡️ Хулиган метил в <b>${zoneText[enemyA]}</b>, но вы заблокировали его.`);
             } else {
-                p.hp = Math.max(0, p.hp - dmg);
-                logs.push(`🥊 Хулиган нанес вам удар в <b>${zoneText[enemyA]}</b>. Урон: -${enemyDmg}.`);
+                var isDodge = Math.random() * 100 < dodgeChance;
+                if (isDodge) {
+                    logs.push(`💨 <b>УВОРОТ!</b> Хулиган пытался пробить вас в <b>${zoneText[enemyA]}</b>, но вы технично уклонились!`);
+                } else {
+                    p.hp = Math.max(0, p.hp - baseEnemyDmg);
+                    logs.push(`🥊 Хулиган нанес вам удар в <b>${zoneText[enemyA]}</b>. Урон: -${baseEnemyDmg}.`);
+                }
             }
 
             var logBox = document.querySelector(".combat-log-text");
@@ -139,16 +161,31 @@ function initBattleUI() {
                 if (p.hp <= 0 && e.hp <= 0) {
                     logBox.innerHTML = "<b>⚔️ Ничья! Оба упали без сил.</b><br>" + logBox.innerHTML;
                 } else if (e.hp <= 0) {
-                    p.coins += 200; // Награда за победу
-                    logBox.innerHTML = "<b>🎉 Победа! Местный хулиган повержен. Получено 200 монет!</b><br>" + logBox.innerHTML;
+                    var rewardCoins = 200 + (p.level * 20);
+                    var rewardExp = 40; // Даем 40 опыта за победу
+                    
+                    p.coins += rewardCoins;
+                    p.exp += rewardExp;
+                    
+                    logBox.innerHTML = `<b>🎉 Победа! Местный хулиган повержен. Награда: +${rewardCoins} монет, +${rewardExp} опыта!</b><br>` + logBox.innerHTML;
+                    
+                    // Проверяем поднятие уровня (Level Up)
+                    if (p.exp >= p.maxExp) {
+                        p.level += 1;
+                        p.exp = p.exp - p.maxExp;
+                        p.maxExp = Math.floor(p.maxExp * 1.3); // Следующий уровень требует больше опыта
+                        p.freePoints += 3; // Даем 3 очка прокачки характеристик!
+                        p.maxHp += 20; // Увеличиваем макс здоровье персонажа
+                        logBox.innerHTML = `<b style="color: #f1c40f;">🌟 ПОЗДРАВЛЯЕМ! Вы получили ${p.level} уровень! Получено 3 очка характеристик.</b><br>` + logBox.innerHTML;
+                    }
                 } else {
-                    logBox.innerHTML = "<b>💀 Поражение. Вас унесли в госпиталь на восстановление.</b><br>" + logBox.innerHTML;
+                    logBox.innerHTML = "<b>💀 Поражение. Вас унесли в госпиталь. Восстановление...</b><br>" + logBox.innerHTML;
                 }
                 
-                // Кнопка возрождения (сброс боя через 4 секунды)
+                // Автоматическое воскрешение/сброс боя через 4 секунды
                 setTimeout(function() {
                     p.hp = p.maxHp;
-                    e.hp = e.maxHp;
+                    e.hp = e.maxHp + (p.level * 10); // Враг тоже растет в силе со временем
                     turnBtn.disabled = false;
                     if (logBox) logBox.innerHTML = "Ожидание хода...";
                     updateUI();
@@ -166,7 +203,7 @@ function initBattleUI() {
     }
 }
 
-// 3. ЛОГИКА РЫНКА (МАГАЗИНА)
+// 3. ЛОГИКА РЫНКА
 function initShopUI() {
     var buyBrass = document.getElementById("buy-brass");
     var buyKnife = document.getElementById("buy-knife");
@@ -176,7 +213,7 @@ function initShopUI() {
             if (p.coins >= 150) {
                 p.coins -= 150;
                 p.weapon = "Кастеты";
-                p.bonusDamage = 5; // +5 к удару
+                p.bonusDamage = 5;
                 showNotice("Вы купили Кастеты!");
                 updateUI();
                 save();
@@ -191,7 +228,7 @@ function initShopUI() {
             if (p.coins >= 400) {
                 p.coins -= 400;
                 p.weapon = "Охотничий нож";
-                p.bonusDamage = 12; // +12 к удару
+                p.bonusDamage = 12;
                 showNotice("Вы купили Охотничий нож!");
                 updateUI();
                 save();
@@ -202,33 +239,15 @@ function initShopUI() {
     }
 }
 
-// 4. УВЕДОМЛЕНИЯ
-function showNotice(t) {
-    var n = document.getElementById("notice");
-    if (!n) return;
-    n.innerText = t;
-    n.style.display = "block";
-    setTimeout(function() { n.style.display = "none"; }, 2500);
-}
+// 4. ПРОКАЧКА ХАРАКТЕРИСТИК (СТАТОВ)
+function initStatsUI() {
+    var addStr = document.getElementById("add-str");
+    var addAgi = document.getElementById("add-agi");
 
-// 5. ОБНОВЛЕНИЕ ЗДОРОВЬЯ, МОНЕТ И ПРОФИЛЯ
-function updateUI() {
-    var coinsEl = document.getElementById("coins");
-    if (coinsEl) coinsEl.innerText = p.coins;
-
-    var playerText = document.getElementById("hp-text-player");
-    var enemyText = document.getElementById("hp-text-enemy");
-    if (playerText) playerText.innerText = p.hp + "/" + p.maxHp;
-    if (enemyText) enemyText.innerText = e.hp + "/" + e.maxHp;
-
-    var playerFill = document.getElementById("hp-fill-player");
-    var enemyFill = document.getElementById("hp-fill-enemy");
-    if (playerFill) playerFill.style.width = ((p.hp / p.maxHp) * 100) + "%";
-    if (enemyFill) enemyFill.style.width = ((e.hp / e.maxHp) * 100) + "%";
-
-    // Обновляем данные на странице "Персонаж"
-    var profWeapon = document.getElementById("prof-weapon");
-    var profDamage = document.getElementById("prof-damage");
-    if (profWeapon) profWeapon.innerText = p.weapon;
-    if (profDamage) profDamage.innerText = (15 + p.bonusDamage);
-}
+    if (addStr) {
+        addStr.addEventListener("click", function() {
+            if (p.freePoints > 0) {
+                p.freePoints--;
+                p.strength++;
+                updateUI();
+                save();
