@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta name="viewport"
@@ -12,6 +14,16 @@
     <title>Territory</title>
 
     <link rel="stylesheet" href="style.css">
+
+    <!-- THREE.JS -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js"
+        }
+    }
+    </script>
+
 </head>
 
 <body>
@@ -20,7 +32,8 @@
         Выберите зоны атаки и защиты!
     </div>
 
-    <!-- ===== ШАПКА ===== -->
+
+    <!-- ШАПКА -->
 
     <header>
 
@@ -53,20 +66,20 @@
     </header>
 
 
-    <!-- ===== ОСНОВНОЙ ЭКРАН ===== -->
+    <!-- ОСНОВНОЙ ЭКРАН -->
 
     <section class="screen">
 
 
-        <!-- ===== АРЕНА ===== -->
+        <!-- АРЕНА -->
 
         <div id="page-home" class="game-page">
 
-            <!-- 3D АРЕНА -->
+            <!-- 3D -->
             <div id="battle-3d"></div>
 
 
-            <!-- СТАРЫЙ ИНТЕРФЕЙС БОЯ -->
+            <!-- ИНТЕРФЕЙС БОЯ -->
 
             <div class="battle">
 
@@ -78,8 +91,6 @@
                     Местный хулиган <span>🥊</span>
                 </div>
 
-
-                <!-- HP -->
 
                 <div class="bars-container">
 
@@ -123,8 +134,6 @@
                 </div>
 
 
-                <!-- АТАКА -->
-
                 <div class="zone-title">
                     Куда атакуем:
                 </div>
@@ -145,8 +154,6 @@
 
                 </div>
 
-
-                <!-- ЗАЩИТА -->
 
                 <div class="zone-title">
                     Что блокируем:
@@ -176,7 +183,7 @@
             </div>
 
 
-            <!-- ЛОГ БОЯ -->
+            <!-- ИСТОРИЯ -->
 
             <div class="log-container">
 
@@ -193,12 +200,12 @@
         </div>
 
 
-        <!-- ===== РЫНОК ===== -->
+        <!-- РЫНОК -->
 
         <div
             id="page-shop"
             class="game-page"
-            style="display: none;">
+            style="display:none;">
 
             <div class="hero">
 
@@ -265,12 +272,12 @@
         </div>
 
 
-        <!-- ===== РАЙОНЫ ===== -->
+        <!-- РАЙОНЫ -->
 
         <div
             id="page-map"
             class="game-page"
-            style="display: none;">
+            style="display:none;">
 
             <div class="hero">
 
@@ -291,12 +298,12 @@
         </div>
 
 
-        <!-- ===== ПРОФИЛЬ ===== -->
+        <!-- ПРОФИЛЬ -->
 
         <div
             id="page-profile"
             class="game-page"
-            style="display: none;">
+            style="display:none;">
 
             <div class="hero">
 
@@ -308,8 +315,6 @@
                     Персонаж <span>👤</span>
                 </div>
 
-
-                <!-- ОПЫТ -->
 
                 <div style="margin-bottom:12px;">
 
@@ -326,7 +331,7 @@
                             float:right;
                             color:#f1c40f;">
 
-                            0/100 XP
+                            0 / 100 XP
 
                         </span>
 
@@ -356,16 +361,13 @@
                     <span
                         id="prof-level"
                         style="float:right;">
-
                         1
-
                     </span>
 
                 </p>
 
 
                 <p>
-
                     Оружие:
 
                     <span
@@ -373,31 +375,25 @@
                         style="
                         float:right;
                         color:#e74c3c;">
-
                         Кулаки
-
                     </span>
 
                 </p>
 
 
                 <p>
-
                     Урон:
 
                     <span
                         id="prof-damage"
                         style="float:right;">
-
                         15
-
                     </span>
 
                 </p>
 
 
                 <p>
-
                     Макс. HP:
 
                     <span
@@ -405,9 +401,7 @@
                         style="
                         float:right;
                         color:#2ecc71;">
-
                         120 HP
-
                     </span>
 
                 </p>
@@ -418,8 +412,6 @@
                     border-color:#252533;
                     margin:10px 0;">
 
-
-                <!-- ОЧКИ -->
 
                 <div
                     id="free-points-block"
@@ -441,8 +433,6 @@
                 </div>
 
 
-                <!-- СИЛА -->
-
                 <div
                     style="
                     display:flex;
@@ -450,13 +440,8 @@
                     margin-top:8px;">
 
                     <span>
-
                         💪 Сила:
-
-                        <b id="prof-str">
-                            5
-                        </b>
-
+                        <b id="prof-str">5</b>
                     </span>
 
                     <button
@@ -466,15 +451,11 @@
                         background:#f1c40f;
                         color:#111;
                         display:none;">
-
                         +
-
                     </button>
 
                 </div>
 
-
-                <!-- ЛОВКОСТЬ -->
 
                 <div
                     style="
@@ -483,13 +464,8 @@
                     margin-top:8px;">
 
                     <span>
-
                         💨 Ловкость:
-
-                        <b id="prof-agi">
-                            5
-                        </b>
-
+                        <b id="prof-agi">5</b>
                     </span>
 
                     <button
@@ -499,9 +475,7 @@
                         background:#f1c40f;
                         color:#111;
                         display:none;">
-
                         +
-
                     </button>
 
                 </div>
@@ -513,7 +487,7 @@
     </section>
 
 
-    <!-- ===== НИЖНЕЕ МЕНЮ ===== -->
+    <!-- НИЖНЕЕ МЕНЮ -->
 
     <div class="nav-tabs">
 
@@ -559,14 +533,12 @@
     </div>
 
 
-    <!-- ===== THREE.JS ===== -->
-
-    <script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
-
-
-    <!-- ===== ТВОЯ ИГРОВАЯ ЛОГИКА ===== -->
-
-    <script src="app.js"></script>
+    <!-- APP.JS -->
+    <script
+        type="module"
+        src="app.js">
+    </script>
 
 </body>
+
 </html>
