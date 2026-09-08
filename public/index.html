@@ -1,40 +1,707 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#101318">
 
-    <meta charset="UTF-8">
+  <title>Territory</title>
 
-    <meta name="viewport"
-          content="width=device-width,
-                   initial-scale=1.0,
-                   maximum-scale=1.0,
-                   user-scalable=no">
-
-    <title>Territory</title>
-
-    <link rel="stylesheet" href="style.css">
-
-    <!-- THREE.JS -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js"
-        }
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js"
     }
-    </script>
+  }
+  </script>
 
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div id="notice" class="notice">
-        Выберите зоны атаки и защиты!
+<header class="top-header">
+  <div class="logo">
+    <span class="logo-icon">⚔️</span>
+    <span>TERRITORY</span>
+  </div>
+
+  <div class="header-right">
+    <div class="coins">
+      🪙 <span id="coins">1000</span>
+    </div>
+
+    <div class="level-badge">
+      LVL <span id="header-level">1</span>
+    </div>
+  </div>
+</header>
+
+
+<main>
+
+  <!-- ================= АРЕНА ================= -->
+
+  <section id="page-arena" class="game-page active">
+
+    <div class="hero">
+      <div class="hero-title">УЛИЧНАЯ АРЕНА</div>
+      <div class="hero-subtitle">
+        Победи противника и забери награду
+      </div>
+    </div>
+
+    <div class="battle-card">
+
+      <div class="battle-title">
+        <span>БОЙ</span>
+        <span class="enemyname">Местный хулиган</span>
+      </div>
+
+      <div class="bars-container">
+
+        <div class="bar-block">
+          <div class="bar-label">
+            <span>Ты</span>
+            <span id="hp-text-player">120 / 120</span>
+          </div>
+
+          <div class="hp-bar-bg">
+            <div id="hp-fill-player" class="hp-fill player-hp"></div>
+          </div>
+        </div>
+
+        <div class="bar-block">
+          <div class="bar-label">
+            <span>Противник</span>
+            <span id="hp-text-enemy">100 / 100</span>
+          </div>
+
+          <div class="hp-bar-bg">
+            <div id="hp-fill-enemy" class="hp-fill enemy-hp"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="battle-3d" class="battle-3d"></div>
+
+      <div class="battle-controls">
+
+        <div class="control-title">
+          КУДА АТАКОВАТЬ
+        </div>
+
+        <div class="powers attack-zones">
+          <button id="btn-att-head" class="power-btn attack-zone">
+            🧠<br>
+            <span>Голова</span>
+          </button>
+
+          <button id="btn-att-body" class="power-btn attack-zone selected">
+            🫀<br>
+            <span>Тело</span>
+          </button>
+
+          <button id="btn-att-legs" class="power-btn attack-zone">
+            🦵<br>
+            <span>Ноги</span>
+          </button>
+        </div>
+
+
+        <div class="control-title">
+          КУДА БЛОКИРОВАТЬ
+        </div>
+
+        <div class="powers block-zones">
+          <button id="btn-blk-head" class="power-btn block-zone">
+            🧠<br>
+            <span>Голова</span>
+          </button>
+
+          <button id="btn-blk-body" class="power-btn block-zone selected">
+            🫀<br>
+            <span>Тело</span>
+          </button>
+
+          <button id="btn-blk-legs" class="power-btn block-zone">
+            🦵<br>
+            <span>Ноги</span>
+          </button>
+        </div>
+
+        <button id="attack" class="main-attack">
+          ⚔️ АТАКОВАТЬ
+        </button>
+
+      </div>
+
+      <div id="notice" class="notice"></div>
+
+      <div class="log-container">
+        <div class="log-title">
+          📜 ЖУРНАЛ БОЯ
+        </div>
+
+        <div id="combat-log-text" class="combat-log-text">
+          Бой готов. Выбери зону атаки.
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ================= РЫНОК ================= -->
+
+  <section id="page-market" class="game-page">
+
+    <div class="page-title">
+      🛒 РЫНОК
+    </div>
+
+    <div class="page-subtitle">
+      Покупай оружие и экипировку
     </div>
 
 
-    <!-- ШАПКА -->
+    <div class="market-grid">
 
+      <div class="shop-item">
+        <div class="shop-icon">🥊</div>
+
+        <div class="shop-info">
+          <div class="shop-name">Кастеты</div>
+          <div class="shop-description">
+            +5 к урону
+          </div>
+        </div>
+
+        <button id="buy-brass" class="buy-button">
+          🪙 150
+        </button>
+      </div>
+
+
+      <div class="shop-item">
+        <div class="shop-icon">🔪</div>
+
+        <div class="shop-info">
+          <div class="shop-name">Нож</div>
+          <div class="shop-description">
+            +12 к урону<br>
+            +5% крит. шанс
+          </div>
+        </div>
+
+        <button id="buy-knife" class="buy-button">
+          🪙 400
+        </button>
+      </div>
+
+
+      <div class="shop-item">
+        <div class="shop-icon">🧢</div>
+
+        <div class="shop-info">
+          <div class="shop-name">Кепка</div>
+          <div class="shop-description">
+            +2 защита<br>
+            +1 ловкость
+          </div>
+        </div>
+
+        <button id="buy-cap" class="buy-button">
+          🪙 120
+        </button>
+      </div>
+
+
+      <div class="shop-item">
+        <div class="shop-icon">🧥</div>
+
+        <div class="shop-info">
+          <div class="shop-name">Худи</div>
+          <div class="shop-description">
+            +5 защита<br>
+            +10 макс. HP
+          </div>
+        </div>
+
+        <button id="buy-hoodie" class="buy-button">
+          🪙 250
+        </button>
+      </div>
+
+
+      <div class="shop-item">
+        <div class="shop-icon">👖</div>
+
+        <div class="shop-info">
+          <div class="shop-name">Тактические штаны</div>
+          <div class="shop-description">
+            +3 защита<br>
+            +1 сила
+          </div>
+        </div>
+
+        <button id="buy-pants" class="buy-button">
+          🪙 180
+        </button>
+      </div>
+
+
+      <div class="shop-item">
+        <div class="shop-icon">👟</div>
+
+        <div class="shop-info">
+          <div class="shop-name">Кроссовки</div>
+          <div class="shop-description">
+            +2 защита<br>
+            +2 ловкость<br>
+            +3% уклонение
+          </div>
+        </div>
+
+        <button id="buy-shoes" class="buy-button">
+          🪙 220
+        </button>
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ================= РАЙОНЫ ================= -->
+
+  <section id="page-districts" class="game-page">
+
+    <div class="page-title">
+      🗺️ РАЙОНЫ
+    </div>
+
+    <div class="page-subtitle">
+      Исследуй город и становись сильнее
+    </div>
+
+
+    <div class="district-card unlocked">
+
+      <div class="district-icon">
+        🏙️
+      </div>
+
+      <div class="district-info">
+        <div class="district-name">
+          Центральный район
+        </div>
+
+        <div class="district-description">
+          Здесь начинается твой путь.
+        </div>
+
+        <div class="district-status">
+          ● ДОСТУПНО
+        </div>
+      </div>
+
+      <button class="district-button">
+        ВОЙТИ
+      </button>
+
+    </div>
+
+
+    <div class="district-card locked">
+
+      <div class="district-icon">
+        🏭
+      </div>
+
+      <div class="district-info">
+        <div class="district-name">
+          Промзона
+        </div>
+
+        <div class="district-description">
+          Опасные противники и большая награда.
+        </div>
+
+        <div class="district-status">
+          🔒 УРОВЕНЬ 5
+        </div>
+      </div>
+
+      <button class="district-button" disabled>
+        ЗАКРЫТО
+      </button>
+
+    </div>
+
+
+    <div class="district-card locked">
+
+      <div class="district-icon">
+        🌃
+      </div>
+
+      <div class="district-info">
+        <div class="district-name">
+          Ночной квартал
+        </div>
+
+        <div class="district-description">
+          Территория самых сильных бойцов.
+        </div>
+
+        <div class="district-status">
+          🔒 УРОВЕНЬ 10
+        </div>
+      </div>
+
+      <button class="district-button" disabled>
+        ЗАКРЫТО
+      </button>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ================= ПЕРСОНАЖ ================= -->
+
+  <section id="page-profile" class="game-page">
+
+    <div class="page-title">
+      👤 ПЕРСОНАЖ
+    </div>
+
+    <div class="page-subtitle">
+      Управляй экипировкой и характеристиками
+    </div>
+
+
+    <!-- УРОВЕНЬ -->
+
+    <div class="character-level-card">
+
+      <div class="level-top">
+        <div>
+          <div class="character-name">
+            Боец
+          </div>
+
+          <div class="character-level">
+            Уровень <span id="prof-level">1</span>
+          </div>
+        </div>
+
+        <div class="level-number">
+          <span id="header-level-copy">1</span>
+        </div>
+      </div>
+
+      <div class="exp-info">
+        <span>Опыт</span>
+        <span id="exp-text">0 / 100</span>
+      </div>
+
+      <div class="exp-bar">
+        <div id="exp-fill" class="exp-fill"></div>
+      </div>
+
+    </div>
+
+
+
+    <!-- 3D ПЕРСОНАЖ -->
+
+    <div class="character-preview-card">
+
+      <div class="section-heading">
+        🧍 ТВОЙ БОЕЦ
+      </div>
+
+      <div id="character-3d" class="character-3d"></div>
+
+    </div>
+
+
+
+    <!-- ЭКИПИРОВКА -->
+
+    <div class="character-card">
+
+      <div class="section-heading">
+        🛡️ ЭКИПИРОВКА
+      </div>
+
+      <div class="equipment-grid">
+
+        <button id="equip-head" class="equip-slot">
+          <span class="equip-slot-icon">🧢</span>
+          <span class="equip-slot-title">Голова</span>
+          <span class="equip-slot-item">Пусто</span>
+        </button>
+
+
+        <button id="equip-body" class="equip-slot">
+          <span class="equip-slot-icon">🧥</span>
+          <span class="equip-slot-title">Тело</span>
+          <span class="equip-slot-item">Пусто</span>
+        </button>
+
+
+        <button id="equip-hand" class="equip-slot">
+          <span class="equip-slot-icon">🥊</span>
+          <span class="equip-slot-title">Руки</span>
+          <span class="equip-slot-item">Кулаки</span>
+        </button>
+
+
+        <button id="equip-legs" class="equip-slot">
+          <span class="equip-slot-icon">👖</span>
+          <span class="equip-slot-title">Ноги</span>
+          <span class="equip-slot-item">Пусто</span>
+        </button>
+
+
+        <button id="equip-feet" class="equip-slot">
+          <span class="equip-slot-icon">👟</span>
+          <span class="equip-slot-title">Обувь</span>
+          <span class="equip-slot-item">Пусто</span>
+        </button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ХАРАКТЕРИСТИКИ -->
+
+    <div class="character-card">
+
+      <div class="section-heading">
+        📊 ХАРАКТЕРИСТИКИ
+      </div>
+
+
+      <div class="stats-grid">
+
+        <div class="stat-box">
+          <span class="stat-icon">❤️</span>
+          <span class="stat-name">HP</span>
+          <strong id="stat-hp">120</strong>
+        </div>
+
+
+        <div class="stat-box">
+          <span class="stat-icon">⚔️</span>
+          <span class="stat-name">Урон</span>
+          <strong id="stat-damage">15</strong>
+        </div>
+
+
+        <div class="stat-box">
+          <span class="stat-icon">🛡️</span>
+          <span class="stat-name">Защита</span>
+          <strong id="stat-defense">0</strong>
+        </div>
+
+
+        <div class="stat-box">
+          <span class="stat-icon">💪</span>
+          <span class="stat-name">Сила</span>
+          <strong id="stat-strength">5</strong>
+        </div>
+
+
+        <div class="stat-box">
+          <span class="stat-icon">⚡</span>
+          <span class="stat-name">Ловкость</span>
+          <strong id="stat-agility">5</strong>
+        </div>
+
+
+        <div class="stat-box">
+          <span class="stat-icon">🎯</span>
+          <span class="stat-name">Крит</span>
+          <strong id="stat-crit">20%</strong>
+        </div>
+
+
+        <div class="stat-box">
+          <span class="stat-icon">💨</span>
+          <span class="stat-name">Уклонение</span>
+          <strong id="stat-dodge">15%</strong>
+        </div>
+
+
+        <div class="stat-box">
+          <span class="stat-icon">🎒</span>
+          <span class="stat-name">Вес</span>
+          <strong id="inventory-weight">0 / 20</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ОЧКИ -->
+
+    <div id="free-points-block" class="character-card points-card">
+
+      <div class="section-heading">
+        ⭐ СВОБОДНЫЕ ОЧКИ
+      </div>
+
+      <div class="free-points">
+        <span id="prof-free">0</span>
+      </div>
+
+
+      <div class="points-row">
+
+        <div class="point-info">
+          <span>💪 Сила</span>
+          <small>+1 сила = +1 урон</small>
+        </div>
+
+        <button id="add-str" class="add-point">
+          +
+        </button>
+
+      </div>
+
+
+      <div class="points-row">
+
+        <div class="point-info">
+          <span>⚡ Ловкость</span>
+          <small>Увеличивает уклонение</small>
+        </div>
+
+        <button id="add-agi" class="add-point">
+          +
+        </button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ИНВЕНТАРЬ -->
+
+    <div class="character-card">
+
+      <div class="inventory-header">
+
+        <div class="section-heading">
+          🎒 ИНВЕНТАРЬ
+        </div>
+
+        <div class="inventory-count">
+          <span id="inventory-count">1</span> предметов
+        </div>
+
+      </div>
+
+
+      <div id="inventory-grid" class="inventory-grid"></div>
+
+
+      <div id="item-actions" class="item-actions hidden">
+
+        <div class="selected-item">
+
+          <div id="selected-item-icon" class="selected-item-icon">
+            👊
+          </div>
+
+          <div>
+            <div id="selected-item-name" class="selected-item-name">
+              Кулаки
+            </div>
+
+            <div id="selected-item-info" class="selected-item-info">
+              Твои руки
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="item-action-buttons">
+
+          <button id="equip-item" class="action-button equip-action">
+            ⚔️ Надеть
+          </button>
+
+          <button id="unequip-item" class="action-button unequip-action">
+            ↩️ Снять
+          </button>
+
+          <button id="drop-item" class="action-button drop-action">
+            🗑️ Выбросить
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+
+<!-- ================= НИЖНЕЕ МЕНЮ ================= -->
+
+<nav class="bottom-nav">
+
+  <button class="nav-btn active" data-page="arena">
+    <span class="nav-icon">⚔️</span>
+    <span>Арена</span>
+  </button>
+
+
+  <button class="nav-btn" data-page="market">
+    <span class="nav-icon">🛒</span>
+    <span>Рынок</span>
+  </button>
+
+
+  <button class="nav-btn" data-page="districts">
+    <span class="nav-icon">🗺️</span>
+    <span>Районы</span>
+  </button>
+
+
+  <button class="nav-btn" data-page="profile">
+    <span class="nav-icon">👤</span>
+    <span>Персонаж</span>
+  </button>
+
+</nav>
+
+
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
     <header>
 
         <div class="brand">
