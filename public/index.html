@@ -3,37 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Territory: Arena</title>
-    <!-- Подключаем PixiJS для плавной и быстрой анимации -->
-    <script src="https://cloudflare.com"></script>
+    <title>Territory 3D</title>
     <style>
         :root {
-            --bg-color: #0b0e14;
-            --card-color: #131722;
-            --text-color: #ffffff;
-            --text-secondary: #8a8f9d;
-            --green-bar: #34c759;
-            --red-bar: #ff3b30;
-            --border-color: #2a2f3d;
+            --bg-dark: #0b0e14;
+            --bg-card: #131722;
+            --border-gray: #2a2f3d;
+            --text-main: #ffffff;
+            --text-sub: #8a8f9d;
+            --btn-active: #242936;
+            --btn-selected: #e91e63; /* Цвет подсветки выбранной зоны */
         }
 
         body {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             user-select: none;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        /* Шапка игры */
-        .header {
+        /* Общая обертка приложения под формат ТГ */
+        .game-wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+
+        /* Шапка с балансом */
+        .game-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        .coins-badge {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gray);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Главная карточка боя */
+        .battle-container {
+            background-color: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-gray);
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .battle-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        /* HP бары */
+        .hp-block {
+            margin-bottom: 14px;
+        }
+        .hp-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .hp-track {
+            width: 100%;
+            height: 8px;
+            background-color: #1a2233;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .hp-fill {
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease-out;
+        }
+        .hp-player { background-color: #34c759; }
+        .hp-enemy { background-color: #ff3b30; }
+
+        /* Контейнер для вашей 3D графики (Three.js/Canvas) */
+        #render-window {
+            width: 100%;
+            height: 240px;
+            background: #000; /* Здесь рендерится ваша 3D сцена */
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Текстовые индикаторы поверх 3D (урон, блок) */
+        .overlay-text {
+            position: absolute;
+            font-weight: 900;
+            font-size: 26px;
+            text-shadow: 0 0 4px #000;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .overlay-text.show {
+            opacity: 1;
+            transform: scale(1) translateY(-30px);
+        }
+
+        /* Стили кнопок выбора зон */
+        .controls-headline {
+            font-size: 12px;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 15px 0 8px 0;
+        }
+        .grid-3x3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .zone-btn {
+            background-color: #1c2130;
+            border: 1px solid var(--border-gray);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .zone-btn.selected {
+            background-color: var(--btn-selected);
+            border-color: #ff6097;
+        }
+
+        /* Нижнее меню навигации */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--bg-card);
+            border-top: 1px solid var(--border-gray);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 0;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-sub);
+            text-decoration: none;
+        }
+        .nav-item.active { color: #fff; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <!-- Шапка -->
+        <div class="game-header">
+            <div style="font-weight: 900; font-size: 18px; letter-spacing: 0.5px;">TERRITORY</div>
+            <div class="coins-badge" id="player-coins">🪙 300</div>
+        </div>
+
+        <!-- Арена -->
+        <div class="battle-container">
+            <div class="battle-info">
+                <span style="font-weight: bold; color: #fff;">Бойцовская Арена</span>
+                <span>Местный хулиган 🛑</span>
+            </div>
+
+            <!-- Здоровье персонажей -->
+            <div class="hp-block">
+                <div class="hp-labels"><span>Вы:</span> <span id="txt-player-hp">120/120</span></div>
+                <div class="hp-track"><div class="hp-fill hp-player" id="bar-player-hp"></div></div>
+
+                <div class="hp-labels"><span>Враг:</span> <span id="txt-enemy-hp">100/100</span></div>
+                <div class="hp-track"><div class="hp-fill hp-enemy" id="bar-enemy-hp"></div></div>
+            </div>
+
+            <!-- 3D Окно -->
+            <div id="render-window">
+                <!-- Всплывающие надписи поверх 3D сцены -->
+                <div id="pop-player" class="overlay-text" style="left: 25%; top: 40%; color: #ff3b30;"></div>
+                <div id="pop-enemy" class="overlay-text" style="left: 70%; top: 40%; color: #ff3b30;"></div>
+                
+                <!-- Сюда инжектится ваш существующий 3D Canvas -->
+                <!-- <canvas id="your-3d-canvas"></canvas> -->
+            </div>
+        </div>
+
+        <!-- Интерфейс управления раундом -->
+        <div class="controls-headline">Куда атакуем:</div>
+        <div class="grid-3x3">
+            <button class="zone-btn attack-btn" data-zone="head" onclick="selectZone('attack', 'head', this)">Голова</button>
+            <button class="zone-btn attack-btn" data-zone="body" onclick="selectZone('attack', 'body', this)">Корпус</button>
+            <button class="zone-btn attack-btn" data-zone="legs" onclick="selectZone('attack', 'legs', this)">Ноги</button>
+        </div>
+
+        <div class="controls-headline">Что блокируем:</div>
+        <div class="grid-3x3" style="margin-bottom: 80px;">
+            <button class="zone-btn defend-btn" data-zone="head" onclick="selectZone('defend', 'head', this)">Голова</button>
+            <button class="zone-btn defend-btn" data-zone="body" onclick="selectZone('defend', 'body', this)">Корпус</button>
+            <button class="zone-btn defend-btn" data-zone="legs" onclick="selectZone('defend', 'legs', this)">Ноги</button>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active"><span class="nav-icon">🥊</span>Арена</a>
+        <a href="#" class="nav-item"><span class="nav-icon">🛒</span>Рынок</a>
+        <a href="#" class="nav-item"><span class="nav-icon">🗺️</span>Районы</a>
+        <a href="#" class="nav-item"><span class="nav-icon">👤</span>Профиль</a>
+    </div>
+
+    <script>
+        // Глобальное состояние здоровья (синхронизируется с сервером)
+        const state = {
+            tg_id: 1234567, // Брать из window.Telegram.WebApp.initDataUnsafe.user.id
+            playerHp: 120,
+            playerMaxHp: 120,
+            enemyHp: 100,
+            enemyMaxHp: 100,
+            currentAttack: null,
+            currentDefend: null,
+            isProcessing: false // Защита от спама кнопками во время анимации
+        };
+
+        // Логика выбора зон кнопками
+        function selectZone(type, zone, element) {
+            if (state.isProcessing) return;
+
+            // Снимаем класс со старых кнопок этой группы
+            const buttons = document.querySelectorAll(`.${type}-btn`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+
+            // Подсвечиваем текущую кнопку
+            element.classList.add('selected');
+
+            if (type === 'attack') state.currentAttack = zone;
+            if (type === 'defend') state.currentDefend = zone;
+
+            // Если выбраны оба параметра — отправляем раунд на сервер
+            if (state.currentAttack && state.currentDefend) {
+                sendTurnToServer();
+            }
+        }
+
+        // Отправка данных на бэкенд и запуск анимаций
+        function sendTurnToServer() {
+            state.isProcessing = true;
+
+            // URL вашего развернутого сервера на Render
+            fetch('/api/battle/turn', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    tg_id: state.tg_id,
+                    attackZone: state.currentAttack,
+                    defendZone: state.currentDefend,
+                    enemyHpCurrent: state.enemyHp,
+                    playerHpCurrent: state.playerHp
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
         }
         .logo {
             font-weight: 800;
