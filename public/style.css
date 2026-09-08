@@ -1,40 +1,215 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>TERITORY</title>
-
-<style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-html,body{
-    width:100%;
-    min-height:100%;
-    background:#0b0e13;
-    color:#fff;
-    font-family:Arial,sans-serif;
+:root {
+    --bg: #0b0e13;
+    --panel: #141a22;
+    --panel-light: #19212b;
+    --border: #293341;
+    --text: #f4f6fa;
+    --muted: #8993a3;
+    --gold: #f4c95d;
+    --green: #35c779;
+    --blue: #3f82f1;
+    --red: #e94b4b;
+    --purple: #8b5cf6;
 }
 
-body{
-    padding-bottom:80px;
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 }
 
-button{
-    font-family:inherit;
-    cursor:pointer;
-    border:none;
+body {
+    min-height: 100vh;
+    padding-bottom: 90px;
 }
 
-.game{
-    width:100%;
-    max-width:720px;
-    min-height:100vh;
+button {
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.game {
+    width: 100%;
+    max-width: 720px;
+    min-height: 100vh;
+    margin: 0 auto;
+}
+
+
+/* =========================
+   ВЕРХНЯЯ ПАНЕЛЬ
+========================= */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    width: 100%;
+    min-height: 122px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 20px;
+
+    background: #10151d;
+    border-bottom: 1px solid var(--border);
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.25);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand-icon {
+    width: 64px;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #e94444,
+            #a91f2b
+        );
+
+    font-size: 31px;
+
+    box-shadow:
+        0 8px 25px rgba(220, 40, 50, 0.2);
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.subtitle {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.top-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.level,
+.money {
+    min-height: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 16px;
+
+    background: #1b222d;
+
+    border: 1px solid #303a49;
+    border-radius: 16px;
+
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.money {
+    font-size: 18px;
+}
+
+.money span {
+    margin-left: 5px;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+main {
+    width: 100%;
+    padding: 30px 20px 110px;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+
+/* =========================
+   ЗАГОЛОВКИ
+========================= */
+
+.page-title {
+    padding: 24px 22px;
+    margin-bottom: 26px;
+
+    border: 1px solid #272d37;
+    border-radius: 28px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #101116,
+            #111318
+        );
+}
+
+.page-title h1 {
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.page-title p {
+    margin-top: 12px;
+
+    color: var(--muted);
+    font-size: 17px;
+}
+
+
+/* =========================
+   КАРТОЧКА ИГРОКА
+========================= */
+
+.player-card {
+    margin-bottom: 24px;
+    padding: 26px;
+
+    background: var(--panel);
+
+    border: 1    min-height:100vh;
     margin:auto;
 }
 
