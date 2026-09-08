@@ -1,39 +1,320 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#101318">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Territory: Arena</title>
+    <!-- Подключаем PixiJS для плавной и быстрой анимации -->
+    <script src="https://cloudflare.com"></script>
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --card-color: #131722;
+            --text-color: #ffffff;
+            --text-secondary: #8a8f9d;
+            --green-bar: #34c759;
+            --red-bar: #ff3b30;
+            --border-color: #2a2f3d;
+        }
 
-  <title>Territory</title>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+            overflow: hidden;
+        }
 
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js"
-    }
-  }
-  </script>
+        /* Шапка игры */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            font-size: 18px;
+        }
+        .stats-top {
+            display: flex;
+            gap: 10px;
+        }
+        .badge {
+            background: var(--card-color);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+        }
 
-  <link rel="stylesheet" href="style.css">
+        /* Контейнер арены */
+        .arena-container {
+            padding: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .title-zone {
+            margin-bottom: 15px;
+        }
+        .title-zone h1 {
+            font-size: 22px;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+        }
+        .title-zone p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Карточка боя */
+        .battle-card {
+            background-color: var(--card-color);
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .battle-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .enemy-name {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Полоски жизней (HP) */
+        .hp-section {
+            margin-bottom: 15px;
+        }
+        .hp-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .hp-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: #1a2233;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .hp-bar {
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s ease-out;
+        }
+        .hp-player { background-color: var(--green-bar); }
+        .hp-enemy { background-color: var(--red-bar); }
+
+        /* Окно анимации (Canvas) */
+        #canvas-container {
+            width: 100%;
+            height: 260px;
+            background: radial-gradient(circle, #1f2738 0%, #0b0e14 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Блок выбора удара */
+        .controls-section {
+            margin-top: 20px;
+        }
+        .controls-title {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .attack-btn {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .attack-btn:active {
+            background-color: #1c2233;
+            transform: scale(0.96);
+        }
+        .attack-btn icon {
+            font-size: 18px;
+        }
+
+        /* Всплывающий урон */
+        .damage-text {
+            position: absolute;
+            color: #ff3b30;
+            font-weight: 900;
+            font-size: 24px;
+            text-shadow: 0 0 5px #000;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
+        }
+    </style>
 </head>
-
 <body>
 
-<header class="top-header">
-  <div class="logo">
-    <span class="logo-icon">⚔️</span>
-    <span>TERRITORY</span>
-  </div>
-
-  <div class="header-right">
-    <div class="coins">
-      🪙 <span id="coins">1000</span>
+    <!-- Вверхнее меню -->
+    <div class="header">
+        <div class="logo">⚔ TERRITORY</div>
+        <div class="stats-top">
+            <div class="badge">🪙 1000</div>
+            <div class="badge">LVL 1</div>
+        </div>
     </div>
 
-    <div class="level-badge">
-      LVL <span id="header-level">1</span>
+    <!-- Основной экран -->
+    <div class="arena-container">
+        <div class="title-zone">
+            <h1>Уличная Арена</h1>
+            <p>Победи противника и забери награду</p>
+        </div>
+
+        <div class="battle-card">
+            <div class="battle-header">
+                <div class="combatant-title">БОЙ</div>
+                <div class="enemy-name" id="enemy-title">Местный хулиган</div>
+            </div>
+
+            <!-- Здоровье -->
+            <div class="hp-section">
+                <div class="hp-row">
+                    <span>Ты</span>
+                    <span id="player-hp-text">120 / 120</span>
+                </div>
+                <div class="hp-bar-container">
+                    <div class="hp-bar hp-player" id="player-hp-bar"></div>
+                </div>
+
+                <div class="hp-row">
+                    <span>Противник</span>
+                    <span id="enemy-hp-text">100 / 100</span>
+                </div>
+                <div class="hp-bar-container">
+                    <div class="hp-bar hp-enemy" id="enemy-hp-bar"></div>
+                </div>
+            </div>
+
+            <!-- Игровой холст для анимации -->
+            <div id="canvas-container"></div>
+        </div>
+
+        <!-- Кнопки управления -->
+        <div class="controls-section">
+            <div class="controls-title">Куда атаковать</div>
+            <div class="buttons-grid">
+                <button class="attack-btn" onclick="makeTurn('head')">
+                    <span>🧠</span>
+                    <span>Голова</span>
+                </button>
+                <button class="attack-btn" onclick="makeTurn('body')">
+                    <span>🫀</span>
+                    <span>Тело</span>
+                </button>
+                <button class="attack-btn" onclick="makeTurn('legs')">
+                    <span>🦵</span>
+                    <span>Ноги</span>
+                </button>
+            </div>
+        </div>
     </div>
+
+    <script>
+        // Данные персонажей
+        const gameState = {
+            player: { hp: 120, maxHp: 120 },
+            enemy: { hp: 100, maxHp: 100 }
+        };
+
+        // Инициализация графического движка PixiJS в окне боя
+        const container = document.getElementById('canvas-container');
+        const app = new PIXI.Application({
+            width: container.clientWidth,
+            height: 260,
+            backgroundAlpha: 0, // Прозрачный фон, используем градиент из CSS
+            antialias: true
+        });
+        container.appendChild(app.view);
+
+        // Создаем спрайты (замените на свои картинки player.png и enemy.png)
+        // Если картинок нет, Pixi создаст цветные заглушки
+        let playerSprite, enemySprite;
+
+        // Игрок (Слева)
+        playerSprite = PIXI.Sprite.from('player.png');
+        playerSprite.anchor.set(0.5, 1);
+        playerSprite.x = app.screen.width * 0.25;
+        playerSprite.y = app.screen.height - 20;
+        playerSprite.scale.set(0.6);
+        app.stage.addChild(playerSprite);
+
+        // Противник (Справа)
+        enemySprite = PIXI.Sprite.from('enemy.png');
+        enemySprite.anchor.set(0.5, 1);
+        enemySprite.x = app.screen.width * 0.75;
+        enemySprite.y = app.screen.height - 20;
+        enemySprite.scale.set(0.6);
+        enemySprite.scale.x *= -1; // Зеркально разворачиваем лицом к игроку
+        app.stage.addChild(enemySprite);
+
+        // Эффект покачивания (Idle анимация "дыхания")
+        let ticker = 0;
+        app.ticker.add(() => {
+            ticker += 0.05;
+            playerSprite.scale.y = 0.6 + Math.sin(ticker) * 0.01;
+            enemySprite.scale.y = 0.6 + Math.cos(ticker) * 0.01;
+        });
+
+        // Функция обработки хода
+        function makeTurn(zone) {
+            if (gameState.enemy.hp <= 0 || gameState.player.hp <= 0) return;
+
+            // 1. Анимация удара Игрока (рывок вперед и возврат)
+            const startX = playerSprite.x;
+            let targetX = enemySprite.x - 50;
+
+            let attackTween = setInterval(() => {
+                playerSprite.x += (targetX - playerSprite.x) * 0.3;
+                if (Math.abs(playerSprite.x - targetX) < 5) {
+                    clearInterval(attackTween);
+                    
+                    // Момент удара: наносим урон
+                    dealDamageToEnemy(zone);
+                    
+                    // Возвращение назад
+                    let returnTween = setInterval(() => {
   </div>
 </header>
 
