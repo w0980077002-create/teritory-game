@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-version="105">
+<html lang="ru" data-version="200">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -68,7 +68,6 @@
         </div>
       </div>
     </div>
-
     <!-- 2. ЭКРАН МАГАЗИНА (РЫНОК) -->
     <div id="page-shop" class="game-page" style="display: none;">
       <div class="hero">
@@ -169,56 +168,3 @@
     <button class="tab" data-tab="shop">🛒<small>Рынок</small></button>
     <button class="tab" data-tab="profile">👤<small>Персонаж</small></button>
   </nav>
-
-  <script>
-    var playerHp = 120;
-    var playerMaxHp = 120;
-    var enemyHp = 100;
-    var enemyMaxHp = 100;
-    var coins = 1000;
-    
-    var level = 1;
-    var victories = 0;
-    var basePower = 5;      
-    var agility = 5;        
-    var weaponBonus = 0;    
-    var weaponName = "Кулаки";
-    var freePoints = 0;     
-
-    var enemyName = "Местный хулиган";
-    var enemyPower = 4;
-    var enemyPrize = 200;
-
-    var selectedAttack = null;
-    var selectedBlock = null;
-
-    try {
-      var saved = localStorage.getItem("territory_save_v4");
-      if (saved) {
-        var p = JSON.parse(saved);
-        if (p && typeof p.basePower === "number") {
-          playerHp = p.playerHp; playerMaxHp = p.playerMaxHp; coins = p.coins;
-          level = p.level; victories = p.victories; basePower = p.basePower;
-          agility = p.agility; weaponBonus = p.weaponBonus; weaponName = p.weaponName;
-          freePoints = p.freePoints;
-          if (p.enemyName) {
-            enemyName = p.enemyName; enemyHp = p.enemyHp; enemyMaxHp = p.enemyMaxHp;
-            enemyPower = p.enemyPower; enemyPrize = p.enemyPrize;
-          }
-        }
-      }
-    } catch(e) {}
-
-    function saveGame() {
-      try {
-        var data = {
-          playerHp: playerHp, playerMaxHp: playerMaxHp, coins: coins,
-          level: level, victories: victories, basePower: basePower,
-          agility: agility, weaponBonus: weaponBonus, weaponName: weaponName,
-          freePoints: freePoints, enemyName: enemyName, enemyHp: enemyHp,
-          enemyMaxHp: enemyMaxHp, enemyPower: enemyPower, enemyPrize: enemyPrize
-        };
-        localStorage.setItem("territory_save_v4", JSON.stringify(data));
-      } catch(e) {}
-    }
-
