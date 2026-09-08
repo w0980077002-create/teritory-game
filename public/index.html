@@ -47,16 +47,16 @@
 
         <div class="zone-title">КУДА АТАКУЕМ:</div>
         <div class="powers">
-          <button class="attack-zone" data-zone="head">👤 Голова</button>
-          <button class="attack-zone" data-zone="torso">👕 Корпус</button>
-          <button class="attack-zone" data-zone="legs">👖 Ноги</button>
+          <button class="attack-zone" data-zone="head">Голова</button>
+          <button class="attack-zone" data-zone="torso">Корпус</button>
+          <button class="attack-zone" data-zone="legs">Ноги</button>
         </div>
 
         <div class="zone-title">ЧТО БЛОКИРУЕМ:</div>
         <div class="powers">
-          <button class="block-zone" data-zone="head">👤 Голова</button>
-          <button class="block-zone" data-zone="torso">👕 Корпус</button>
-          <button class="block-zone" data-zone="legs">👖 Ноги</button>
+          <button class="block-zone" data-zone="head">Голова</button>
+          <button class="block-zone" data-zone="torso">Корпус</button>
+          <button class="block-zone" data-zone="legs">Ноги</button>
         </div>
 
         <button id="attack" class="attack">⚔️ СДЕЛАТЬ ХОД</button>
@@ -146,9 +146,7 @@
     <button class="tab" data-tab="profile">👤<small>Персонаж</small></button>
   </nav>
 
-  <!-- ВСЯ ВСТРОЕННАЯ ЛОГИКА ИГРЫ -->
   <script>
-    // Ждем полной загрузки страницы
     document.addEventListener("DOMContentLoaded", function() {
       try {
         if (window.Telegram && window.Telegram.WebApp) {
@@ -165,7 +163,6 @@
 
       let player = defaultPlayer;
 
-      // Безопасное чтение сохранений
       try {
         let saved = localStorage.getItem("territory_player");
         if (saved) {
@@ -203,13 +200,11 @@
         if (document.getElementById("enemyhp")) document.getElementById("enemyhp").textContent = enemy.hp + "/" + enemy.maxHp;
         if (document.getElementById("level")) document.getElementById("level").textContent = "Уровень " + player.level;
 
-        // Вкладка Персонажа
         if (document.getElementById("prof-victories")) document.getElementById("prof-victories").textContent = player.victories;
         if (document.getElementById("prof-power")) document.getElementById("prof-power").textContent = player.power + " (+" + player.weaponBonus + ")";
         if (document.getElementById("prof-agility")) document.getElementById("prof-agility").textContent = player.agility;
         if (document.getElementById("prof-weapon")) document.getElementById("prof-weapon").textContent = player.weapon;
 
-        // Кнопки прокачки
         let ptsBox = document.getElementById("prof-points-box");
         let btnP = document.getElementById("up-power");
         let btnA = document.getElementById("up-agility");
@@ -226,3 +221,6 @@
         }
 
         let pPhp = document.querySelector(".player-hp-bar");
+        if (pPhp) pPhp.style.width = Math.max((player.hp / player.maxHp) * 100, 0) + "%";
+
+        let pEhp = document.querySelector(".enemy-hp-bar");
