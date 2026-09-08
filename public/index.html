@@ -73,26 +73,4 @@
     <button class="tab active" data-tab="home">🥊<small>Арена</small></button><button class="tab" data-tab="map">🗺️<small>Районы</small></button><button class="tab" data-tab="shop">🛒<small>Рынок</small></button><button class="tab" data-tab="profile">👤<small>Персонаж</small></button>
   </nav>
   <script>
-    var p={hp:120,maxHp:120,coins:1000,level:1,power:5,agility:5,victories:0,weaponBonus:0,weaponName:"Кулаки",freePoints:0};
-    var e={name:"Местный хулиган",hp:100,maxHp:100,power:4,prize:200,type:"thug"};
-    var selA=null,selB=null;
-    try{var s=localStorage.getItem("t_save_v10");if(s){var parsed=JSON.parse(s);if(parsed&&typeof parsed.power==="number")p=parsed;}}catch(err){}
-    function save(){try{localStorage.setItem("t_save_v10",JSON.stringify(p));}catch(err){}}
-    function showNotice(t){var n=document.getElementById("notice");if(n){n.textContent=t;n.style.display="block";setTimeout(function(){n.style.display="none"},2000)}}
-    function updateUI(){
-      document.getElementById("playerhp").textContent=p.hp+"/"+p.maxHp;document.getElementById("enemyhp").textContent=e.hp+"/"+e.maxHp;
-      document.getElementById("coins").textContent=p.coins;document.getElementById("level").textContent="Уровень "+p.level;
-      if(document.getElementById("arena-title"))document.getElementById("arena-title").textContent=e.name;
-      var nl=document.querySelector(".enemyname");if(nl)nl.innerHTML="⚔️ Противник: <span>"+e.hp+"/"+e.maxHp+"</span>";
-      document.getElementById("prof-victories").textContent=p.victories;document.getElementById("prof-power").textContent=p.power+" (+"+p.weaponBonus+")";
-      document.getElementById("prof-agility").textContent=p.agility;document.getElementById("prof-weapon").textContent=p.weaponName;
-      var pb=document.getElementById("prof-points-box"),bp=document.getElementById("up-power"),ba=document.getElementById("up-agility");
-      if(p.freePoints>0){if(pb)pb.style.display="block";document.getElementById("prof-points").textContent=p.freePoints;if(bp)bp.style.display="block";if(ba)ba.style.display="block"}
-      else{if(pb)pb.style.display="none";if(bp)bp.style.display="none";if(ba)ba.style.display="none"}
-      var h1=document.querySelector(".player-hp-bar");if(h1)h1.style.width=((p.hp/p.maxHp)*100)+"%";
-      var h2=document.querySelector(".enemy-hp-bar");if(h2)h2.style.width=((e.hp/e.maxHp)*100)+"%"
-    }
-    var tabs=document.querySelectorAll(".tab");
-    tabs.forEach(function(t){t.onclick=function(){tabs.forEach(function(x){x.classList.remove("active")});t.classList.add("active");document.querySelectorAll(".game-page").forEach(function(pg){pg.style.display="none"});var target="page-"+t.getAttribute("data-tab");if(document.getElementById(target))document.getElementById(target).style.display="block";updateUI()}});
-    var eb=document.querySelectorAll(".select-enemy");
-    eb.forEach(function(b){b.onclick=function(){var t=b.getAttribute("data-type");e.type=t;if(t==="rat"){e.name="Бродячая крыса";e.maxHp=40;e.hp=40;e.power=2;e.prize=60}else if(t==="thug"){e.name="Местный хулиган";e.maxHp=100;e.hp=100;e.power=4;e.prize=200}else if(t==="boss"){e.name="Главарь промзоны [БОСС]";e.maxHp=220;e.hp=220;e.power=9;e.prize=600}updateUI();tabs.forEach(function(x){x.classList.remove("active")});document.querySelector("[data-tab='home']").classList.add("active");document.querySelectorAll(".game-page").forEach(function(p){p.style.display="none"});document.getElementById("page-home").style.display="block";var lb=document.getElementById("battle-log");if(lb)lb.innerHTML="<p>Вы нашли цель: "+e.name+"!</p>";showNotice("🎯 Цель выбрана!")}});
+  <script src="app.js"></script>
