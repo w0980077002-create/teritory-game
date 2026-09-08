@@ -1,214 +1,68 @@
-(() => {
-"use strict";
-const TG = window.Telegram?.WebApp;
-try{TG?.ready();TG?.expand?.()}catch(e){}
-
-const KEY="territory_classic_save_v3";
-const zones=["Голова","Грудь","Живот","Пояс","Ноги"];
-const blocks=[["Голова","Грудь"],["Грудь","Живот"],["Живот","Пояс"],["Пояс","Ноги"]];
-const SHOP=[
- {id:"knife",name:"Нож новичка",price:50,level:1,damage:5,hp:0,slot:"weapon",icon:"🔪"},
- {id:"knuckles",name:"Кастет",price:120,level:1,damage:12,hp:0,slot:"weapon",icon:"🥊"},
- {id:"jacket",name:"Кожаная куртка",price:200,level:1,damage:0,hp:40,slot:"armor",icon:"🧥"},
- {id:"sword",name:"Меч Наемника",price:450,level:2,damage:25,hp:0,slot:"weapon",icon:"⚔️"}
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const key='territoryUltimateV1';
+const initial={screen:'city',ria:170,energy:100,maxEnergy:100,level:1,xp:30,hp:165,maxHp:165,str:10,def:8,agi:7,skill:3,weapon:null,armor:null,inventory:[
+{id:'pistol',name:'Импульсный пистолет',icon:'🔫',qty:1,type:'weapon',bonus:3},
+{id:'jacket',name:'Куртка Phantom',icon:'🧥',qty:1,type:'armor',bonus:3},
+{id:'med',name:'Аптечка',icon:'🩹',qty:2,type:'consumable'},
+{id:'chip',name:'Нейро-чип',icon:'💠',qty:1,type:'artifact'}],
+missions:{rat:false,delivery:false,boss:false},clan:{name:'NEON WOLVES',rank:'Участник',members:27,power:18420},log:['Система: Territory загружен.','Добро пожаловать в Sector 7.']};
+let S=JSON.parse(localStorage.getItem(key)||'null')||initial;
+let enemy={name:'Сумасшедшая Крыса',icon:'🐀',level:1,hp:55,maxHp:55,reward:35,xp:25};
+let target='Голова',guard='Голова + Грудь',missionTab='active';
+const enemies=[
+{name:'Сумасшедшая Крыса',icon:'🐀',level:1,hp:55,reward:35,xp:25},
+{name:'Охотник окраины',icon:'🤖',level:3,hp:105,reward:75,xp:55},
+{name:'Главарь «Vortex»',icon:'☠️',level:6,hp:180,reward:160,xp:120}
 ];
-const BOTS=[
- {id:"rat",name:"Сумасшедшая Крыса",short:"Крыса",level:1,hp:50,maxHp:50,damage:7,xp:15,ria:20,drop:"knife",dropChance:.20,icon:"🐀"},
- {id:"thief",name:"Мародер Окраины",short:"Мародер",level:2,hp:120,maxHp:120,damage:11,xp:35,ria:50,drop:"knuckles",dropChance:.15,icon:"🗡️"},
- {id:"boss",name:"Главарь Банды",short:"Главарь",level:3,hp:250,maxHp:250,damage:16,xp:70,ria:100,drop:"jacket",dropChance:.10,icon:"☠️"}
-];
-const defaultState={
- name:"Странник",level:1,xp:0,ria:500,gold:0,hp:100,energy:100,
- base:{strength:10,agility:5,endurance:5},points:0,
- inventory:[],equipped:{weapon:null,armor:null},location:"square",view:"home",
- chat:[
-  {t:"02:00",u:"Админ",m:"Добро пожаловать в Территорию!"},
-  {t:"02:01",u:"Странник",m:"Кто в бой?"}
- ],combat:null,combatLog:[]
-};
-let S=load();
-
-function load(){try{return {...defaultState,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){return {...defaultState}}}
-function save(){localStorage.setItem(KEY,JSON.stringify(S))}
-function now(){return new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})}
-function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function item(id){return SHOP.find(x=>x.id===id)}
-function bonusDamage(){const i=item(S.equipped.weapon);return i?.damage||0}
-function bonusHp(){const i=item(S.equipped.armor);return i?.hp||0}
-function maxHp(){return 100+S.base.endurance*5+bonusHp()}
-function strength(){return S.base.strength}
-function playerDamage(){return Math.max(1,Math.floor(strength()+bonusDamage()))}
-function toast(t){const e=document.getElementById("toast");e.textContent=t;e.classList.add("show");clearTimeout(window.__tt);window.__tt=setTimeout(()=>e.classList.remove("show"),1800)}
-function renderTop(){
- document.getElementById("topName").textContent=S.name;
- document.getElementById("topLevel").textContent=S.level;
- document.getElementById("topRia").textContent=S.ria;
- document.getElementById("topGold").textContent=S.gold;
- const mh=maxHp(); S.hp=Math.min(S.hp,mh);
- document.getElementById("hpText").textContent=`${S.hp} / ${mh}`;
- document.getElementById("energyText").textContent=`${S.energy} / 100`;
- document.getElementById("xpText").textContent=`${S.xp} / 100`;
- document.getElementById("hpBar").style.width=(S.hp/mh*100)+"%";
- document.getElementById("energyBar").style.width=S.energy+"%";
- document.getElementById("xpBar").style.width=S.xp+"%";
-}
-function go(view,location=S.location){S.view=view;S.location=location;save();render()}
-function layout(body){
- document.getElementById("screen").innerHTML=body;
- document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.toggle("active",b.dataset.nav===S.view));
- renderTop();bind();
-}
-function render(){
- if(S.combat)return renderCombat();
- if(S.view==="character")return renderCharacter();
- if(S.view==="inventory")return renderInventory();
- if(S.view==="shop")return renderShop();
- if(S.view==="arena")return renderArena();
- renderHome();
-}
-function renderHome(){
- const loc=S.location;
- const data={
-  square:{title:"Центральная площадь",desc:"Старый центр города. Здесь сходятся торговцы, бойцы и наёмники.",art:"ЦЕНТРАЛЬНЫЙ РАЙОН",players:["Wanderer","Shadow","Striker"]},
-  outskirts:{title:"Окраина",desc:"Пыльная дорога заканчивается высокой травой. Здесь лучше не задерживаться.",art:"ОКРАИНА",players:["Shadow","Raven"]},
-  hospital:{title:"Госпиталь",desc:"Тихое место, где можно восстановить силы после тяжёлого боя.",art:"ГОСПИТАЛЬ",players:["Медик"]},
-  bank:{title:"Банк",desc:"Хранилище города. Ваш баланс Ria защищён.",art:"ГОРОДСКОЙ БАНК",players:["Кассир"]},
-  shop:{title:"Лавка торговца",desc:"Старый торговец раскладывает оружие и броню на прилавке.",art:"МАГАЗИН",players:["Торговец"]}
- }[loc];
- const links= loc==="square" ? `
-  <button class="link" data-action="arena">→ Перейти на Арену</button>
-  <button class="link" data-action="shop">→ Зайти в Магазин</button>
-  <button class="link" data-action="bank">→ Пойти в Банк</button>
-  <button class="link" data-action="outskirts">→ Выйти на Окраину</button>
-  <button class="link" data-action="hospital">→ В Госпиталь</button>` :
- loc==="outskirts" ? `<button class="link" data-action="search">→ Искать врагов в траве</button><button class="link" data-action="home">→ Вернуться на площадь</button>` :
- loc==="hospital" ? `<button class="link" data-action="rest">→ Отдохнуть и восстановить силы</button><button class="link" data-action="home">→ На площадь</button>` :
- loc==="bank" ? `<button class="link" data-action="home">→ На площадь</button>` :
- `<button class="link" data-action="shop">→ Смотреть товары</button><button class="link" data-action="home">→ На площадь</button>`;
- layout(`
-  <section class="panel">
-   <div class="panel-title">${esc(data.title)}</div><div class="panel-body">
-    <div class="location-art"><div class="art-sign">${esc(data.art)}</div><div class="buildings">
-      <div class="building"><b>🏛</b>Арена</div><div class="building"><b>⚒</b>Лавка</div><div class="building"><b>🏦</b>Банк</div>
-    </div></div>
-    <p><b>Описание:</b> ${esc(data.desc)}</p>
-    <p class="muted">В этой локации сейчас:</p><div class="players">${data.players.map(x=>`<span class="player">${esc(x)}</span>`).join("")}</div>
-    <h3 style="margin-top:9px">Куда пойти:</h3><div class="links">${links}</div>
-   </div>
-  </section>
-  ${loc==="bank"?`<section class="panel"><div class="panel-title">Счёт</div><div class="panel-body"><b>${S.ria} Ria</b> — доступный баланс</div></section>`:""}
-  ${loc==="hospital"?`<section class="panel"><div class="panel-title">Лечение</div><div class="panel-body"><p>Здесь вы полностью восстанавливаете HP и энергию.</p><button class="btn" data-action="rest">ОТДОХНУТЬ</button></div></section>`:""}
-  <section class="panel"><div class="panel-title">Игровой чат</div><div class="panel-body"><div class="chat">
-   <div class="chatlog" id="chatlog">${S.chat.map(m=>`<div class="msg">[${esc(m.t)}] <b data-user="${esc(m.u)}">${esc(m.u)}</b>: ${esc(m.m)}</div>`).join("")}</div>
-   <form class="chatform" id="chatform"><input id="chatinput" maxlength="160" placeholder="Сообщение..."><button class="btn">Отправить</button></form>
-  </div></div></section>
- `);
- const c=document.getElementById("chatlog");if(c)c.scrollTop=c.scrollHeight;
-}
-function renderShop(){
- layout(`<section class="panel"><div class="panel-title">Лавка торговца</div><div class="panel-body">
- <p class="muted">Ваш кошелёк: <b>${S.ria} Ria</b>. Все купленные вещи попадают в Инвентарь.</p>
- <div class="grid">${SHOP.map(i=>`<div class="item"><div class="item-head"><b>${i.icon} ${esc(i.name)}</b><span class="price">${i.price} Ria</span></div>
- <div class="req">Требуется уровень ${i.level}. ${i.damage?`+${i.damage} к Урону.`:""} ${i.hp?`+${i.hp} к Макс. HP.`:""}</div>
- <div class="item-actions"><button class="btn" data-buy="${i.id}" ${S.level<i.level||S.ria<i.price?"disabled":""}>Купить</button></div></div>`).join("")}</div>
- </div></section>`);
-}
-function renderInventory(){
- const inv=S.inventory.map(id=>item(id)).filter(Boolean);
- layout(`<section class="panel"><div class="panel-title">Инвентарь</div><div class="panel-body">
- <div class="equip">${["weapon","armor"].map(slot=>{const id=S.equipped[slot],it=item(id);return `<div class="slot"><b>${slot==="weapon"?"⚔ Оружие":"🛡 Броня"}</b>${it?`${it.icon} ${esc(it.name)}<br><button class="btn alt" data-unequip="${slot}">Снять</button>`:"— пусто"}</div>`}).join("")}</div>
- <h3 style="margin-top:10px">Сумка</h3>
- ${inv.length?`<div class="grid">${inv.map(i=>`<div class="item"><div class="item-head"><b>${i.icon} ${esc(i.name)}</b><span>${i.damage?`+${i.damage} урон`:`+${i.hp} HP`}</span></div><div class="item-actions"><button class="btn" data-equip="${i.id}">${S.equipped[i.slot]===i.id?"Надето":"Надеть"}</button></div></div>`).join("")}`:"<div class='empty'>Сумка пуста. Купите вещь в Магазине или получите её в бою.</div>"}
- </div></section>`);
-}
-function renderCharacter(){
- layout(`<section class="panel"><div class="panel-title">Персонаж — ${esc(S.name)}</div><div class="panel-body">
- <div class="notice">Уровень <b>${S.level}</b>. Свободных очков характеристик: <b>${S.points}</b></div>
- ${[["strength","Сила","Увеличивает урон"],["agility","Ловкость","Шанс уклонения"],["endurance","Выносливость","+5 максимального HP"]].map(([k,n,d])=>`<div class="statrow"><span><b>${n}</b><br><small class="muted">${d}</small></span><span><b>${S.base[k]}</b> <button class="btn stat-plus" data-stat="${k}" ${S.points<=0?"disabled":""}>+</button></span></div>`).join("")}
- <p style="margin-top:9px">Макс. HP: <b>${maxHp()}</b> · Урон: <b>${playerDamage()}</b></p>
- </div></section>`);
-}
-function renderArena(){
- layout(`<section class="panel"><div class="panel-title">Арена — список противников</div><div class="panel-body">
- <p class="muted">Выберите противника. После нажатия «Атаковать» начинается пошаговый бой.</p>
- <div class="grid">${BOTS.map(b=>`<div class="item"><div class="item-head"><b>${b.icon} [Бот] ${esc(b.name)}</b><span>ур. ${b.level}</span></div>
- <p>HP: <b>${b.hp}</b> · Урон: ${b.damage}</p><div class="req">Награда: ${b.xp} опыта, ${b.ria} Ria. Дроп ${Math.round(b.dropChance*100)}%: ${esc(item(b.drop).name)}.</div>
- <div class="item-actions"><button class="btn danger" data-fight="${b.id}">⚔ АТАКОВАТЬ</button></div></div>`).join("")}</div>
- </div></section>`);
-}
-function renderCombat(){
- const c=S.combat,b=BOTS.find(x=>x.id===c.botId);
- if(!b){S.combat=null;return renderArena()}
- layout(`<section class="panel"><div class="panel-title">⚔ БОЙ — ${esc(b.name)}</div><div class="panel-body">
- <div class="combatants">
-  <div class="fighter"><div class="avatar">♙</div><b>${esc(S.name)}</b> · ур. ${S.level}<div class="bar hp"><i style="width:${S.hp/maxHp()*100}%"></i></div><small>${S.hp}/${maxHp()} HP</small></div>
-  <div class="fighter enemy"><div class="avatar">${b.icon}</div><b>${esc(b.name)}</b> · ур. ${b.level}<div class="bar hp"><i style="width:${b.hp/b.maxHp*100}%"></i></div><small>${b.hp}/${b.maxHp} HP</small></div>
- </div>
- <div class="panel" style="margin-top:9px"><div class="panel-title">1. Куда ударить?</div><div class="panel-body"><div class="zones">${zones.map(z=>`<label class="zone ${c.strike===z?"active":""}"><input type="radio" name="strike" value="${esc(z)}" ${c.strike===z?"checked":""}>${esc(z)}</label>`).join("")}</div></div></div>
- <div class="panel"><div class="panel-title">2. Как блокировать?</div><div class="panel-body"><div class="zones">${blocks.map((z,i)=>`<label class="zone ${c.block===i?"active":""}"><input type="radio" name="block" value="${i}" ${c.block===i?"checked":""}>${z[0]} + ${z[1]}</label>`).join("")}</div></div></div>
- <button class="btn danger" data-strike-button ${c.strike&&c.block!==null?"":"disabled"}>⚔ УДАРИТЬ</button>
- <h3 style="margin-top:9px">Боевой лог</h3><div class="log" id="combatlog">${S.combatLog.map(x=>`<div class="${x.cls||""}">${x.html||esc(x)}</div>`).join("")}</div>
- </div></section>`);
- const l=document.getElementById("combatlog");if(l)l.scrollTop=l.scrollHeight;
-}
-function startFight(id){const b=BOTS.find(x=>x.id===id);S.combat={botId:id,strike:null,block:null};S.combatLog=[`[${now()}] Вы вступили в бой с ${b.name}.`];save();render()}
-function log(text,cls=""){S.combatLog.push({html:text,cls});}
-function attack(){
- const c=S.combat,b=BOTS.find(x=>x.id===c.botId);if(!c?.strike||c.block===null)return;
- const enemyStrike=zones[Math.floor(Math.random()*zones.length)];
- const enemyBlock=blocks[Math.floor(Math.random()*blocks.length)];
- let pdmg=0;
- const blocked=enemyBlock.includes(c.strike);
- if(blocked){pdmg=Math.random()<.35?1:0;log(`[${now()}] Вы ударили ${b.short} в ${c.strike} — БЛОК. Урон: -${pdmg} HP.`)}
- else if(Math.random()<.10){pdmg=playerDamage()*2;log(`[${now()}] <span class="crit">CRIT! Вы сокрушили ${b.short} в ${c.strike} на -${pdmg} HP!</span>`)}
- else if(Math.random()<.10){pdmg=0;log(`[${now()}] <span class="evade">${b.short} уклонился от вашего удара!</span>`)}
- else{pdmg=playerDamage();log(`[${now()}] Вы ударили ${b.short} в ${c.strike} на -${pdmg} HP.`)}
- b.hp=Math.max(0,b.hp-pdmg);
- if(b.hp<=0)return winFight(b);
- const playerBlock=blocks[c.block];
- let edmg=0;
- if(playerBlock.includes(enemyStrike)){edmg=0;log(`[${now()}] ${b.short} ударил вас в ${enemyStrike} (Блок) на -0 HP.`)}
- else if(Math.random()<.10){edmg=0;log(`[${now()}] <span class="evade">Вы уклонились от удара ${b.short}!</span>`)}
- else{edmg=Math.max(1,b.damage+Math.floor(Math.random()*5)-Math.floor(S.base.endurance/3));log(`[${now()}] ${b.short} ударил вас в ${enemyStrike} на -${edmg} HP.`)}
- S.hp=Math.max(0,S.hp-edmg);
- if(S.hp<=0){log(`[${now()}] <span class="defeat">Поражение. Вы отправлены в Госпиталь.</span>`,"defeat");S.hp=1;S.energy=Math.max(0,S.energy-15);S.combat={...c,ended:"defeat",strike:null,block:null};save();return render()}
- c.strike=null;c.block=null;S.combat=c;save();render()
-}
-function winFight(b){
- S.xp+=b.xp;S.ria+=b.ria;let drop=null;
- if(Math.random()<b.dropChance){drop=b.drop;S.inventory.push(drop)}
- log(`[${now()}] <span class="victory">ПОБЕДА! Вы получили ${b.xp} опыта и ${b.ria} Ria${drop?`. Выпал предмет: ${item(drop).name}!`:"."}</span>`,"victory");
- while(S.xp>=100){S.xp-=100;S.level++;S.points+=3;toast(`Новый уровень! Теперь уровень ${S.level}`)}
- S.combat={botId:b.id,ended:"victory",strike:null,block:null,reward:`Победа! +${b.xp} XP, +${b.ria} Ria${drop?`, дроп: ${item(drop).name}`:""}`};save();render()
-}
-function buy(id){const i=item(id);if(!i||S.level<i.level||S.ria<i.price)return;S.ria-=i.price;S.inventory.push(id);save();toast(`Куплено: ${i.name}`);render()}
-function equip(id){const i=item(id);if(!i)return;S.equipped[i.slot]=id;save();toast(`Надето: ${i.name}`);render()}
-function unequip(slot){S.equipped[slot]=null;save();render()}
-function addStat(k){if(S.points<=0)return;S.base[k]++;S.points--;S.hp=Math.min(S.hp,maxHp());save();render()}
-function searchEnemy(){const b=BOTS[Math.floor(Math.random()*BOTS.length)];toast(`В траве появился ${b.name}!`);startFight(b.id)}
-function rest(){S.hp=maxHp();S.energy=100;save();toast("Силы полностью восстановлены");render()}
-function sendChat(){
- const input=document.getElementById("chatinput"),m=input?.value.trim();if(!m)return;
- S.chat.push({t:now(),u:S.name,m});if(S.chat.length>80)S.chat.shift();save();render();
-}
-function bind(){
- document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go(b.dataset.nav));
- document.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>buy(b.dataset.buy));
- document.querySelectorAll("[data-equip]").forEach(b=>b.onclick=()=>equip(b.dataset.equip));
- document.querySelectorAll("[data-unequip]").forEach(b=>b.onclick=()=>unequip(b.dataset.unequip));
- document.querySelectorAll("[data-stat]").forEach(b=>b.onclick=()=>addStat(b.dataset.stat));
- document.querySelectorAll("[data-fight]").forEach(b=>b.onclick=()=>startFight(b.dataset.fight));
- document.querySelectorAll("[data-user]").forEach(b=>b.onclick=()=>{const i=document.getElementById("chatinput");if(i)i.value="@"+b.dataset.user+" "});
- document.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>{
-  const a=b.dataset.action;
-  if(a==="home")go("home","square"); else if(a==="arena")go("arena","arena"); else if(a==="shop")go("shop","shop");
-  else if(a==="bank")go("home","bank"); else if(a==="outskirts")go("home","outskirts"); else if(a==="hospital")go("home","hospital");
-  else if(a==="rest")rest(); else if(a==="search")searchEnemy();
- });
- document.querySelectorAll('input[name="strike"]').forEach(x=>x.onchange=()=>{S.combat.strike=x.value;save();render()});
- document.querySelectorAll('input[name="block"]').forEach(x=>x.onchange=()=>{S.combat.block=Number(x.value);save();render()});
- const sb=document.querySelector("[data-strike-button]");if(sb)sb.onclick=attack;
- const form=document.getElementById("chatform");if(form)form.onsubmit=e=>{e.preventDefault();sendChat()};
-}
+function save(){localStorage.setItem(key,JSON.stringify(S));$('#ria').textContent=S.ria;$('#energyTop').textContent=S.energy}
+function toast(t){let e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.remove('show'),1700)}
+function go(x){S.screen=x;render();scrollTo({top:0,behavior:'smooth'})}
+function xp(n){S.xp+=n;while(S.xp>=S.level*100){S.xp-=S.level*100;S.level++;S.maxHp+=15;S.hp=S.maxHp;S.str++;toast('LEVEL UP — уровень '+S.level)}}
+function stats(){return `<div class="stats"><div class="stat"><small>HP</small><b>${S.hp}/${S.maxHp}</b><div class="bar hp"><i style="width:${S.hp/S.maxHp*100}%"></i></div></div><div class="stat"><small>ЭНЕРГИЯ</small><b>${S.energy}/${S.maxEnergy}</b><div class="bar en"><i style="width:${S.energy/S.maxEnergy*100}%"></i></div></div><div class="stat"><small>ОПЫТ</small><b>${S.xp}/${S.level*100}</b><div class="bar"><i style="width:${S.xp/(S.level*100)*100}%"></i></div></div></div>`}
+function city(){return `<h1 class="title">Sector 7</h1><p class="subtitle">Живой мегаполис. Каждый район — новая возможность.</p>
+<section class="card hero"><div class="hero-copy"><div class="eyebrow">NIGHT CITY · 02:35</div><h1>Город<br>не спит.</h1><p>Зарабатывай Ria, открывай районы, выполняй миссии и забирай территорию.</p><button class="btn" style="margin-top:13px" onclick="go('arena')">⚔ Выйти в бой</button></div><div class="city-art"><div class="moon"></div><div class="building b1"></div><div class="building b2"></div><div class="building b3"></div><div class="building b4"></div></div></section>${stats()}
+<div class="section"><div class="section-head"><b>Карта города</b><span>4 района открыто</span></div><div class="map">
+<button class="district" onclick="showDistrict('Центр','NPC, рынок, задания')"><span class="di">🏙️</span><b>Неон-центр</b><small>Рынок · NPC · задания</small><em class="tag live">LIVE</em></button>
+<button class="district" onclick="go('missions')"><span class="di">🌃</span><b>Северный сектор</b><small>Миссии · тайники</small><em class="tag live">LIVE</em></button>
+<button class="district" onclick="go('arena')"><span class="di">⚔️</span><b>Тёмный переулок</b><small>Бои · PvP · награды</small><em class="tag live">LIVE</em></button>
+<button class="district" onclick="showDistrict('Порт','Контракты и редкий лут')"><span class="di">⚓</span><b>Порт</b><small>Контракты · лут</small><em class="tag">LVL 3+</em></button>
+</div></div>
+<div class="section"><div class="section-head"><b>Быстрый доступ</b></div><div class="grid map">
+<button class="district" onclick="go('shop')"><span class="di">🛒</span><b>Магазин</b><small>Оружие и экипировка</small></button>
+<button class="district" onclick="go('character')"><span class="di">🧬</span><b>Профиль</b><small>Статы и снаряжение</small></button>
+</div></div>`}
+function character(){return `<h1 class="title">Твой герой</h1><p class="subtitle">Странник · уровень ${S.level}</p>
+<section class="card"><div class="hero-visual"><div class="aura"></div><div class="fighter">🧑‍🚀</div></div><div class="pad"><div class="profile"><div class="avatar">🧑‍🚀</div><div><h2>Странник</h2><p>Охотник за территориями</p><span class="level">LVL ${S.level} · ${S.xp}/${S.level*100} XP</span></div></div>
+<div class="gear"><div class="slot"><small>ОРУЖИЕ</small><b>${S.weapon||'Пусто'}</b></div><div class="slot"><small>БРОНЯ</small><b>${S.armor||'Пусто'}</b></div></div></div></section>
+<div class="section"><div class="section-head"><b>Характеристики</b><span>${S.skill} очков</span></div><div class="list">${[['Сила','str','Урон'],['Защита','def','Снижение урона'],['Ловкость','agi','Уклонение']].map(a=>`<div class="row"><div><b>${a[0]}</b><small>${a[2]}</small></div><div><b class="gold">${S[a[1]]}</b> <button class="mini" onclick="upgrade('${a[1]}')">+1</button></div></div>`).join('')}</div></div>`}
+function inventory(){return `<h1 class="title">Инвентарь</h1><p class="subtitle">Экипировка меняет характеристики героя.</p><div class="list">${S.inventory.map((it,i)=>`<div class="row"><div class="row-left"><div class="ico">${it.icon}</div><div><b>${it.name}</b><small>${it.type==='weapon'?'Оружие · +'+it.bonus+' сила':it.type==='armor'?'Броня · +'+it.bonus+' защита':'Предмет · количество '+it.qty}</small></div></div>${it.type==='weapon'||it.type==='armor'?`<button class="mini" onclick="equip(${i})">${(it.type==='weapon'?S.weapon:S.armor)===it.name?'Снять':'Надеть'}</button>`:''}</div>`).join('')}</div><div class="section"><button class="btn secondary wide" onclick="useMed()">🩹 Использовать аптечку</button></div>`}
+const shop=[['pistol2','Плазменный «Nova»','⚡',120,'weapon',6],['armor2','Броня «Spectre»','🛡️',145,'armor',7],['med2','Аптечка XL','🩹',45,'consumable',1],['chip2','Тактический чип','💠',80,'artifact',2]];
+function shopPage(){return `<h1 class="title">Рынок</h1><p class="subtitle">Технологии, которые меняют правила улицы.</p><div class="list">${shop.map((it,i)=>`<div class="row"><div class="row-left"><div class="ico">${it[2]}</div><div><b>${it[1]}</b><small>${it[4]==='weapon'?'Оружие · +'+it[5]+' сила':it[4]==='armor'?'Броня · +'+it[5]+' защита':'Уникальный предмет'}</small></div></div><div><div class="price">◆ ${it[3]}</div><button class="mini" onclick="buy(${i})">Купить</button></div></div>`).join('')}</div>`}
+function missions(){let data=[['rat','Первая зачистка','Победи 1 противника на арене.',35,25,!S.missions.rat],['delivery','Ночной курьер','Заработай 100 Ria.',70,45,!S.missions.delivery],['boss','Охота на Vortex','Победи Главаря «Vortex».',160,120,!S.missions.boss]];return `<h1 class="title">Миссии</h1><p class="subtitle">Контракты города обновляются каждый день.</p><div class="tabs"><button class="tab active">Активные</button><button class="tab" onclick="toast('Архив миссий пока пуст')">Архив</button></div><div class="list">${data.map(m=>`<div class="mission"><div class="mission-top"><b>${m[1]}</b><span class="reward">◆ ${m[3]} · XP ${m[4]}</span></div><p>${m[2]}</p><button class="btn small ${m[5]?'':'secondary'}" onclick="${m[5]?`mission('${m[0]}')`:`toast('Миссия уже выполнена')`}">${m[5]?'Начать':'Выполнено'}</button></div>`).join('')}</div>`}
+function clan(){return `<h1 class="title">Клан</h1><p class="subtitle">Объединяйтесь и контролируйте районы вместе.</p><section class="card clan-banner"><div class="eyebrow">ТВОЙ КЛАН</div><h2>♜ ${S.clan.name}</h2><p>Ранг: ${S.clan.rank} · Участников: ${S.clan.members}</p><div class="stats"><div class="stat"><small>СИЛА</small><b>${S.clan.power}</b></div><div class="stat"><small>РЕЙТИНГ</small><b>#12</b></div><div class="stat"><small>ТЕРРИТОРИИ</small><b>7</b></div></div></section>
+<div class="section"><div class="section-head"><b>Участники</b><span>онлайн 8</span></div><div class="members">${[['Raven','Лидер'],['Mira','Зам.'],['Kron','Боец'],['Vex','Боец'],['Nox','Разведчик'],['Ari','Боец']].map(x=>`<div class="member"><div style="font-size:22px">👤</div><strong>${x[0]}</strong><small>${x[1]}</small></div>`).join('')}</div></div>
+<div class="section"><button class="btn wide" onclick="toast('Заявка на участие в захвате отправлена')">⚑ Участвовать в захвате</button><button class="btn secondary wide" onclick="toast('Клановый чат открыт')">💬 Открыть чат клана</button></div>`}
+function arena(){return `<h1 class="title">Арена</h1><p class="subtitle">PvE и PvP сражения без ожидания.</p><div class="list">${enemies.map((e,i)=>`<button class="row" onclick="chooseEnemy(${i})"><div class="row-left"><div class="ico">${e.icon}</div><div><b>${e.name}</b><small>LVL ${e.level} · награда ◆ ${e.reward} · XP ${e.xp}</small></div></div><span class="cyan">→</span></button>`).join('')}</div>
+<div class="section card arena-head"><div class="enemy-wrap"><div class="enemy-name"><small>ТЕКУЩИЙ БОЙ · LVL ${enemy.level}</small><b>${enemy.name}</b><div class="bar hp" style="width:180px"><i style="width:${enemy.hp/enemy.maxHp*100}%"></i></div><small>${enemy.hp}/${enemy.maxHp} HP</small></div><div class="enemy">${enemy.icon}</div></div></div>
+<div class="card fight"><b>1. Выбери зону атаки</b><div class="zones">${['Голова','Грудь','Живот','Пояс','Ноги'].map(x=>`<button class="zone ${target===x?'sel':''}" onclick="target='${x}';render()">${x}</button>`).join('')}</div><b>2. Поставь блок</b><div class="blockgrid">${['Голова + Грудь','Грудь + Живот','Живот + Пояс','Пояс + Ноги'].map(x=>`<button class="zone ${guard===x?'sel':''}" onclick="guard='${x}';render()">${x}</button>`).join('')}</div><button class="btn wide" onclick="attack()">⚡ НАНЕСТИ УДАР</button><button class="btn secondary wide" onclick="defend()">🛡️ ПОЛНЫЙ БЛОК</button><div class="combat-log" id="combatLog">${S.log.slice(-8).map(x=>`<div>${x}</div>`).join('')}</div></div>
+<div class="section card pvp"><div class="versus"><div style="text-align:center"><div class="vsavatar">🧑‍🚀</div><small>Ты</small></div><div class="vs">VS</div><div style="text-align:center"><div class="vsavatar">🎭</div><small>Рейтинг #184</small></div></div><div class="pad"><button class="btn wide" onclick="pvp()">⚔ Найти соперника</button></div></div>`}
+function render(){let fn={city,character,inventory,shop:shopPage,missions,clan,arena}[S.screen]||city;$('#screen').innerHTML=fn();$$('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===S.screen));save()}
+function upgrade(k){if(!S.skill)return toast('Нет очков развития');S.skill--;S[k]++;toast('Характеристика улучшена');render()}
+function equip(i){let it=S.inventory[i], slot=it.type==='weapon'?'weapon':'armor';S[slot]=S[slot]===it.name?null:it.name;toast(S[slot]?'Экипировано':'Снято');render()}
+function useMed(){let i=S.inventory.findIndex(x=>x.id==='med'&&x.qty>0);if(i<0)return toast('Аптечек нет');if(S.hp===S.maxHp)return toast('HP уже полное');S.inventory[i].qty--;S.hp=Math.min(S.maxHp,S.hp+60);toast('+60 HP');render()}
+function buy(i){let it=shop[i];if(S.ria<it[3])return toast('Недостаточно Ria');S.ria-=it[3];let existing=S.inventory.find(x=>x.id===it[0]);if(existing)existing.qty++;else S.inventory.push({id:it[0],name:it[1],icon:it[2],qty:1,type:it[4],bonus:it[5]});if(it[4]==='weapon')S.str+=it[5];if(it[4]==='armor')S.def+=it[5];toast('Предмет куплен');render()}
+function chooseEnemy(i){enemy={...enemies[i]};S.log.push('Новый противник: '+enemy.name);render();toast('Противник выбран')}
+function enemyAttack(blocking=false){if(Math.random()<Math.min(.35,S.agi/100)){S.log.push('Противник промахнулся — ловкость спасла тебя.');return}let dmg=Math.max(2,enemy.level*5+Math.floor(Math.random()*9)-S.def);if(blocking)dmg=Math.floor(dmg*.25);S.hp=Math.max(0,S.hp-dmg);S.log.push(enemy.name+' наносит '+dmg+' урона.');if(S.hp<=0){S.hp=Math.ceil(S.maxHp*.25);S.energy=100;S.log.push('Ты проиграл. Медцентр восстановил 25% HP.');toast('Поражение')}}
+function attack(){if(S.energy<10)return toast('Недостаточно энергии');S.energy-=10;let dmg=Math.max(5,S.str+Math.floor(Math.random()*8));if(target==='Голова'&&Math.random()<.25){dmg*=2;S.log.push('💥 КРИТ! '+dmg+' урона в голову.')}else if(Math.random()<S.agi/180){S.log.push('💨 Удар прошёл мимо!');dmg=0}else S.log.push('⚡ Удар в '+target+': -'+dmg+' HP');enemy.hp=Math.max(0,enemy.hp-dmg);if(enemy.hp<=0){S.ria+=enemy.reward;xp(enemy.xp);S.log.push('🏆 ПОБЕДА: +'+enemy.reward+' Ria, +'+enemy.xp+' XP');if(enemy.name.includes('Vortex'))S.missions.boss=true;S.missions.rat=true;toast('Победа!');enemy={...enemies[0]}}else enemyAttack();render()}
+function defend(){if(S.energy<5)return toast('Недостаточно энергии');S.energy-=5;S.log.push('🛡️ Ты закрылся. Урон снижен.');enemyAttack(true);render()}
+function pvp(){if(S.energy<20)return toast('Нужно 20 энергии');S.energy-=20;let win=Math.random()<.52+S.agi*.01;if(win){let r=100+Math.floor(Math.random()*80);S.ria+=r;xp(70);S.log.push('⚔ PvP победа: +'+r+' Ria');toast('PvP победа!')}else{S.log.push('⚔ PvP поражение.');toast('Соперник оказался сильнее')}render()}
+function mission(id){if(id==='rat'){go('arena')}else if(id==='delivery'){S.ria+=70;xp(45);S.missions.delivery=true;toast('Контракт выполнен! +70 Ria');render()}else if(id==='boss'){go('arena');chooseEnemy(2)}}
+function showDistrict(a,b){openModal(`<div class="modal-head"><div><b>${a}</b><small style="display:block;color:var(--muted);margin-top:3px">${b}</small></div><button class="close" onclick="closeModal()">✕</button></div><div class="list"><div class="row"><div class="row-left"><div class="ico">👤</div><div><b>NPC района</b><small>Доступны диалоги и контракты</small></div></div><button class="mini" onclick="toast('NPC: Новые задания появятся скоро')">Поговорить</button></div><div class="row"><div class="row-left"><div class="ico">📦</div><div><b>Тайник</b><small>Случайная награда</small></div></div><button class="mini" onclick="loot()">Открыть</button></div></div>`)}
+function loot(){let r=20+Math.floor(Math.random()*60);S.ria+=r;toast('Тайник: +'+r+' Ria');closeModal();render()}
+function openModal(h){$('#modal').innerHTML='<div class="modal-card">'+h+'</div>';$('#modal').classList.add('show')}
+function closeModal(){$('#modal').classList.remove('show')}
+$$('.bottom button').forEach(b=>b.onclick=()=>go(b.dataset.go));
+$$('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 render();
-})();
+window.go=go;window.toast=toast;window.upgrade=upgrade;window.equip=equip;window.useMed=useMed;window.buy=buy;window.chooseEnemy=chooseEnemy;window.attack=attack;window.defend=defend;window.pvp=pvp;window.mission=mission;window.showDistrict=showDistrict;window.loot=loot;window.openModal=openModal;window.closeModal=closeModal;
+try{window.Telegram?.WebApp?.ready();window.Telegram?.WebApp?.expand()}catch(e){}
