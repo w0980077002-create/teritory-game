@@ -1,5 +1,12 @@
-// Состояние игры
-var p = { hp: 120, maxHp: 120, coins: 1000, level: 1, freePoints: 0 };
+// Состояние игры (добавили инвентарь и силу)
+var p = { 
+    hp: 120, 
+    maxHp: 120, 
+    coins: 1000, 
+    level: 1, 
+    weapon: "Кулаки", 
+    bonusDamage: 0 
+};
 var e = { name: "Местный хулиган", hp: 100, maxHp: 100 };
 
 var selA = null; // Выбранная атака
@@ -19,41 +26,38 @@ function save() {
 document.addEventListener("DOMContentLoaded", function() {
     initTabs();        
     initBattleUI();    
+    initShopUI(); // Инициализируем рынок
     updateUI();        
 });
 
-// 1. НАВИГАЦИЯ ПО ВКЛАДКАМ (Прямая привязка по ID кнопок и экранов)
+// 1. НАВИГАЦИЯ ПО ВКЛАДКАМ
 function initTabs() {
-    // Находим кнопки навигации по их ID
     var btnArena = document.getElementById("tab-arena");
     var btnShop = document.getElementById("tab-shop");
     var btnMap = document.getElementById("tab-map");
     var btnProfile = document.getElementById("tab-profile");
 
-    // Находим экраны игры по их ID
     var pageArena = document.getElementById("page-home");
     var pageShop = document.getElementById("page-shop");
     var pageMap = document.getElementById("page-map");
     var pageProfile = document.getElementById("page-profile");
 
-    // Функция для переключения на конкретный экран
     function switchPage(activeButton, activePage) {
-        // Прячем все экраны
         if (pageArena) pageArena.style.display = "none";
         if (pageShop) pageShop.style.display = "none";
         if (pageMap) pageMap.style.display = "none";
         if (pageProfile) pageProfile.style.display = "none";
 
-        // Убираем подсветку со всех кнопок меню
         var allTabs = document.querySelectorAll(".tab");
         allTabs.forEach(function(tab) { tab.classList.remove("active"); });
 
-        // Включаем нужный экран и подсвечиваем кнопку
         if (activePage) activePage.style.display = "block";
         if (activeButton) activeButton.classList.add("active");
+        
+        // При переходе на вкладку персонажа обновляем его инфо
+        updateUI();
     }
 
-    // Привязываем клики (работает и на ПК, и на смартфонах)
     if (btnArena) { btnArena.addEventListener("click", function() { switchPage(btnArena, pageArena); }); }
     if (btnShop) { btnShop.addEventListener("click", function() { switchPage(btnShop, pageShop); }); }
     if (btnMap) { btnMap.addEventListener("click", function() { switchPage(btnMap, pageMap); }); }
@@ -64,23 +68,18 @@ function initTabs() {
 function initBattleUI() {
     var allButtons = Array.from(document.querySelectorAll("button"));
     
-    // Находим боевые кнопки по тексту на них
     var zoneButtons = allButtons.filter(function(btn) {
         var txt = btn.innerText.trim();
         return txt === "Голова" || txt === "Корпус" || txt === "Ноги";
     });
 
-    // Первые 3 кнопки — АТАКА, вторые 3 — БЛОК
     var attackBtns = zoneButtons.slice(0, 3);
     var blockBtns = zoneButtons.slice(3, 6);
-    
-    // Ищем кнопку хода
     var turnBtn = document.getElementById("attack");
 
     var zones = ["head", "body", "legs"];
     var zoneText = { "head": "Голову", "body": "Корпус", "legs": "Ноги" };
 
-    // Клик по кнопкам атаки
     attackBtns.forEach(function(b, idx) {
         b.addEventListener("click", function() {
             attackBtns.forEach(function(btn) { btn.classList.remove("zone-btn-active"); });
@@ -89,7 +88,6 @@ function initBattleUI() {
         });
     });
 
-    // Клик по кнопкам блока
     blockBtns.forEach(function(b, idx) {
         b.addEventListener("click", function() {
             blockBtns.forEach(function(btn) { btn.classList.remove("zone-btn-active"); });
@@ -98,7 +96,6 @@ function initBattleUI() {
         });
     });
 
-    // Нажатие кнопки "СДЕЛАТЬ ХОД"
     if (turnBtn) {
         turnBtn.addEventListener("click", function() {
             if (!selA || !selB) {
@@ -110,7 +107,9 @@ function initBattleUI() {
             var enemyB = zones[Math.floor(Math.random() * 3)];
             
             var logs = [];
-            var dmg = 15;
+            // Твой базовый урон 15 + бонус от купленного оружия!
+            var dmg = 15 + p.bonusDamage; 
+            var enemyDmg = 15;
 
             // Урон по хулигану
             if (selA === enemyB) {
@@ -125,10 +124,9 @@ function initBattleUI() {
                 logs.push(`🛡️ Хулиган метил в <b>${zoneText[enemyA]}</b>, но вы заблокировали его.`);
             } else {
                 p.hp = Math.max(0, p.hp - dmg);
-                logs.push(`🥊 Хулиган нанес вам удар в <b>${zoneText[enemyA]}</b>. Урон: -${dmg}.`);
+                logs.push(`🥊 Хулиган нанес вам удар в <b>${zoneText[enemyA]}</b>. Урон: -${enemyDmg}.`);
             }
 
-            // Вывод лога
             var logBox = document.querySelector(".combat-log-text");
             if (logBox) {
                 if (logBox.innerHTML.includes("Ожидание хода...")) logBox.innerHTML = "";
@@ -141,34 +139,79 @@ function initBattleUI() {
                 if (p.hp <= 0 && e.hp <= 0) {
                     logBox.innerHTML = "<b>⚔️ Ничья! Оба упали без сил.</b><br>" + logBox.innerHTML;
                 } else if (e.hp <= 0) {
-                    p.coins += 1000;
-                    logBox.innerHTML = "<b>🎉 Победа! Получено 1000 монет!</b><br>" + logBox.innerHTML;
+                    p.coins += 200; // Награда за победу
+                    logBox.innerHTML = "<b>🎉 Победа! Местный хулиган повержен. Получено 200 монет!</b><br>" + logBox.innerHTML;
                 } else {
-                    logBox.innerHTML = "<b>💀 Поражение. Вы отправлены в госпиталь.</b><br>" + logBox.innerHTML;
+                    logBox.innerHTML = "<b>💀 Поражение. Вас унесли в госпиталь на восстановление.</b><br>" + logBox.innerHTML;
                 }
-                save();
+                
+                // Кнопка возрождения (сброс боя через 4 секунды)
+                setTimeout(function() {
+                    p.hp = p.maxHp;
+                    e.hp = e.maxHp;
+                    turnBtn.disabled = false;
+                    if (logBox) logBox.innerHTML = "Ожидание хода...";
+                    updateUI();
+                    save();
+                }, 4000);
             }
 
-            // Сброс выбора кнопок
             selA = null; selB = null;
             attackBtns.forEach(function(btn) { btn.classList.remove("zone-btn-active"); });
             blockBtns.forEach(function(btn) { btn.classList.remove("zone-btn-active"); });
             
             updateUI();
+            save();
         });
     }
 }
 
-// 3. УВЕДОМЛЕНИЯ
+// 3. ЛОГИКА РЫНКА (МАГАЗИНА)
+function initShopUI() {
+    var buyBrass = document.getElementById("buy-brass");
+    var buyKnife = document.getElementById("buy-knife");
+
+    if (buyBrass) {
+        buyBrass.addEventListener("click", function() {
+            if (p.coins >= 150) {
+                p.coins -= 150;
+                p.weapon = "Кастеты";
+                p.bonusDamage = 5; // +5 к удару
+                showNotice("Вы купили Кастеты!");
+                updateUI();
+                save();
+            } else {
+                showNotice("Не хватает монет!");
+            }
+        });
+    }
+
+    if (buyKnife) {
+        buyKnife.addEventListener("click", function() {
+            if (p.coins >= 400) {
+                p.coins -= 400;
+                p.weapon = "Охотничий нож";
+                p.bonusDamage = 12; // +12 к удару
+                showNotice("Вы купили Охотничий нож!");
+                updateUI();
+                save();
+            } else {
+                showNotice("Не хватает монет!");
+            }
+        });
+    }
+}
+
+// 4. УВЕДОМЛЕНИЯ
 function showNotice(t) {
     var n = document.getElementById("notice");
     if (!n) return;
     n.innerText = t;
     n.style.display = "block";
-    setTimeout(function() { n.style.display = "none"; }, 3000);
+    setTimeout(function() { n.style.display = "none"; }, 2500);
 }
 
-// 4. ОБНОВЛЕНИЕ ЗДОРОВЬЯ И МОНЕТ НА ЭКРАНЕ
+// 5. ОБНОВЛЕНИЕ ЗДОРОВЬЯ, МОНЕТ И ПРОФИЛЯ
 function updateUI() {
     var coinsEl = document.getElementById("coins");
     if (coinsEl) coinsEl.innerText = p.coins;
@@ -182,4 +225,10 @@ function updateUI() {
     var enemyFill = document.getElementById("hp-fill-enemy");
     if (playerFill) playerFill.style.width = ((p.hp / p.maxHp) * 100) + "%";
     if (enemyFill) enemyFill.style.width = ((e.hp / e.maxHp) * 100) + "%";
+
+    // Обновляем данные на странице "Персонаж"
+    var profWeapon = document.getElementById("prof-weapon");
+    var profDamage = document.getElementById("prof-damage");
+    if (profWeapon) profWeapon.innerText = p.weapon;
+    if (profDamage) profDamage.innerText = (15 + p.bonusDamage);
 }
