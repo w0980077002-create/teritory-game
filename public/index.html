@@ -23,6 +23,8 @@
   </header>
 
   <section class="screen">
+    <div id="notice" class="notice"></div>
+
     <!-- 1. ЭКРАН БОЯ (АРЕНА) -->
     <div id="page-home" class="game-page">
       <div class="hero">
@@ -84,6 +86,13 @@
           </div>
           <button id="buy-knuckles" style="background: #f1c40f; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #121216;">500 🪙</button>
         </div>
+        <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 style="font-size: 14px;">🔪 Охотничий нож</h3>
+            <small style="color: #2ecc71;">+8 к Силе удара</small>
+          </div>
+          <button id="buy-knife" style="background: #f1c40f; border: none; padding: 8px 12px; font-weight: bold; border-radius: 6px; font-size: 12px; color: #121216;">1200 🪙</button>
+        </div>
       </div>
     </div>
 
@@ -97,9 +106,22 @@
         <div class="shield">👤</div>
       </div>
       <div style="background: #1f1f24; border: 1px solid #2b2b33; padding: 14px; border-radius: 12px; margin-top: 10px; display: flex; flex-direction: column; gap: 12px;">
+        <p style="color: #f1c40f; font-weight: bold; display: none;" id="prof-points-box">✨ Свободные очки: <span id="prof-points">0</span></p>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2b2b33; padding-bottom: 6px;">
+          <span>💪 Сила: <b id="prof-power">5</b></span>
+          <button id="up-power" style="display: none; background: #2ecc71; border: none; color: white; width: 28px; height: 28px; font-weight: bold; border-radius: 6px; font-size: 16px;">+</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2b2b33; padding-bottom: 6px;">
+          <span>⚡ Ловкость (Крит): <b id="prof-agility">5</b></span>
+          <button id="up-agility" style="display: none; background: #2ecc71; border: none; color: white; width: 28px; height: 28px; font-weight: bold; border-radius: 6px; font-size: 16px;">+</button>
+        </div>
+
+        <p>🎒 Экипировано: <b id="prof-weapon">Кулаки</b></p>
         <p>🏆 Всего побед: <b id="prof-victories">0</b></p>
-        <p>💪 Базовая Сила: <b>5</b></p>
-        <p>🎒 Экипировано: <b>Кулаки</b></p>
+        
+        <button id="reset-progress" style="background: #e74c3c; border: none; color: white; padding: 10px; border-radius: 8px; font-weight: bold; margin-top: 10px; font-size: 12px;">Обнулить прогресс</button>
       </div>
     </div>
 
@@ -112,7 +134,7 @@
         </div>
         <div class="shield">🗺️</div>
       </div>
-      <p style="text-align: center; color: #8a8a93; margin-top: 40px; font-style: italic;">Новые районы откроются на 3 уровне...</p>
+      <p style="text-align: center; color: #8a8a93; margin-top: 40px; font-style: italic;">Новые криминальные районы откроются на 3 уровне...</p>
     </div>
   </section>
 
@@ -124,22 +146,88 @@
   </nav>
 
   <script>
-    // Самый надежный запуск без лишних библиотек
+    // Инициализация характеристик игрока
     var playerHp = 120;
     var playerMaxHp = 120;
     var enemyHp = 100;
     var enemyMaxHp = 100;
     var coins = 1000;
+    
+    var level = 1;
+    var victories = 0;
+    var basePower = 5;      // Базовая сила
+    var agility = 5;        // Ловкость (влияет на криты)
+    var weaponBonus = 0;    // Бонус от купленного оружия
+    var weaponName = "Кулаки";
+    var freePoints = 0;     // Свободные очки статов
 
     var selectedAttack = null;
     var selectedBlock = null;
 
-    // Функция обновления цифр на экране
+    // Пытаемся загрузить сохранения из локальной памяти устройства
+    try {
+      var saved = localStorage.getItem("territory_save");
+      if (saved) {
+        var p = JSON.parse(saved);
+        if (p && typeof p.basePower === "number") {
+          playerHp = p.playerHp; playerMaxHp = p.playerMaxHp; coins = p.coins;
+          level = p.level; victories = p.victories; basePower = p.basePower;
+          agility = p.agility; weaponBonus = p.weaponBonus; weaponName = p.weaponName;
+          freePoints = p.freePoints;
+        }
+      }
+    } catch(e) {}
+
+    function saveGame() {
+      try {
+        var data = {
+          playerHp: playerHp, playerMaxHp: playerMaxHp, coins: coins,
+          level: level, victories: victories, basePower: basePower,
+          agility: agility, weaponBonus: weaponBonus, weaponName: weaponName,
+          freePoints: freePoints
+        };
+        localStorage.setItem("territory_save", JSON.stringify(data));
+      } catch(e) {}
+    }
+
+    function showNotice(text) {
+      var n = document.getElementById("notice");
+      if (n) {
+        n.textContent = text; n.style.display = "block";
+        setTimeout(function() { n.style.display = "none"; }, 2000);
+      }
+    }
+
+    // Полное обновление данных на всех вкладках
     function updateUI() {
       document.getElementById("playerhp").textContent = playerHp + "/" + playerMaxHp;
       document.getElementById("enemyhp").textContent = enemyHp + "/" + enemyMaxHp;
       document.getElementById("coins").textContent = coins;
+      document.getElementById("level").textContent = "Уровень " + level;
 
+      // Экран Профиля персонажа
+      document.getElementById("prof-victories").textContent = victories;
+      document.getElementById("prof-power").textContent = basePower + " (+" + weaponBonus + " от оружия)";
+      document.getElementById("prof-agility").textContent = agility;
+      document.getElementById("prof-weapon").textContent = weaponName;
+
+      // Логика отображения кнопок прокачки [+]
+      var ptsBox = document.getElementById("prof-points-box");
+      var btnP = document.getElementById("up-power");
+      var btnA = document.getElementById("up-agility");
+      
+      if (freePoints > 0) {
+        if (ptsBox) ptsBox.style.display = "block";
+        document.getElementById("prof-points").textContent = freePoints;
+        if (btnP) btnP.style.display = "block";
+        if (btnA) btnA.style.display = "block";
+      } else {
+        if (ptsBox) ptsBox.style.display = "none";
+        if (btnP) btnP.style.display = "none";
+        if (btnA) btnA.style.display = "none";
+      }
+
+      // Полоски жизней
       var pPhp = document.querySelector(".player-hp-bar");
       if (pPhp) pPhp.style.width = ((playerHp / playerMaxHp) * 100) + "%";
 
@@ -147,110 +235,7 @@
       if (pEhp) pEhp.style.width = ((enemyHp / enemyMaxHp) * 100) + "%";
     }
 
-    // Настройка вкладок меню
+    // Переключение вкладок меню
     var tabs = document.querySelectorAll(".tab");
     tabs.forEach(function(tab) {
       tab.onclick = function() {
-        tabs.forEach(function(x) { x.classList.remove("active"); });
-        tab.classList.add("active");
-
-        document.querySelectorAll(".game-page").forEach(function(page) {
-          page.style.display = "none";
-        });
-        
-        var targetPage = "page-" + tab.getAttribute("data-tab");
-        if (document.getElementById(targetPage)) {
-          document.getElementById(targetPage).style.display = "block";
-        }
-      };
-    });
-
-    // Настройка кнопок АТАКЫ
-    var attackBtns = document.querySelectorAll(".attack-zone");
-    attackBtns.forEach(function(btn) {
-      btn.onclick = function() {
-        attackBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
-        btn.style.backgroundColor = "#e74c3c"; // Красим в красный
-        selectedAttack = btn.getAttribute("data-zone");
-      };
-    });
-
-    // Настройка кнопок БЛОКА
-    var blockBtns = document.querySelectorAll(".block-zone");
-    blockBtns.forEach(function(btn) {
-      btn.onclick = function() {
-        blockBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
-        btn.style.backgroundColor = "#2ecc71"; // Красим в зеленый
-        selectedBlock = btn.getAttribute("data-zone");
-      };
-    });
-
-    // Кнопка СДЕЛАТЬ ХОД
-    document.getElementById("attack").onclick = function() {
-      if (!selectedAttack || !selectedBlock) {
-        alert("Выберите зоны Атаки и Блока!");
-        return;
-      }
-
-      var zones = ["head", "torso", "legs"];
-      var zoneNames = { head: "Голову", torso: "Корпус", legs: "Ноги" };
-
-      var enemyAttack = zones[Math.floor(Math.random() * zones.length)];
-      var enemyBlock = zones[Math.floor(Math.random() * zones.length)];
-
-      var logText = "<b>--- Раунд ---</b><br>";
-
-      // Наш удар
-      if (selectedAttack === enemyBlock) {
-        logText += "🛡️ Враг заблокировал ваш удар.<br>";
-      } else {
-        var dmg = Math.floor(Math.random() * 5) + 5;
-        enemyHp = Math.max(enemyHp - dmg, 0);
-        logText += "⚔️ Вы нанесли удар в " + zoneNames[selectedAttack] + " на <b>-" + dmg + " HP</b>.<br>";
-      }
-
-      // Удар врага
-      if (enemyAttack === selectedBlock) {
-        logText += "🛡️ Вы заблокировали удар врага.<br>";
-      } else {
-        var enemyDmg = Math.floor(Math.random() * 4) + 4;
-        playerHp = Math.max(playerHp - enemyDmg, 0);
-        logText += "🩸 Враг ударил вас в " + zoneNames[enemyAttack] + " на <b>-" + enemyDmg + " HP</b>.<br>";
-      }
-
-      // Вывод в лог
-      var p = document.createElement("p");
-      p.innerHTML = logText;
-      var logBox = document.getElementById("battle-log");
-      if (logBox) logBox.insertBefore(p, logBox.firstChild);
-
-      updateUI();
-
-      // Проверка финала боя
-      if (enemyHp <= 0) {
-        alert("🏆 Победа!");
-        playerHp = playerMaxHp;
-        enemyHp = enemyMaxHp;
-        coins += 200;
-        if (logBox) logBox.innerHTML = "<p>Ожидание вашего хода...</p>";
-        updateUI();
-      } else if (playerHp <= 0) {
-        alert("☠️ Вы проиграли!");
-        playerHp = playerMaxHp;
-        enemyHp = enemyMaxHp;
-        if (logBox) logBox.innerHTML = "<p>Ожидание вашего хода...</p>";
-        updateUI();
-      }
-
-      // Сброс выбора
-      selectedAttack = null;
-      selectedBlock = null;
-      attackBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
-      blockBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
-    };
-
-    // Первичный запуск
-    updateUI();
-  </script>
-</body>
-</html>
