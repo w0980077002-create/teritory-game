@@ -1,109 +1,154 @@
-// Состояние боя
-let playerHp = 120;
-let playerMaxHp = 120;
-let enemyHp = 100;
-let enemyMaxHp = 100;
+// Состояние персонажа и врага (точно как в твоем коде)
+var p = { hp: 120, maxHp: 120, coins: 1000, level: 1, freePoints: 0 };
+var e = { name: "Местный хулиган", hp: 100, maxHp: 100 };
 
-let selectedAttack = null; // Выбранная зона атаки
-let selectedBlock = null;  // Выбранная зона защиты
+var selA = null; // Выбранная атака
+var selB = null; // Выбранный блок
 
-// Перевод зон для вывода в лог боя
-const zoneText = { 'head': 'Голову', 'body': 'Корпус', 'legs': 'Ноги' };
+// Загрузка сохранения из localStorage при старте
+try {
+    var s = localStorage.getItem("territory_save");
+    if (s) p = JSON.parse(s);
+} catch (err) { console.error(err); }
 
+function save() {
+    try { localStorage.setItem("territory_save", JSON.stringify(p)); } catch (e) {}
+}
+
+// Запуск при полной загрузке страницы
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Автоматически находим кнопки по тексту на них
-    const allButtons = Array.from(document.querySelectorAll('button'));
-    
-    // Фильтруем кнопки для атаки и блока (ищем по три кнопки "Голова", "Корпус", "Ноги")
-    const attackSectionBtns = allButtons.slice(0, 3); // Первые три кнопки сверху
-    const blockSectionBtns = allButtons.slice(3, 6);  // Следующие три кнопки ниже
-    
-    // Находим главную кнопку "СДЕЛАТЬ ХОД" (ищем по тексту)
-    const turnBtn = allButtons.find(b => b.textContent.includes('СДЕЛАТЬ ХОД'));
-    
-    // Находим блок истории боя
-    const logContainer = document.querySelector('.combat-log-text') || document.getElementById('combat-log') || allButtons[allButtons.length - 1].nextElementSibling;
+    initTabs();        // Навигация по вкладкам (Арена, Рынок и т.д.)
+    initBattleUI();    // Логика боевых кнопок
+    updateUI();        // Первичное обновление экрана
+});
 
-    const zones = ['head', 'body', 'legs'];
+// 1. НАВИГАЦИЯ ПО ВКЛАДКАМ
+function initTabs() {
+    var tabs = document.querySelectorAll(".tab");
+    var screens = document.querySelectorAll(".game-page, [id^='page-']");
 
-    // 2. Вешаем логику на кнопки АТАКИ
-    attackSectionBtns.forEach((btn, index) => {
-        btn.addEventListener('click', () => {
-            attackSectionBtns.forEach(b => b.classList.remove('zone-btn-active'));
-            btn.classList.add('zone-btn-active'); // Включаем наш новый CSS-класс
-            selectedAttack = zones[index];
-            console.log("Выбрана атака в зону:", selectedAttack);
-        });
+    tabs.forEach(function(t, idx) {
+        t.onclick = function() {
+            tabs.forEach(tab => tab.classList.remove("active"));
+            t.classList.add("active");
+            
+            // Скрываем все экраны и показываем нужный
+            screens.forEach(scr => scr.style.display = "none");
+            if (screens[idx]) screens[idx].style.display = "block";
+        };
+    });
+}
+
+// 2. БОЕВАЯ СИСТЕМА
+function initBattleUI() {
+    // Находим все кнопки внутри блоков КУДА АТАКУЕМ и ЧТО БЛОКИРУЕМ
+    var powersBlocks = document.querySelectorAll(".powers");
+    if (powersBlocks.length < 2) return;
+
+    var attackBtns = powersBlocks[0].querySelectorAll("button");
+    var blockBtns = powersBlocks[1].querySelectorAll("button");
+    var turnBtn = document.getElementById("attack"); // Твоя желтая кнопка "СДЕЛАТЬ ХОД"
+
+    var zones = ["head", "body", "legs"];
+
+    // Клик по кнопкам атаки
+    attackBtns.forEach(function(b, idx) {
+        b.onclick = function() {
+            attackBtns.forEach(btn => btn.classList.remove("zone-btn-active"));
+            b.classList.add("zone-btn-active");
+            selA = zones[idx];
+        };
     });
 
-    // 3. Вешаем логику на кнопки БЛОКА
-    blockSectionBtns.forEach((btn, index) => {
-        btn.addEventListener('click', () => {
-            blockSectionBtns.forEach(b => b.classList.remove('zone-btn-active'));
-            btn.classList.add('zone-btn-active'); // Включаем наш новый CSS-класс
-            selectedBlock = zones[index];
-            console.log("Выбран блок зоны:", selectedBlock);
-        });
+    // Клик по кнопкам блока
+    blockBtns.forEach(function(b, idx) {
+        b.onclick = function() {
+            blockBtns.forEach(btn => btn.classList.remove("zone-btn-active"));
+            b.classList.add("zone-btn-active");
+            selB = zones[idx];
+        };
     });
 
-    // 4. Логика кнопки "СДЕЛАТЬ ХОД"
+    // Нажатие кнопки "СДЕЛАТЬ ХОД"
     if (turnBtn) {
-        turnBtn.addEventListener('click', () => {
-            if (!selectedAttack || !selectedBlock) {
-                alert("Выберите зону атаки и зону блока!");
+        turnBtn.onclick = function() {
+            if (!selA || !selB) {
+                showNotice("Выберите зоны атаки и защиты!");
                 return;
             }
 
-            // Рандомный выбор Местного хулигана
-            let enemyAttack = zones[Math.floor(Math.random() * 3)];
-            let enemyBlock = zones[Math.floor(Math.random() * 3)];
+            // Рандомный выбор бота
+            var enemyA = zones[Math.floor(Math.random() * 3)];
+            var enemyB = zones[Math.floor(Math.random() * 3)];
+            
+            var zoneText = { "head": "Голову", "body": "Корпус", "legs": "Ноги" };
+            var logs = [];
+            var dmg = 15;
 
-            let turnLogs = [];
-            let dmg = 15; // Базовый урон игры
-
-            // Считаем урон по врагу
-            if (selectedAttack === enemyBlock) {
-                turnLogs.push(`🛡️ Вы замахнулись в <b>${zoneText[selectedAttack]}</b>, но Хулиган заблокировал удар.`);
+            // Считаем урон по хулигану
+            if (selA === enemyB) {
+                logs.push(`🛡️ Вы ударили в <b>${zoneText[selA]}</b>, но Хулиган заблокировал удар.`);
             } else {
-                enemyHp = Math.max(0, enemyHp - dmg);
-                turnLogs.push(`💥 Вы успешно пробили Хулигана в <b>${zoneText[selectedAttack]}</b>! Урон: -${dmg}.`);
+                e.hp = Math.max(0, e.hp - dmg);
+                logs.push(`💥 Вы успешно пробили Хулигана в <b>${zoneText[selA]}</b>! Урон: -${dmg}.`);
             }
 
             // Считаем урон по игроку
-            if (enemyAttack === selectedBlock) {
-                turnLogs.push(`🛡️ Местный хулиган пытался ударить в <b>${zoneText[enemyAttack]}</b>, но вы поставили блок!`);
+            if (enemyA === selB) {
+                logs.push(`🛡️ Хулиган метил в <b>${zoneText[enemyA]}</b>, но вы заблокировали его.`);
             } else {
-                playerHp = Math.max(0, playerHp - dmg);
-                turnLogs.push(`🥊 Хулиган нанес вам удар в <b>${zoneText[enemyAttack]}</b>. Урон: -${dmg}.`);
+                p.hp = Math.max(0, p.hp - dmg);
+                logs.push(`🥊 Хулиган нанес вам удар в <b>${zoneText[enemyA]}</b>. Урон: -${dmg}.`);
             }
 
-            // Выводим результат раунда в историю боя
-            if (logContainer) {
-                let currentText = logContainer.innerHTML;
-                if (currentText.includes("Ожидание хода...")) currentText = "";
-                
-                logContainer.innerHTML = turnLogs.join('<br>') + "<br><hr style='border-color:#2a2a2a'><br>" + currentText;
+            // Вывод лога в твой log-container
+            var logBox = document.querySelector(".log-container div") || document.querySelector(".log-container");
+            if (logBox) {
+                if (logBox.innerHTML.includes("Ожидание хода...")) logBox.innerHTML = "";
+                logBox.innerHTML = logs.join("<br>") + "<br><hr style='border-color:#2a2a2a'><br>" + logBox.innerHTML;
             }
 
-            // Проверяем завершение боя
-            if (playerHp <= 0 || enemyHp <= 0) {
+            // Проверка исхода боя
+            if (p.hp <= 0 || e.hp <= 0) {
                 turnBtn.disabled = true;
-                let endMessage = "";
-                if (playerHp <= 0 && enemyHp <= 0) {
-                    endMessage = "<br><b style='color: #8a8a93;'>⚔️ Ничья! Оба бойца без сил.</b>";
-                } else if (enemyHp <= 0) {
-                    endMessage = "<br><b style='color: #2ecc71;'>🎉 Победа! Местный хулиган повержен. Вы получили золото!</b>";
+                if (p.hp <= 0 && e.hp <= 0) {
+                    logBox.innerHTML = "<b>⚔️ Ничья! Оба упали без сил.</b><br>" + logBox.innerHTML;
+                } else if (e.hp <= 0) {
+                    p.coins += 1000;
+                    logBox.innerHTML = "<b>🎉 Победа! Получено 1000 монет!</b><br>" + logBox.innerHTML;
                 } else {
-                    endMessage = "<br><b style='color: #e74c3c;'>💀 Поражение. Вас унесли в больницу...</b>";
+                    logBox.innerHTML = "<b>💀 Поражение. Вы отправлены в госпиталь.</b><br>" + logBox.innerHTML;
                 }
-                logContainer.innerHTML = endMessage + "<br><br>" + logContainer.innerHTML;
+                save();
             }
 
-            // Сбрасываем выбор кнопок для следующего раунда
-            selectedAttack = null;
-            selectedBlock = null;
-            attackSectionBtns.forEach(b => b.classList.remove('zone-btn-active'));
-            blockSectionBtns.forEach(b => b.classList.remove('zone-btn-active'));
-        });
+            // Сброс выбора
+            selA = null; selB = null;
+            attackBtns.forEach(btn => btn.classList.remove("zone-btn-active"));
+            blockBtns.forEach(btn => btn.classList.remove("zone-btn-active"));
+            
+            updateUI();
+        };
     }
-});
+}
+
+// 3. УВЕДОМЛЕНИЯ (.notice)
+function showNotice(t) {
+    var n = document.getElementById("notice");
+    if (!n) return;
+    n.innerText = t;
+    n.style.display = "block";
+    setTimeout(function() { n.style.display = "none"; }, 3000);
+}
+
+// 4. ОБНОВЛЕНИЕ ЗДОРОВЬЯ И МОНЕТ НА ЭКРАНЕ
+function updateUI() {
+    // Обновляем золото (твой b id="coins" из шапки)
+    var coinsEl = document.getElementById("coins");
+    if (coinsEl) coinsEl.innerText = p.coins;
+
+    // Обновление полосок HP (если у тебя есть классы или id на них)
+    // Ищем контейнеры с текстом Вы: и Враг:
+    var bars = document.querySelectorAll(".bars-container div");
+    // Здесь мы добавим логику изменения ширины, как только проверим разметку полосок в html
+}
