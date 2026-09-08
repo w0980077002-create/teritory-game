@@ -3,63 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Территория: Центральный Район</title>
-    <style>
-        all: initial;
-        * {
-            box-sizing: border-box !important;
-            -webkit-tap-highlight-color: transparent !important;
-            margin: 0; padding: 0;
-        }
-        
-        :root {
-            --bg-dark: #121315;      /* Цвет асфальта */
-            --panel-bg: #1a1c1f;     /* Стальной серый */
-            --border-steel: #3a3d45; /* Металл */
-            --text-gold: #d4af37;    /* Золотой */
-            --text-light: #e0e0e0;
-            --text-gray: #7a7e85;
-            --hp-green: #2ecc71;
-            --hp-red: #e74c3c;
-        }
+    <title>Teritory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-        html, body {
-            width: 100% !important;
-            min-height: 100% !important;
-            background-color: var(--bg-dark) !important;
-            color: var(--text-light) !important;
-            font-family: "Courier New", Courier, monospace, sans-serif !important;
-            user-select: none !important;
-            overflow-x: hidden !important;
-        }
+<body>
 
-        body { padding-bottom: 90px !important; }
-        .wrapper { max-width: 500px; margin: 0 auto; padding: 12px; }
+<div class="game">
 
-        /* Шапка игры */
-        .game-header {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            border-bottom: 2px solid var(--border-steel) !important;
-            padding-bottom: 8px !important;
-            margin-bottom: 15px !important;
-        }
-        .logo-text { font-weight: bold !important; font-size: 20px !important; color: var(--text-gold) !important; letter-spacing: 2px !important; }
-        .status-badge { background: var(--panel-bg) !important; border: 1px solid var(--border-steel) !important; padding: 4px 10px !important; font-size: 13px !important; color: #fff !important; }
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <header class="topbar">
+        <div>
+            <div class="logo">TERITORY</div>
+            <div class="level">Уровень <span id="playerLevel">1</span></div>
+        </div>
 
-        /* Карточки-панели */
-        .combat-card {
-            background: var(--panel-bg) !important;
-            border: 2px solid var(--border-steel) !important;
-            padding: 12px !important;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important;
-            margin-bottom: 15px !important;
-        }
-        
-        /* Кнопки-здания для Главной Улицы */
-        .location-link {
-            display: flex !important;
+        <div class="money">
+            💰 <span id="money">1000</span>
+        </div>
+    </header>
+
+
+    <!-- ОСНОВНОЕ ОКНО -->
+    <main>
+
+        <!-- ПЕРСОНАЖ -->
+        <section id="characterScreen" class="screen active">
+
+            <h1>ПЕРСОНАЖ</h1>
+
+            <div class="character-card">
+
+                <div class="avatar">
+                    <div class="avatar-head">👤</div>
+                    <div class="avatar-name" id="playerName">Игрок</div>
+                </div>
+
+                <div class="equipment">
+
+                    <h2>ЭКИПИРОВКА</h2>
+
+                    <div class="equip-slot">
+                        <span>🪖 Голова</span>
+                        <span id="slot-head">Пусто</span>
+                    </div>
+
+                    <div class="equip-slot">
+                        <span>🛡 Броня</span>
+                        <span id="slot-body">Пусто</span>
+                    </div>
+
+                    <div class="equip-slot">
+                        <span>🔫 Основное оружие</span>
+                        <span id="slot-weapon">Пусто</span>
+                    </div>
+
+                    <div class="equip-slot">
+                        <span>🔪 Второе оружие</span>
+                        <span id="slot-secondary">Пусто</span>
+                    </div>
+
+                    <div class="equip-slot">
+                        <span>👕 Одежда</span>
+                        <span id="slot-clothes">Пусто</span>
+                    </div>
+
+                    <div class="equip-slot">
+                        <span>👟 Обувь</span>
+                        <span id="slot-feet">Пусто</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- HP -->
+            <div class="stat-panel">
+
+                <div class="stat-row">
+                    <span>❤️ Здоровье</span>
+                    <strong>
+                        <span id="hp">100</span> /
+                        <span id="maxHp">100</span>
+                    </strong>
+                </div>
+
+                <div class="progress">
+                    <div id="hpBar" class="hp-bar"></div>
+                </div>
+
+
+                <div class="stat-row">
+                    <span>⚡ Энергия</span>
+                    <strong>
+                        <span id="energy">100</span> /
+                        <span id="maxEnergy">100</span>
+                    </strong>
+                </div>
+
+                <div class="progress">
+                    <div id="energyBar" class="energy-bar"></div>
+                </div>
+
+            </div>
+
+
+            <!-- ХАРАКТЕРИСТИКИ -->
+            <div class="stats">
+
+                <h2>ХАРАКТЕРИСТИКИ</h2>
+
+                <div class="stats-grid">
+
+                    <div class="stat">
+                        <span>💪 Сила</span>
+                        <b id="strength">10</b>
+                    </div>
+
+                    <div class="stat">
+                        <span>🏃 Ловкость</span>
+                        <b id="agility">10</b>
+                    </div>
+
+                    <div class="stat">
+                        <span>🛡 Защита</span>
+                        <b id="defense">5</b>
+                    </div>
+
+                    <div class="stat">
+                        <span>⚔️ Урон</span>
+                        <b id="damage">5</b>
+                    </div>
+
+                    <div class="stat">
+                        <span>🎯 Точность</span>
+                        <b id="accuracy">50</b>
+                    </div>
+
+                    <div class="stat">
+                        <span>💥 Крит</span>
+                        <b id="critical">5%</b>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ИНВЕНТАРЬ -->
+        <section id="inventoryScreen" class="screen">
+
+            <h1>ИНВЕНТАРЬ</h1>
+
+            <div class="inventory-info">
+                <span>🎒 Рюкзак</span>
+                <span>
+                    <b id="inventoryCount">0</b> / 30
+                </span>
+            </div>
+
+            <div id="inventory" class="inventory"></div>
+
+        </section>
+
+
+        <!-- БОЙ -->
+        <section id="battleScreen" class="screen">
+
+            <h1>АРЕНА</h1>
+
+            <div class="enemy">
+                <div class="enemy-avatar">👹</div>
+
+                <h2>Бандит</h2>
+
+                <div class="progress">
+                    <div id="enemyBar" class="enemy-bar"></div>
+                </div>
+
+                <p>
+                    ❤️ <span id="enemyHp">100</span> / 100
+                </p>
+            </div>
+
+            <div class="battle-log" id="battleLog">
+                Бой начинается...
+            </div>
+
+            <button class="attack-button" onclick="attack()">
+                ⚔️ АТАКОВАТЬ
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- НИЖНЕЕ МЕНЮ -->
+    <nav class="bottom-menu">
+
+        <button onclick="showScreen('characterScreen')">
+            👤
+            <span>Персонаж</span>
+        </button>
+
+        <button onclick="showScreen('inventoryScreen')">
+            🎒
+            <span>Инвентарь</span>
+        </button>
+
+        <button onclick="showScreen('battleScreen')">
+            ⚔️
+            <span>Арена</span>
+        </button>
+
+    </nav>
+
+</div>
+
+
+<!-- МОДАЛЬНОЕ ОКНО ПРЕДМЕТА -->
+<div id="itemModal" class="modal">
+
+    <div class="modal-content">
+
+        <button class="close" onclick="closeModal()">✕</button>
+
+        <div id="modalIcon" class="modal-icon">🔫</div>
+
+        <h2 id="modalName">Предмет</h2>
+
+        <p id="modalDescription"></p>
+
+        <div id="modalStats" class="modal-stats"></div>
+
+        <div class="modal-buttons">
+
+            <button id="equipButton" onclick="equipSelectedItem()">
+                НАДЕТЬ
+            </button>
+
+            <button id="useButton" onclick="useSelectedItem()">
+                ИСПОЛЬЗОВАТЬ
+            </button>
+
+            <button class="danger" onclick="dropSelectedItem()">
+                ВЫБРОСИТЬ
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>            display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
             background: #25282e !important;
