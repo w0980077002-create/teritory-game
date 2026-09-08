@@ -1,83 +1,149 @@
-<!doctype html>
-<html lang="ru" data-build="777">
-
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Territory</title><link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Territory</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main class="app">
-  <header>
-    <div class="brand"><div class="logo">T</div><div><b>TERRITORY</b><small id="level">Уровень 1</small></div></div>
-    <div class="res"><span>🪙 <b id="coins">1000</b></span><span>🩸 <b id="playerhp">120/120</b></span></div>
-  </header>
-  <section class="screen">
-    <div id="notice" class="notice"></div>
-    <!-- 1. АРЕНА -->
-    <div id="page-home" class="game-page">
-      <div class="hero"><div><small>БОЙЦОВСКАЯ АРЕНА</small><h1 id="arena-title">Местный хулиган</h1></div><div class="shield">🥊</div></div>
-      <div class="battle">
-        <div class="enemyname">⚔️ Противник: <span id="enemyhp">100/100</span></div>
-        <div class="bars-container">
-    <div class="bar-label">
-        Вы: <span id="hp-text-player">120/120</span>
-        <div class="hp-bar-bg"><div id="hp-fill-player" class="hp-fill player-hp" style="width: 100%;"></div></div>
-    </div>
-    <div class="bar-label">
-        Враг: <span id="hp-text-enemy">100/100</span>
-        <div class="hp-bar-bg"><div id="hp-fill-enemy" class="hp-fill enemy-hp" style="width: 100%;"></div></div>
-    </div>
-</div>
 
-        <div class="zone-title">КУДА АТАКУЕМ:</div>
-        <div class="powers"><button class="attack-zone" data-zone="head">Голова</button><button class="attack-zone" data-zone="torso">Корпус</button><button class="attack-zone" data-zone="legs">Ноги</button></div>
-        <div class="zone-title">ЧТО БЛОКИРУЕМ:</div>
-        <div class="powers"><button class="block-zone" data-zone="head">Голова</button><button class="block-zone" data-zone="torso">Корпус</button><button class="block-zone" data-zone="legs">Ноги</button></div>
-        <button id="attack" class="attack">⚔️ СДЕЛАТЬ ХОД</button>
-      </div>
-      <div class="log-container"><div class="log-title">История боя:</div><div id="battle-log" class="battle-log"><p>Ожидание хода...</p></div></div>
+    <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ -->
+    <div id="notice" class="notice">Выберете зоны атаки и защиты!</div>
+
+    <!-- ВЕРХНЯЯ ШАПКА -->
+    <header>
+        <div class="brand">
+            <div class="logo-badge">T</div>
+            <div class="brand-info">
+                <h1>TERRITORY</h1>
+                <small>Уровень 1</small>
+            </div>
+        </div>
+        <div class="res">
+            <span>🪙 <b id="coins">1000</b></span>
+        </div>
+    </header>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <section class="screen">
+        
+        <!-- 1. ЭКРАН: БОЙЦОВСКАЯ АРЕНА -->
+        <div id="page-home" class="game-page">
+            <div class="battle">
+                <div class="battle-title">Бойцовская Арена</div>
+                <div class="enemyname">Местный хулиган <span>🥊</span></div>
+                
+                <!-- Контейнер с полосками здоровья -->
+                <div class="bars-container">
+                    <div class="bar-label">
+                        Вы: <span id="hp-text-player">120/120</span>
+                        <div class="hp-bar-bg">
+                            <div id="hp-fill-player" class="hp-fill player-hp"></div>
+                        </div>
+                    </div>
+                    <div class="bar-label">
+                        Враг: <span id="hp-text-enemy">100/100</span>
+                        <div class="hp-bar-bg">
+                            <div id="hp-fill-enemy" class="hp-fill enemy-hp"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Выбор зон удара -->
+                <div class="zone-title">Куда атакуем:</div>
+                <div class="powers">
+                    <button>Голова</button>
+                    <button>Корпус</button>
+                    <button>Ноги</button>
+                </div>
+
+                <!-- Выбор зон блока -->
+                <div class="zone-title">Что блокируем:</div>
+                <div class="powers">
+                    <button>Голова</button>
+                    <button>Корпус</button>
+                    <button>Ноги</button>
+                </div>
+
+                <button id="attack">⚔️ Сделать ход</button>
+            </div>
+
+            <!-- История боя -->
+            <div class="log-container">
+                <div class="log-title">История боя:</div>
+                <div class="combat-log-text">Ожидание хода...</div>
+            </div>
+        </div>
+
+        <!-- 2. ЭКРАН: РЫНОК -->
+        <div id="page-shop" class="game-page" style="display: none;">
+            <div class="hero">
+                <div class="battle-title">Оружейная лавка</div>
+                <div class="enemyname">Рынок снаряжения <span>🛒</span></div>
+                
+                <div class="shop-item">
+                    <div>
+                        <h3>🩸 Кастеты</h3>
+                        <small>Урон +5 | Цена: 150 🪙</small>
+                    </div>
+                    <button>Купить</button>
+                </div>
+
+                <div class="shop-item">
+                    <div>
+                        <h3>🔪 Охотничий нож</h3>
+                        <small>Урон +12 | Цена: 400 🪙</small>
+                    </div>
+                    <button>Купить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. ЭКРАН: РАЙОНЫ -->
+        <div id="page-map" class="game-page" style="display: none;">
+            <div class="hero">
+                <div class="battle-title">Перемещение</div>
+                <div class="enemyname">Районы города <span>🗺️</span></div>
+                <p style="color: #8a8a93; margin-top: 10px;">Другие районы города станут доступны со 2-го уровня персонажа.</p>
+            </div>
+        </div>
+
+        <!-- 4. ЭКРАН: ПЕРСОНАЖ -->
+        <div id="page-profile" class="game-page" style="display: none;">
+            <div class="hero">
+                <div class="battle-title">Характеристики</div>
+                <div class="enemyname">Ваш Персонаж <span>👤</span></div>
+                <p style="margin-top: 12px;">Уровень: <span style="float: right; font-weight: bold;">1</span></p>
+                <p style="margin-top: 8px;">Очки здоровья: <span style="float: right; color: #2ecc71; font-weight: bold;">120 / 120</span></p>
+                <p style="margin-top: 8px;">Сила: <span style="float: right; font-weight: bold;">5</span></p>
+                <p style="margin-top: 8px;">Ловкость: <span style="float: right; font-weight: bold;">5</span></p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ (TABS) -->
+    <div class="nav-tabs">
+        <button class="tab active">
+            <span>🥊</span>
+            <span>Арена</span>
+        </button>
+        <button class="tab">
+            <span>🛒</span>
+            <span>Рынок</span>
+        </button>
+        <button class="tab">
+            <span>🗺️</span>
+            <span>Районы</span>
+        </button>
+        <button class="tab">
+            <span>👤</span>
+            <span>Персонаж</span>
+        </button>
     </div>
-    <!-- 2. РЫНОК -->
-    <div id="page-shop" class="game-page" style="display:none">
-      <div class="hero"><div><small>ОРУЖЕЙНАЯ ЛАВКА</small><h1>Рынок</h1></div><div class="shield">🛒</div></div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
-        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
-          <div><h3>🥊 Кастеты</h3><small style="color:#2ecc71">+3 к Силе</small></div><button id="buy-knuckles" style="background:#f1c40f;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#121216">500 🪙</button>
-        </div>
-        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
-          <div><h3>🔪 Нож</h3><small style="color:#2ecc71">+8 к Силе</small></div><button id="buy-knife" style="background:#f1c40f;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#121216">1200 🪙</button>
-        </div>
-      </div>
-    </div>
-    <!-- 3. ПЕРСОНАЖ -->
-    <div id="page-profile" class="game-page" style="display:none">
-      <div class="hero"><div><small>ЛИЧНОЕ ДЕЛО</small><h1>Ваш Боец</h1></div><div class="shield">👤</div></div>
-      <div style="background:#1f1f24;border:1px solid #2b2b33;padding:14px;border-radius:12px;margin-top:10px;display:flex;flex-direction:column;gap:12px">
-        <p style="color:#f1c40f;font-weight:bold;display:none" id="prof-points-box">✨ Очки прокачки: <span id="prof-points">0</span></p>
-        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2b2b33;padding-bottom:6px"><span>💪 Сила: <b id="prof-power">5</b></span><button id="up-power" style="display:none;background:#2ecc71;border:none;color:white;width:28px;height:28px;font-weight:bold;border-radius:6px">+</button></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2b2b33;padding-bottom:6px"><span>⚡ Ловкость: <b id="prof-agility">5</b></span><button id="up-agility" style="display:none;background:#2ecc71;border:none;color:white;width:28px;height:28px;font-weight:bold;border-radius:6px">+</button></div>
-        <p>🎒 Оружие: <b id="prof-weapon">Кулаки</b></p><p>🏆 Побед: <b id="prof-victories">0</b></p>
-        <button id="reset-progress" style="background:#e74c3c;border:none;color:white;padding:10px;border-radius:8px;font-weight:bold;font-size:12px">Сбросить игру</button>
-      </div>
-    </div>
-    <!-- 4. РАЙОНЫ -->
-    <div id="page-map" class="game-page" style="display:none">
-      <div class="hero"><div><small>КАРТА ГОРОДА</small><h1>Районы</h1></div><div class="shield">🗺️</div></div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
-        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
-          <div><h3>🐾 Бродячая крыса</h3><small style="color:#8a8a93">40 HP • Награда: +60 🪙</small></div><button class="select-enemy" data-type="rat" style="background:#e74c3c;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#fff">В БОЙ</button>
-        </div>
-        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
-          <div><h3>🥊 Местный хулиган</h3><small style="color:#8a8a93">100 HP • Награда: +200 🪙</small></div><button class="select-enemy" data-type="thug" style="background:#e74c3c;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#fff">В БОЙ</button>
-        </div>
-        <div style="background:#1f1f24;border:1px solid #2b2b33;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;border-color:#f1c40f">
-          <div><h3 style="color:#f1c40f">👹 Главарь промзоны [БОСС]</h3><small style="color:#8a8a93">220 HP • Награда: +600 🪙</small></div><button class="select-enemy" data-type="boss" style="background:#f1c40f;border:none;padding:8px 12px;font-weight:bold;border-radius:6px;color:#121216">В БОЙ</button>
-        </div>
-      </div>
-    </div>
-  </section>
-  <nav>
-    <button class="tab active" data-tab="home">🥊<small>Арена</small></button><button class="tab" data-tab="map">🗺️<small>Районы</small></button><button class="tab" data-tab="shop">🛒<small>Рынок</small></button><button class="tab" data-tab="profile">👤<small>Персонаж</small></button>
-  </nav>
-  <script>
-  <script src="app.js"></script>
+
+    <!-- ПОДКЛЮЧЕНИЕ НАШЕГО СКРИПТА -->
+    <script src="app.js"></script>
+</body>
+</html>
