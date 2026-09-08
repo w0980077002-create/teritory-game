@@ -1,9 +1,8 @@
 import * as THREE from "three";
 
-/* =========================================
-   TERRITORY
-   3D BATTLE + GAME LOGIC
-========================================= */
+/* =========================
+   TERRITORY — 3D BATTLE
+   ========================= */
 
 var p = {
     hp: 120,
@@ -30,32 +29,22 @@ var selB = null;
 
 try {
     var saved = localStorage.getItem("territory_save");
-
     if (saved) {
-        var parsed = JSON.parse(saved);
-
-        if (parsed) {
-            p = Object.assign(p, parsed);
-        }
+        p = JSON.parse(saved);
     }
 } catch (err) {}
 
 function save() {
     try {
-        localStorage.setItem(
-            "territory_save",
-            JSON.stringify(p)
-        );
+        localStorage.setItem("territory_save", JSON.stringify(p));
     } catch (err) {}
 }
 
-
-/* =========================================
-   3D STATE
-========================================= */
+/* =========================
+   3D
+   ========================= */
 
 var battle3D = {
-    container: null,
     scene: null,
     camera: null,
     renderer: null,
@@ -69,718 +58,442 @@ var battle3D = {
     playerBase: null,
     enemyBase: null,
 
-    initialized: false,
+    ready: false,
 
-    playerAnimating: false,
-    enemyAnimating: false,
+    playerAction: null,
+    enemyAction: null,
 
-    cameraShake: 0,
-    cameraShakePower: 0
+    actionStart: 0,
+
+    shake: 0,
+    cameraBaseX: 0,
+    cameraBaseY: 0,
+    cameraBaseZ: 0
 };
 
-
-/* =========================================
-   MATERIAL
-========================================= */
-
-function makeMaterial(color, roughness) {
-
-    return new THREE.MeshStandardMaterial({
-        color: color,
-        roughness: roughness || 0.7,
-        metalness: 0.05
-    });
-}
-
-
-/* =========================================
+/* =========================
    FIGHTER
-========================================= */
+   ========================= */
 
 function createFighter(isPlayer) {
 
     var group = new THREE.Group();
 
-    var skin = makeMaterial(0xf0b48a);
-    var shirt = makeMaterial(
-        isPlayer ? 0x2468ff : 0xb52d2d
-    );
-    var pants = makeMaterial(
-        isPlayer ? 0x202636 : 0x171717
-    );
-    var shoes = makeMaterial(0x080808);
-    var hair = makeMaterial(0x15110e);
+    var bodyColor = isPlayer ? 0x2463ff : 0xb83232;
+    var skinColor = 0xffc08f;
+    var pantsColor = isPlayer ? 0x202c42 : 0x171717;
+    var shoeColor = 0x080808;
+    var hairColor = 0x151515;
 
-
-    /* Legs */
-
-    var leftLeg = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            0.42,
-            1.15,
-            0.42
-        ),
-        pants
-    );
-
-    var rightLeg = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            0.42,
-            1.15,
-            0.42
-        ),
-        pants
-    );
-
-    leftLeg.position.set(
-        -0.25,
-        0.65,
-        0
-    );
-
-    rightLeg.position.set(
-        0.25,
-        0.65,
-        0
-    );
-
-    group.add(leftLeg);
-    group.add(rightLeg);
-
-
-    /* Shoes */
-
-    var leftShoe = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            0.48,
-            0.25,
-            0.75
-        ),
-        shoes
-    );
-
-    var rightShoe = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            0.48,
-            0.25,
-            0.75
-        ),
-        shoes
-    );
-
-    leftShoe.position.set(
-        -0.25,
-        0.08,
-        0.12
-    );
-
-    rightShoe.position.set(
-        0.25,
-        0.08,
-        0.12
-    );
-
-    group.add(leftShoe);
-    group.add(rightShoe);
-
-
-    /* Body */
+    /* BODY */
 
     var body = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            1,
-            1.25,
-            0.58
-        ),
-        shirt
+        new THREE.BoxGeometry(1.15, 1.45, 0.65),
+        new THREE.MeshStandardMaterial({
+            color: bodyColor,
+            roughness: 0.8
+        })
     );
 
-    body.position.y = 1.65;
-
+    body.position.y = 2.15;
     group.add(body);
 
-
-    /* Head */
+    /* HEAD */
 
     var head = new THREE.Mesh(
-        new THREE.SphereGeometry(
-            0.48,
-            20,
-            16
-        ),
-        skin
+        new THREE.SphereGeometry(0.48, 20, 16),
+        new THREE.MeshStandardMaterial({
+            color: skinColor,
+            roughness: 0.8
+        })
     );
 
-    head.position.y = 2.62;
-
+    head.position.y = 3.25;
     group.add(head);
 
+    /* HAIR */
 
-    /* Hair */
-
-    var hairMesh = new THREE.Mesh(
+    var hair = new THREE.Mesh(
         new THREE.SphereGeometry(
-            0.49,
+            0.50,
             20,
-            12
+            10,
+            0,
+            Math.PI * 2,
+            0,
+            Math.PI / 2
         ),
-        hair
+        new THREE.MeshStandardMaterial({
+            color: hairColor,
+            roughness: 0.9
+        })
     );
 
-    hairMesh.scale.set(
-        1,
-        0.42,
-        1
+    hair.position.y = 3.48;
+    group.add(hair);
+
+    /* LEGS */
+
+    var legL = new THREE.Mesh(
+        new THREE.BoxGeometry(0.38, 1.15, 0.45),
+        new THREE.MeshStandardMaterial({
+            color: pantsColor,
+            roughness: 0.9
+        })
     );
 
-    hairMesh.position.set(
-        0,
-        2.92,
-        -0.02
+    var legR = legL.clone();
+
+    legL.position.set(-0.27, 0.85, 0);
+    legR.position.set(0.27, 0.85, 0);
+
+    group.add(legL);
+    group.add(legR);
+
+    /* SHOES */
+
+    var shoeL = new THREE.Mesh(
+        new THREE.BoxGeometry(0.48, 0.25, 0.65),
+        new THREE.MeshStandardMaterial({
+            color: shoeColor,
+            roughness: 1
+        })
     );
 
-    group.add(hairMesh);
+    var shoeR = shoeL.clone();
 
+    shoeL.position.set(-0.27, 0.22, 0.08);
+    shoeR.position.set(0.27, 0.22, 0.08);
 
-    /* Arms */
+    group.add(shoeL);
+    group.add(shoeR);
 
-    var leftArm = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            0.30,
-            1,
-            0.30
-        ),
-        skin
+    /* ARMS */
+
+    var armL = new THREE.Mesh(
+        new THREE.BoxGeometry(0.28, 1.1, 0.3),
+        new THREE.MeshStandardMaterial({
+            color: skinColor,
+            roughness: 0.8
+        })
     );
 
-    var rightArm = new THREE.Mesh(
-        new THREE.BoxGeometry(
-            0.30,
-            1,
-            0.30
-        ),
-        skin
+    var armR = armL.clone();
+
+    armL.position.set(-0.78, 2.15, 0);
+    armR.position.set(0.78, 2.15, 0);
+
+    group.add(armL);
+    group.add(armR);
+
+    /* FISTS */
+
+    var fistL = new THREE.Mesh(
+        new THREE.SphereGeometry(0.18, 12, 10),
+        new THREE.MeshStandardMaterial({
+            color: skinColor
+        })
     );
 
-    leftArm.position.set(
-        -0.68,
-        1.72,
-        0
-    );
+    var fistR = fistL.clone();
 
-    rightArm.position.set(
-        0.68,
-        1.72,
-        0
-    );
+    fistL.position.set(-0.78, 1.60, 0);
+    fistR.position.set(0.78, 1.60, 0);
 
-    group.add(leftArm);
-    group.add(rightArm);
+    group.add(fistL);
+    group.add(fistR);
 
+    /* STORE PARTS */
 
-    /* Fists */
-
-    var leftFist = new THREE.Mesh(
-        new THREE.SphereGeometry(
-            0.20,
-            14,
-            10
-        ),
-        skin
-    );
-
-    var rightFist = new THREE.Mesh(
-        new THREE.SphereGeometry(
-            0.20,
-            14,
-            10
-        ),
-        skin
-    );
-
-    leftFist.position.set(
-        -0.68,
-        1.18,
-        0
-    );
-
-    rightFist.position.set(
-        0.68,
-        1.18,
-        0
-    );
-
-    group.add(leftFist);
-    group.add(rightFist);
-
-
-    group.userData = {
-
+    group.userData.parts = {
         body: body,
         head: head,
-
-        leftArm: leftArm,
-        rightArm: rightArm,
-
-        leftLeg: leftLeg,
-        rightLeg: rightLeg,
-
-        leftFist: leftFist,
-        rightFist: rightFist
+        armL: armL,
+        armR: armR,
+        fistL: fistL,
+        fistR: fistR,
+        legL: legL,
+        legR: legR
     };
-
 
     return group;
 }
 
-
-/* =========================================
-   INIT 3D
-========================================= */
+/* =========================
+   3D ARENA
+   ========================= */
 
 function init3DArena() {
 
-    var container =
-        document.getElementById("battle-3d");
+    var container = document.getElementById("battle-3d");
 
-    if (!container) {
+    if (!container) return;
+
+    if (battle3D.ready) {
+        resize3DArena();
         return;
     }
-
-    battle3D.container = container;
-
-
-    /* Scene */
 
     var scene = new THREE.Scene();
 
-    scene.background =
-        new THREE.Color(0x090a12);
+    scene.background = new THREE.Color(0x111119);
 
     battle3D.scene = scene;
 
+    /* CAMERA */
 
-    /* Camera */
-
-    var width =
-        container.clientWidth || 320;
-
-    var height =
-        container.clientHeight || 270;
-
-    var camera =
-        new THREE.PerspectiveCamera(
-            42,
-            width / height,
-            0.1,
-            100
-        );
-
-    camera.position.set(
-        0,
-        3.2,
-        7.6
+    var camera = new THREE.PerspectiveCamera(
+        45,
+        container.clientWidth / container.clientHeight,
+        0.1,
+        100
     );
 
-    camera.lookAt(
-        0,
-        1.5,
-        0
-    );
+    camera.position.set(0, 3.8, 8.8);
+    camera.lookAt(0, 2, 0);
 
     battle3D.camera = camera;
 
+    battle3D.cameraBaseX = camera.position.x;
+    battle3D.cameraBaseY = camera.position.y;
+    battle3D.cameraBaseZ = camera.position.z;
 
-    /* Renderer */
+    /* RENDERER */
 
-    var renderer;
-
-    try {
-
-        renderer =
-            new THREE.WebGLRenderer({
-                antialias: true,
-                alpha: false,
-                powerPreference:
-                    "high-performance"
-            });
-
-    } catch (err) {
-
-        container.innerHTML =
-            "<div style='height:100%;display:flex;align-items:center;justify-content:center;color:#777;text-align:center;font-size:14px;padding:20px'>" +
-            "3D-графика недоступна" +
-            "</div>";
-
-        return;
-    }
-
+    var renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: false
+    });
 
     renderer.setPixelRatio(
-        Math.min(
-            window.devicePixelRatio || 1,
-            1.5
-        )
+        Math.min(window.devicePixelRatio || 1, 2)
     );
 
     renderer.setSize(
-        width,
-        height,
-        false
+        container.clientWidth,
+        container.clientHeight
     );
 
-    renderer.outputColorSpace =
-        THREE.SRGBColorSpace;
-
+    renderer.shadowMap.enabled = true;
 
     container.innerHTML = "";
-
-    container.appendChild(
-        renderer.domElement
-    );
+    container.appendChild(renderer.domElement);
 
     battle3D.renderer = renderer;
 
+    /* LIGHT */
 
-    /* =====================================
-       LIGHT
-    ===================================== */
-
-    var hemi =
-        new THREE.HemisphereLight(
-            0xffffff,
-            0x141421,
-            2.2
-        );
+    var hemi = new THREE.HemisphereLight(
+        0xffffff,
+        0x151522,
+        2.2
+    );
 
     scene.add(hemi);
 
-
-    var mainLight =
-        new THREE.DirectionalLight(
-            0xffffff,
-            3
-        );
-
-    mainLight.position.set(
-        3,
-        7,
-        5
+    var light = new THREE.DirectionalLight(
+        0xffffff,
+        2.5
     );
 
-    scene.add(mainLight);
+    light.position.set(4, 8, 6);
+    light.castShadow = true;
 
+    scene.add(light);
 
-    var redLight =
-        new THREE.PointLight(
-            0xff2222,
-            5,
-            10
-        );
-
-    redLight.position.set(
-        0,
-        3,
-        -3
+    var redLight = new THREE.PointLight(
+        0xff3030,
+        15,
+        12
     );
+
+    redLight.position.set(0, 2, -3);
 
     scene.add(redLight);
 
+    /* FLOOR */
 
-    var blueLight =
-        new THREE.PointLight(
-            0x2255ff,
-            4,
-            8
-        );
-
-    blueLight.position.set(
-        -4,
-        2,
-        2
+    var floor = new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            4.1,
+            4.1,
+            0.25,
+            64
+        ),
+        new THREE.MeshStandardMaterial({
+            color: 0x292731,
+            roughness: 0.9,
+            metalness: 0.1
+        })
     );
 
-    scene.add(blueLight);
-
-
-    /* =====================================
-       FLOOR
-    ===================================== */
-
-    var floor =
-        new THREE.Mesh(
-            new THREE.CylinderGeometry(
-                4.3,
-                4.3,
-                0.25,
-                48
-            ),
-            makeMaterial(0x181923)
-        );
-
-    floor.position.y = -0.15;
+    floor.position.y = -0.05;
+    floor.receiveShadow = true;
 
     scene.add(floor);
 
+    /* INNER RING */
 
-    /* Ring */
+    var ring = new THREE.Mesh(
+        new THREE.TorusGeometry(
+            3.1,
+            0.035,
+            10,
+            80
+        ),
+        new THREE.MeshBasicMaterial({
+            color: 0x9293a8
+        })
+    );
 
-    var ring =
-        new THREE.Mesh(
-            new THREE.TorusGeometry(
-                3.5,
-                0.07,
-                10,
-                64
-            ),
-            makeMaterial(
-                0xe74c3c,
-                0.45
-            )
-        );
-
-    ring.rotation.x =
-        Math.PI / 2;
-
-    ring.position.y = 0.02;
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = 0.10;
 
     scene.add(ring);
 
+    /* RED OUTER RING */
 
-    /* Inner ring */
-
-    var ring2 =
-        new THREE.Mesh(
-            new THREE.TorusGeometry(
-                2.7,
-                0.035,
-                8,
-                64
-            ),
-            makeMaterial(
-                0x555566,
-                0.5
-            )
-        );
-
-    ring2.rotation.x =
-        Math.PI / 2;
-
-    ring2.position.y =
-        0.025;
-
-    scene.add(ring2);
-
-
-    /* Wall */
-
-    var wall =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                12,
-                6,
-                0.3
-            ),
-            makeMaterial(0x11121b)
-        );
-
-    wall.position.set(
-        0,
-        2.7,
-        -2.8
+    var outerRing = new THREE.Mesh(
+        new THREE.TorusGeometry(
+            3.9,
+            0.08,
+            12,
+            80
+        ),
+        new THREE.MeshBasicMaterial({
+            color: 0xff4038
+        })
     );
+
+    outerRing.rotation.x = Math.PI / 2;
+    outerRing.position.y = 0.12;
+
+    scene.add(outerRing);
+
+    /* BACK WALL */
+
+    var wall = new THREE.Mesh(
+        new THREE.BoxGeometry(14, 8, 0.3),
+        new THREE.MeshStandardMaterial({
+            color: 0x1a1a22
+        })
+    );
+
+    wall.position.set(0, 3.5, -3.6);
 
     scene.add(wall);
 
+    /* FIGHTERS */
 
-    /* =====================================
-       FIGHTERS
-    ===================================== */
+    var player = createFighter(true);
+    var enemy = createFighter(false);
 
-    var player =
-        createFighter(true);
+    player.position.set(-1.65, 0, 0.1);
+    enemy.position.set(1.65, 0, -0.1);
 
-    var enemy =
-        createFighter(false);
+    /* PLAYER LOOKS RIGHT */
 
+    player.rotation.y = -0.12;
 
-    player.position.set(
-        -1.75,
-        0,
-        0.3
-    );
+    /* ENEMY LOOKS LEFT */
 
-    enemy.position.set(
-        1.75,
-        0,
-        -0.2
-    );
-
-
-    player.rotation.y =
-        -0.25;
-
-    enemy.rotation.y =
-        Math.PI + 0.25;
-
+    enemy.rotation.y = Math.PI + 0.12;
 
     scene.add(player);
     scene.add(enemy);
 
-
     battle3D.player = player;
     battle3D.enemy = enemy;
 
-    battle3D.playerParts =
-        player.userData;
+    battle3D.playerParts = player.userData.parts;
+    battle3D.enemyParts = enemy.userData.parts;
 
-    battle3D.enemyParts =
-        enemy.userData;
+    battle3D.playerBase = player.position.clone();
+    battle3D.enemyBase = enemy.position.clone();
 
-    battle3D.playerBase =
-        player.position.clone();
-
-    battle3D.enemyBase =
-        enemy.position.clone();
-
-    battle3D.initialized = true;
-
-
-    resize3DArena();
+    battle3D.ready = true;
 
     window.addEventListener(
         "resize",
         resize3DArena
     );
 
-
     animate3DArena();
 }
 
-
-/* =========================================
+/* =========================
    RESIZE
-========================================= */
+   ========================= */
 
 function resize3DArena() {
 
-    if (
-        !battle3D.container ||
-        !battle3D.camera ||
-        !battle3D.renderer
-    ) {
-        return;
-    }
+    var container = document.getElementById("battle-3d");
 
-    var width =
-        battle3D.container.clientWidth;
+    if (!container || !battle3D.renderer) return;
 
-    var height =
-        battle3D.container.clientHeight;
+    var w = container.clientWidth;
+    var h = container.clientHeight;
 
-    if (
-        width <= 0 ||
-        height <= 0
-    ) {
-        return;
-    }
+    if (w <= 0 || h <= 0) return;
 
-    battle3D.camera.aspect =
-        width / height;
-
+    battle3D.camera.aspect = w / h;
     battle3D.camera.updateProjectionMatrix();
 
-    battle3D.renderer.setSize(
-        width,
-        height,
-        false
-    );
+    battle3D.renderer.setSize(w, h);
 }
 
-
-/* =========================================
+/* =========================
    ANIMATION LOOP
-========================================= */
-
-var clock =
-    new THREE.Clock();
+   ========================= */
 
 function animate3DArena() {
 
-    requestAnimationFrame(
-        animate3DArena
+    requestAnimationFrame(animate3DArena);
+
+    if (!battle3D.ready) return;
+
+    var now = performance.now();
+
+    updateFighterAnimation(
+        battle3D.player,
+        battle3D.playerParts,
+        battle3D.playerAction,
+        now,
+        true
     );
 
-    if (
-        !battle3D.initialized ||
-        !battle3D.renderer
-    ) {
-        return;
-    }
+    updateFighterAnimation(
+        battle3D.enemy,
+        battle3D.enemyParts,
+        battle3D.enemyAction,
+        now,
+        false
+    );
 
-    var t =
-        clock.getElapsedTime();
+    /* CAMERA SHAKE */
 
+    if (battle3D.shake > 0) {
 
-    /* Idle player */
-
-    if (
-        !battle3D.playerAnimating &&
-        battle3D.player
-    ) {
-
-        battle3D.player.position.y =
-            Math.sin(t * 2) * 0.025;
-
-        battle3D.player.rotation.z =
-            Math.sin(t * 1.5) * 0.015;
-    }
-
-
-    /* Idle enemy */
-
-    if (
-        !battle3D.enemyAnimating &&
-        battle3D.enemy
-    ) {
-
-        battle3D.enemy.position.y =
-            Math.sin(t * 2 + 1) * 0.025;
-
-        battle3D.enemy.rotation.z =
-            Math.sin(t * 1.4 + 1) * 0.015;
-    }
-
-
-    /* =====================================
-       CAMERA SHAKE
-    ===================================== */
-
-    if (
-        battle3D.cameraShake > 0
-    ) {
-
-        battle3D.cameraShake -= 0.025;
-
-        var power =
-            battle3D.cameraShakePower *
-            battle3D.cameraShake;
+        battle3D.shake *= 0.86;
 
         battle3D.camera.position.x =
-            Math.sin(t * 55) *
-            power;
+            battle3D.cameraBaseX +
+            (Math.random() - 0.5) * battle3D.shake;
 
         battle3D.camera.position.y =
-            3.2 +
-            Math.cos(t * 50) *
-            power;
+            battle3D.cameraBaseY +
+            (Math.random() - 0.5) * battle3D.shake;
 
     } else {
 
-        battle3D.camera.position.x = 0;
-        battle3D.camera.position.y = 3.2;
+        battle3D.camera.position.x =
+            battle3D.cameraBaseX;
+
+        battle3D.camera.position.y =
+            battle3D.cameraBaseY;
     }
 
+    battle3D.camera.lookAt(0, 2, 0);
 
     battle3D.renderer.render(
         battle3D.scene,
@@ -788,1015 +501,438 @@ function animate3DArena() {
     );
 }
 
+/* =========================
+   FIGHT ANIMATION
+   ========================= */
 
-/* =========================================
-   CAMERA SHAKE
-========================================= */
-
-function shakeCamera(power) {
-
-    battle3D.cameraShake =
-        1;
-
-    battle3D.cameraShakePower =
-        power || 0.08;
-}
-
-
-/* =========================================
-   PLAYER ATTACK
-========================================= */
-
-function playPlayerAttack(
-    zone,
-    damage
+function updateFighterAnimation(
+    fighter,
+    parts,
+    action,
+    now,
+    isPlayer
 ) {
 
-    if (
-        !battle3D.initialized ||
-        !battle3D.player
-    ) {
+    if (!fighter || !parts) return;
+
+    var idle = Math.sin(now * 0.002) * 0.025;
+
+    fighter.position.y = idle;
+
+    /* RESET */
+
+    parts.armL.rotation.set(0, 0, 0);
+    parts.armR.rotation.set(0, 0, 0);
+
+    parts.legL.rotation.set(0, 0, 0);
+    parts.legR.rotation.set(0, 0, 0);
+
+    fighter.rotation.x = 0;
+
+    if (!action) return;
+
+    var elapsed = now - action.start;
+    var duration = action.duration;
+
+    if (elapsed >= duration) {
+
+        if (action.type === "attack") {
+            fighter.position.copy(
+                isPlayer
+                    ? battle3D.playerBase
+                    : battle3D.enemyBase
+            );
+        }
+
+        if (action.type === "hit") {
+            fighter.position.copy(
+                isPlayer
+                    ? battle3D.playerBase
+                    : battle3D.enemyBase
+            );
+        }
+
+        if (action.type === "dodge") {
+            fighter.position.copy(
+                isPlayer
+                    ? battle3D.playerBase
+                    : battle3D.enemyBase
+            );
+        }
+
+        if (isPlayer) {
+            battle3D.playerAction = null;
+        } else {
+            battle3D.enemyAction = null;
+        }
+
         return;
     }
 
-    var fighter =
-        battle3D.player;
+    var t = elapsed / duration;
 
-    var parts =
-        battle3D.playerParts;
+    /* ATTACK */
 
-    battle3D.playerAnimating =
-        true;
+    if (action.type === "attack") {
 
+        var punch = Math.sin(t * Math.PI);
 
-    var start =
-        performance.now();
+        if (action.zone === "head") {
 
-    var duration = 550;
+            fighter.position.z =
+                (isPlayer ? 0.1 : -0.1) -
+                punch * 0.30;
 
+            parts.armR.rotation.z =
+                -punch * 1.7;
 
-    function frame(now) {
-
-        var progress =
-            Math.min(
-                (now - start) /
-                duration,
-                1
-            );
-
-
-        /* Punch */
-
-        var punch;
-
-        if (progress < 0.35) {
-
-            punch =
-                progress / 0.35;
-
-        } else if (progress < 0.65) {
-
-            punch = 1;
-
-        } else {
-
-            punch =
-                1 -
-                (
-                    (progress - 0.65) /
-                    0.35
-                );
-        }
-
-
-        /* Attack zone */
-
-        if (zone === "head") {
-
-            parts.rightArm.rotation.z =
-                -punch * 1.8;
-
-            parts.rightArm.rotation.x =
-                -punch * 1.0;
-
-            parts.rightFist.position.y =
-                1.18 +
-                punch * 0.9;
-
-            parts.rightFist.position.z =
-                punch * 0.55;
-
-        } else if (zone === "legs") {
-
-            parts.rightArm.rotation.z =
-                -punch * 0.7;
-
-            parts.rightArm.rotation.x =
-                punch * 0.8;
-
-            parts.rightFist.position.y =
-                1.18 -
-                punch * 0.65;
-
-            parts.rightFist.position.z =
-                punch * 0.55;
-
-        } else {
-
-            parts.rightArm.rotation.z =
-                -punch * 1.6;
-
-            parts.rightArm.rotation.x =
+            parts.armR.rotation.x =
                 -punch * 0.8;
 
-            parts.rightFist.position.z =
-                punch * 0.65;
-        }
+        } else if (action.zone === "body") {
 
+            fighter.position.x +=
+                (isPlayer ? 1 : -1) *
+                punch *
+                0.55;
 
-        fighter.position.z =
-            battle3D.playerBase.z +
-            punch * 0.45;
+            parts.armR.rotation.z =
+                -punch * 2.0;
 
-
-        if (progress < 1) {
-
-            requestAnimationFrame(frame);
-
-        } else {
-
-            parts.rightArm.rotation.set(
-                0,
-                0,
-                0
-            );
-
-            parts.rightFist.position.set(
-                0.68,
-                1.18,
-                0
-            );
-
-            fighter.position.copy(
-                battle3D.playerBase
-            );
-
-            battle3D.playerAnimating =
-                false;
-        }
-    }
-
-
-    requestAnimationFrame(frame);
-}
-
-
-/* =========================================
-   ENEMY ATTACK
-========================================= */
-
-function playEnemyAttack(
-    zone
-) {
-
-    if (
-        !battle3D.initialized ||
-        !battle3D.enemy
-    ) {
-        return;
-    }
-
-    var fighter =
-        battle3D.enemy;
-
-    var parts =
-        battle3D.enemyParts;
-
-    battle3D.enemyAnimating =
-        true;
-
-
-    var start =
-        performance.now();
-
-    var duration = 550;
-
-
-    function frame(now) {
-
-        var progress =
-            Math.min(
-                (now - start) /
-                duration,
-                1
-            );
-
-
-        var punch;
-
-        if (progress < 0.35) {
-
-            punch =
-                progress / 0.35;
-
-        } else if (progress < 0.65) {
-
-            punch = 1;
-
-        } else {
-
-            punch =
-                1 -
-                (
-                    (progress - 0.65) /
-                    0.35
-                );
-        }
-
-
-        if (zone === "head") {
-
-            parts.leftArm.rotation.z =
-                punch * 1.8;
-
-            parts.leftArm.rotation.x =
-                -punch;
-
-            parts.leftFist.position.y =
-                1.18 +
-                punch * 0.9;
-
-            parts.leftFist.position.z =
-                -punch * 0.55;
-
-        } else if (zone === "legs") {
-
-            parts.leftArm.rotation.z =
+            parts.armL.rotation.z =
                 punch * 0.7;
 
-            parts.leftArm.rotation.x =
-                punch * 0.8;
-
-            parts.leftFist.position.y =
-                1.18 -
-                punch * 0.65;
-
-            parts.leftFist.position.z =
-                -punch * 0.55;
-
         } else {
 
-            parts.leftArm.rotation.z =
-                punch * 1.6;
+            parts.legR.rotation.z =
+                -punch * 1.0;
 
-            parts.leftArm.rotation.x =
-                -punch * 0.8;
+            parts.legL.rotation.z =
+                punch * 0.5;
 
-            parts.leftFist.position.z =
-                -punch * 0.65;
-        }
-
-
-        fighter.position.z =
-            battle3D.enemyBase.z -
-            punch * 0.45;
-
-
-        if (progress < 1) {
-
-            requestAnimationFrame(frame);
-
-        } else {
-
-            parts.leftArm.rotation.set(
-                0,
-                0,
-                0
-            );
-
-            parts.leftFist.position.set(
-                -0.68,
-                1.18,
-                0
-            );
-
-            fighter.position.copy(
-                battle3D.enemyBase
-            );
-
-            battle3D.enemyAnimating =
-                false;
+            fighter.rotation.x =
+                punch * 0.18;
         }
     }
 
+    /* HIT REACTION */
 
-    requestAnimationFrame(frame);
-}
+    if (action.type === "hit") {
 
+        var recoil = Math.sin(t * Math.PI);
 
-/* =========================================
-   HIT REACTION
-========================================= */
+        fighter.position.x +=
+            (isPlayer ? -1 : 1) *
+            recoil *
+            0.55;
 
-function show3DHit(
-    isPlayerTarget,
-    damage,
-    critical
-) {
-
-    if (!battle3D.initialized) {
-        return;
-    }
-
-    var target =
-        isPlayerTarget
-            ? battle3D.player
-            : battle3D.enemy;
-
-
-    if (!target) {
-        return;
-    }
-
-
-    /* Camera */
-
-    shakeCamera(
-        critical ? 0.16 : 0.09
-    );
-
-
-    /* Flash */
-
-    var originalScale =
-        target.scale.clone();
-
-    var start =
-        performance.now();
-
-    var duration = 300;
-
-
-    function flash(now) {
-
-        var progress =
-            Math.min(
-                (now - start) /
-                duration,
-                1
-            );
-
-
-        var hit =
-            Math.sin(
-                progress * Math.PI
-            );
-
-
-        target.scale.set(
-            originalScale.x *
-                (1 + hit * 0.12),
-
-            originalScale.y *
-                (1 - hit * 0.06),
-
-            originalScale.z *
-                (1 + hit * 0.12)
-        );
-
-
-        /* Knockback */
-
-        var base =
-            isPlayerTarget
-                ? battle3D.playerBase
-                : battle3D.enemyBase;
-
-        var direction =
-            isPlayerTarget
-                ? -1
-                : 1;
-
-        target.position.x =
-            base.x +
-            hit *
-            direction *
+        fighter.rotation.z =
+            (isPlayer ? -1 : 1) *
+            recoil *
             0.18;
-
-
-        if (progress < 1) {
-
-            requestAnimationFrame(
-                flash
-            );
-
-        } else {
-
-            target.scale.copy(
-                originalScale
-            );
-
-            target.position.copy(
-                base
-            );
-        }
     }
 
+    /* BLOCK */
 
-    requestAnimationFrame(flash);
+    if (action.type === "block") {
 
+        parts.armL.rotation.z = 1.1;
+        parts.armR.rotation.z = -1.1;
 
-    /* Damage number */
+        parts.armL.rotation.x = -0.5;
+        parts.armR.rotation.x = -0.5;
+    }
 
-    createDamageText(
-        target,
-        damage,
-        critical
-    );
+    /* DODGE */
+
+    if (action.type === "dodge") {
+
+        var dodge = Math.sin(t * Math.PI);
+
+        fighter.position.x +=
+            (isPlayer ? -1 : 1) *
+            dodge *
+            0.9;
+
+        fighter.rotation.z =
+            (isPlayer ? -1 : 1) *
+            dodge *
+            0.22;
+    }
 }
 
+/* =========================
+   PLAYER ATTACK
+   ========================= */
 
-/* =========================================
-   3D DAMAGE NUMBER
-========================================= */
+function playPlayerAttack(zone, critical) {
 
-function createDamageText(
-    target,
-    damage,
-    critical
-) {
+    if (!battle3D.ready) return;
 
-    if (!battle3D.scene) {
-        return;
-    }
+    battle3D.playerAction = {
+        type: "attack",
+        zone: zone,
+        start: performance.now(),
+        duration: critical ? 650 : 500
+    };
 
+    battle3D.shake = critical ? 0.18 : 0.07;
 
-    var canvas =
-        document.createElement("canvas");
+    setTimeout(function() {
 
-    canvas.width = 256;
-    canvas.height = 128;
+        if (battle3D.enemy) {
 
-
-    var ctx =
-        canvas.getContext("2d");
-
-
-    ctx.clearRect(
-        0,
-        0,
-        256,
-        128
-    );
-
-
-    ctx.textAlign =
-        "center";
-
-    ctx.font =
-        critical
-            ? "bold 54px Arial"
-            : "bold 46px Arial";
-
-
-    ctx.fillStyle =
-        critical
-            ? "#ffd21c"
-            : "#ffffff";
-
-
-    ctx.strokeStyle =
-        "#111111";
-
-    ctx.lineWidth = 8;
-
-
-    var text =
-        critical
-            ? "КРИТ! -" + damage
-            : "-" + damage;
-
-
-    ctx.strokeText(
-        text,
-        128,
-        70
-    );
-
-    ctx.fillText(
-        text,
-        128,
-        70
-    );
-
-
-    var texture =
-        new THREE.CanvasTexture(
-            canvas
-        );
-
-    texture.needsUpdate = true;
-
-
-    var material =
-        new THREE.SpriteMaterial({
-            map: texture,
-            transparent: true,
-            depthTest: false
-        });
-
-
-    var sprite =
-        new THREE.Sprite(material);
-
-
-    sprite.scale.set(
-        1.8,
-        0.9,
-        1
-    );
-
-
-    sprite.position.copy(
-        target.position
-    );
-
-    sprite.position.y =
-        3.4;
-
-
-    battle3D.scene.add(sprite);
-
-
-    var start =
-        performance.now();
-
-    var duration = 900;
-
-
-    function animateText(now) {
-
-        var progress =
-            Math.min(
-                (now - start) /
-                duration,
-                1
-            );
-
-
-        sprite.position.y =
-            3.4 +
-            progress * 1.2;
-
-
-        material.opacity =
-            1 - progress;
-
-
-        sprite.scale.set(
-            1.8 +
-            progress * 0.5,
-            0.9 +
-            progress * 0.25,
-            1
-        );
-
-
-        if (progress < 1) {
-
-            requestAnimationFrame(
-                animateText
-            );
-
-        } else {
-
-            battle3D.scene.remove(
-                sprite
-            );
-
-            texture.dispose();
-            material.dispose();
+            battle3D.enemyAction = {
+                type: "hit",
+                start: performance.now(),
+                duration: critical ? 520 : 380
+            };
         }
-    }
 
-
-    requestAnimationFrame(
-        animateText
-    );
+    }, critical ? 180 : 220);
 }
 
+/* =========================
+   ENEMY ATTACK
+   ========================= */
 
-/* =========================================
-   BLOCK EFFECT
-========================================= */
+function playEnemyAttack(zone, blocked, dodged) {
 
-function showBlockEffect(
-    isPlayer
-) {
+    if (!battle3D.ready) return;
 
-    if (!battle3D.initialized) {
-        return;
+    battle3D.enemyAction = {
+        type: "attack",
+        zone: zone,
+        start: performance.now(),
+        duration: 520
+    };
+
+    if (blocked || dodged) {
+
+        setTimeout(function() {
+
+            if (blocked) {
+
+                battle3D.enemyAction = {
+                    type: "hit",
+                    start: performance.now(),
+                    duration: 350
+                };
+
+            } else {
+
+                battle3D.playerAction = {
+                    type: "dodge",
+                    start: performance.now(),
+                    duration: 500
+                };
+            }
+
+        }, 250);
+    } else {
+
+        setTimeout(function() {
+
+            battle3D.playerAction = {
+                type: "hit",
+                start: performance.now(),
+                duration: 400
+            };
+
+            battle3D.shake = 0.10;
+
+        }, 300);
     }
-
-
-    var target =
-        isPlayer
-            ? battle3D.player
-            : battle3D.enemy;
-
-
-    if (!target) {
-        return;
-    }
-
-
-    var start =
-        performance.now();
-
-
-    var duration = 350;
-
-
-    function animateBlock(now) {
-
-        var progress =
-            Math.min(
-                (now - start) /
-                duration,
-                1
-            );
-
-
-        var hit =
-            Math.sin(
-                progress * Math.PI
-            );
-
-
-        target.rotation.z =
-            hit * 0.15;
-
-
-        target.scale.set(
-            1 + hit * 0.08,
-            1 - hit * 0.04,
-            1 + hit * 0.08
-        );
-
-
-        if (progress < 1) {
-
-            requestAnimationFrame(
-                animateBlock
-            );
-
-        } else {
-
-            target.rotation.z = 0;
-
-            target.scale.set(
-                1,
-                1,
-                1
-            );
-        }
-    }
-
-
-    requestAnimationFrame(
-        animateBlock
-    );
-
-
-    shakeCamera(0.045);
 }
 
+/* =========================
+   FLOATING DAMAGE
+   ========================= */
 
-/* =========================================
-   DODGE EFFECT
-========================================= */
+function showDamage(text, critical, enemySide) {
 
-function showDodgeEffect(
-    isPlayer
-) {
+    var container = document.getElementById("battle-3d");
 
-    if (!battle3D.initialized) {
-        return;
-    }
+    if (!container) return;
 
+    var el = document.createElement("div");
 
-    var target =
-        isPlayer
-            ? battle3D.player
-            : battle3D.enemy;
+    el.innerText = text;
 
+    el.style.position = "absolute";
+    el.style.left = enemySide ? "67%" : "25%";
+    el.style.top = "38%";
+    el.style.zIndex = "20";
+    el.style.pointerEvents = "none";
 
-    if (!target) {
-        return;
-    }
+    el.style.fontWeight = "900";
+    el.style.fontSize = critical ? "30px" : "24px";
+    el.style.color = critical ? "#ffd21f" : "#ffffff";
 
+    el.style.textShadow =
+        "0 3px 10px #000, 0 0 15px rgba(255,60,60,.7)";
 
-    var base =
-        isPlayer
-            ? battle3D.playerBase
-            : battle3D.enemyBase;
+    el.style.transition =
+        "transform .8s ease, opacity .8s ease";
 
+    el.style.transform =
+        "translate(-50%, 0) scale(1.15)";
 
-    var start =
-        performance.now();
+    el.style.opacity = "1";
 
-    var duration = 400;
+    container.appendChild(el);
 
+    setTimeout(function() {
 
-    function dodge(now) {
+        el.style.transform =
+            "translate(-50%, -90px) scale(1)";
 
-        var progress =
-            Math.min(
-                (now - start) /
-                duration,
-                1
-            );
+        el.style.opacity = "0";
 
+    }, 30);
 
-        var move;
+    setTimeout(function() {
 
-        if (progress < 0.5) {
-
-            move =
-                progress / 0.5;
-
-        } else {
-
-            move =
-                1 -
-                (
-                    (progress - 0.5) /
-                    0.5
-                );
+        if (el.parentNode) {
+            el.parentNode.removeChild(el);
         }
 
-
-        target.position.x =
-            base.x +
-            move *
-            (
-                isPlayer
-                    ? -0.5
-                    : 0.5
-            );
-
-
-        target.rotation.z =
-            move *
-            (
-                isPlayer
-                    ? -0.18
-                    : 0.18
-            );
-
-
-        if (progress < 1) {
-
-            requestAnimationFrame(
-                dodge
-            );
-
-        } else {
-
-            target.position.copy(
-                base
-            );
-
-            target.rotation.z = 0;
-        }
-    }
-
-
-    requestAnimationFrame(dodge);
+    }, 900);
 }
 
+/* =========================
+   NOTICE
+   ========================= */
 
-/* =========================================
+function showNotice(text) {
+
+    var n = document.getElementById("notice");
+
+    if (!n) return;
+
+    n.innerText = text;
+    n.style.display = "block";
+
+    setTimeout(function() {
+        n.style.display = "none";
+    }, 2000);
+}
+
+/* =========================
    DOM READY
-========================================= */
+   ========================= */
 
 document.addEventListener(
     "DOMContentLoaded",
-    function () {
+    function() {
 
+        init3DArena();
 
-        /* Start 3D */
-
-        setTimeout(
-            function () {
-                init3DArena();
-            },
-            100
-        );
-
-
-        /* =================================
+        /* =====================
            TABS
-        ================================= */
+           ===================== */
 
         var tArena =
-            document.getElementById(
-                "tab-arena"
-            );
+            document.getElementById("tab-arena");
 
         var tShop =
-            document.getElementById(
-                "tab-shop"
-            );
+            document.getElementById("tab-shop");
 
         var tMap =
-            document.getElementById(
-                "tab-map"
-            );
+            document.getElementById("tab-map");
 
         var tProfile =
-            document.getElementById(
-                "tab-profile"
-            );
-
+            document.getElementById("tab-profile");
 
         var pArena =
-            document.getElementById(
-                "page-home"
-            );
+            document.getElementById("page-home");
 
         var pShop =
-            document.getElementById(
-                "page-shop"
-            );
+            document.getElementById("page-shop");
 
         var pMap =
-            document.getElementById(
-                "page-map"
-            );
+            document.getElementById("page-map");
 
         var pProfile =
-            document.getElementById(
-                "page-profile"
-            );
+            document.getElementById("page-profile");
 
+        function showPage(tab, page) {
 
-        function showPage(
-            tab,
-            page
-        ) {
+            if (pArena) pArena.style.display = "none";
+            if (pShop) pShop.style.display = "none";
+            if (pMap) pMap.style.display = "none";
+            if (pProfile) pProfile.style.display = "none";
 
-            if (pArena)
-                pArena.style.display =
-                    "none";
+            if (tArena) tArena.classList.remove("active");
+            if (tShop) tShop.classList.remove("active");
+            if (tMap) tMap.classList.remove("active");
+            if (tProfile) tProfile.classList.remove("active");
 
-            if (pShop)
-                pShop.style.display =
-                    "none";
+            if (page) page.style.display = "block";
+            if (tab) tab.classList.add("active");
 
-            if (pMap)
-                pMap.style.display =
-                    "none";
-
-            if (pProfile)
-                pProfile.style.display =
-                    "none";
-
-
-            if (tArena)
-                tArena.classList.remove(
-                    "active"
-                );
-
-            if (tShop)
-                tShop.classList.remove(
-                    "active"
-                );
-
-            if (tMap)
-                tMap.classList.remove(
-                    "active"
-                );
-
-            if (tProfile)
-                tProfile.classList.remove(
-                    "active"
-                );
-
-
-            if (page)
-                page.style.display =
-                    "block";
-
-            if (tab)
-                tab.classList.add(
-                    "active"
-                );
-
+            setTimeout(resize3DArena, 50);
 
             updateUI();
-
-
-            setTimeout(
-                resize3DArena,
-                50
-            );
         }
-
 
         if (tArena) {
-
             tArena.addEventListener(
                 "click",
-                function () {
-                    showPage(
-                        tArena,
-                        pArena
-                    );
+                function() {
+                    showPage(tArena, pArena);
                 }
             );
         }
-
 
         if (tShop) {
-
             tShop.addEventListener(
                 "click",
-                function () {
-                    showPage(
-                        tShop,
-                        pShop
-                    );
+                function() {
+                    showPage(tShop, pShop);
                 }
             );
         }
-
 
         if (tMap) {
-
             tMap.addEventListener(
                 "click",
-                function () {
-                    showPage(
-                        tMap,
-                        pMap
-                    );
+                function() {
+                    showPage(tMap, pMap);
                 }
             );
         }
-
 
         if (tProfile) {
-
             tProfile.addEventListener(
                 "click",
-                function () {
-                    showPage(
-                        tProfile,
-                        pProfile
-                    );
+                function() {
+                    showPage(tProfile, pProfile);
                 }
             );
         }
 
-
-        /* =================================
+        /* =====================
            ATTACK ZONES
-        ================================= */
+           ===================== */
 
         var attHead =
-            document.getElementById(
-                "btn-att-head"
-            );
+            document.getElementById("btn-att-head");
 
         var attBody =
-            document.getElementById(
-                "btn-att-body"
-            );
+            document.getElementById("btn-att-body");
 
         var attLegs =
-            document.getElementById(
-                "btn-att-legs"
-            );
-
-
-        /* BLOCK ZONES */
+            document.getElementById("btn-att-legs");
 
         var blkHead =
-            document.getElementById(
-                "btn-blk-head"
-            );
+            document.getElementById("btn-blk-head");
 
         var blkBody =
-            document.getElementById(
-                "btn-blk-body"
-            );
+            document.getElementById("btn-blk-body");
 
         var blkLegs =
-            document.getElementById(
-                "btn-blk-legs"
-            );
-
+            document.getElementById("btn-blk-legs");
 
         function clearAtt() {
 
@@ -1816,7 +952,6 @@ document.addEventListener(
                 );
         }
 
-
         function clearBlk() {
 
             if (blkHead)
@@ -1835,130 +970,96 @@ document.addEventListener(
                 );
         }
 
-
         if (attHead) {
-
             attHead.addEventListener(
                 "click",
-                function () {
-
+                function() {
                     clearAtt();
-
                     attHead.classList.add(
                         "zone-btn-active"
                     );
-
                     selA = "head";
                 }
             );
         }
 
-
         if (attBody) {
-
             attBody.addEventListener(
                 "click",
-                function () {
-
+                function() {
                     clearAtt();
-
                     attBody.classList.add(
                         "zone-btn-active"
                     );
-
                     selA = "body";
                 }
             );
         }
 
-
         if (attLegs) {
-
             attLegs.addEventListener(
                 "click",
-                function () {
-
+                function() {
                     clearAtt();
-
                     attLegs.classList.add(
                         "zone-btn-active"
                     );
-
                     selA = "legs";
                 }
             );
         }
 
-
         if (blkHead) {
-
             blkHead.addEventListener(
                 "click",
-                function () {
-
+                function() {
                     clearBlk();
-
                     blkHead.classList.add(
                         "zone-btn-active"
                     );
-
                     selB = "head";
                 }
             );
         }
 
-
         if (blkBody) {
-
             blkBody.addEventListener(
                 "click",
-                function () {
-
+                function() {
                     clearBlk();
-
                     blkBody.classList.add(
                         "zone-btn-active"
                     );
-
                     selB = "body";
                 }
             );
         }
 
-
         if (blkLegs) {
-
             blkLegs.addEventListener(
                 "click",
-                function () {
-
+                function() {
                     clearBlk();
-
                     blkLegs.classList.add(
                         "zone-btn-active"
                     );
-
                     selB = "legs";
                 }
             );
         }
 
-
-        /* =================================
-           BATTLE BUTTON
-        ================================= */
+        /* =====================
+           TURN
+           ===================== */
 
         var turnBtn =
-            document.getElementById(
-                "attack"
-            );
-
+            document.getElementById("attack");
 
         if (turnBtn) {
 
             turnBtn.addEventListener(
                 "click",
-                function () {
+                function() {
 
                     if (!selA || !selB) {
 
@@ -1969,21 +1070,17 @@ document.addEventListener(
                         return;
                     }
 
-
                     var zones = [
                         "head",
                         "body",
                         "legs"
                     ];
 
-
                     var zoneText = {
-
                         head: "Голову",
                         body: "Корпус",
                         legs: "Ноги"
                     };
-
 
                     var enemyA =
                         zones[
@@ -1992,7 +1089,6 @@ document.addEventListener(
                             )
                         ];
 
-
                     var enemyB =
                         zones[
                             Math.floor(
@@ -2000,32 +1096,17 @@ document.addEventListener(
                             )
                         ];
 
-
                     var logs = [];
 
-
                     var dmg =
-                        15 +
-                        p.bonusDamage;
+                        15 + p.bonusDamage;
 
+                    var baseEnemyDmg =
+                        15 + (p.level * 2);
 
-                    var enemyDamage =
-                        15 +
-                        (p.level * 2);
+                    /* PLAYER ATTACK */
 
-
-                    /* =================================
-                       PLAYER ATTACK
-                    ================================= */
-
-                    if (
-                        selA === enemyB
-                    ) {
-
-                        showBlockEffect(
-                            false
-                        );
-
+                    if (selA === enemyB) {
 
                         logs.push(
                             "🛡️ Вы ударили в <b>" +
@@ -2033,50 +1114,49 @@ document.addEventListener(
                             "</b>, но Хулиган заблокировал удар."
                         );
 
+                        battle3D.enemyAction = {
+                            type: "block",
+                            start: performance.now(),
+                            duration: 500
+                        };
+
+                        setTimeout(function() {
+
+                            if (battle3D.player) {
+
+                                battle3D.playerAction = {
+                                    type: "hit",
+                                    start: performance.now(),
+                                    duration: 300
+                                };
+                            }
+
+                        }, 180);
+
                     } else {
 
                         var isCrit =
-                            (
-                                Math.random() * 100
-                            ) <
-                            (
-                                p.strength * 3
-                            );
+                            (Math.random() * 100) <
+                            (p.strength * 3);
 
+                        var finalPlayerDmg =
+                            isCrit ? dmg * 2 : dmg;
 
-                        var finalDamage =
-                            isCrit
-                                ? dmg * 2
-                                : dmg;
-
-
-                        e.hp =
-                            Math.max(
-                                0,
-                                e.hp -
-                                finalDamage
-                            );
-
+                        e.hp = Math.max(
+                            0,
+                            e.hp - finalPlayerDmg
+                        );
 
                         playPlayerAttack(
                             selA,
-                            finalDamage
+                            isCrit
                         );
 
-
-                        setTimeout(
-                            function () {
-
-                                show3DHit(
-                                    false,
-                                    finalDamage,
-                                    isCrit
-                                );
-
-                            },
-                            260
+                        showDamage(
+                            "-" + finalPlayerDmg,
+                            isCrit,
+                            true
                         );
-
 
                         if (isCrit) {
 
@@ -2084,7 +1164,7 @@ document.addEventListener(
                                 "⚡💥 <b>КРИТ!</b> Вы пробили Хулигана в <b>" +
                                 zoneText[selA] +
                                 "</b>! Урон: -" +
-                                finalDamage +
+                                finalPlayerDmg +
                                 "."
                             );
 
@@ -2094,25 +1174,15 @@ document.addEventListener(
                                 "💥 Вы успешно пробили Хулигана в <b>" +
                                 zoneText[selA] +
                                 "</b>! Урон: -" +
-                                finalDamage +
+                                finalPlayerDmg +
                                 "."
                             );
                         }
                     }
 
+                    /* ENEMY ATTACK */
 
-                    /* =================================
-                       ENEMY ATTACK
-                    ================================= */
-
-                    if (
-                        enemyA === selB
-                    ) {
-
-                        showBlockEffect(
-                            true
-                        );
-
+                    if (enemyA === selB) {
 
                         logs.push(
                             "🛡️ Хулиган метил в <b>" +
@@ -2120,23 +1190,19 @@ document.addEventListener(
                             "</b>, но вы заблокировали его."
                         );
 
+                        playEnemyAttack(
+                            enemyA,
+                            true,
+                            false
+                        );
+
                     } else {
 
                         var isDodge =
-                            (
-                                Math.random() * 100
-                            ) <
-                            (
-                                p.agility * 3
-                            );
-
+                            (Math.random() * 100) <
+                            (p.agility * 3);
 
                         if (isDodge) {
-
-                            showDodgeEffect(
-                                true
-                            );
-
 
                             logs.push(
                                 "💨 <b>УВОРОТ!</b> Вы уклонились от удара в <b>" +
@@ -2144,54 +1210,47 @@ document.addEventListener(
                                 "</b>!"
                             );
 
-                        } else {
-
-                            p.hp =
-                                Math.max(
-                                    0,
-                                    p.hp -
-                                    enemyDamage
-                                );
-
-
-                            setTimeout(
-                                function () {
-
-                                    playEnemyAttack(
-                                        enemyA
-                                    );
-
-                                    show3DHit(
-                                        true,
-                                        enemyDamage,
-                                        false
-                                    );
-
-                                },
-                                180
+                            playEnemyAttack(
+                                enemyA,
+                                false,
+                                true
                             );
 
+                        } else {
+
+                            p.hp = Math.max(
+                                0,
+                                p.hp - baseEnemyDmg
+                            );
 
                             logs.push(
                                 "🥊 Хулиган нанес вам удар в <b>" +
                                 zoneText[enemyA] +
                                 "</b>. Урон: -" +
-                                enemyDamage +
+                                baseEnemyDmg +
                                 "."
+                            );
+
+                            playEnemyAttack(
+                                enemyA,
+                                false,
+                                false
+                            );
+
+                            showDamage(
+                                "-" + baseEnemyDmg,
+                                false,
+                                false
                             );
                         }
                     }
 
-
-                    /* =================================
-                       LOG
-                    ================================= */
+                    /* LOG */
 
                     var logBox =
                         document.querySelector(
                             ".combat-log-text"
                         );
-
 
                     if (logBox) {
 
@@ -2200,11 +1259,8 @@ document.addEventListener(
                                 "Ожидание хода..."
                             )
                         ) {
-
-                            logBox.innerHTML =
-                                "";
+                            logBox.innerHTML = "";
                         }
-
 
                         logBox.innerHTML =
                             logs.join("<br>") +
@@ -2212,31 +1268,23 @@ document.addEventListener(
                             logBox.innerHTML;
                     }
 
-
-                    /* =================================
-                       END BATTLE
-                    ================================= */
+                    /* END */
 
                     if (
                         p.hp <= 0 ||
                         e.hp <= 0
                     ) {
 
-                        turnBtn.disabled =
-                            true;
-
+                        turnBtn.disabled = true;
 
                         if (
                             p.hp <= 0 &&
                             e.hp <= 0
                         ) {
 
-                            if (logBox) {
-
-                                logBox.innerHTML =
-                                    "<b>⚔️ Ничья!</b><br>" +
-                                    logBox.innerHTML;
-                            }
+                            logBox.innerHTML =
+                                "<b>⚔️ Ничья!</b><br>" +
+                                logBox.innerHTML;
 
                         } else if (
                             e.hp <= 0
@@ -2248,82 +1296,59 @@ document.addEventListener(
 
                             p.exp += 40;
 
-
-                            if (logBox) {
-
-                                logBox.innerHTML =
-                                    "<b>🎉 Победа! Награда получена!</b><br>" +
-                                    logBox.innerHTML;
-                            }
-
+                            logBox.innerHTML =
+                                "<b>🎉 Победа! Награда получена!</b><br>" +
+                                logBox.innerHTML;
 
                             if (
-                                p.exp >=
-                                p.maxExp
+                                p.exp >= p.maxExp
                             ) {
 
                                 p.level += 1;
 
-                                p.exp -=
-                                    p.maxExp;
+                                p.exp -= p.maxExp;
 
                                 p.maxExp =
                                     Math.floor(
-                                        p.maxExp *
-                                        1.3
+                                        p.maxExp * 1.3
                                     );
 
-                                p.freePoints +=
-                                    3;
+                                p.freePoints += 3;
 
-                                p.maxHp +=
-                                    20;
+                                p.maxHp += 20;
 
+                                p.hp = p.maxHp;
 
-                                if (logBox) {
-
-                                    logBox.innerHTML =
-                                        "<b style='color:#f1c40f;'>🌟 ЛЕВЕЛ АП! Получен " +
-                                        p.level +
-                                        " уровень!</b><br>" +
-                                        logBox.innerHTML;
-                                }
+                                logBox.innerHTML =
+                                    "<b style='color:#f1c40f'>" +
+                                    "🌟 ЛЕВЕЛ АП! Получен " +
+                                    p.level +
+                                    " уровень!</b><br>" +
+                                    logBox.innerHTML;
                             }
 
                         } else {
 
-                            if (logBox) {
-
-                                logBox.innerHTML =
-                                    "<b>💀 Поражение. Восстановление...</b><br>" +
-                                    logBox.innerHTML;
-                            }
+                            logBox.innerHTML =
+                                "<b>💀 Поражение. Восстановление...</b><br>" +
+                                logBox.innerHTML;
                         }
 
-
                         setTimeout(
-                            function () {
+                            function() {
 
-                                p.hp =
-                                    p.maxHp;
+                                p.hp = p.maxHp;
 
                                 e.hp =
                                     e.maxHp +
-                                    (
-                                        p.level *
-                                        10
-                                    );
+                                    (p.level * 10);
 
-                                turnBtn.disabled =
-                                    false;
-
+                                turnBtn.disabled = false;
 
                                 if (logBox) {
-
                                     logBox.innerHTML =
                                         "Ожидание хода...";
                                 }
-
 
                                 updateUI();
                                 save();
@@ -2332,7 +1357,6 @@ document.addEventListener(
                             4000
                         );
                     }
-
 
                     selA = null;
                     selB = null;
@@ -2346,40 +1370,30 @@ document.addEventListener(
             );
         }
 
-
-        /* =================================
+        /* =====================
            SHOP
-        ================================= */
+           ===================== */
 
         var buyBrass =
-            document.getElementById(
-                "buy-brass"
-            );
+            document.getElementById("buy-brass");
 
         var buyKnife =
-            document.getElementById(
-                "buy-knife"
-            );
-
+            document.getElementById("buy-knife");
 
         if (buyBrass) {
 
             buyBrass.addEventListener(
                 "click",
-                function () {
+                function() {
 
                     if (p.coins >= 150) {
 
                         p.coins -= 150;
-
-                        p.weapon =
-                            "Кастеты";
-
-                        p.bonusDamage =
-                            5;
+                        p.weapon = "Кастеты";
+                        p.bonusDamage = 5;
 
                         showNotice(
-                            "Куплены Кастеты!"
+                            "🥊 Куплены Кастеты!"
                         );
 
                         updateUI();
@@ -2394,26 +1408,21 @@ document.addEventListener(
                 }
             );
         }
-
 
         if (buyKnife) {
 
             buyKnife.addEventListener(
                 "click",
-                function () {
+                function() {
 
                     if (p.coins >= 400) {
 
                         p.coins -= 400;
-
-                        p.weapon =
-                            "Охотничий нож";
-
-                        p.bonusDamage =
-                            12;
+                        p.weapon = "Охотничий нож";
+                        p.bonusDamage = 12;
 
                         showNotice(
-                            "Куплен Нож!"
+                            "🔪 Куплен Нож!"
                         );
 
                         updateUI();
@@ -2429,31 +1438,23 @@ document.addEventListener(
             );
         }
 
-
-        /* =================================
+        /* =====================
            STATS
-        ================================= */
+           ===================== */
 
         var addStr =
-            document.getElementById(
-                "add-str"
-            );
+            document.getElementById("add-str");
 
         var addAgi =
-            document.getElementById(
-                "add-agi"
-            );
-
+            document.getElementById("add-agi");
 
         if (addStr) {
 
             addStr.addEventListener(
                 "click",
-                function () {
+                function() {
 
-                    if (
-                        p.freePoints > 0
-                    ) {
+                    if (p.freePoints > 0) {
 
                         p.freePoints--;
                         p.strength++;
@@ -2465,16 +1466,13 @@ document.addEventListener(
             );
         }
 
-
         if (addAgi) {
 
             addAgi.addEventListener(
                 "click",
-                function () {
+                function() {
 
-                    if (
-                        p.freePoints > 0
-                    ) {
+                    if (p.freePoints > 0) {
 
                         p.freePoints--;
                         p.agility++;
@@ -2486,220 +1484,131 @@ document.addEventListener(
             );
         }
 
-
         updateUI();
     }
 );
 
-
-/* =========================================
-   NOTICE
-========================================= */
-
-function showNotice(text) {
-
-    var n =
-        document.getElementById(
-            "notice"
-        );
-
-    if (!n) {
-        return;
-    }
-
-
-    n.innerText = text;
-
-    n.style.display =
-        "block";
-
-
-    setTimeout(
-        function () {
-
-            n.style.display =
-                "none";
-
-        },
-        2000
-    );
-}
-
-
-/* =========================================
-   UI UPDATE
-========================================= */
+/* =========================
+   UI
+   ========================= */
 
 function updateUI() {
 
-    var coinsEl =
-        document.getElementById(
-            "coins"
-        );
+    var coins =
+        document.getElementById("coins");
 
-    if (coinsEl) {
-        coinsEl.innerText =
-            p.coins;
-    }
+    if (coins)
+        coins.innerText = p.coins;
 
+    var level =
+        document.getElementById("header-level");
 
-    var lvlEl =
-        document.getElementById(
-            "header-level"
-        );
-
-    if (lvlEl) {
-
-        lvlEl.innerText =
-            "Уровень " +
-            p.level;
-    }
-
+    if (level)
+        level.innerText =
+            "Уровень " + p.level;
 
     var pTxt =
         document.getElementById(
             "hp-text-player"
         );
 
-    if (pTxt) {
-
+    if (pTxt)
         pTxt.innerText =
-            p.hp +
-            "/" +
-            p.maxHp;
-    }
-
+            p.hp + "/" + p.maxHp;
 
     var eTxt =
         document.getElementById(
             "hp-text-enemy"
         );
 
-    if (eTxt) {
-
+    if (eTxt)
         eTxt.innerText =
-            e.hp +
-            "/" +
-            e.maxHp;
-    }
-
+            e.hp + "/" + e.maxHp;
 
     var pFill =
         document.getElementById(
             "hp-fill-player"
         );
 
-    if (pFill) {
-
+    if (pFill)
         pFill.style.width =
-            (
-                p.hp /
-                p.maxHp *
-                100
-            ) +
+            ((p.hp / p.maxHp) * 100) +
             "%";
-    }
-
 
     var eFill =
         document.getElementById(
             "hp-fill-enemy"
         );
 
-    if (eFill) {
-
+    if (eFill)
         eFill.style.width =
-            (
-                e.hp /
-                e.maxHp *
-                100
-            ) +
+            ((e.hp / e.maxHp) * 100) +
             "%";
-    }
 
-
-    var prLvl =
+    var profLevel =
         document.getElementById(
             "prof-level"
         );
 
-    if (prLvl) {
-        prLvl.innerText =
+    if (profLevel)
+        profLevel.innerText =
             p.level;
-    }
 
-
-    var prWpn =
+    var profWeapon =
         document.getElementById(
             "prof-weapon"
         );
 
-    if (prWpn) {
-        prWpn.innerText =
+    if (profWeapon)
+        profWeapon.innerText =
             p.weapon;
-    }
 
-
-    var prDmg =
+    var profDamage =
         document.getElementById(
             "prof-damage"
         );
 
-    if (prDmg) {
+    if (profDamage)
+        profDamage.innerText =
+            15 + p.bonusDamage;
 
-        prDmg.innerText =
-            15 +
-            p.bonusDamage;
-    }
-
-
-    var prMhp =
+    var profHp =
         document.getElementById(
             "prof-maxhp"
         );
 
-    if (prMhp) {
+    if (profHp)
+        profHp.innerText =
+            p.maxHp + " HP";
 
-        prMhp.innerText =
-            p.maxHp +
-            " HP";
-    }
-
-
-    var prStr =
+    var profStr =
         document.getElementById(
             "prof-str"
         );
 
-    if (prStr) {
-        prStr.innerText =
+    if (profStr)
+        profStr.innerText =
             p.strength;
-    }
 
-
-    var prAgi =
+    var profAgi =
         document.getElementById(
             "prof-agi"
         );
 
-    if (prAgi) {
-        prAgi.innerText =
+    if (profAgi)
+        profAgi.innerText =
             p.agility;
-    }
 
-
-    var prFre =
+    var profFree =
         document.getElementById(
             "prof-free"
         );
 
-    if (prFre) {
-        prFre.innerText =
+    if (profFree)
+        profFree.innerText =
             p.freePoints;
-    }
 
-
-    var fBlock =
+    var freeBlock =
         document.getElementById(
             "free-points-block"
         );
@@ -2714,14 +1623,11 @@ function updateUI() {
             "add-agi"
         );
 
+    if (freeBlock) {
 
-    if (fBlock) {
+        if (p.freePoints > 0) {
 
-        if (
-            p.freePoints > 0
-        ) {
-
-            fBlock.style.display =
+            freeBlock.style.display =
                 "block";
 
             if (btnS)
@@ -2734,7 +1640,7 @@ function updateUI() {
 
         } else {
 
-            fBlock.style.display =
+            freeBlock.style.display =
                 "none";
 
             if (btnS)
@@ -2747,35 +1653,25 @@ function updateUI() {
         }
     }
 
-
     var expTxt =
         document.getElementById(
             "exp-text"
         );
 
-    if (expTxt) {
-
+    if (expTxt)
         expTxt.innerText =
             p.exp +
             " / " +
             p.maxExp +
             " XP";
-    }
-
 
     var expFill =
         document.getElementById(
             "exp-fill"
         );
 
-    if (expFill) {
-
+    if (expFill)
         expFill.style.width =
-            (
-                p.exp /
-                p.maxExp *
-                100
-            ) +
+            ((p.exp / p.maxExp) * 100) +
             "%";
-    }
 }
