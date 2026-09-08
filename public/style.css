@@ -1,33 +1,376 @@
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { background-color: #111116; color: #e2e2e9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; padding-bottom: 80px; }
-header { background-color: #1a1a24; border-bottom: 1px solid #252533; display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; position: sticky; top: 0; z-index: 100; }
-.brand { display: flex; align-items: center; gap: 10px; }
-.logo-badge { background-color: #e74c3c; color: #fff; font-weight: bold; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
-.brand-info h1 { font-size: 14px; text-transform: uppercase; }
-.brand-info small { color: #8a8a93; font-size: 11px; }
-.res { font-weight: 600; }
-.screen { padding: 16px; max-width: 500px; margin: 0 auto; }
-.battle, .hero { background-color: #1a1a24; border: 1px solid #252533; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-.battle-title { color: #e74c3c; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-.enemyname { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; }
-.zone-title { font-size: 11px; color: #8a8a93; text-transform: uppercase; margin-bottom: 8px; margin-top: 12px; }
-.powers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-button { background-color: #252533; border: 1px solid #333344; border-radius: 8px; color: #e2e2e9; padding: 12px 8px; font-size: 14px; }
-#attack { background-color: #f1c40f; border: none; color: #111116; font-weight: 700; width: 100%; padding: 14px; margin-top: 16px; border-radius: 8px; text-transform: uppercase; }
-.zone-btn-active { border: 1px solid #e74c3c !important; background-color: rgba(231, 76, 60, 0.25) !important; }
-.bars-container { background-color: #111116; border: 1px solid #252533; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
-.bar-label { font-size: 13px; color: #8a8a93; margin-bottom: 8px; }
-.bar-label:last-child { margin-bottom: 0; }
-.bar-label span { float: right; color: #e2e2e9; font-weight: 600; }
-.hp-bar-bg { width: 100%; height: 10px; background-color: #252533; border-radius: 5px; margin-top: 4px; overflow: hidden; }
-.hp-fill { height: 100%; width: 100%; transition: width 0.2s ease; }
-.player-hp { background-color: #2ecc71; }
-.enemy-hp { background-color: #e74c3c; }
-.log-container { background-color: #1a1a24; border: 1px solid #252533; border-radius: 12px; padding: 16px; }
-.log-title { font-size: 11px; color: #8a8a93; text-transform: uppercase; margin-bottom: 6px; }
-.nav-tabs { background-color: #1a1a24; border-top: 1px solid #252533; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 10px 0; }
-.tab { background: none; border: none; color: #8a8a93; display: flex; flex-direction: column; align-items: center; font-size: 12px; width: 25%; padding: 4px; }
-.tab span:first-child { font-size: 20px; margin-bottom: 2px; }
-.tab.active { color: #e74c3c; }
-.notice { background-color: #e74c3c; color: white; padding: 10px; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; border-radius: 6px; display: none; }
-.shop-item { background-color: #111116; border: 1px solid #252533; border-radius: 10px; padding: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    font-family: Inter, Arial, sans-serif;
+    color: #f5f5f7;
+    background: #08080d;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    background: #08080d;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: 0;
+}
+
+.app {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+header {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: #111118;
+    border-bottom: 1px solid #252532;
+    position: relative;
+    z-index: 10;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e74c3c, #9b2418);
+    color: white;
+    font-size: 22px;
+    font-weight: 900;
+    box-shadow: 0 5px 18px rgba(231, 76, 60, 0.25);
+}
+
+.brand-info h1 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.brand-info small {
+    color: #8a8a93;
+    font-size: 11px;
+}
+
+.res {
+    font-size: 15px;
+}
+
+.screen {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 12px 12px 90px;
+}
+
+.game-page {
+    width: 100%;
+}
+
+.battle,
+.hero,
+.log-container {
+    width: 100%;
+    background: #111118;
+    border: 1px solid #252532;
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.battle-title {
+    font-size: 19px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.enemyname {
+    color: #8a8a93;
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+
+.bars-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.bar-label {
+    font-size: 12px;
+    color: #bdbdc5;
+}
+
+.bar-label > span {
+    float: right;
+    color: #ffffff;
+}
+
+.hp-bar-bg {
+    width: 100%;
+    height: 9px;
+    margin-top: 5px;
+    overflow: hidden;
+    background: #25252e;
+    border-radius: 10px;
+}
+
+.hp-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+    transition: width 0.35s ease;
+}
+
+.player-hp {
+    background: #2ecc71;
+}
+
+.enemy-hp {
+    background: #e74c3c;
+}
+
+.zone-title {
+    color: #8a8a93;
+    font-size: 12px;
+    margin: 10px 0 7px;
+}
+
+.powers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+}
+
+.powers button {
+    min-height: 42px;
+    padding: 8px 4px;
+    border-radius: 10px;
+    background: #20202a;
+    border: 1px solid #30303c;
+    color: #eeeeF2;
+    font-size: 13px;
+    transition: 0.15s;
+}
+
+.powers button:active {
+    transform: scale(0.96);
+}
+
+.powers button.zone-btn-active {
+    background: #e74c3c;
+    border-color: #ff6b5c;
+    color: white;
+    box-shadow: 0 0 14px rgba(231, 76, 60, 0.3);
+}
+
+#attack {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #e95757, #c83232);
+    color: white;
+    font-size: 15px;
+    font-weight: 800;
+    box-shadow: 0 7px 20px rgba(231, 76, 60, 0.22);
+}
+
+#attack:disabled {
+    opacity: 0.45;
+    box-shadow: none;
+}
+
+.log-container {
+    margin-top: 12px;
+}
+
+.log-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.combat-log-text {
+    color: #bdbdc5;
+    font-size: 12px;
+    line-height: 1.6;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.shop-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid #252532;
+}
+
+.shop-item:last-child {
+    border-bottom: 0;
+}
+
+.shop-item h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+}
+
+.shop-item small {
+    color: #8a8a93;
+}
+
+.shop-item button {
+    padding: 9px 14px;
+    border-radius: 9px;
+    color: white;
+    font-weight: 700;
+}
+
+.hero p {
+    font-size: 14px;
+}
+
+.hero hr {
+    opacity: 0.7;
+}
+
+.nav-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 72px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: rgba(13, 13, 19, 0.96);
+    border-top: 1px solid #252532;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tab {
+    background: transparent;
+    color: #777782;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-size: 11px;
+}
+
+.tab span:first-child {
+    font-size: 21px;
+}
+
+.tab.active {
+    color: #ffffff;
+}
+
+.notice {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 76px;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: calc(100% - 30px);
+    max-width: 420px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    background: #25252f;
+    border: 1px solid #3a3a47;
+    color: white;
+    text-align: center;
+    font-size: 13px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================================
+   3D АРЕНА
+   ========================================= */
+
+#battle-3d {
+    width: 100%;
+    height: 270px;
+    margin-bottom: 12px;
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            #202033 0%,
+            #0d0d16 55%,
+            #07070b 100%
+        );
+    border: 1px solid #252532;
+    box-shadow:
+        inset 0 0 40px rgba(0, 0, 0, 0.55),
+        0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+#battle-3d canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}
+
+
+/* Небольшая адаптация для маленьких экранов */
+
+@media (max-width: 360px) {
+
+    .screen {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .battle,
+    .hero,
+    .log-container {
+        padding: 11px;
+        border-radius: 15px;
+    }
+
+    #battle-3d {
+        height: 240px;
+    }
+
+    .powers button {
+        font-size: 12px;
+    }
+
+    .brand-info h1 {
+        font-size: 16px;
+    }
+}
