@@ -1,199 +1,174 @@
-// Проверяем наличие Telegram WebApp
-const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.ready();
-  tg.expand();
-}
-
-// 1. Инициализация персонажа в стиле оригинальной "Территории"
-let player = JSON.parse(localStorage.getItem("territory_player")) || {
-  hp: 120,
-  maxHp: 120,
-  coins: 1000,
-  level: 1,
-  power: 5,
-  agility: 5,
-  victories: 0
-};
-
-// Состояние текущего противника
-let enemy = {
-  name: "Уличный Боец",
-  hp: 100,
-  maxHp: 100,
-  power: 4
-};
-
-// Переменные для хранения выбора игрока
-let selectedAttack = null;
-let selectedBlock = null;
-
-const $ = id => document.getElementById(id);
-
-function save() {
-  localStorage.setItem("territory_player", JSON.stringify(player));
-}
-
-// 2. Обновление цифр и полосок здоровья на экране
-function render() {
-  if ($("coins")) $("coins").textContent = player.coins;
-  if ($("playerhp")) $("playerhp").textContent = `${player.hp}/${player.maxHp}`;
-  if ($("enemyhp")) $("enemyhp").textContent = `${enemy.hp}/${enemy.maxHp}`;
-  if ($("level")) $("level").textContent = `Уровень ${player.level}`;
-
-  // Обновление полосок здоровья
-  const pPhp = document.querySelector(".player-hp-bar");
-  if (pPhp) pPhp.style.width = `${Math.max((player.hp / player.maxHp) * 100, 0)}%`;
-
-  const pEhp = document.querySelector(".enemy-hp-bar");
-  if (pEhp) pEhp.style.width = `${Math.max((enemy.hp / enemy.maxHp) * 100, 0)}%`;
-}
-
-// Вывод сообщений в историю боя
-function addLog(text) {
-  const logBox = $("battle-log");
-  if (logBox) {
-    const p = document.createElement("p");
-    p.innerHTML = text;
-    logBox.insertBefore(p, logBox.firstChild); // Новые раунды всегда будут сверху
+window.onload = function() {
+  try {
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
+  } catch (e) {
+    console.log("Telegram API не найден");
   }
-}
 
-/* 3. НАСТРОЙКА КНОПОК ВЫБОРА ЗОН */
-
-// Кнопки атаки
-document.querySelectorAll(".attack-zone").forEach(btn => {
-  btn.onclick = (e) => {
-    e.preventDefault();
-    document.querySelectorAll(".attack-zone").forEach(x => x.style.background = "#27272e");
-    
-    // Подсвечиваем выбранную кнопку красным цветом
-    btn.style.background = "#e74c3c";
-    selectedAttack = btn.getAttribute("data-zone");
+  // Базовый шаблон персонажа
+  let defaultPlayer = {
+    hp: 120,
+    maxHp: 120,
+    coins: 1000,
+    level: 1,
+    power: 5,
+    agility: 5,
+    victories: 0
   };
-});
 
-// Кнопки блока
-document.querySelectorAll(".block-zone").forEach(btn => {
-  btn.onclick = (e) => {
-    e.preventDefault();
-    document.querySelectorAll(".block-zone").forEach(x => x.style.background = "#27272e");
-    
-    // Подсвечиваем выбранную кнопку зеленым цветом
-    btn.style.background = "#2ecc71";
-    selectedBlock = btn.getAttribute("data-zone");
-  };
-});
+  let player = defaultPlayer;
 
-/* 4. РАСЧЕТ ХОДА ПРИ НАЖАТИИ «СДЕЛАТЬ ХОД» */
-const attackBtn = $("attack");
-if (attackBtn) {
-  attackBtn.onclick = () => {
-    // Если игрок забыл что-то выбрать
-    if (!selectedAttack || !selectedBlock) {
-      alert("Выберите куда атаковать и что блокировать!");
-      return;
-    }
-
-    if (player.hp <= 0 || enemy.hp <= 0) {
-      addLog("<b>Бой окончен. Подождите восстановления сил!</b>");
-      return;
-    }
-
-    const zones = ["head", "torso", "legs"];
-    const zoneNames = { head: "Голову", torso: "Корпус", legs: "Ноги" };
-
-    // Компьютер выбирает зоны атаки и блока случайно
-    const enemyAttack = zones[Math.floor(Math.random() * zones.length)];
-    const enemyBlock = zones[Math.floor(Math.random() * zones.length)];
-
-    let roundLog = `<b>--- Раунд ---</b><br>`;
-
-    // ХОД ИГРОКА: проверяем, заблокировал ли враг
-    if (selectedAttack === enemyBlock) {
-      roundLog += `🛡️ Вы ударили в ${zoneNames[selectedAttack]}, но враг выставил блок.<br>`;
-    } else {
-      let dmg = Math.floor(Math.random() * 5) + player.power;
-      // Шанс критического удара
-      if (Math.random() * 100 < player.agility * 2) {
-        dmg = Math.floor(dmg * 1.5);
-        roundLog += `💥 Критический удар! Вы пробили ${zoneNames[selectedAttack]} врага на <b>-${dmg} HP</b>.<br>`;
+  // Безопасная загрузка сохранений с исправлением старых багов (NaN)
+  try {
+    let saved = localStorage.getItem("territory_player");
+    if (saved) {
+      let parsed = JSON.parse(saved);
+      // Если старое сохранение сломано или в нем нет HP, чиним его
+      if (!parsed || typeof parsed.hp !== "number" || isNaN(parsed.hp)) {
+        localStorage.clear(); // Стираем старый сломанный кэш кликера
+        player = defaultPlayer;
       } else {
-        roundLog += `⚔️ Вы нанесли удар в ${zoneNames[selectedAttack]} на <b>-${dmg} HP</b>.<br>`;
+        player = parsed;
       }
-      enemy.hp = Math.max(enemy.hp - dmg, 0);
     }
+  } catch(e) {
+    player = defaultPlayer;
+  }
 
-    // ХОД ВРАГА: проверяем, заблокировали ли вы
-    if (enemyAttack === selectedBlock) {
-      roundLog += `🛡️ Враг метил в ${zoneNames[enemyAttack]}, но вы заблокировали удар.<br>`;
-    } else {
-      const enemyDmg = Math.floor(Math.random() * 4) + enemy.power;
-      roundLog += `🩸 Враг нанес вам удар в ${zoneNames[enemyAttack]} на <b>-${enemyDmg} HP</b>.<br>`;
-      player.hp = Math.max(player.hp - enemyDmg, 0);
+  let enemy = { name: "Уличный Боец", hp: 100, maxHp: 100, power: 4 };
+  let selectedAttack = null;
+  let selectedBlock = null;
+
+  function save() {
+    try {
+      localStorage.setItem("territory_player", JSON.stringify(player));
+    } catch(e) {}
+  }
+
+  function render() {
+    // Двойная проверка, чтобы не выводить NaN
+    if (isNaN(player.hp) || player.hp === undefined) player.hp = player.maxHp;
+    if (isNaN(player.maxHp) || player.maxHp === undefined) player.maxHp = 120;
+
+    if (document.getElementById("coins")) document.getElementById("coins").textContent = player.coins;
+    if (document.getElementById("playerhp")) document.getElementById("playerhp").textContent = player.hp + "/" + player.maxHp;
+    if (document.getElementById("enemyhp")) document.getElementById("enemyhp").textContent = enemy.hp + "/" + enemy.maxHp;
+    if (document.getElementById("level")) document.getElementById("level").textContent = "Уровень " + player.level;
+
+    let pPhp = document.querySelector(".player-hp-bar");
+    if (pPhp) pPhp.style.width = Math.max((player.hp / player.maxHp) * 100, 0) + "%";
+
+    let pEhp = document.querySelector(".enemy-hp-bar");
+    if (pEhp) pEhp.style.width = Math.max((enemy.hp / enemy.maxHp) * 100, 0) + "%";
+  }
+
+  function addLog(text) {
+    let logBox = document.getElementById("battle-log");
+    if (logBox) {
+      let p = document.createElement("p");
+      p.innerHTML = text;
+      logBox.insertBefore(p, logBox.firstChild);
     }
+  }
 
-    addLog(roundLog);
-    render();
+  // Клик на зоны АТАКИ
+  let attackButtons = document.querySelectorAll(".attack-zone");
+  attackButtons.forEach(function(btn) {
+    btn.onclick = function(e) {
+      e.preventDefault();
+      attackButtons.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
+      btn.style.backgroundColor = "#e74c3c"; 
+      selectedAttack = btn.getAttribute("data-zone");
+    };
+  });
 
-    // Проверка результатов поединка
-    if (enemy.hp <= 0 && player.hp <= 0) {
-      addLog("<br>💀 <b>Ничья! Оба бойца упали без сил.</b>");
-      resetBattle();
-    } else if (enemy.hp <= 0) {
-      player.victories++;
-      const reward = 150 + player.level * 50;
-      player.coins += reward;
-      addLog(`<br>🏆 <b>Победа! Противник повержен. Награда: +${reward} 🪙</b>`);
-      
-      // Повышение уровня за каждые 3 победы
-      if (player.victories % 3 === 0) {
-        player.level++;
-        player.power += 2;
-        player.maxHp += 15;
-        addLog(`<br>⬆️ <b>Новый уровень: ${player.level}! Сила возросла.</b>`);
+  // Клик на зоны БЛОКА
+  let blockButtons = document.querySelectorAll(".block-zone");
+  blockButtons.forEach(function(btn) {
+    btn.onclick = function(e) {
+      e.preventDefault();
+      blockButtons.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
+      btn.style.backgroundColor = "#2ecc71"; 
+      selectedBlock = btn.getAttribute("data-zone");
+    };
+  });
+
+  // Логика кнопки «СДЕЛАТЬ ХОД»
+  let attackBtn = document.getElementById("attack");
+  if (attackBtn) {
+    attackBtn.onclick = function() {
+      if (!selectedAttack || !selectedBlock) {
+        alert("Пожалуйста, выберите зону удара и зону блока перед ходом!");
+        return;
       }
-      resetBattle();
-    } else if (player.hp <= 0) {
-      addLog(`<br>☠️ <b>Вы проиграли поединок и отправлены на восстановление...</b>`);
-      resetBattle();
-    }
 
-    // Сбрасываем выбор для следующего раунда
-    selectedAttack = null;
-    selectedBlock = null;
-    document.querySelectorAll(".attack-zone, .block-zone").forEach(x => x.style.background = "#27272e");
+      if (player.hp <= 0 || enemy.hp <= 0) {
+        alert("Бой окончен! Дождитесь восстановления сил.");
+        return;
+      }
+
+      let zones = ["head", "torso", "legs"];
+      let zoneNames = { head: "Голову", torso: "Корпус", legs: "Ноги" };
+
+      let enemyAttack = zones[Math.floor(Math.random() * zones.length)];
+      let enemyBlock = zones[Math.floor(Math.random() * zones.length)];
+
+      let roundLog = "<b>--- Раунд ---</b><br>";
+
+      // Наш удар
+      if (selectedAttack === enemyBlock) {
+        roundLog += "🛡️ Вы ударили в " + zoneNames[selectedAttack] + ", но враг заблокировал удар.<br>";
+      } else {
+        let dmg = Math.floor(Math.random() * 5) + player.power;
+        roundLog += "⚔️ Вы нанесли удар в " + zoneNames[selectedAttack] + " на <b>-" + dmg + " HP</b>.<br>";
+        enemy.hp = Math.max(enemy.hp - dmg, 0);
+      }
+
+      // Удар врага
+      if (enemyAttack === selectedBlock) {
+        roundLog += "🛡️ Враг метил в " + zoneNames[enemyAttack] + ", но вы отбили удар.<br>";
+      } else {
+        let enemyDmg = Math.floor(Math.random() * 4) + enemy.power;
+        roundLog += "🩸 Враг попал вам в " + zoneNames[enemyAttack] + " на <b>-" + enemyDmg + " HP</b>.<br>";
+        player.hp = Math.max(player.hp - enemyDmg, 0);
+      }
+
+      addLog(roundLog);
+      render();
+
+      // Финал боя
+      if (enemy.hp <= 0) {
+        player.victories++;
+        player.coins += 200;
+        addLog("<br>🏆 <b>Победа! Вы победили уличного бойца! Получено +200 🪙</b>");
+        resetBattle();
+      } else if (player.hp <= 0) {
+        addLog("<br>☠️ <b>Вы проиграли. Персонаж отправлен отдыхать.</b>");
+        resetBattle();
+      }
+
+      // Сброс выбора
+      selectedAttack = null;
+      selectedBlock = null;
+      attackButtons.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
+      blockButtons.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
+      save();
+    };
+  }
+
+  function resetBattle() {
     save();
-  };
-}
+    setTimeout(function() {
+      player.hp = player.maxHp;
+      enemy.hp = 100;
+      let logBox = document.getElementById("battle-log");
+      if (logBox) logBox.innerHTML = '<p class="system-msg">Ожидание вашего хода...</p>';
+      render();
+    }, 4000);
+  }
 
-// Восстановление здоровья для следующего поединка
-function resetBattle() {
-  save();
-  setTimeout(() => {
-    player.hp = player.maxHp;
-    enemy.hp = 100 + player.level * 15; 
-    enemy.power = 4 + player.level;
-    
-    // Очищаем старый лог и пишем новое приветствие
-    const logBox = $("battle-log");
-    if (logBox) logBox.innerHTML = '<p class="system-msg">Ожидание вашего хода...</p>';
-    
-    render();
-  }, 4000); // Новая битва начнется через 4 секунды после окончания старой
-}
-
-/* Нижнее меню */
-document.querySelectorAll(".tab").forEach(tab => {
-  tab.onclick = (e) => {
-    e.preventDefault();
-    document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
-    tab.classList.add("active");
-    
-    const page = tab.getAttribute("data-tab");
-    addLog(`📍 Переход в режим: ${tab.textContent.trim()}`);
-  };
-});
-
-// Самый первый запуск игры
-render();
+  render();
+};
