@@ -2,8 +2,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
     <title>Teritory</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -11,413 +17,414 @@
 
 <div class="game">
 
-    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <!-- =========================
+         ВЕРХНЯЯ ПАНЕЛЬ
+         ========================= -->
+
     <header class="topbar">
-        <div>
-            <div class="logo">TERITORY</div>
-            <div class="level">Уровень <span id="playerLevel">1</span></div>
+
+        <div class="brand">
+
+            <div class="logo-badge">
+                ⚔️
+            </div>
+
+            <div class="brand-info">
+                <h1>TERITORY</h1>
+                <small>Город возможностей</small>
+            </div>
+
         </div>
 
-        <div class="money">
-            💰 <span id="money">1000</span>
+        <div class="header-right">
+
+            <div class="level-badge">
+                Уровень <span id="playerLevel">1</span>
+            </div>
+
+            <div class="coins">
+                💰 <span id="money">1000</span>
+            </div>
+
         </div>
+
     </header>
 
 
-    <!-- ОСНОВНОЕ ОКНО -->
     <main>
 
-        <!-- ПЕРСОНАЖ -->
-        <section id="characterScreen" class="screen active">
+        <!-- =========================
+             ПЕРСОНАЖ
+             ========================= -->
 
-            <h1>ПЕРСОНАЖ</h1>
+        <section
+            id="characterScreen"
+            class="screen active"
+        >
 
-            <div class="character-card">
+            <div class="hero">
 
-                <div class="avatar">
-                    <div class="avatar-head">👤</div>
-                    <div class="avatar-name" id="playerName">Игрок</div>
+                <div class="hero-title">
+                    ПЕРСОНАЖ
                 </div>
 
-                <div class="equipment">
+                <div class="hero-subtitle">
+                    Твой боец и его экипировка
+                </div>
 
-                    <h2>ЭКИПИРОВКА</h2>
+            </div>
 
-                    <div class="equip-slot">
-                        <span>🪖 Голова</span>
-                        <span id="slot-head">Пусто</span>
+
+            <!-- УРОВЕНЬ -->
+
+            <div class="character-level-card">
+
+                <div class="level-top">
+
+                    <div>
+
+                        <div
+                            class="character-name"
+                            id="playerName"
+                        >
+                            Игрок
+                        </div>
+
+                        <div class="character-level">
+                            Уличный боец
+                        </div>
+
                     </div>
 
-                    <div class="equip-slot">
-                        <span>🛡 Броня</span>
-                        <span id="slot-body">Пусто</span>
+                    <div class="level-number">
+                        <span id="playerLevelBig">1</span>
                     </div>
 
-                    <div class="equip-slot">
-                        <span>🔫 Основное оружие</span>
-                        <span id="slot-weapon">Пусто</span>
-                    </div>
+                </div>
 
-                    <div class="equip-slot">
-                        <span>🔪 Второе оружие</span>
-                        <span id="slot-secondary">Пусто</span>
-                    </div>
 
-                    <div class="equip-slot">
-                        <span>👕 Одежда</span>
-                        <span id="slot-clothes">Пусто</span>
-                    </div>
+                <div class="exp-info">
 
-                    <div class="equip-slot">
-                        <span>👟 Обувь</span>
-                        <span id="slot-feet">Пусто</span>
-                    </div>
+                    <span>Опыт</span>
+
+                    <span>
+                        <span id="playerExp">0</span> /
+                        <span id="playerMaxExp">100</span>
+                    </span>
+
+                </div>
+
+                <div class="exp-bar">
+
+                    <div
+                        id="expBar"
+                        class="exp-fill"
+                    ></div>
 
                 </div>
 
             </div>
 
 
-            <!-- HP -->
+            <!-- 3D ПЕРСОНАЖ -->
+
+            <div class="character-preview-card">
+
+                <div class="section-heading">
+                    ПЕРСОНАЖ
+                </div>
+
+                <div
+                    id="character-3d"
+                    class="character-3d"
+                ></div>
+
+            </div>
+
+
+            <!-- ЭКИПИРОВКА -->
+
+            <div class="character-card">
+
+                <div class="section-heading">
+                    ЭКИПИРОВКА
+                </div>
+
+                <div class="equipment-grid">
+
+                    <button
+                        class="equip-slot"
+                        id="equip-head"
+                    >
+
+                        <span class="equip-slot-icon">
+                            🪖
+                        </span>
+
+                        <span class="equip-slot-title">
+                            ГОЛОВА
+                        </span>
+
+                        <span
+                            class="equip-slot-item"
+                            id="slot-head"
+                        >
+                            Пусто
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="equip-slot"
+                        id="equip-body"
+                    >
+
+                        <span class="equip-slot-icon">
+                            🛡️
+                        </span>
+
+                        <span class="equip-slot-title">
+                            БРОНЯ
+                        </span>
+
+                        <span
+                            class="equip-slot-item"
+                            id="slot-body"
+                        >
+                            Пусто
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="equip-slot"
+                        id="equip-weapon"
+                    >
+
+                        <span class="equip-slot-icon">
+                            🔫
+                        </span>
+
+                        <span class="equip-slot-title">
+                            ОРУЖИЕ
+                        </span>
+
+                        <span
+                            class="equip-slot-item"
+                            id="slot-weapon"
+                        >
+                            Пусто
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="equip-slot"
+                        id="equip-secondary"
+                    >
+
+                        <span class="equip-slot-icon">
+                            🔪
+                        </span>
+
+                        <span class="equip-slot-title">
+                            ВТОРОЕ
+                        </span>
+
+                        <span
+                            class="equip-slot-item"
+                            id="slot-secondary"
+                        >
+                            Пусто
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="equip-slot"
+                        id="equip-clothes"
+                    >
+
+                        <span class="equip-slot-icon">
+                            👕
+                        </span>
+
+                        <span class="equip-slot-title">
+                            ОДЕЖДА
+                        </span>
+
+                        <span
+                            class="equip-slot-item"
+                            id="slot-clothes"
+                        >
+                            Пусто
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="equip-slot"
+                        id="equip-feet"
+                    >
+
+                        <span class="equip-slot-icon">
+                            👟
+                        </span>
+
+                        <span class="equip-slot-title">
+                            ОБУВЬ
+                        </span>
+
+                        <span
+                            class="equip-slot-item"
+                            id="slot-feet"
+                        >
+                            Пусто
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ЗДОРОВЬЕ -->
+
             <div class="stat-panel">
 
                 <div class="stat-row">
-                    <span>❤️ Здоровье</span>
+
+                    <span>
+                        ❤️ Здоровье
+                    </span>
+
                     <strong>
-                        <span id="hp">100</span> /
-                        <span id="maxHp">100</span>
+
+                        <span id="hp">
+                            100
+                        </span>
+
+                        /
+
+                        <span id="maxHp">
+                            100
+                        </span>
+
                     </strong>
+
                 </div>
 
                 <div class="progress">
-                    <div id="hpBar" class="hp-bar"></div>
+
+                    <div
+                        id="hpBar"
+                        class="hp-bar"
+                    ></div>
+
                 </div>
 
 
                 <div class="stat-row">
-                    <span>⚡ Энергия</span>
+
+                    <span>
+                        ⚡ Энергия
+                    </span>
+
                     <strong>
-                        <span id="energy">100</span> /
-                        <span id="maxEnergy">100</span>
+
+                        <span id="energy">
+                            100
+                        </span>
+
+                        /
+
+                        <span id="maxEnergy">
+                            100
+                        </span>
+
                     </strong>
+
                 </div>
 
                 <div class="progress">
-                    <div id="energyBar" class="energy-bar"></div>
+
+                    <div
+                        id="energyBar"
+                        class="energy-bar"
+                    ></div>
+
                 </div>
 
             </div>
 
 
             <!-- ХАРАКТЕРИСТИКИ -->
+
             <div class="stats">
 
-                <h2>ХАРАКТЕРИСТИКИ</h2>
+                <div class="section-heading">
+                    ХАРАКТЕРИСТИКИ
+                </div>
 
                 <div class="stats-grid">
 
-                    <div class="stat">
-                        <span>💪 Сила</span>
-                        <b id="strength">10</b>
+                    <div class="stat-box">
+
+                        <span class="stat-icon">
+                            💪
+                        </span>
+
+                        <span class="stat-name">
+                            Сила
+                        </span>
+
+                        <strong id="strength">
+                            10
+                        </strong>
+
                     </div>
 
-                    <div class="stat">
-                        <span>🏃 Ловкость</span>
-                        <b id="agility">10</b>
+
+                    <div class="stat-box">
+
+                        <span class="stat-icon">
+                            🏃
+                        </span>
+
+                        <span class="stat-name">
+                            Ловкость
+                        </span>
+
+                        <strong id="agility">
+                            10
+                        </strong>
+
                     </div>
 
-                    <div class="stat">
-                        <span>🛡 Защита</span>
-                        <b id="defense">5</b>
+
+                    <div class="stat-box">
+
+                        <span class="stat-icon">
+                            🛡️
+                        </span>
+
+                        <span class="stat-name">
+                            Защита
+                        </span>
+
+                        <strong id="defense">
+                            5
+                        </strong>
+
                     </div>
 
-                    <div class="stat">
-                        <span>⚔️ Урон</span>
-                        <b id="damage">5</b>
-                    </div>
 
-                    <div class="stat">
-                        <span>🎯 Точность</span>
-                        <b id="accuracy">50</b>
-                    </div>
+                    <div class="stat-box">
 
-                    <div class="stat">
-                        <span>💥 Крит</span>
-                        <b id="critical">5%</b>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ИНВЕНТАРЬ -->
-        <section id="inventoryScreen" class="screen">
-
-            <h1>ИНВЕНТАРЬ</h1>
-
-            <div class="inventory-info">
-                <span>🎒 Рюкзак</span>
-                <span>
-                    <b id="inventoryCount">0</b> / 30
-                </span>
-            </div>
-
-            <div id="inventory" class="inventory"></div>
-
-        </section>
-
-
-        <!-- БОЙ -->
-        <section id="battleScreen" class="screen">
-
-            <h1>АРЕНА</h1>
-
-            <div class="enemy">
-                <div class="enemy-avatar">👹</div>
-
-                <h2>Бандит</h2>
-
-                <div class="progress">
-                    <div id="enemyBar" class="enemy-bar"></div>
-                </div>
-
-                <p>
-                    ❤️ <span id="enemyHp">100</span> / 100
-                </p>
-            </div>
-
-            <div class="battle-log" id="battleLog">
-                Бой начинается...
-            </div>
-
-            <button class="attack-button" onclick="attack()">
-                ⚔️ АТАКОВАТЬ
-            </button>
-
-        </section>
-
-    </main>
-
-
-    <!-- НИЖНЕЕ МЕНЮ -->
-    <nav class="bottom-menu">
-
-        <button onclick="showScreen('characterScreen')">
-            👤
-            <span>Персонаж</span>
-        </button>
-
-        <button onclick="showScreen('inventoryScreen')">
-            🎒
-            <span>Инвентарь</span>
-        </button>
-
-        <button onclick="showScreen('battleScreen')">
-            ⚔️
-            <span>Арена</span>
-        </button>
-
-    </nav>
-
-</div>
-
-
-<!-- МОДАЛЬНОЕ ОКНО ПРЕДМЕТА -->
-<div id="itemModal" class="modal">
-
-    <div class="modal-content">
-
-        <button class="close" onclick="closeModal()">✕</button>
-
-        <div id="modalIcon" class="modal-icon">🔫</div>
-
-        <h2 id="modalName">Предмет</h2>
-
-        <p id="modalDescription"></p>
-
-        <div id="modalStats" class="modal-stats"></div>
-
-        <div class="modal-buttons">
-
-            <button id="equipButton" onclick="equipSelectedItem()">
-                НАДЕТЬ
-            </button>
-
-            <button id="useButton" onclick="useSelectedItem()">
-                ИСПОЛЬЗОВАТЬ
-            </button>
-
-            <button class="danger" onclick="dropSelectedItem()">
-                ВЫБРОСИТЬ
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<script src="app.js"></script>
-
-</body>
-</html>            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            background: #25282e !important;
-            border: 2px solid var(--border-steel) !important;
-            color: var(--text-light) !important;
-            padding: 16px !important;
-            margin-bottom: 12px !important;
-            cursor: pointer !important;
-            font-weight: bold !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1px !important;
-            transition: all 0.2s !important;
-        }
-        .location-link:active {
-            background: #1a1c20 !important;
-            border-color: var(--text-gold) !important;
-        }
-        .location-desc {
-            font-size: 11px !important;
-            color: var(--text-gray) !important;
-            text-transform: none !important;
-            margin-top: 4px !important;
-            font-weight: normal !important;
-            letter-spacing: 0 !important;
-        }
-
-        /* Полосы здоровья на арене */
-        .bar-container { width: 100% !important; height: 12px !important; background: #000 !important; border: 1px solid var(--border-steel) !important; margin-bottom: 6px !important; position: relative !important; }
-        .bar-fill { height: 100% !important; transition: width 0.3s !important; }
-        .bar-text { position: absolute !important; width: 100% !important; text-align: center !important; font-size: 10px !important; font-weight: bold !important; top: -1px !important; color: #fff !important; text-shadow: 1px 1px 1px #000 !important; }
-
-        /* Окно для 3D графики */
-        #render-window {
-            width: 100% !important; height: 220px !important;
-            background: #050505 !important;
-            border: 1px solid var(--border-steel) !important;
-            margin: 10px 0 !important;
-        }
-
-        /* Лог боя */
-        .combat-log {
-            width: 100% !important; height: 90px !important;
-            background: #000 !important;
-            border: 1px solid var(--border-steel) !important;
-            padding: 6px !important;
-            font-size: 11px !important;
-            color: #a8a8a8 !important;
-            overflow-y: auto !important;
-        }
-        .log-row { margin-bottom: 4px !important; }
-        .log-hit { color: #ff6b6b !important; }
-        .log-block { color: #2ecc71 !important; }
-
-        /* Сетка управления ударами */
-        .section-title { font-size: 11px !important; color: var(--text-gold) !important; text-transform: uppercase !important; margin: 12px 0 6px 0 !important; font-weight: bold !important; }
-        .zones-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; }
-        .zone-button {
-            background: #25282e !important;
-            border: 1px solid var(--border-steel) !important;
-            color: var(--text-light) !important;
-            padding: 10px !important;
-            font-size: 13px !important;
-            font-weight: bold !important;
-            cursor: pointer !important;
-        }
-        .zone-button.selected {
-            background: var(--text-gold) !important;
-            color: #000 !important;
-            border-color: #fff !important;
-        }
-
-        /* Меню навигации */
-        .bottom-bar {
-            display: flex !important; justify-content: space-around !important;
-            background: var(--panel-bg) !important;
-            border-top: 2px solid var(--border-steel) !important;
-            position: fixed !important; bottom: 0 !important; left: 0 !important; width: 100% !important; padding: 14px 0 !important; z-index: 9999 !important;
-        }
-        .bar-link { text-decoration: none !important; color: var(--text-gray) !important; font-size: 13px !important; font-weight: bold !important; text-transform: uppercase !important; }
-        .bar-link.active { color: var(--text-gold) !important; }
-    </style>
-</head>
-<body>
-    <div class="wrapper">
-        <!-- Единая Шапка -->
-        <div class="game-header">
-            <div class="logo-text" id="area-title">УЛИЦА ГОРОДА</div>
-            <div style="display: flex; gap: 6px;">
-                <div class="status-badge" id="user-lvl">Лвл 1</div>
-                <div class="status-badge" id="user-coins">🪙 300</div>
-            </div>
-        </div>
-
-        <!-- 1. СТАРТОВЫЙ ЭКРАН: ГЛАВНАЯ УЛИЦА РАЙОНА -->
-        <div id="street-screen">
-            <div class="combat-card" style="font-size: 13px; line-height: 1.4; margin-bottom: 20px;">
-                Вы стоите на перекрестке Центрального района. Вокруг светят вывески заведений, а в подворотнях собираются местные банды. Куда направитесь?
-            </div>
-
-            <div class="location-link" onclick="switchScreen('arena')">
-                <div>
-                    <div>⚔️ Бойцовский клуб</div>
-                    <div class="location-desc">Подать заявку на поединок с хулиганами за монеты</div>
-                </div>
-                <span style="color: var(--text-gold);">➔</span>
-            </div>
-
-            <div class="location-link" onclick="switchScreen('shop')">
-                <div>
-                    <div>🛒 Магазин Али-Бабы</div>
-                    <div class="location-desc">Купить кастеты, ножи и экипировку для повышения урона</div>
-                </div>
-                <span style="color: var(--text-gold);">➔</span>
-            </div>
-
-            <div class="location-link" onclick="alert('В разработке: Работа на Шахте / Заводе')">
-                <div>
-                    <div>🏭 Промышленная зона</div>
-                    <div class="location-desc">Устроиться на работу и добывать ресурсы (в разработке)</div>
-                </div>
-                <span style="color: var(--text-gray);">🔒</span>
-            </div>
-        </div>
-
-        <!-- 2. ЭКРАН: БОЙЦОВСКИЙ КЛУБ (АРЕНА) -->
-        <div id="arena-screen" style="display: none;">
-            <div class="combat-card">
-                <div style="display: flex !important; justify-content: space-between !important; font-size: 13px; color: var(--text-gold); margin-bottom: 8px; font-weight: bold;">
-                    <span>Вы (Уличный боец)</span><span>Местный хулиган</span>
-                </div>
-                
-                <div class="bar-container">
-                    <div class="bar-fill" style="background: var(--hp-green);" id="bar-p-hp"></div>
-                    <div class="bar-text" id="txt-p-hp">120 / 120</div>
-                </div>
-
-                <div class="bar-container">
-                    <div class="bar-fill" style="background: var(--hp-red);" id="bar-e-hp"></div>
-                    <div class="bar-text" id="txt-e-hp">100 / 100</div>
-                </div>
-
-                <!-- 3D Холст перенесен сюда -->
-                <div id="render-window"></div>
-
-                <div class="combat-log" id="log-box">
-                    <div class="log-row">Вы вошли в Бойцовский Клуб. Выберите зоны атаки и защиты, чтобы совершить обмен ударами...</div>
-                </div>
-            </div>
-
-            <div class="section-title">Куда бьем:</div>
-            <div class="zones-grid">
-                <button class="zone-button att-btn" onclick="hit('head', this)">Голова</button>
-                <button class="zone-button att-btn" onclick="hit('body', this)">Корпус</button>
-                <button class="zone-button att-btn" onclick="hit('legs', this)">Ноги</button>
-            </div>
-
+                       
