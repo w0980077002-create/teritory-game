@@ -402,7 +402,7 @@
     document.getElementById("buy-knife").onclick = function() {
       if (coins >= 1200) {
         coins -= 1200; weaponName = "Охотничий нож"; weaponBonus = 8;
-        saveGameGame(); updateUI(); showNotice("🔪 Нож куплен!");
+        saveGame(); updateUI(); showNotice("🔪 Нож куплен!");
       } else { showNotice("❌ Недостаточно монет!"); }
     };
 
