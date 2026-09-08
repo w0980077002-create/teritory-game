@@ -146,7 +146,6 @@
   </nav>
 
   <script>
-    // Инициализация характеристик игрока
     var playerHp = 120;
     var playerMaxHp = 120;
     var enemyHp = 100;
@@ -155,18 +154,17 @@
     
     var level = 1;
     var victories = 0;
-    var basePower = 5;      // Базовая сила
-    var agility = 5;        // Ловкость (влияет на криты)
-    var weaponBonus = 0;    // Бонус от купленного оружия
+    var basePower = 5;      
+    var agility = 5;        
+    var weaponBonus = 0;    
     var weaponName = "Кулаки";
-    var freePoints = 0;     // Свободные очки статов
+    var freePoints = 0;     
 
     var selectedAttack = null;
     var selectedBlock = null;
 
-    // Пытаемся загрузить сохранения из локальной памяти устройства
     try {
-      var saved = localStorage.getItem("territory_save");
+      var saved = localStorage.getItem("territory_save_v2");
       if (saved) {
         var p = JSON.parse(saved);
         if (p && typeof p.basePower === "number") {
@@ -186,7 +184,7 @@
           agility: agility, weaponBonus: weaponBonus, weaponName: weaponName,
           freePoints: freePoints
         };
-        localStorage.setItem("territory_save", JSON.stringify(data));
+        localStorage.setItem("territory_save_v2", JSON.stringify(data));
       } catch(e) {}
     }
 
@@ -198,20 +196,17 @@
       }
     }
 
-    // Полное обновление данных на всех вкладках
     function updateUI() {
       document.getElementById("playerhp").textContent = playerHp + "/" + playerMaxHp;
       document.getElementById("enemyhp").textContent = enemyHp + "/" + enemyMaxHp;
       document.getElementById("coins").textContent = coins;
       document.getElementById("level").textContent = "Уровень " + level;
 
-      // Экран Профиля персонажа
       document.getElementById("prof-victories").textContent = victories;
       document.getElementById("prof-power").textContent = basePower + " (+" + weaponBonus + " от оружия)";
       document.getElementById("prof-agility").textContent = agility;
       document.getElementById("prof-weapon").textContent = weaponName;
 
-      // Логика отображения кнопок прокачки [+]
       var ptsBox = document.getElementById("prof-points-box");
       var btnP = document.getElementById("up-power");
       var btnA = document.getElementById("up-agility");
@@ -227,7 +222,6 @@
         if (btnA) btnA.style.display = "none";
       }
 
-      // Полоски жизней
       var pPhp = document.querySelector(".player-hp-bar");
       if (pPhp) pPhp.style.width = ((playerHp / playerMaxHp) * 100) + "%";
 
@@ -235,7 +229,15 @@
       if (pEhp) pEhp.style.width = ((enemyHp / enemyMaxHp) * 100) + "%";
     }
 
-    // Переключение вкладок меню
     var tabs = document.querySelectorAll(".tab");
     tabs.forEach(function(tab) {
       tab.onclick = function() {
+        tabs.forEach(function(x) { x.classList.remove("active"); });
+        tab.classList.add("active");
+
+        document.querySelectorAll(".game-page").forEach(function(page) {
+          page.style.display = "none";
+        });
+        
+        var targetPage = "page-" + tab.getAttribute("data-tab");
+        if (document.getElementById(targetPage)) {
