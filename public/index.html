@@ -239,8 +239,166 @@
           page.style.display = "none";
         });
         
-        var targetPage = "page-" + tab.getAttribute("data-tab");
+          var targetPage = "page-" + tab.getAttribute("data-tab");
         if (document.getElementById(targetPage)) {
+          document.getElementById(targetPage).style.display = "block";
+        }
+        updateUI();
+      };
+    });
+
+    // Выбор зон АТАКИ
+    var attackBtns = document.querySelectorAll(".attack-zone");
+    attackBtns.forEach(function(btn) {
+      btn.onclick = function() {
+        attackBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
+        btn.style.backgroundColor = "#e74c3c";
+        selectedAttack = btn.getAttribute("data-zone");
+      };
+    });
+
+    // Выбор зон БЛОКА
+    var blockBtns = document.querySelectorAll(".block-zone");
+    blockBtns.forEach(function(btn) {
+      btn.onclick = function() {
+        blockBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
+        btn.style.backgroundColor = "#2ecc71";
+        selectedBlock = btn.getAttribute("data-zone");
+      };
+    });
+
+    // Кнопка СДЕЛАТЬ ХОД
+    document.getElementById("attack").onclick = function() {
+      if (!selectedAttack || !selectedBlock) {
+        alert("Выберите зоны Атаки и Блока!"); return;
+      }
+      if (playerHp <= 0 || enemyHp <= 0) {
+        alert("Поединок завершен!"); return;
+      }
+
+      var zones = ["head", "torso", "legs"];
+      var zoneNames = { head: "Голову", torso: "Корпус", legs: "Ноги" };
+
+      var enemyAttack = zones[Math.floor(Math.random() * zones.length)];
+      var enemyBlock = zones[Math.floor(Math.random() * zones.length)];
+
+      var logText = "<b>--- Раунд ---</b><br>";
+
+      if (selectedAttack === enemyBlock) {
+        logText += "🛡️ Враг заблокировал ваш удар.<br>";
+      } else {
+        var currentPower = basePower + weaponBonus;
+        var dmg = Math.floor(Math.random() * 5) + currentPower;
+        
+        if (Math.random() * 100 < (agility * 2.5)) {
+          dmg = Math.floor(dmg * 1.5);
+          logText += "💥 Критический удар! Пробита " + zoneNames[selectedAttack] + " на <b>-" + dmg + " HP</b>.<br>";
+        } else {
+          logText += "⚔️ Вы нанесли удар в " + zoneNames[selectedAttack] + " на <b>-" + dmg + " HP</b>.<br>";
+        }
+        enemyHp = Math.max(enemyHp - dmg, 0);
+      }
+
+      if (enemyAttack === selectedBlock) {
+        logText += "🛡️ Вы заблокировали удар противника.<br>";
+      } else {
+        var enemyDmg = Math.floor(Math.random() * 4) + 4 + level;
+        playerHp = Math.max(playerHp - enemyDmg, 0);
+        logText += "🩸 Враг провел атаку в " + zoneNames[enemyAttack] + " на <b>-" + enemyDmg + " HP</b>.<br>";
+      }
+
+      var p = document.createElement("p");
+      p.innerHTML = logText;
+      var logBox = document.getElementById("battle-log");
+      if (logBox) logBox.insertBefore(p, logBox.firstChild);
+
+      updateUI();
+
+      if (enemyHp <= 0) {
+        victories++;
+        var prize = 150 + (level * 50);
+        coins += prize;
+        addSystemMessage("<br>🏆 <b>Победа! Награда: +" + prize + " 🪙</b>");
+        
+        if (victories % 3 === 0) {
+          level++;
+          freePoints += 3; 
+          playerMaxHp += 15;
+          addSystemMessage("<br>⬆️ <b>Получен новый Уровень: " + level + "! Выдано 3 очка характеристик. Загляните в меню Персонаж!</b>");
+        }
+        autoResetBattle();
+      } else if (playerHp <= 0) {
+        addSystemMessage("<br>☠️ <b>Вы проиграли этот бой. Восстановление...</b>");
+        autoResetBattle();
+      }
+
+      selectedAttack = null; selectedBlock = null;
+      attackBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
+      blockBtns.forEach(function(x) { x.style.backgroundColor = "#27272e"; });
+      saveGame();
+    };
+
+    function addSystemMessage(htmlText) {
+      var p = document.createElement("p");
+      p.innerHTML = htmlText;
+      var logBox = document.getElementById("battle-log");
+      if (logBox) logBox.insertBefore(p, logBox.firstChild);
+    }
+
+    function autoResetBattle() {
+      saveGame();
+      setTimeout(function() {
+        playerHp = playerMaxHp;
+        enemyHp = 100 + (level * 15); 
+        var logBox = document.getElementById("battle-log");
+        if (logBox) logBox.innerHTML = "<p>Ожидание вашего хода...</p>";
+        updateUI();
+      }, 3500);
+    }
+
+    document.getElementById("buy-knuckles").onclick = function() {
+      if (coins >= 500) {
+        coins -= 500; weaponName = "Кожаные кастеты"; weaponBonus = 3;
+        saveGame(); updateUI(); showNotice("🥊 Кастеты куплены и экипированы!");
+      } else { showNotice("❌ Недостаточно монет!"); }
+    };
+
+    document.getElementById("buy-knife").onclick = function() {
+      if (coins >= 1200) {
+        coins -= 1200; weaponName = "Охотничий нож"; weaponBonus = 8;
+        saveGame(); updateUI(); showNotice("🔪 Нож куплен и экипированы!");
+      } else { showNotice("❌ Недостаточно монет!"); }
+    };
+
+    document.getElementById("up-power").onclick = function() {
+      if (freePoints > 0) {
+        freePoints--; basePower++;
+        saveGame(); updateUI();
+      }
+    };
+
+    document.getElementById("up-agility").onclick = function() {
+      if (freePoints > 0) {
+        freePoints--; agility++;
+        saveGame(); updateUI();
+      }
+    };
+
+    document.getElementById("reset-progress").onclick = function() {
+      if (confirm("Вы точно хотите обнулить весь прогресс?")) {
+        localStorage.clear();
+        playerHp = 120; playerMaxHp = 120; enemyHp = 100; enemyMaxHp = 100; coins = 1000;
+        level = 1; victories = 0; basePower = 5; agility = 5; weaponBonus = 0;
+        weaponName = "Кулаки"; freePoints = 0;
+        saveGame(); updateUI();
+        var logBox = document.getElementById("battle-log");
+        if (logBox) logBox.innerHTML = "<p>Ожидание вашего хода...</p>";
+        showNotice("🔄 Игра сброшена!");
+      }
+    };
+
+    updateUI();
+  </script>
 </main>
 </body>
 </html>
