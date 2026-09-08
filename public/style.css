@@ -1,40 +1,937 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>TERITORY</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-html,
-body {
-    width: 100%;
-    min-height: 100%;
+html,body{
+    width:100%;
+    min-height:100%;
+    background:#0b0e13;
+    color:#fff;
+    font-family:Arial,sans-serif;
 }
 
-body {
-    background: #080b10;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    overflow-x: hidden;
+body{
+    padding-bottom:80px;
 }
 
-button {
-    font-family: inherit;
-    cursor: pointer;
-    color: inherit;
-    border: 0;
-    -webkit-tap-highlight-color: transparent;
+button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
 }
 
-button:active {
-    transform: scale(0.97);
+.game{
+    width:100%;
+    max-width:720px;
+    min-height:100vh;
+    margin:auto;
 }
 
+/* ================= HEADER ================= */
 
-/* =========================================
-   ОСНОВА ИГРЫ
-   ========================================= */
+.game-header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 14px;
+    background:#11161e;
+    border-bottom:1px solid #2b3340;
+    box-shadow:0 5px 20px rgba(0,0,0,.35);
+}
 
-.game {
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.logo-badge{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#e74c3c,#96271d);
+    font-size:25px;
+    box-shadow:0 5px 18px rgba(231,76,60,.25);
+}
+
+.brand-title{
+    font-size:20px;
+    font-weight:900;
+    letter-spacing:2px;
+}
+
+.brand-subtitle{
+    margin-top:3px;
+    color:#818b9a;
+    font-size:11px;
+}
+
+.header-right{
+    display:flex;
+    gap:7px;
+    align-items:center;
+}
+
+.badge{
+    padding:9px 11px;
+    border-radius:11px;
+    background:#202731;
+    border:1px solid #343e4c;
+    font-size:13px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+/* ================= PAGES ================= */
+
+.page{
+    display:none;
+    padding:14px 14px 25px;
+}
+
+.page.active{
+    display:block;
+}
+
+.page-title{
+    margin:4px 0 4px;
+    font-size:26px;
+    font-weight:900;
+}
+
+.page-subtitle{
+    color:#8993a2;
+    font-size:13px;
+    margin-bottom:15px;
+}
+
+/* ================= CARDS ================= */
+
+.card{
+    margin-bottom:12px;
+    padding:15px;
+    border-radius:18px;
+    background:#151b23;
+    border:1px solid #2b3542;
+    box-shadow:0 8px 25px rgba(0,0,0,.2);
+}
+
+/* ================= CHARACTER ================= */
+
+.player-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.player-name{
+    font-size:22px;
+    font-weight:900;
+}
+
+.player-class{
+    margin-top:5px;
+    color:#8d97a6;
+    font-size:13px;
+}
+
+.level-circle{
+    width:58px;
+    height:58px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#282f3b;
+    border:1px solid #475160;
+    font-size:21px;
+    font-weight:900;
+}
+
+.exp-row{
+    display:flex;
+    justify-content:space-between;
+    margin-top:15px;
+    margin-bottom:5px;
+    color:#929cab;
+    font-size:12px;
+}
+
+.bar{
+    width:100%;
+    height:10px;
+    overflow:hidden;
+    border-radius:20px;
+    background:#080b10;
+}
+
+.exp-fill{
+    width:0%;
+    height:100%;
+    background:#8b5cf6;
+    border-radius:20px;
+}
+
+/* ================= 3D CHARACTER ================= */
+
+.character-window{
+    height:350px;
+    margin-top:12px;
+    border-radius:16px;
+    border:1px solid #303a48;
+    background:
+        radial-gradient(circle at 50% 35%,#252d38 0%,#10151c 60%,#080b10 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+.character-placeholder{
+    text-align:center;
+}
+
+.character-placeholder .body{
+    font-size:110px;
+}
+
+.character-placeholder p{
+    margin-top:8px;
+    color:#8d97a6;
+    font-size:12px;
+}
+
+/* ================= EQUIPMENT ================= */
+
+.section-title{
+    margin-bottom:11px;
+    font-size:15px;
+    font-weight:900;
+}
+
+.equipment-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+}
+
+.equip{
+    min-height:82px;
+    padding:10px;
+    border-radius:13px;
+    background:#1b222c;
+    border:1px solid #303a47;
+}
+
+.equip-icon{
+    font-size:23px;
+}
+
+.equip-title{
+    margin-top:5px;
+    color:#818b99;
+    font-size:10px;
+}
+
+.equip-item{
+    margin-top:3px;
+    font-size:12px;
+    font-weight:900;
+}
+
+/* ================= STATS ================= */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+}
+
+.stat{
+    min-height:55px;
+    padding:10px;
+    border-radius:12px;
+    background:#1b222c;
+    border:1px solid #303a47;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.stat-left{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.stat-icon{
+    font-size:20px;
+}
+
+.stat-name{
+    color:#9aa3b0;
+    font-size:12px;
+}
+
+.stat-value{
+    font-size:15px;
+    font-weight:900;
+}
+
+/* ================= HEALTH ================= */
+
+.status-row{
+    margin-bottom:14px;
+}
+
+.status-head{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:6px;
+    font-size:14px;
+}
+
+.green{
+    background:#35c477;
+}
+
+.blue{
+    background:#3985ed;
+}
+
+.red{
+    background:#e34853;
+}
+
+.status-fill{
+    height:100%;
+    width:100%;
+    border-radius:20px;
+    transition:width .3s;
+}
+
+/* ================= INVENTORY ================= */
+
+.inventory-info{
+    display:flex;
+    justify-content:space-between;
+    padding:13px;
+    margin-bottom:12px;
+    border-radius:13px;
+    background:#151b23;
+    border:1px solid #2b3542;
+}
+
+.inventory-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:7px;
+}
+
+.inventory-item{
+    min-height:90px;
+    padding:7px 4px;
+    border-radius:11px;
+    background:#181f28;
+    border:1px solid #303947;
+    text-align:center;
+}
+
+.inventory-item:active{
+    transform:scale(.97);
+}
+
+.item-icon{
+    font-size:28px;
+}
+
+.item-name{
+    margin-top:5px;
+    font-size:9px;
+    font-weight:bold;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.item-count{
+    margin-top:4px;
+    color:#8993a1;
+    font-size:9px;
+}
+
+.item-selected{
+    border-color:#8b5cf6;
+    background:#252b37;
+}
+
+/* ================= ITEM ACTIONS ================= */
+
+.item-actions{
+    display:none;
+    margin-top:10px;
+    padding:12px;
+    border-radius:13px;
+    background:#10151b;
+    border:1px solid #303947;
+}
+
+.item-actions.active{
+    display:block;
+}
+
+.selected-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.selected-icon{
+    width:48px;
+    height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:11px;
+    background:#222a35;
+    font-size:25px;
+}
+
+.selected-name{
+    font-weight:900;
+}
+
+.selected-description{
+    margin-top:4px;
+    color:#8993a1;
+    font-size:10px;
+}
+
+.actions{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+    margin-top:10px;
+}
+
+.action{
+    padding:10px 4px;
+    border-radius:9px;
+    background:#242c37;
+    border:1px solid #3a4553;
+    color:white;
+    font-size:10px;
+    font-weight:900;
+}
+
+.action.equip{
+    border-color:#3c8058;
+}
+
+.action.drop{
+    border-color:#814047;
+}
+
+/* ================= ARENA ================= */
+
+.enemy-card{
+    text-align:center;
+}
+
+.enemy-icon{
+    font-size:85px;
+    margin:8px 0;
+}
+
+.enemy-name{
+    font-size:20px;
+    font-weight:900;
+}
+
+.enemy-class{
+    margin-top:4px;
+    color:#8b95a3;
+    font-size:12px;
+}
+
+.arena-bar{
+    margin-top:12px;
+}
+
+.arena-label{
+    display:flex;
+    justify-content:space-between;
+    color:#b9c1cc;
+    font-size:11px;
+    margin-bottom:5px;
+}
+
+/* ================= 3D ARENA ================= */
+
+#battle3d{
+    height:270px;
+    margin-top:12px;
+    border-radius:16px;
+    border:1px solid #303947;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 40%,#303744 0%,#11161d 58%,#070a0e 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.arena-visual{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    position:relative;
+}
+
+.fighter{
+    text-align:center;
+    transition:.2s;
+}
+
+.fighter-icon{
+    font-size:75px;
+}
+
+.fighter-name{
+    margin-top:5px;
+    font-size:11px;
+    color:#b8c0cc;
+}
+
+.vs{
+    font-size:20px;
+    font-weight:900;
+    color:#e74c3c;
+}
+
+.hit{
+    animation:hit .25s;
+}
+
+@keyframes hit{
+    0%{transform:translateX(0)}
+    30%{transform:translateX(-12px) rotate(-4deg)}
+    60%{transform:translateX(12px) rotate(4deg)}
+    100%{transform:translateX(0)}
+}
+
+/* ================= ATTACK ZONES ================= */
+
+.zone-title{
+    margin:13px 0 7px;
+    color:#8993a1;
+    font-size:11px;
+    font-weight:900;
+}
+
+.zones{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+}
+
+.zone{
+    min-height:47px;
+    border-radius:11px;
+    background:#1c232c;
+    border:1px solid #35404d;
+    color:white;
+    font-size:12px;
+    font-weight:900;
+}
+
+.zone.selected{
+    background:#e74c3c;
+    border-color:#ff7268;
+}
+
+.attack{
+    width:100%;
+    height:55px;
+    margin-top:12px;
+    border-radius:13px;
+    background:linear-gradient(135deg,#e95757,#a92832);
+    color:white;
+    font-size:16px;
+    font-weight:900;
+    box-shadow:0 7px 20px rgba(231,76,60,.2);
+}
+
+.attack:active{
+    transform:scale(.98);
+}
+
+.attack:disabled{
+    opacity:.45;
+}
+
+/* ================= LOG ================= */
+
+.combat-log{
+    margin-top:12px;
+    min-height:100px;
+    max-height:150px;
+    overflow-y:auto;
+    padding:12px;
+    border-radius:12px;
+    background:#080b10;
+    border:1px solid #28313d;
+    color:#b9c1cc;
+    font-size:11px;
+    line-height:1.6;
+}
+
+.log-hit{
+    color:#ff7777;
+}
+
+.log-good{
+    color:#63d995;
+}
+
+.log-gold{
+    color:#ffd45f;
+}
+
+/* ================= SHOP ================= */
+
+.shop-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 0;
+    border-bottom:1px solid #29323e;
+}
+
+.shop-item:last-child{
+    border-bottom:none;
+}
+
+.shop-icon{
+    width:50px;
+    height:50px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:12px;
+    background:#202832;
+    font-size:26px;
+}
+
+.shop-info{
+    flex:1;
+}
+
+.shop-name{
+    font-size:14px;
+    font-weight:900;
+}
+
+.shop-description{
+    margin-top:4px;
+    color:#818b99;
+    font-size:10px;
+}
+
+.buy{
+    padding:10px 9px;
+    border-radius:9px;
+    background:#29323d;
+    border:1px solid #3d4857;
+    color:white;
+    font-size:10px;
+    font-weight:900;
+}
+
+.buy:active{
+    transform:scale(.95);
+}
+
+.buy.owned{
+    color:#6ee09a;
+    border-color:#3b704f;
+}
+
+/* ================= STREET ================= */
+
+.location{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:15px;
+    margin-bottom:10px;
+    border-radius:15px;
+    background:#151b23;
+    border:1px solid #303947;
+}
+
+.location:active{
+    transform:scale(.99);
+}
+
+.location-name{
+    font-size:14px;
+    font-weight:900;
+}
+
+.location-desc{
+    margin-top:5px;
+    color:#858f9d;
+    font-size:10px;
+    line-height:1.4;
+}
+
+.location-arrow{
+    color:#ffd45f;
+    font-size:20px;
+}
+
+/* ================= BOTTOM NAV ================= */
+
+.bottom-nav{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:300;
+    height:72px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    background:rgba(15,19,25,.98);
+    border-top:1px solid #2b3542;
+    box-shadow:0 -5px 20px rgba(0,0,0,.35);
+    padding-bottom:env(safe-area-inset-bottom);
+}
+
+.nav-btn{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    background:transparent;
+    color:#707b8a;
+    font-size:10px;
+    font-weight:900;
+}
+
+.nav-icon{
+    font-size:22px;
+}
+
+.nav-btn.active{
+    color:white;
+}
+
+/* ================= NOTICE ================= */
+
+.notice{
+    position:fixed;
+    top:82px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:1000;
+    width:calc(100% - 30px);
+    max-width:420px;
+    display:none;
+    padding:11px 14px;
+    border-radius:12px;
+    background:#252c36;
+    border:1px solid #414c5b;
+    text-align:center;
+    font-size:12px;
+    font-weight:bold;
+    box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+
+.notice.show{
+    display:block;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:380px){
+
+    .brand-title{
+        font-size:17px;
+    }
+
+    .badge{
+        padding:8px 7px;
+        font-size:11px;
+    }
+
+    .character-window{
+        height:300px;
+    }
+
+    #battle3d{
+        height:240px;
+    }
+
+    .fighter-icon{
+        font-size:60px;
+    }
+
+    .inventory-grid{
+        grid-template-columns:repeat(4,1fr);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<!-- ================= HEADER ================= -->
+
+<header class="game-header">
+
+    <div class="brand">
+
+        <div class="logo-badge">⚔️</div>
+
+        <div>
+            <div class="brand-title">TERITORY</div>
+            <div class="brand-subtitle">Город возможностей</div>
+        </div>
+
+    </div>
+
+    <div class="header-right">
+
+        <div class="badge">
+            Уровень <span id="level">1</span>
+        </div>
+
+        <div class="badge">
+            💰 <span id="coins">1000</span>
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- ================= ПЕРСОНАЖ ================= -->
+
+<section id="character" class="page active">
+
+    <div class="page-title">ПЕРСОНАЖ</div>
+    <div class="page-subtitle">Твой боец и его экипировка</div>
+
+    <div class="card">
+
+        <div class="player-top">
+
+            <div>
+                <div class="player-name">Игрок</div>
+                <div class="player-class">Уличный боец</div>
+            </div>
+
+            <div class="level-circle">
+                <span id="level2">1</span>
+            </div>
+
+        </div>
+
+        <div class="exp-row">
+            <span>Опыт</span>
+            <span><span id="exp">0</span> / <span id="expMax">100</span></span>
+        </div>
+
+        <div class="bar">
+            <div id="expBar" class="exp-fill"></div>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="section-title">ПЕРСОНАЖ</div>
+
+        <div class="character-window">
+
+            <div class="character-placeholder">
+
+                <div class="body">🧍</div>
+
+                <p>Твой персонаж</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="section-title">ЭКИПИРОВКА</div>
+
+        <div class="equipment-grid">
+
+            <div class="equip">
+                <div class="equip-icon">🪖</div>
+                <div class="equip-title">ГОЛОВА</div>
+                <div class="equip-item" id="headSlot">Пусто</div>
+            </div>
+
+            <div class="equip">
+                <div class="equip-icon">🛡️</div>
+                <div class="equip-title">БРОНЯ</div>
+                <div class="equip-item" id="bodySlot">Пусто</div>
+            </div>
+
+            <div class="equip">
+                <div class="equip-icon">🔫</div>
+                <div class="equip-title">ОРУЖИЕ</div>
+                <div class="equip-item" id="weaponSlot">Пусто</div>
+            </div>
+
+            <div class="equip">
+                <div class="equip-icon">🔪</div>
+                <div class="equip-title">ВТОРОЕ</div>
+                <div class="equip-item" id="secondarySlot">Пусто</div>
+            </div>
+
+            <div class="equip">
+                <div class="equip-icon">👕</div>
+                <div class="equip-title">ОДЕЖДА</div>
+                <div class="equip-item" id="clothesSlot">Пусто</div>
+            </div>
+
+            <div class="equip">
+                <.game {
     width: 100%;
     max-width: 720px;
     min-height: 100vh;
