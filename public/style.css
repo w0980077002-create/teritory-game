@@ -1,325 +1,324 @@
-/* Полный сброс и базовая настройка под экраны смартфонов */
+/* ==========================================
+   БАЗОВЫЕ СТИЛИ И ИНТЕРФЕЙС ИГРЫ ТЕРРИТОРИЯ
+   ========================================== */
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  user-select: none;
-  -webkit-user-select: none;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background-color: #121216;
-  color: #f5f5f7;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  overflow: hidden;
+    background-color: #111116;
+    color: #e2e2e9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    padding-bottom: 70px; /* Отступ снизу под меню навигации */
 }
 
-.app {
-  width: 100%;
-  max-width: 480px;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #18181c;
-  position: relative;
-}
-
-/* Верхняя панель */
+/* Шапка игры (Header) */
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #1f1f24;
-  border-bottom: 1px solid #2b2b33;
-  z-index: 10;
+    background-color: #1a1a24;
+    border-bottom: 1px solid #252533;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.logo {
-  background: #e74c3c;
-  color: #fff;
-  font-weight: bold;
-  font-size: 18px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
+.logo-badge {
+    background-color: #e74c3c;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
 }
 
-.brand b {
-  font-size: 14px;
-  letter-spacing: 0.5px;
-  display: block;
+.brand-info h1 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.brand small {
-  color: #8a8a93;
-  font-size: 11px;
+.brand-info small {
+    color: #8a8a93;
+    font-size: 11px;
 }
 
 .res {
-  display: flex;
-  gap: 12px;
-  font-size: 14px;
-  font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
 }
 
-/* Главный контейнер прокрутки */
+.res span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Контейнеры экранов игры */
 .screen {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding-bottom: 90px;
-  position: relative;
-  z-index: 5;
+    padding: 16px;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-/* Страницы игры */
 .game-page {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+    animation: fadeIn 0.2s ease-in-out;
 }
 
-/* Карточки информации */
-.hero {
-  background: linear-gradient(135deg, #23232a 0%, #1a1a20 100%);
-  border: 1px solid #2b2b33;
-  padding: 14px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.hero small {
-  color: #e74c3c;
-  font-weight: bold;
-  font-size: 10px;
-  letter-spacing: 1px;
+/* Карточки и блоки */
+.battle, .hero {
+    background-color: #1a1a24;
+    border: 1px solid #252533;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
 }
 
-.hero h1 {
-  font-size: 18px;
-  margin-top: 2px;
-}
-
-.shield {
-  font-size: 28px;
-}
-
-/* Блок боя */
-.battle {
-  background: #1f1f24;
-  border: 1px solid #2b2b33;
-  border-radius: 12px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.battle-title {
+    color: #e74c3c;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
 }
 
 .enemyname {
-  font-size: 14px;
-  font-weight: bold;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-/* Полоски жизни */
-.bars-container {
-  background: rgba(0, 0, 0, 0.4);
-  padding: 10px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.bar-label {
-  font-size: 11px;
-  color: #a0a0ab;
-}
-
-.bar {
-  background: #2b2b33;
-  height: 10px;
-  border-radius: 4px;
-  overflow: hidden;
-  width: 100%;
-}
-
-/* Зоны Атаки и Блока */
+/* Боевые кнопки выбора зон */
 .zone-title {
-  font-size: 11px;
-  font-weight: bold;
-  color: #8a8a93;
-  margin-top: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #8a8a93;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    margin-top: 12px;
 }
 
 .powers {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 11fr);
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
-/* ПРИНУДИТЕЛЬНО ВКЛЮЧАЕМ КЛИКИ ДЛЯ КНОПОК */
-.attack-zone, .block-zone, .attack, .tab, button {
-  pointer-events: auto !important;
-  cursor: pointer !important;
-  touch-action: manipulation;
+button {
+    background-color: #252533;
+    border: 1px solid #333344;
+    border-radius: 8px;
+    color: #e2e2e9;
+    padding: 12px 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
 }
 
-.attack-zone, .block-zone {
-  background: #27272e;
-  color: #f5f5f7;
-  border: 1px solid #3a3a44;
-  padding: 12px 4px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: bold;
-  transition: background 0.1s ease;
+button:active {
+    transform: scale(0.97);
 }
 
-/* Желтая кнопка «СДЕЛАТЬ ХОД» */
-.attack {
-  background: #f1c40f;
-  color: #121216;
-  border: none;
-  padding: 14px;
-  font-size: 15px;
-  font-weight: bold;
-  border-radius: 10px;
-  margin-top: 6px;
+/* Главная кнопка хода */
+#attack {
+    background-color: #f1c40f;
+    border: none;
+    color: #111116;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 100%;
+    padding: 14px;
+    margin-top: 16px;
+    border-radius: 8px;
 }
 
-/* История боя */
-.log-container {
-  background: #1f1f24;
-  border: 1px solid #2b2b33;
-  border-radius: 12px;
-  padding: 14px;
+#attack:disabled {
+    background-color: #252533;
+    color: #555566;
+    cursor: not-allowed;
 }
 
-.log-title {
-  font-size: 12px;
-  color: #8a8a93;
-  font-weight: bold;
-  border-bottom: 1px solid #2b2b33;
-  padding-bottom: 6px;
-  margin-bottom: 6px;
-}
-
-.battle-log {
-  max-height: 160px;
-  overflow-y: auto;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.battle-log p {
-  margin-bottom: 6px;
-  padding-bottom: 6px;
-  border-bottom: 1px dashed #2b2b33;
-}
-
-/* Нижнее меню навигации */
-nav {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 64px;
-  background: #1f1f24;
-  border-top: 1px solid #2b2b33;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 20;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.tab {
-  background: none;
-  border: none;
-  color: #8a8a93;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
-  height: 100%;
-  justify-content: center;
-}
-
-.tab small {
-  font-size: 10px;
-}
-
-.tab.active {
-  color: #e74c3c;
-}
-
-/* Уведомления */
-.notice {
-  display: none;
-  background: #e74c3c;
-  color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 13px;
-  font-weight: bold;
-}
-/* Состояние кнопок зон при выборе (атака и блок) */
+/* Активное состояние кнопок зон при нажатии */
 .zone-btn-active {
-    .zone-btn-active {
     border: 1px solid #e74c3c !important;
-    background-color: rgba(231, 76, 60, 0.1) !important;
+    background-color: rgba(231, 76, 60, 0.15) !important;
     color: #fff !important;
 }
 
-.zone-btn-active {
-    border: 1px solid #e74c3c !important;
-    background-color: rgba(231, 76, 60, 0.1) !important;
+/* Полоски здоровья (HP) */
+.bars-container {
+    background-color: #111116;
+    border: 1px solid #252533;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
 }
-/* Контейнер подложки (серый фон полоски) */
+
+.bar-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #8a8a93;
+    margin-bottom: 10px;
+}
+
+.bar-label:last-child {
+    margin-bottom: 0;
+}
+
+.bar-label span {
+    float: right;
+    color: #e2e2e9;
+    font-weight: 600;
+}
+
 .hp-bar-bg {
     width: 100%;
     height: 8px;
-    background-color: #2a2a2a;
+    background-color: #252533;
     border-radius: 4px;
-    margin-top: 4px;
+    margin-top: 6px;
     overflow: hidden;
 }
 
-/* Общий стиль для заполнения */
 .hp-fill {
     height: 100%;
     width: 100%;
-    transition: width 0.3s ease-in-out; /* Плавное уменьшение при ударе */
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Цвет твоей полоски (зеленый) */
 .player-hp {
     background-color: #2ecc71;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
 }
 
-/* Цвет полоски хулигана (красный) */
 .enemy-hp {
     background-color: #e74c3c;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+}
+
+/* Лог боя */
+.log-container {
+    background-color: #1a1a24;
+    border: 1px solid #252533;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.log-title {
+    font-size: 11px;
+    color: #8a8a93;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #252533;
+    padding-bottom: 6px;
+}
+
+.combat-log-text {
+    font-size: 13px;
+    color: #b5b5be;
+    line-height: 1.5;
+}
+
+/* Всплывающее уведомление */
+.notice {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    font-weight: 600;
+    display: none;
+}
+
+/* Нижнее меню навигации (Tabs) */
+.nav-tabs {
+    background-color: #1a1a24;
+    border-top: 1px solid #252533;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 6px 0;
+    z-index: 100;
+}
+
+.tab {
+    background: none;
+    border: none;
+    color: #8a8a93;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 12px;
+    width: auto;
+}
+
+.tab i, .tab span:first-child {
+    font-size: 18px;
+}
+
+.tab.active {
+    color: #e74c3c;
+    background: none !important;
+    border: none !important;
+}
+
+/* Стили вкладок рынка */
+.shop-item {
+    background-color: #1a1a24;
+    border: 1px solid #252533;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
