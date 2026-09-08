@@ -3,37 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Territory 3D</title>
+    <title>Territory WebApp</title>
     <style>
         :root {
-            --bg-dark: #0b0e14;
-            --bg-card: #131722;
-            --border-gray: #2a2f3d;
-            --text-main: #ffffff;
-            --text-sub: #8a8f9d;
-            --btn-active: #242936;
-            --btn-selected: #e91e63; /* Цвет подсветки выбранной зоны */
+            --bg: #0b0e14; --card: #131722; --border: #2a2f3d;
+            --text: #fff; --sub: #8a8f9d; --primary: #e91e63;
         }
-
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            user-select: none;
-            overflow-x: hidden;
+            margin: 0; background-color: var(--bg); color: var(--text);
+            font-family: -apple-system, sans-serif; user-select: none; overflow-x: hidden;
+        }
+        .wrapper { max-width: 500px; margin: 0 auto; padding: 12px; box-sizing: border-box; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .badge { background: var(--card); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-weight: bold; }
+        .main-card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); padding: 16px; }
+        .hp-track { width: 100%; height: 8px; background: #1a2233; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+        .hp-fill { height: 100%; width: 100%; transition: width 0.3s; }
+        #render-window { width: 100%; height: 240px; background: #000; border-radius: 12px; position: relative; }
+        .headline { font-size: 12px; color: var(--sub); text-transform: uppercase; margin: 15px 0 8px 0; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .btn { background: #1c2130; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .btn.selected { background: var(--primary); border-color: #ff6097; }
+        .bottom-nav { display: flex; justify-content: space-around; background: var(--card); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; width: 100%; padding: 10px 0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--sub); text-decoration: none; }
+        .nav-item.active { color: #fff; }
+        .pop-text { position: absolute; font-weight: 900; font-size: 26px; opacity: 0; transition: all 0.3s; }
+        .pop-text.show { opacity: 1; transform: translateY(-20px); }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div style="font-weight:900;" id="user-name">TERRITORY</div>
+            <div class="badge" id="user-coins">🪙 300</div>
+        </div>
+
+        <!-- КРАН АРЕНЫ -->
+        <div id="arena-screen">
+            <div class="main-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--sub);">
+                    <span>Бойцовская Арена</span><span>Хулиган 🛑</span>
+                </div>
+                <div>
+                    <div>Вы: <span id="txt-p-hp">120/120</span></div>
+                    <div class="hp-track"><div class="hp-fill" style="background:#34c759;" id="bar-p-hp"></div></div>
+                    <div>Враг: <span id="txt-e-hp">100/100</span></div>
+                    <div class="hp-track"><div class="hp-fill" style="background:#ff3b30;" id="bar-e-hp"></div></div>
+                </div>
+                <div id="render-window">
+                    <div id="pop-p" class="pop-text" style="left:20%; top:40%; color:#ff3b30;"></div>
+                    <div id="pop-e" class="pop-text" style="left:70%; top:40%; color:#ff3b30;"></div>
+                    <!-- Сюда твоя скрипт-сцена автоматически добавит 3D Canvas -->
+                </div>
+            </div>
+            <div class="headline">Куда атакуем:</div>
+            <div class="grid">
+                <button class="btn att-btn" onclick="hit('head', this)">Голова</button>
+                <button class="btn att-btn" onclick="hit('body', this)">Корпус</button>
+                <button class="btn att-btn" onclick="hit('legs', this)">Ноги</button>
+            </div>
+            <div class="headline">Что блокируем:</div>
+            <div class="grid" style="margin-bottom:80px;">
+                <button class="btn def-btn" onclick="block('head', this)">Голова</button>
+                <button class="btn def-btn" onclick="block('body', this)">Корпус</button>
+                <button class="btn def-btn" onclick="block('legs', this)">Ноги</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН РЫНКА -->
+        <div id="shop-screen" style="display:none; margin-bottom:80px;">
+            <div class="main-card">
+                <div style="font-weight:bold; margin-bottom:15px;">🛒 Оружейная лавка</div>
+                <div id="shop-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="switchTab('arena')"><span>🥊</span>Арена</a>
+        <a href="#" class="nav-item" onclick="switchTab('shop')"><span>🛒</span>Рынок</a>
+    </div>
+
+    <script>
+        const state = { tg_id: 12345, pHp: 120, pMax: 120, eHp: 100, eMax: 100, att: null, def: null, lock: false };
+
+        // Инициализация при старте (Авторизация)
+        // Если запущено в ТГ, подтянет реальный ID
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tgData = window.Telegram.WebApp.initDataUnsafe.user;
+            if (tgData) { state.tg_id = tgData.id; document.getElementById('user-name').innerText = tgData.first_name; }
         }
 
-        /* Общая обертка приложения под формат ТГ */
-        .game-wrapper {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 12px;
-            box-sizing: border-box;
+        fetch('/api/auth', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ tg_id: state.tg_id })
+        }).then(res => res.json()).then(d => {
+            document.getElementById('user-coins').innerText = `🪙 ${d.user.coins}`;
+            state.pMax = d.user.hp_max; state.pHp = d.user.hp_max; updateUI();
+        });
+
+        function hit(z, b) { if(state.lock) return; state.att = z; selectBtn('att-btn', b); checkTurn(); }
+        function block(z, b) { if(state.lock) return; state.def = z; selectBtn('defend-btn', b); checkTurn(); }
+        function selectBtn(c, b) { document.querySelectorAll('.'+c).forEach(el=>el.classList.remove('selected')); b.classList.add('selected'); }
+
+        function checkTurn() {
+            if (!state.att || !state.def) return;
+            state.lock = true;
+
+            fetch('/api/battle/turn', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ tg_id: state.tg_id, attackZone: state.att, defendZone: state.def, enemyHpCurrent: state.eHp, playerHpCurrent: state.pHp })
+            }).then(res => res.json()).then(d => {
+                // ТРИГГЕРЫ ДЛЯ ТВОИХ 3D МОДЕЛЕЙ (Вставляй сюда вызовы анимаций):
+                console.log("Вы ударили в:", state.att, "Враг блокировал:", d.enemyAction.def);
+                
+                // Эффекты урона
+                setTimeout(() => {
+                    showPop('e', d.pSuccess ? `-${d.pDamage}` : 'БЛОК', d.pSuccess ? '#ff3b30' : '#34c759');
+                    state.eHp = d.nextEnemyHp; updateUI();
+                }, 400);
+
+                setTimeout(() => {
+                    if (state.eHp <= 0) { endBattle(d); return; }
+                    showPop('p', d.eSuccess ? `-${d.eDamage}` : 'БЛОК', d.eSuccess ? '#ff3b30' : '#34c759');
+                    state.pHp = d.nextPlayerHp; updateUI();
+                    
+                    if (d.battleOver) endBattle(d); else resetRound();
+                }, 1200);
+            });
         }
 
-        /* Шапка с балансом */
+        function showPop(t, txt, c) { const e = document.getElementById('pop-'+t); e.innerText = txt; e.style.color = c; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'), 800); }
+        function updateUI() {
+            document.getElementById('txt-p-hp').innerText = `${state.pHp}/${state.pMax}`;
+            document.getElementById('bar-p-hp').style.width = `${(state.pHp/state.pMax)*100}%`;
+            document.getElementById('txt-e-hp').innerText = `${state.eHp}/${state.eMax}`;
+            document.getElementById('bar-e-hp').style.width = `${(state.eHp/state.eMax)*100}%`;
+        }
+        function resetRound() { state.att = null; state.def = null; state.lock = false; document.querySelectorAll('.btn').forEach(b=>b.classList.remove('selected')); }
+        
+        function endBattle(d) {
+            setTimeout(() => {
+                alert(d.winner === 'player' ? `Победа! Награда: 🪙 ${d.reward}` : d.winner === 'enemy' ? 'Вы проиграли.' : 'Ничья');
+                if (d.winner === 'player') {
+                    const cEl = document.getElementById('user-coins');
+                    let c = parseInt(cEl.innerText.replace(/\D/g, ''));
+                    cEl.innerText = `🪙 ${c + d.reward}`;
+                }
+                state.pHp = state.pMax; state.eHp = state.eMax; updateUI(); resetRound();
+            }, 500);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+            document.getElementById('arena-screen').style.display = tab === 'arena' ? 'block' : 'none';
+            document.getElementById('shop-screen').style.display = tab === 'shop' ? 'block' : 'none';
+            event.currentTarget.classList.add('active');
+            if (tab === 'shop') loadShop();
+        }
+
+        function loadShop() {
+            fetch('/api/shop').then(res=>res.json()).then(items => {
+                const list = document.getElementById('shop-list'); list.innerHTML = '';
+                items.forEach(i => {
+                    list.insertAdjacentHTML('beforeend', `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#1c2130; padding:10px; border-radius:12px;">
         .game-header {
             display: flex;
             justify-content: space-between;
