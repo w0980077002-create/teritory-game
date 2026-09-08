@@ -1,40 +1,3274 @@
 import * as THREE from "three";
 
-/* =====================================================
-   TERRITORY — 3D BATTLE
-   НОВАЯ ВЕРСИЯ
-   ===================================================== */
+/* =========================================================
+   TERRITORY
+   Персонаж + инвентарь + экипировка + 3D + бой + магазин
+   ========================================================= */
 
-var defaultPlayer = {
-    hp: 120,
-    maxHp: 120,
-    coins: 1000,
-    level: 1,
-    exp: 0,
-    maxExp: 100,
-    weapon: "Кулаки",
-    bonusDamage: 0,
-    strength: 5,
-    agility: 5,
-    freePoints: 0,
-    combo: 0
+
+/* =========================================================
+   НАСТРОЙКИ
+   ========================================================= */
+
+const SAVE_KEY = "territory_save";
+
+const $ = (id) => document.getElementById(id);
+
+
+/* =========================================================
+   ПРЕДМЕТЫ
+   ========================================================= */
+
+const ITEMS = {
+
+  fists: {
+    id: "fists",
+    name: "Кулаки",
+    icon: "👊",
+    type: "weapon",
+    slot: "hand",
+    damage: 0,
+    weight: 0,
+    price: 0,
+    description: "Твои руки. Всегда с тобой."
+  },
+
+  brass: {
+    id: "brass",
+    name: "Кастеты",
+    icon: "🥊",
+    type: "weapon",
+    slot: "hand",
+    damage: 5,
+    weight: 1,
+    price: 150,
+    description: "+5 к урону"
+  },
+
+  knife: {
+    id: "knife",
+    name: "Нож",
+    icon: "🔪",
+    type: "weapon",
+    slot: "hand",
+    damage: 12,
+    crit: 5,
+    weight: 1,
+    price: 400,
+    description: "+12 урона, +5% крит"
+  },
+
+  cap: {
+    id: "cap",
+    name: "Кепка",
+    icon: "🧢",
+    type: "armor",
+    slot: "head",
+    defense: 2,
+    agility: 1,
+    weight: 0.3,
+    price: 120,
+    description: "+2 защита, +1 ловкость"
+  },
+
+  hoodie: {
+    id: "hoodie",
+    name: "Худи",
+    icon: "🧥",
+    type: "armor",
+    slot: "body",
+    defense: 5,
+    maxHp: 10,
+    weight: 1.2,
+    price: 250,
+    description: "+5 защита, +10 макс. HP"
+  },
+
+  pants: {
+    id: "pants",
+    name: "Тактические штаны",
+    icon: "👖",
+    type: "armor",
+    slot: "legs",
+    defense: 3,
+    strength: 1,
+    weight: 0.8,
+    price: 180,
+    description: "+3 защита, +1 сила"
+  },
+
+  shoes: {
+    id: "shoes",
+    name: "Кроссовки",
+    icon: "👟",
+    type: "armor",
+    slot: "feet",
+    defense: 2,
+    agility: 2,
+    dodge: 3,
+    weight: 0.7,
+    price: 220,
+    description: "+2 защита, +2 ловкость, +3% уклонение"
+  }
+
 };
 
-var p = Object.assign({}, defaultPlayer);
 
-var e = {
-    name: "Местный хулиган",
-    hp: 100,
-    maxHp: 100
+/* =========================================================
+   ИГРОК
+   ========================================================= */
+
+const defaultPlayer = {
+
+  hp: 120,
+  maxHp: 120,
+
+  coins: 1000,
+
+  level: 1,
+  exp: 0,
+  maxExp: 100,
+
+  strength: 5,
+  agility: 5,
+
+  freePoints: 0,
+
+  combo: 0,
+
+  inventory: [
+    "fists"
+  ],
+
+  equipment: {
+    head: null,
+    body: null,
+    hand: "fists",
+    legs: null,
+    feet: null
+  }
+
 };
 
-var selA = null;
-var selB = null;
-var battleLocked = false;
+
+/* =========================================================
+   ВРАГ
+   ========================================================= */
+
+let enemy = {
+
+  name: "Местный хулиган",
+
+  hp: 100,
+  maxHp: 100
+
+};
 
 
-/* =====================================================
-   SAVE
+/* =========================================================
+   ЗАГРУЗКА СОХРАНЕНИЯ
+   ========================================================= */
+
+function loadPlayer() {
+
+  let saved = null;
+
+  try {
+
+    saved = JSON.parse(
+      localStorage.getItem(SAVE_KEY)
+    );
+
+  } catch (error) {
+
+    saved = null;
+
+  }
+
+
+  const p = {
+    ...defaultPlayer,
+    ...(saved || {})
+  };
+
+
+  /* -----------------------------------------
+     Миграция старого сохранения
+     ----------------------------------------- */
+
+  if (!Array.isArray(p.inventory)) {
+
+    p.inventory = ["fists"];
+
+  }
+
+
+  if (!p.equipment || typeof p.equipment !== "object") {
+
+    p.equipment = {
+      head: null,
+      body: null,
+      hand: "fists",
+      legs: null,
+      feet: null
+    };
+
+  }
+
+
+  /* Старое оружие */
+
+  if (saved && saved.weapon) {
+
+    if (
+      saved.weapon === "Кастеты" &&
+      !p.inventory.includes("brass")
+    ) {
+
+      p.inventory.push("brass");
+
+      p.equipment.hand = "brass";
+
+    }
+
+    else if (
+      saved.weapon === "Нож" &&
+      !p.inventory.includes("knife")
+    ) {
+
+      p.inventory.push("knife");
+
+      p.equipment.hand = "knife";
+
+    }
+
+  }
+
+
+  if (!p.inventory.includes("fists")) {
+
+    p.inventory.unshift("fists");
+
+  }
+
+
+  if (!ITEMS[p.equipment.hand]) {
+
+    p.equipment.hand = "fists";
+
+  }
+
+
+  if (!p.inventory.includes(p.equipment.hand)) {
+
+    p.inventory.push(p.equipment.hand);
+
+  }
+
+
+  p.hp = Number(p.hp) || 120;
+  p.maxHp = Number(p.maxHp) || 120;
+
+  p.coins = Number(p.coins) || 0;
+
+  p.level = Number(p.level) || 1;
+  p.exp = Number(p.exp) || 0;
+  p.maxExp = Number(p.maxExp) || 100;
+
+  p.strength = Number(p.strength) || 5;
+  p.agility = Number(p.agility) || 5;
+  p.freePoints = Number(p.freePoints) || 0;
+
+  p.hp = Math.min(p.hp, p.maxHp);
+
+  return p;
+
+}
+
+
+let player = loadPlayer();
+
+
+/* =========================================================
+   СОХРАНЕНИЕ
+   ========================================================= */
+
+function saveGame() {
+
+  try {
+
+    localStorage.setItem(
+      SAVE_KEY,
+      JSON.stringify(player)
+    );
+
+  } catch (error) {
+
+    console.log("Ошибка сохранения", error);
+
+  }
+
+}
+
+
+/* =========================================================
+   ЭКИПИРОВАННЫЕ ПРЕДМЕТЫ
+   ========================================================= */
+
+function getEquippedItems() {
+
+  const result = [];
+
+  Object.values(player.equipment).forEach(id => {
+
+    if (id && ITEMS[id]) {
+
+      result.push(ITEMS[id]);
+
+    }
+
+  });
+
+  return result;
+
+}
+
+
+/* =========================================================
+   ХАРАКТЕРИСТИКИ
+   ========================================================= */
+
+function getStats() {
+
+  let maxHp = player.maxHp;
+
+  let damage = 10 + player.strength;
+
+  let defense = 0;
+
+  let strength = player.strength;
+
+  let agility = player.agility;
+
+  let crit = 5 + strength * 3;
+
+  let dodge = agility * 3;
+
+
+  getEquippedItems().forEach(item => {
+
+    maxHp += item.maxHp || 0;
+
+    damage += item.damage || 0;
+
+    defense += item.defense || 0;
+
+    strength += item.strength || 0;
+
+    agility += item.agility || 0;
+
+    crit += item.crit || 0;
+
+    dodge += item.dodge || 0;
+
+  });
+
+
+  crit = Math.min(50, crit);
+
+  dodge = Math.min(50, dodge);
+
+
+  return {
+
+    maxHp,
+    damage,
+    defense,
+    strength,
+    agility,
+    crit,
+    dodge
+
+  };
+
+}
+
+
+/* =========================================================
+   СИНХРОНИЗАЦИЯ СТАРЫХ ПОЛЕЙ
+   ========================================================= */
+
+function syncLegacyFields() {
+
+  const weaponId = player.equipment.hand || "fists";
+
+  const weapon = ITEMS[weaponId] || ITEMS.fists;
+
+  player.weapon = weapon.name;
+
+  player.bonusDamage = weapon.damage || 0;
+
+}
+
+
+/* =========================================================
+   NOTICE
+   ========================================================= */
+
+let noticeTimer = null;
+
+function showNotice(text) {
+
+  const el = $("notice");
+
+  if (!el) return;
+
+  el.textContent = text;
+
+  clearTimeout(noticeTimer);
+
+  noticeTimer = setTimeout(() => {
+
+    el.textContent = "";
+
+  }, 2500);
+
+}
+
+
+/* =========================================================
+   UI
+   ========================================================= */
+
+function updateUI() {
+
+  syncLegacyFields();
+
+  const stats = getStats();
+
+
+  /* Монеты */
+
+  if ($("coins")) {
+
+    $("coins").textContent =
+      Math.floor(player.coins);
+
+  }
+
+
+  /* Уровень */
+
+  if ($("header-level")) {
+
+    $("header-level").textContent =
+      player.level;
+
+  }
+
+  if ($("header-level-copy")) {
+
+    $("header-level-copy").textContent =
+      player.level;
+
+  }
+
+  if ($("prof-level")) {
+
+    $("prof-level").textContent =
+      player.level;
+
+  }
+
+
+  /* HP */
+
+  player.hp = Math.max(
+    0,
+    Math.min(player.hp, stats.maxHp)
+  );
+
+
+  if ($("hp-text-player")) {
+
+    $("hp-text-player").textContent =
+      `${Math.ceil(player.hp)} / ${stats.maxHp}`;
+
+  }
+
+
+  if ($("hp-fill-player")) {
+
+    $("hp-fill-player").style.width =
+      `${(player.hp / stats.maxHp) * 100}%`;
+
+  }
+
+
+  if ($("hp-text-enemy")) {
+
+    $("hp-text-enemy").textContent =
+      `${Math.ceil(enemy.hp)} / ${enemy.maxHp}`;
+
+  }
+
+
+  if ($("hp-fill-enemy")) {
+
+    $("hp-fill-enemy").style.width =
+      `${(enemy.hp / enemy.maxHp) * 100}%`;
+
+  }
+
+
+  /* XP */
+
+  if ($("exp-text")) {
+
+    $("exp-text").textContent =
+      `${player.exp} / ${player.maxExp}`;
+
+  }
+
+
+  if ($("exp-fill")) {
+
+    $("exp-fill").style.width =
+      `${Math.min(100, player.exp / player.maxExp * 100)}%`;
+
+  }
+
+
+  /* Статы */
+
+  setText("stat-hp", stats.maxHp);
+
+  setText("stat-damage", stats.damage);
+
+  setText("stat-defense", stats.defense);
+
+  setText("stat-strength", stats.strength);
+
+  setText("stat-agility", stats.agility);
+
+  setText("stat-crit", `${stats.crit}%`);
+
+  setText("stat-dodge", `${stats.dodge}%`);
+
+
+  /* Свободные очки */
+
+  setText(
+    "prof-free",
+    player.freePoints
+  );
+
+
+  /* Кнопки очков */
+
+  if ($("add-str")) {
+
+    $("add-str").disabled =
+      player.freePoints <= 0;
+
+  }
+
+
+  if ($("add-agi")) {
+
+    $("add-agi").disabled =
+      player.freePoints <= 0;
+
+  }
+
+
+  renderEquipment();
+
+  renderInventory();
+
+  updateShopButtons();
+
+  updateCharacter3D();
+
+  saveGame();
+
+}
+
+
+function setText(id, value) {
+
+  const el = $(id);
+
+  if (el) {
+
+    el.textContent = value;
+
+  }
+
+}
+
+
+/* =========================================================
+   ЭКИПИРОВКА
+   ========================================================= */
+
+const SLOT_IDS = {
+
+  head: "equip-head",
+  body: "equip-body",
+  hand: "equip-hand",
+  legs: "equip-legs",
+  feet: "equip-feet"
+
+};
+
+
+function renderEquipment() {
+
+  Object.keys(SLOT_IDS).forEach(slot => {
+
+    const el = $(SLOT_IDS[slot]);
+
+    if (!el) return;
+
+
+    const itemId = player.equipment[slot];
+
+    const item = itemId
+      ? ITEMS[itemId]
+      : null;
+
+
+    const icon = el.querySelector(
+      ".equip-slot-icon"
+    );
+
+    const name = el.querySelector(
+      ".equip-slot-item"
+    );
+
+
+    if (item) {
+
+      if (icon) {
+
+        icon.textContent = item.icon;
+
+      }
+
+      if (name) {
+
+        name.textContent = item.name;
+
+      }
+
+      el.classList.add("equipped");
+
+    }
+
+    else {
+
+      const defaultIcons = {
+
+        head: "🧢",
+        body: "🧥",
+        hand: "🥊",
+        legs: "👖",
+        feet: "👟"
+
+      };
+
+
+      if (icon) {
+
+        icon.textContent =
+          defaultIcons[slot];
+
+      }
+
+      if (name) {
+
+        name.textContent = "Пусто";
+
+      }
+
+      el.classList.remove("equipped");
+
+    }
+
+  });
+
+}
+
+
+/* =========================================================
+   НАДЕТЬ ПРЕДМЕТ
+   ========================================================= */
+
+function equipItem(itemId) {
+
+  const item = ITEMS[itemId];
+
+  if (!item) return;
+
+  if (!player.inventory.includes(itemId)) {
+
+    showNotice("Предмета нет в инвентаре");
+
+    return;
+
+  }
+
+
+  const slot = item.slot;
+
+  if (!slot) return;
+
+
+  player.equipment[slot] = itemId;
+
+
+  if (slot === "hand") {
+
+    showNotice(`Оружие надето: ${item.name}`);
+
+  } else {
+
+    showNotice(`Надето: ${item.name}`);
+
+  }
+
+
+  updateUI();
+
+}
+
+
+/* =========================================================
+   СНЯТЬ
+   ========================================================= */
+
+function unequipItem(itemId) {
+
+  const item = ITEMS[itemId];
+
+  if (!item) return;
+
+
+  const slot = item.slot;
+
+  if (!slot) return;
+
+
+  if (player.equipment[slot] === itemId) {
+
+    if (slot === "hand") {
+
+      player.equipment[slot] = "fists";
+
+    } else {
+
+      player.equipment[slot] = null;
+
+    }
+
+  }
+
+
+  showNotice(`Снято: ${item.name}`);
+
+  updateUI();
+
+}
+
+
+/* =========================================================
+   ВЫБРОСИТЬ
+   ========================================================= */
+
+function dropItem(itemId) {
+
+  if (itemId === "fists") {
+
+    showNotice("Кулаки нельзя выбросить");
+
+    return;
+
+  }
+
+
+  const item = ITEMS[itemId];
+
+  if (!item) return;
+
+
+  if (
+    player.equipment[item.slot] === itemId
+  ) {
+
+    if (item.slot === "hand") {
+
+      player.equipment[item.slot] = "fists";
+
+    } else {
+
+      player.equipment[item.slot] = null;
+
+    }
+
+  }
+
+
+  const index =
+    player.inventory.indexOf(itemId);
+
+
+  if (index !== -1) {
+
+    player.inventory.splice(index, 1);
+
+  }
+
+
+  showNotice(`Выброшено: ${item.name}`);
+
+  selectedItemId = null;
+
+  updateUI();
+
+}
+
+
+/* =========================================================
+   INVENTORY
+   ========================================================= */
+
+let selectedItemId = null;
+
+
+function renderInventory() {
+
+  const grid = $("inventory-grid");
+
+  if (!grid) return;
+
+
+  grid.innerHTML = "";
+
+
+  player.inventory.forEach(itemId => {
+
+    const item = ITEMS[itemId];
+
+    if (!item) return;
+
+
+    const isEquipped =
+      player.equipment[item.slot] === itemId;
+
+
+    const div =
+      document.createElement("button");
+
+
+    div.className =
+      "inventory-item" +
+      (isEquipped ? " equipped" : "") +
+      (selectedItemId === itemId
+        ? " selected"
+        : "");
+
+
+    div.innerHTML = `
+
+      <span class="inventory-icon">
+        ${item.icon}
+      </span>
+
+      <span class="inventory-name">
+        ${item.name}
+      </span>
+
+      ${
+        isEquipped
+          ? `<span class="inventory-equipped">✓</span>`
+          : ""
+      }
+
+    `;
+
+
+    div.addEventListener(
+      "click",
+      () => selectItem(itemId)
+    );
+
+
+    grid.appendChild(div);
+
+  });
+
+
+  const weight =
+    player.inventory.reduce(
+      (sum, id) =>
+        sum + (ITEMS[id]?.weight || 0),
+      0
+    );
+
+
+  setText(
+    "inventory-count",
+    player.inventory.length
+  );
+
+
+  setText(
+    "inventory-weight",
+    `${weight.toFixed(1)} / 20`
+  );
+
+
+  updateSelectedItem();
+
+}
+
+
+/* =========================================================
+   ВЫБОР ПРЕДМЕТА
+   ========================================================= */
+
+function selectItem(itemId) {
+
+  selectedItemId = itemId;
+
+  renderInventory();
+
+}
+
+
+/* =========================================================
+   ОКНО ПРЕДМЕТА
+   ========================================================= */
+
+function updateSelectedItem() {
+
+  const actions = $("item-actions");
+
+  if (!actions) return;
+
+
+  if (!selectedItemId) {
+
+    actions.classList.add("hidden");
+
+    return;
+
+  }
+
+
+  const item =
+    ITEMS[selectedItemId];
+
+
+  if (!item) {
+
+    actions.classList.add("hidden");
+
+    return;
+
+  }
+
+
+  actions.classList.remove("hidden");
+
+
+  setText(
+    "selected-item-name",
+    item.name
+  );
+
+
+  setText(
+    "selected-item-info",
+    item.description
+  );
+
+
+  const icon =
+    $("selected-item-icon");
+
+  if (icon) {
+
+    icon.textContent =
+      item.icon;
+
+  }
+
+
+  const equipped =
+    player.equipment[item.slot] === item.id;
+
+
+  const equipBtn =
+    $("equip-item");
+
+  const unequipBtn =
+    $("unequip-item");
+
+  const dropBtn =
+    $("drop-item");
+
+
+  if (equipBtn) {
+
+    equipBtn.disabled = equipped;
+
+  }
+
+
+  if (unequipBtn) {
+
+    unequipBtn.disabled =
+      !equipped ||
+      item.id === "fists";
+
+  }
+
+
+  if (dropBtn) {
+
+    dropBtn.disabled =
+      item.id === "fists";
+
+  }
+
+}
+
+
+/* =========================================================
+   ПОКУПКА
+   ========================================================= */
+
+function buyItem(itemId) {
+
+  const item =
+    ITEMS[itemId];
+
+  if (!item) return;
+
+
+  if (player.inventory.includes(itemId)) {
+
+    showNotice(
+      `${item.name} уже есть в инвентаре`
+    );
+
+    return;
+
+  }
+
+
+  if (player.coins < item.price) {
+
+    showNotice("Недостаточно монет");
+
+    return;
+
+  }
+
+
+  player.coins -= item.price;
+
+  player.inventory.push(itemId);
+
+
+  showNotice(
+    `Куплено: ${item.name}`
+  );
+
+
+  updateUI();
+
+}
+
+
+function updateShopButtons() {
+
+  Object.keys(ITEMS).forEach(id => {
+
+    const item = ITEMS[id];
+
+    const button =
+      $(`buy-${id}`);
+
+    if (!button) return;
+
+
+    if (
+      player.inventory.includes(id)
+    ) {
+
+      button.classList.add("owned");
+
+      button.textContent = "✓ Есть";
+
+    }
+
+    else {
+
+      button.classList.remove("owned");
+
+      button.textContent =
+        `🪙 ${item.price}`;
+
+    }
+
+  });
+
+}
+
+
+/* =========================================================
+   ОЧКИ ХАРАКТЕРИСТИК
+   ========================================================= */
+
+function addStrength() {
+
+  if (player.freePoints <= 0) return;
+
+
+  player.freePoints--;
+
+  player.strength++;
+
+
+  showNotice(
+    "Сила увеличена"
+  );
+
+
+  updateUI();
+
+}
+
+
+function addAgility() {
+
+  if (player.freePoints <= 0) return;
+
+
+  player.freePoints--;
+
+  player.agility++;
+
+
+  showNotice(
+    "Ловкость увеличена"
+  );
+
+
+  updateUI();
+
+}
+
+
+/* =========================================================
+   LEVEL UP
+   ========================================================= */
+
+function addExperience(amount) {
+
+  player.exp += amount;
+
+
+  while (
+    player.exp >= player.maxExp
+  ) {
+
+    player.exp -= player.maxExp;
+
+    player.level++;
+
+    player.maxExp =
+      Math.floor(
+        player.maxExp * 1.4
+      );
+
+
+    player.freePoints += 3;
+
+    player.maxHp += 20;
+
+    player.hp =
+      getStats().maxHp;
+
+
+    showNotice(
+      `🎉 Новый уровень: ${player.level}! +3 очка`
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   БОЙ
+   ========================================================= */
+
+let selectedAttack = "body";
+
+let selectedBlock = "body";
+
+let battleLocked = false;
+
+
+const attackMultipliers = {
+
+  head: 1.35,
+
+  body: 1,
+
+  legs: 0.85
+
+};
+
+
+const zoneNames = {
+
+  head: "голову",
+
+  body: "тело",
+
+  legs: "ноги"
+
+};
+
+
+function addLog(text) {
+
+  const log =
+    $("combat-log-text");
+
+  if (!log) return;
+
+
+  const line =
+    document.createElement("div");
+
+  line.textContent = text;
+
+
+  log.prepend(line);
+
+
+  while (
+    log.children.length > 12
+  ) {
+
+    log.removeChild(
+      log.lastChild
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ИГРОК АТАКУЕТ
+   ========================================================= */
+
+function playerAttack() {
+
+  if (battleLocked) return;
+
+  if (enemy.hp <= 0) return;
+
+
+  battleLocked = true;
+
+
+  const stats =
+    getStats();
+
+
+  let damage =
+    stats.damage *
+    attackMultipliers[selectedAttack];
+
+
+  let critical = false;
+
+
+  if (
+    Math.random() * 100 <
+    stats.crit
+  ) {
+
+    critical = true;
+
+    damage *= 2;
+
+  }
+
+
+  /* Комбо */
+
+  if (player.combo > 0) {
+
+    damage *=
+      1 + Math.min(
+        0.5,
+        player.combo * 0.05
+      );
+
+  }
+
+
+  damage =
+    Math.max(
+      1,
+      Math.round(damage)
+    );
+
+
+  enemy.hp -= damage;
+
+
+  if (enemy.hp < 0) {
+
+    enemy.hp = 0;
+
+  }
+
+
+  if (critical) {
+
+    addLog(
+      `💥 КРИТ! Ты ударил в ${zoneNames[selectedAttack]} на ${damage} урона!`
+    );
+
+  }
+
+  else {
+
+    addLog(
+      `👊 Ты ударил в ${zoneNames[selectedAttack]} на ${damage} урона.`
+    );
+
+  }
+
+
+  player.combo++;
+
+
+  updateUI();
+
+
+  if (enemy.hp <= 0) {
+
+    winBattle();
+
+    battleLocked = false;
+
+    return;
+
+  }
+
+
+  setTimeout(
+    enemyAttack,
+    550
+  );
+
+}
+
+
+/* =========================================================
+   АТАКА ВРАГА
+   ========================================================= */
+
+function enemyAttack() {
+
+  if (enemy.hp <= 0) {
+
+    battleLocked = false;
+
+    return;
+
+  }
+
+
+  const stats =
+    getStats();
+
+
+  const zones = [
+    "head",
+    "body",
+    "legs"
+  ];
+
+
+  const zone =
+    zones[
+      Math.floor(
+        Math.random() *
+        zones.length
+      )
+    ];
+
+
+  let damage =
+    8 +
+    Math.floor(
+      Math.random() * 7
+    );
+
+
+  /* Уклонение */
+
+  if (
+    Math.random() * 100 <
+    stats.dodge
+  ) {
+
+    addLog(
+      `💨 Ты уклонился от удара в ${zoneNames[zone]}!`
+    );
+
+
+    player.combo = 0;
+
+    battleLocked = false;
+
+    updateUI();
+
+    return;
+
+  }
+
+
+  /* Блок */
+
+  if (zone === selectedBlock) {
+
+    damage *= 0.25;
+
+    damage =
+      Math.max(
+        1,
+        Math.round(damage)
+      );
+
+
+    addLog(
+      `🛡️ Блок! Ты получил всего ${damage} урона.`
+    );
+
+  }
+
+  else {
+
+    damage =
+      Math.max(
+        1,
+        Math.round(
+          damage -
+          stats.defense * 0.5
+        )
+      );
+
+
+    addLog(
+      `💢 Враг ударил в ${zoneNames[zone]} на ${damage} урона.`
+    );
+
+  }
+
+
+  player.hp -= damage;
+
+
+  if (player.hp < 0) {
+
+    player.hp = 0;
+
+  }
+
+
+  player.combo = 0;
+
+
+  updateUI();
+
+
+  if (player.hp <= 0) {
+
+    loseBattle();
+
+    return;
+
+  }
+
+
+  battleLocked = false;
+
+}
+
+
+/* =========================================================
+   ПОБЕДА
+   ========================================================= */
+
+function winBattle() {
+
+  const coinsReward =
+    200 +
+    player.level * 20;
+
+  const expReward =
+    40;
+
+
+  player.coins +=
+    coinsReward;
+
+
+  addExperience(
+    expReward
+  );
+
+
+  const stats =
+    getStats();
+
+
+  player.hp = Math.min(
+    stats.maxHp,
+    player.hp +
+      Math.floor(stats.maxHp * 0.2)
+  );
+
+
+  addLog(
+    `🏆 ПОБЕДА! +${coinsReward} монет`
+  );
+
+
+  addLog(
+    `⭐ +${expReward} опыта`
+  );
+
+
+  showNotice(
+    `🏆 Победа! +${coinsReward} 🪙`
+  );
+
+
+  setTimeout(
+    resetEnemy,
+    800
+  );
+
+
+  updateUI();
+
+}
+
+
+/* =========================================================
+   ПОРАЖЕНИЕ
+   ========================================================= */
+
+function loseBattle() {
+
+  addLog(
+    "💀 Ты проиграл этот бой."
+  );
+
+
+  showNotice(
+    "💀 Поражение. Восстанавливаем HP."
+  );
+
+
+  setTimeout(() => {
+
+    const stats =
+      getStats();
+
+    player.hp =
+      Math.floor(
+        stats.maxHp * 0.5
+      );
+
+
+    resetEnemy();
+
+    updateUI();
+
+  }, 1000);
+
+}
+
+
+/* =========================================================
+   НОВЫЙ ВРАГ
+   ========================================================= */
+
+function resetEnemy() {
+
+  enemy.hp =
+    enemy.maxHp;
+
+  battleLocked = false;
+
+  updateUI();
+
+}
+
+
+/* =========================================================
+   3D ARENA
+   ========================================================= */
+
+let arenaScene;
+
+let arenaCamera;
+
+let arenaRenderer;
+
+let playerFighter;
+
+let enemyFighter;
+
+let arenaClock =
+  new THREE.Clock();
+
+
+function createMaterial(
+  color,
+  roughness = 0.75
+) {
+
+  return new THREE.MeshStandardMaterial({
+
+    color,
+
+    roughness,
+
+    metalness: 0.05
+
+  });
+
+}
+
+
+function createFighter(
+  playerSide = true
+) {
+
+  const group =
+    new THREE.Group();
+
+
+  /* Цвета */
+
+  const skin =
+    createMaterial(0xc78f6d);
+
+  const shirt =
+    createMaterial(
+      playerSide
+        ? 0x315fbd
+        : 0x9d3038
+    );
+
+  const pants =
+    createMaterial(0x252a31);
+
+  const shoes =
+    createMaterial(0x15181d);
+
+
+  /* Голова */
+
+  const head =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        0.48,
+        18,
+        14
+      ),
+      skin
+    );
+
+  head.position.y =
+    2.75;
+
+  head.name = "head";
+
+  group.add(head);
+
+
+  /* Тело */
+
+  const body =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        0.95,
+        1.25,
+        0.55
+      ),
+      shirt
+    );
+
+  body.position.y =
+    1.75;
+
+  body.name = "body";
+
+  group.add(body);
+
+
+  /* Руки */
+
+  const armGeometry =
+    new THREE.CapsuleGeometry(
+      0.13,
+      0.65,
+      5,
+      10
+    );
+
+
+  const armL =
+    new THREE.Mesh(
+      armGeometry,
+      skin
+    );
+
+  armL.position.set(
+    -0.7,
+    1.75,
+    0
+  );
+
+  armL.rotation.z =
+    -0.15;
+
+  armL.name =
+    "armL";
+
+  group.add(armL);
+
+
+  const armR =
+    new THREE.Mesh(
+      armGeometry,
+      skin
+    );
+
+  armR.position.set(
+    0.7,
+    1.75,
+    0
+  );
+
+  armR.rotation.z =
+    0.15;
+
+  armR.name =
+    "armR";
+
+  group.add(armR);
+
+
+  /* Ноги */
+
+  const legGeometry =
+    new THREE.CapsuleGeometry(
+      0.16,
+      0.75,
+      5,
+      10
+    );
+
+
+  const legL =
+    new THREE.Mesh(
+      legGeometry,
+      pants
+    );
+
+  legL.position.set(
+    -0.27,
+    0.72,
+    0
+  );
+
+  legL.name =
+    "legL";
+
+  group.add(legL);
+
+
+  const legR =
+    new THREE.Mesh(
+      legGeometry,
+      pants
+    );
+
+  legR.position.set(
+    0.27,
+    0.72,
+    0
+  );
+
+  legR.name =
+    "legR";
+
+  group.add(legR);
+
+
+  /* Обувь */
+
+  const shoeGeometry =
+    new THREE.BoxGeometry(
+      0.36,
+      0.18,
+      0.65
+    );
+
+
+  const shoeL =
+    new THREE.Mesh(
+      shoeGeometry,
+      shoes
+    );
+
+  shoeL.position.set(
+    -0.27,
+    0.18,
+    0.12
+  );
+
+  shoeL.name =
+    "shoeL";
+
+  group.add(shoeL);
+
+
+  const shoeR =
+    new THREE.Mesh(
+      shoeGeometry,
+      shoes
+    );
+
+  shoeR.position.set(
+    0.27,
+    0.18,
+    0.12
+  );
+
+  shoeR.name =
+    "shoeR";
+
+  group.add(shoeR);
+
+
+  return group;
+
+}
+
+
+/* =========================================================
+   ИНИЦИАЛИЗАЦИЯ АРЕНЫ
+   ========================================================= */
+
+function initArena3D() {
+
+  const container =
+    $("battle-3d");
+
+  if (!container) return;
+
+
+  arenaScene =
+    new THREE.Scene();
+
+
+  arenaScene.background =
+    new THREE.Color(
+      0x0b0e12
+    );
+
+
+  arenaCamera =
+    new THREE.PerspectiveCamera(
+      40,
+      container.clientWidth /
+      container.clientHeight,
+      0.1,
+      100
+    );
+
+
+  arenaCamera.position.set(
+    0,
+    2.1,
+    7
+  );
+
+
+  arenaCamera.lookAt(
+    0,
+    1.5,
+    0
+  );
+
+
+  arenaRenderer =
+    new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true
+    });
+
+
+  arenaRenderer.setPixelRatio(
+    Math.min(
+      window.devicePixelRatio,
+      2
+    )
+  );
+
+
+  arenaRenderer.setSize(
+    container.clientWidth,
+    container.clientHeight
+  );
+
+
+  container.innerHTML = "";
+
+  container.appendChild(
+    arenaRenderer.domElement
+  );
+
+
+  /* Свет */
+
+  const ambient =
+    new THREE.AmbientLight(
+      0xffffff,
+      1.7
+    );
+
+  arenaScene.add(
+    ambient
+  );
+
+
+  const light =
+    new THREE.DirectionalLight(
+      0xffffff,
+      2
+    );
+
+  light.position.set(
+    3,
+    6,
+    5
+  );
+
+  arenaScene.add(
+    light
+  );
+
+
+  /* Пол */
+
+  const floor =
+    new THREE.Mesh(
+
+      new THREE.CircleGeometry(
+        4.5,
+        64
+      ),
+
+      createMaterial(
+        0x1a1f27
+      )
+
+    );
+
+
+  floor.rotation.x =
+    -Math.PI / 2;
+
+  floor.position.y =
+    0;
+
+  arenaScene.add(
+    floor
+  );
+
+
+  /* Кольцо */
+
+  const ring =
+    new THREE.Mesh(
+
+      new THREE.RingGeometry(
+        2.2,
+        2.3,
+        64
+      ),
+
+      new THREE.MeshBasicMaterial({
+        color: 0x39414e,
+        side: THREE.DoubleSide
+      })
+
+    );
+
+
+  ring.rotation.x =
+    -Math.PI / 2;
+
+  ring.position.y =
+    0.01;
+
+  arenaScene.add(
+    ring
+  );
+
+
+  /* Бойцы */
+
+  playerFighter =
+    createFighter(true);
+
+  enemyFighter =
+    createFighter(false);
+
+
+  playerFighter.position.x =
+    -1.35;
+
+
+  enemyFighter.position.x =
+    1.35;
+
+
+  enemyFighter.rotation.y =
+    Math.PI;
+
+
+  arenaScene.add(
+    playerFighter
+  );
+
+  arenaScene.add(
+    enemyFighter
+  );
+
+
+  animateArena();
+
+}
+
+
+/* =========================================================
+   ANIMATE ARENA
+   ========================================================= */
+
+function animateArena() {
+
+  requestAnimationFrame(
+    animateArena
+  );
+
+
+  if (!arenaRenderer) return;
+
+
+  const time =
+    arenaClock.getElapsedTime();
+
+
+  if (playerFighter) {
+
+    playerFighter.position.y =
+      Math.sin(time * 2) *
+      0.025;
+
+  }
+
+
+  if (enemyFighter) {
+
+    enemyFighter.position.y =
+      Math.sin(time * 2 + 1) *
+      0.025;
+
+  }
+
+
+  arenaRenderer.render(
+    arenaScene,
+    arenaCamera
+  );
+
+}
+
+
+/* =========================================================
+   RESIZE ARENA
+   ========================================================= */
+
+function resizeArena() {
+
+  const container =
+    $("battle-3d");
+
+  if (
+    !container ||
+    !arenaRenderer ||
+    !arenaCamera
+  ) return;
+
+
+  const width =
+    container.clientWidth;
+
+  const height =
+    container.clientHeight;
+
+
+  arenaCamera.aspect =
+    width / height;
+
+  arenaCamera.updateProjectionMatrix();
+
+
+  arenaRenderer.setSize(
+    width,
+    height
+  );
+
+}
+
+
+/* =========================================================
+   3D ПЕРСОНАЖ
+   ========================================================= */
+
+let characterScene;
+
+let characterCamera;
+
+let characterRenderer;
+
+let characterFighter;
+
+let characterGear;
+
+let characterClock =
+  new THREE.Clock();
+
+
+function initCharacter3D() {
+
+  const container =
+    $("character-3d");
+
+  if (!container) return;
+
+
+  characterScene =
+    new THREE.Scene();
+
+
+  characterScene.background =
+    new THREE.Color(
+      0x10151c
+    );
+
+
+  characterCamera =
+    new THREE.PerspectiveCamera(
+      35,
+      container.clientWidth /
+      container.clientHeight,
+      0.1,
+      100
+    );
+
+
+  characterCamera.position.set(
+    0,
+    2.2,
+    7
+  );
+
+
+  characterCamera.lookAt(
+    0,
+    1.55,
+    0
+  );
+
+
+  characterRenderer =
+    new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true
+    });
+
+
+  characterRenderer.setPixelRatio(
+    Math.min(
+      window.devicePixelRatio,
+      2
+    )
+  );
+
+
+  characterRenderer.setSize(
+    container.clientWidth,
+    container.clientHeight
+  );
+
+
+  container.innerHTML = "";
+
+  container.appendChild(
+    characterRenderer.domElement
+  );
+
+
+  const ambient =
+    new THREE.AmbientLight(
+      0xffffff,
+      1.8
+    );
+
+  characterScene.add(
+    ambient
+  );
+
+
+  const light =
+    new THREE.DirectionalLight(
+      0xffffff,
+      2.2
+    );
+
+  light.position.set(
+    3,
+    6,
+    5
+  );
+
+  characterScene.add(
+    light
+  );
+
+
+  const floor =
+    new THREE.Mesh(
+
+      new THREE.CircleGeometry(
+        3.5,
+        64
+      ),
+
+      createMaterial(
+        0x1b212a
+      )
+
+    );
+
+
+  floor.rotation.x =
+    -Math.PI / 2;
+
+  characterScene.add(
+    floor
+  );
+
+
+  characterFighter =
+    createFighter(true);
+
+
+  characterFighter.position.y =
+    0;
+
+
+  characterScene.add(
+    characterFighter
+  );
+
+
+  characterGear =
+    new THREE.Group();
+
+
+  characterFighter.add(
+    characterGear
+  );
+
+
+  updateCharacter3D();
+
+
+  animateCharacter();
+
+}
+
+
+/* =========================================================
+   3D ЭКИПИРОВКА
+   ========================================================= */
+
+function updateCharacter3D() {
+
+  if (
+    !characterFighter ||
+    !characterGear
+  ) return;
+
+
+  /* Удаляем старые предметы */
+
+  while (
+    characterGear.children.length
+  ) {
+
+    characterGear.remove(
+      characterGear.children[0]
+    );
+
+  }
+
+
+  const head =
+    characterFighter.getObjectByName(
+      "head"
+    );
+
+  const body =
+    characterFighter.getObjectByName(
+      "body"
+    );
+
+  const legL =
+    characterFighter.getObjectByName(
+      "legL"
+    );
+
+  const legR =
+    characterFighter.getObjectByName(
+      "legR"
+    );
+
+  const shoeL =
+    characterFighter.getObjectByName(
+      "shoeL"
+    );
+
+  const shoeR =
+    characterFighter.getObjectByName(
+      "shoeR"
+    );
+
+
+  /* -----------------------------------------
+     КЕПКА
+     ----------------------------------------- */
+
+  if (
+    player.equipment.head === "cap" &&
+    head
+  ) {
+
+    const cap =
+      new THREE.Mesh(
+
+        new THREE.CylinderGeometry(
+          0.5,
+          0.55,
+          0.18,
+          24
+        ),
+
+        createMaterial(
+          0x25395e
+        )
+
+      );
+
+
+    cap.position.set(
+      head.position.x,
+      head.position.y + 0.42,
+      head.position.z
+    );
+
+
+    characterGear.add(
+      cap
+    );
+
+
+    const visor =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          0.42,
+          0.06,
+          0.28
+        ),
+
+        createMaterial(
+          0x1b2942
+        )
+
+      );
+
+
+    visor.position.set(
+      0,
+      head.position.y + 0.32,
+      0.3
+    );
+
+
+    characterGear.add(
+      visor
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     ХУДИ
+     ----------------------------------------- */
+
+  if (
+    player.equipment.body === "hoodie" &&
+    body
+  ) {
+
+    const hoodie =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          1.08,
+          1.34,
+          0.66
+        ),
+
+        createMaterial(
+          0x394352
+        )
+
+      );
+
+
+    hoodie.position.copy(
+      body.position
+    );
+
+
+    characterGear.add(
+      hoodie
+    );
+
+
+    const hood =
+      new THREE.Mesh(
+
+        new THREE.TorusGeometry(
+          0.31,
+          0.09,
+          8,
+          20
+        ),
+
+        createMaterial(
+          0x303846
+        )
+
+      );
+
+
+    hood.position.set(
+      body.position.x,
+      body.position.y + 0.63,
+      body.position.z
+    );
+
+
+    hood.rotation.x =
+      Math.PI / 2;
+
+
+    characterGear.add(
+      hood
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     ШТАНЫ
+     ----------------------------------------- */
+
+  if (
+    player.equipment.legs === "pants"
+  ) {
+
+    [legL, legR].forEach(
+      leg => {
+
+        if (!leg) return;
+
+
+        const pants =
+          new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+              0.21,
+              0.18,
+              0.95,
+              10
+            ),
+
+            createMaterial(
+              0x34404b
+            )
+
+          );
+
+
+        pants.position.copy(
+          leg.position
+        );
+
+
+        characterGear.add(
+          pants
+        );
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     КРОССОВКИ
+     ----------------------------------------- */
+
+  if (
+    player.equipment.feet === "shoes"
+  ) {
+
+    [shoeL, shoeR].forEach(
+      shoe => {
+
+        if (!shoe) return;
+
+
+        const sneaker =
+          new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+              0.4,
+              0.2,
+              0.72
+            ),
+
+            createMaterial(
+              0x5b6674
+            )
+
+          );
+
+
+        sneaker.position.copy(
+          shoe.position
+        );
+
+
+        characterGear.add(
+          sneaker
+        );
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     ОРУЖИЕ
+     ----------------------------------------- */
+
+  const weaponId =
+    player.equipment.hand;
+
+
+  const arm =
+    characterFighter.getObjectByName(
+      "armR"
+    );
+
+
+  if (
+    weaponId === "brass" &&
+    arm
+  ) {
+
+    const knuckle =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          0.38,
+          0.15,
+          0.2
+        ),
+
+        createMaterial(
+          0xb4bbc4
+        )
+
+      );
+
+
+    knuckle.position.set(
+      arm.position.x + 0.05,
+      arm.position.y - 0.35,
+      0.02
+    );
+
+
+    characterGear.add(
+      knuckle
+    );
+
+  }
+
+
+  if (
+    weaponId === "knife" &&
+    arm
+  ) {
+
+    const handle =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          0.08,
+          0.32,
+          0.08
+        ),
+
+        createMaterial(
+          0x3b2a20
+        )
+
+      );
+
+
+    handle.position.set(
+      arm.position.x + 0.05,
+      arm.position.y - 0.38,
+      0
+    );
+
+
+    characterGear.add(
+      handle
+    );
+
+
+    const blade =
+      new THREE.Mesh(
+
+        new THREE.ConeGeometry(
+          0.09,
+          0.45,
+          4
+        ),
+
+        createMaterial(
+          0xb9c1ca
+        )
+
+      );
+
+
+    blade.rotation.z =
+      Math.PI;
+
+
+    blade.position.set(
+      arm.position.x + 0.05,
+      arm.position.y - 0.68,
+      0
+    );
+
+
+    characterGear.add(
+      blade
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ANIMATE CHARACTER
+   ========================================================= */
+
+function animateCharacter() {
+
+  requestAnimationFrame(
+    animateCharacter
+  );
+
+
+  if (!characterRenderer) return;
+
+
+  const time =
+    characterClock.getElapsedTime();
+
+
+  if (characterFighter) {
+
+    characterFighter.rotation.y =
+      Math.sin(time * 0.55) *
+      0.25;
+
+  }
+
+
+  characterRenderer.render(
+    characterScene,
+    characterCamera
+  );
+
+}
+
+
+/* =========================================================
+   RESIZE CHARACTER
+   ========================================================= */
+
+function resizeCharacter() {
+
+  const container =
+    $("character-3d");
+
+  if (
+    !container ||
+    !characterRenderer ||
+    !characterCamera
+  ) return;
+
+
+  const width =
+    container.clientWidth;
+
+  const height =
+    container.clientHeight;
+
+
+  characterCamera.aspect =
+    width / height;
+
+  characterCamera.updateProjectionMatrix();
+
+
+  characterRenderer.setSize(
+    width,
+    height
+  );
+
+}
+
+
+/* =========================================================
+   НАВИГАЦИЯ
+   ========================================================= */
+
+function setupNavigation() {
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const page =
+            button.dataset.page;
+
+
+          document
+            .querySelectorAll(".nav-btn")
+            .forEach(btn => {
+
+              btn.classList.remove(
+                "active"
+              );
+
+            });
+
+
+          button.classList.add(
+            "active"
+          );
+
+
+          document
+            .querySelectorAll(".game-page")
+            .forEach(section => {
+
+              section.classList.remove(
+                "active"
+              );
+
+            });
+
+
+          const target =
+            $(`page-${page}`);
+
+
+          if (target) {
+
+            target.classList.add(
+              "active"
+            );
+
+          }
+
+
+          if (page === "profile") {
+
+            setTimeout(() => {
+
+              resizeCharacter();
+
+              updateCharacter3D();
+
+            }, 50);
+
+          }
+
+
+          if (page === "arena") {
+
+            setTimeout(() => {
+
+              resizeArena();
+
+            }, 50);
+
+          }
+
+        }
+      );
+
+    });
+
+}
+
+
+/* =========================================================
+   ЗОНЫ АТАКИ
+   ========================================================= */
+
+function setupBattleControls() {
+
+  const attackButtons = {
+
+    "btn-att-head": "head",
+
+    "btn-att-body": "body",
+
+    "btn-att-legs": "legs"
+
+  };
+
+
+  Object.entries(
+    attackButtons
+  ).forEach(([id, zone]) => {
+
+    const button = $(id);
+
+    if (!button) return;
+
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        selectedAttack =
+          zone;
+
+
+        Object.keys(
+          attackButtons
+        ).forEach(key => {
+
+          const btn = $(key);
+
+          if (btn) {
+
+            btn.classList.toggle(
+              "selected",
+              key === id
+            );
+
+          }
+
+        });
+
+      }
+    );
+
+  });
+
+
+  const blockButtons = {
+
+    "btn-blk-head": "head",
+
+    "btn-blk-body": "body",
+
+    "btn-blk-legs": "legs"
+
+  };
+
+
+  Object.entries(
+    blockButtons
+  ).forEach(([id, zone]) => {
+
+    const button = $(id);
+
+    if (!button) return;
+
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        selectedBlock =
+          zone;
+
+
+        Object.keys(
+          blockButtons
+        ).forEach(key => {
+
+          const btn = $(key);
+
+          if (btn) {
+
+            btn.classList.toggle(
+              "selected",
+              key === id
+            );
+
+          }
+
+        });
+
+      }
+    );
+
+  });
+
+
+  const attack =
+    $("attack");
+
+
+  if (attack) {
+
+    attack.addEventListener(
+      "click",
+      playerAttack
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   INVENTORY CONTROLS
+   ========================================================= */
+
+function setupInventoryControls() {
+
+  const equip =
+    $("equip-item");
+
+  if (equip) {
+
+    equip.addEventListener(
+      "click",
+      () => {
+
+        if (selectedItemId) {
+
+          equipItem(
+            selectedItemId
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+  const unequip =
+    $("unequip-item");
+
+  if (unequip) {
+
+    unequip.addEventListener(
+      "click",
+      () => {
+
+        if (selectedItemId) {
+
+          unequipItem(
+            selectedItemId
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+  const drop =
+    $("drop-item");
+
+  if (drop) {
+
+    drop.addEventListener(
+      "click",
+      () => {
+
+        if (!selectedItemId) return;
+
+
+        const item =
+          ITEMS[selectedItemId];
+
+
+        if (!item) return;
+
+
+        const answer =
+          confirm(
+            `Выбросить ${item.name}?`
+          );
+
+
+        if (answer) {
+
+          dropItem(
+            selectedItemId
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   MARKET CONTROLS
+   ========================================================= */
+
+function setupMarketControls() {
+
+  Object.keys(ITEMS)
+    .forEach(id => {
+
+      const button =
+        $(`buy-${id}`);
+
+
+      if (!button) return;
+
+
+      button.addEventListener(
+        "click",
+        () => buyItem(id)
+      );
+
+    });
+
+}
+
+
+/* =========================================================
+   CHARACTER EQUIPMENT SLOT CLICK
+   ========================================================= */
+
+function setupEquipmentSlots() {
+
+  Object.entries(
+    SLOT_IDS
+  ).forEach(([slot, id]) => {
+
+    const button =
+      $(id);
+
+    if (!button) return;
+
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        const itemId =
+          player.equipment[slot];
+
+
+        if (itemId) {
+
+          selectItem(itemId);
+
+          document
+            .querySelector(
+              ".inventory-grid"
+            )
+            ?.scrollIntoView({
+              behavior: "smooth",
+              block: "center"
+            });
+
+        }
+
+      }
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   POINT CONTROLS
+   ========================================================= */
+
+function setupPointControls() {
+
+  if ($("add-str")) {
+
+    $("add-str")
+      .addEventListener(
+        "click",
+        addStrength
+      );
+
+  }
+
+
+  if ($("add-agi")) {
+
+    $("add-agi")
+      .addEventListener(
+        "click",
+        addAgility
+      );
+
+  }
+
+}
+
+
+/* =========================================================
+   RESIZE
+   ========================================================= */
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    resizeArena();
+
+    resizeCharacter();
+
+  }
+);
+
+
+/* =========================================================
+   ЗАПУСК
+   ========================================================= */
+
+function init() {
+
+  syncLegacyFields();
+
+  setupNavigation();
+
+  setupBattleControls();
+
+  setupInventoryControls();
+
+  setupMarketControls();
+
+  setupEquipmentSlots();
+
+  setupPointControls();
+
+
+  initArena3D();
+
+  initCharacter3D();
+
+
+  addLog(
+    "⚔️ Бой готов. Выбери зону атаки."
+  );
+
+
+  updateUI();
+
+}
+
+
+init();   SAVE
    ===================================================== */
 
 try {
