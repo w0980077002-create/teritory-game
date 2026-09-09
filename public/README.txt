@@ -1,9 +1,3 @@
-Territory — Sdolars GAME s8
-
-Добавлено:
-- Общий чат игры.
-- Отдельный чат клана.
-- Переключение Общий / Клан.
-- Отправка сообщений и сохранение чата в localStorage.
-- Компактный режим: чат можно свернуть и развернуть.
-- Существующий дизайн главной страницы не переделан.
+Territory — Sdolars GAME s11
+Language switching RU / EN implemented.
+Main page layout preserved.
