@@ -1,32 +1,51 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Territory — Sdolars</title><link rel="stylesheet" href="style.css"></head><body>
-<div id="app">
-<header class="top">
- <div class="profile"><img src="assets/avatar.jpg"><span>5</span></div>
- <div class="identity"><div class="game-title">Sdolars</div><div class="chapter">Глава 5 · Уровень 3</div><div class="xp"><i></i></div><small>120/300</small></div>
- <div class="resources"><button>🪙 <b>1779</b> ＋</button><button>💎 <b>1330</b> ＋</button><button>⚡ <b>191.38</b> ＋</button></div>
- <div class="top-actions"><button onclick="openPage('Сообщения')">✉️<sup>2</sup><small>Сообщения</small></button><button onclick="openPage('Достижения')">🏆<small>Достижения</small></button><button onclick="openPage('Настройки')">⚙️<small>Настройки</small></button><button onclick="toast('Русский / RU')">🇷🇺<small>RU</small></button></div>
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Territory — Sdolars</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="game">
+<header class="header">
+  <div class="avatar"><span>🧔🏻‍♂️</span><b>5</b></div>
+  <div class="profile"><h1>Sdolars</h1><strong>Глава 5 · Уровень 3</strong><div class="xp"><i></i></div><small>120/300</small></div>
+  <div class="resources"><div>🪙 <b>1779</b> ＋</div><div>💎 <b>1330</b> ＋</div><div>⚡ <b>191.38</b> ＋</div></div>
+  <div class="headerBtns"><button onclick="page('Настройки')">⚙️<small>Настройки</small></button><button onclick="toast('Язык: RU')">🇷🇺<small>RU</small></button></div>
 </header>
-<main>
-<section class="scene">
- <div class="scene-bg"></div>
- <button class="quest" onclick="openPage('Задания')"><img src="assets/quest.jpg"><div><b>Текущее задание</b><strong>Поговори с кузнецом</strong><small>📍 Кузница</small></div><em>›</em></button>
- <button class="daily" onclick="claim()"><img src="assets/daily.jpg"><div><b>Ежедневный бонус</b><strong id="clock">23:45:12</strong></div></button>
- <div class="left-tools"><button onclick="openPage('Бонусы')"><img src="assets/gift.png"><b>Бонусы</b><sup>!</sup></button><button onclick="openPage('События')"><img src="assets/calendar.png"><b>События</b><sup>!</sup></button><button onclick="openPage('VIP')"><img src="assets/vip.png"><b>VIP</b></button></div>
- <div class="right-tools"><button onclick="openPage('Кузница')"><img src="assets/smith.png"><div><b>Кузница</b><small>Улучшение снаряжения</small></div><sup>!</sup></button><button onclick="openPage('Таверна')"><img src="assets/tavern.png"><div><b>Таверна</b><small>Найм героев</small></div><sup>!</sup></button><button onclick="openPage('Магазин')"><img src="assets/shop.png"><div><b>Магазин</b><small>Предметы и снаряжение</small></div><sup>!</sup></button></div>
+
+<section class="world">
+  <div class="sky"></div><div class="mountains"></div><div class="castle">🏰</div><div class="water">〰〰〰</div><div class="viking">🧔🏻‍♂️</div>
+
+  <button class="quest panel" onclick="page('Задания')"><span class="ico">📜</span><div><b>Текущее задание</b><strong>Поговори с кузнецом</strong><small>📍 Кузница</small></div><em>›</em></button>
+  <button class="bonus panel" onclick="claim()"><span class="ico">🎁</span><div><b>Ежедневный бонус</b><strong id="timer">23:45:12</strong></div></button>
+
+  <div class="left">
+    <button onclick="page('Бонусы')">🎁<b>Бонусы</b><sup>!</sup></button>
+    <button onclick="page('События')">🗓️<b>События</b><sup>!</sup></button>
+    <button onclick="page('VIP')">👑<b>VIP</b></button>
+  </div>
+
+  <div class="right">
+    <button onclick="page('Кузница')"><span>⚒️</span><div><b>Кузница</b><small>Улучшение снаряжения</small></div><sup>!</sup></button>
+    <button onclick="page('Таверна')"><span>🍺</span><div><b>Таверна</b><small>Найм героев</small></div><sup>!</sup></button>
+    <button onclick="page('Магазин')"><span>👜</span><div><b>Магазин</b><small>Предметы и снаряжение</small></div><sup>!</sup></button>
+  </div>
 </section>
+
 <section class="quick">
- <button class="blue" onclick="battle()"><img src="assets/battle.png"><b>Бой</b></button>
- <button class="orange" onclick="openPage('Инвентарь')"><img src="assets/inventory.png"><b>Инвентарь</b><sup>!</sup></button>
- <button class="purple" onclick="openPage('Экипировка')"><img src="assets/equipment.png"><b>Экипировка</b></button>
- <button class="green" onclick="openPage('Задания')"><img src="assets/quests.png"><b>Задания</b><sup>!</sup></button>
+ <button class="blue" onclick="battle()">⚔️<b>Бой</b></button>
+ <button class="gold" onclick="page('Инвентарь')">🎒<b>Инвентарь</b><sup>!</sup></button>
+ <button class="purple" onclick="page('Экипировка')">🛡️<b>Экипировка</b></button>
+ <button class="green" onclick="page('Задания')">📜<b>Задания</b><sup>!</sup></button>
 </section>
-<section class="reward"><img src="assets/reward.png"><div><b>Бесплатные награды</b><small>Доступно через <i id="clock2">23:45:12</i></small></div><button onclick="claim()">Получить</button></section>
-</main>
+
+<section class="reward"><span>🎁</span><div><b>Бесплатные награды</b><small>Доступно через <i id="timer2">23:45:12</i></small></div><button onclick="claim()">Получить</button></section>
+
 <nav>
- <button class="active">🏠<b>Город</b></button><button onclick="openPage('Герой')">⚔️<b>Герой</b><sup>!</sup></button><button onclick="openPage('Инвентарь')">🎒<b>Инвентарь</b></button><button onclick="openPage('Задания')">🛡️<b>Задания</b><sup>!</sup></button><button onclick="openPage('Гильдия')">👥<b>Гильдия</b></button><button onclick="openPage('Ещё')">☰<b>Ещё</b></button>
+ <button class="active">🏠<b>Город</b></button><button onclick="page('Герой')">⚔️<b>Герой</b><sup>!</sup></button>
+ <button onclick="page('Инвентарь')">🎒<b>Инвентарь</b></button><button onclick="page('Задания')">🛡️<b>Задания</b><sup>!</sup></button>
+ <button onclick="page('Гильдия')">👥<b>Гильдия</b></button><button onclick="page('Ещё')">☰<b>Ещё</b></button>
 </nav>
 </div>
-<div id="modal"><div class="dialog"><button class="close" onclick="closePage()">×</button><div id="modalBody"></div></div></div><div id="toast"></div>
-<script src="app.js"></script></body></html>
+<div id="modal"><div class="dialog"><button class="x" onclick="closeModal()">×</button><div id="body"></div></div></div>
+<div id="toast"></div>
+<script src="app.js"></script>
+</body></html>
