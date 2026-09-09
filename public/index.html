@@ -1,137 +1,36 @@
-
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#1a0d08">
-<title>TERITORY</title>
-<link rel="stylesheet" href="/style.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#120706"><meta name="description" content="TERITORY — онлайн RPG">
+<title>TERITORY</title><link rel="stylesheet" href="style.css">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-<div id="toast"></div>
+<div id="toast" aria-live="polite"></div>
 <div id="app">
-  <section id="login" class="screen">
-    <div class="logo">☠ <b>TERITORY</b></div>
-    <div class="sub">ОНЛАЙН RPG</div>
-    <div class="login-card">
-      <div class="hero-skull">☠</div>
-      <h1>ТЕРРИТОРИЯ ЖДЁТ</h1>
-      <p id="loginText">Подключение к Telegram...</p>
-      <button id="playBtn" class="gold big" disabled>ИГРАТЬ</button>
-      <button id="demoBtn" class="ghost">ДЕМО-РЕЖИМ</button>
-      <small>В Telegram вход выполняется автоматически.</small>
-    </div>
-  </section>
-
-  <section id="game" class="hidden">
-    <header class="top">
-      <div class="brand">☠ TERITORY</div>
-      <div class="topstats">
-        <span>❤️ <b id="hpTop">0/0</b></span>
-        <span>🪙 <b id="coinsTop">0</b></span>
-        <span>🌐 <b id="onlineTop">0</b></span>
-      </div>
-    </header>
-
-    <main>
-      <div id="view-home" class="view active">
-        <div class="profile-card">
-          <div class="avatar">☠</div>
-          <div>
-            <h2 id="nameHome">Игрок</h2>
-            <div>Уровень <b id="levelHome">1</b></div>
-            <div class="xp"><i id="xpBar"></i></div>
-            <small id="xpText">0 / 100 XP</small>
-          </div>
-        </div>
-        <div class="grid2">
-          <button class="tile" data-go="character">🧍<b>Персонаж</b><small>Экипировка и статы</small></button>
-          <button class="tile" data-go="inventory">🎒<b>Инвентарь</b><small>Предметы и действия</small></button>
-          <button class="tile" data-go="arena">⚔️<b>Арена</b><small>Сражения и награды</small></button>
-          <button class="tile" data-go="shop">🏪<b>Магазин</b><small>Оружие и броня</small></button>
-          <button class="tile" data-go="casino">🎰<b>Казино</b><small>Только виртуальные монеты</small></button>
-          <button class="tile" data-go="world">🗺️<b>Мир</b><small>Локации и события</small></button>
-        </div>
-      </div>
-
-      <div id="view-character" class="view">
-        <h2>🧍 Персонаж</h2>
-        <div class="character">
-          <div class="char-art">🧍</div>
-          <div class="stats">
-            <div><span>❤️ Здоровье</span><b id="hpStat"></b></div>
-            <div><span>⚔️ Атака</span><b id="attackStat"></b></div>
-            <div><span>🛡️ Защита</span><b id="defStat"></b></div>
-            <div><span>🏆 Победы</span><b id="winsStat"></b></div>
-            <div><span>💀 Поражения</span><b id="lossStat"></b></div>
-          </div>
-        </div>
-        <h3>Надето</h3>
-        <div id="equipment"></div>
-        <button id="healBtn" class="gold">🏥 Восстановить HP — 25 🪙</button>
-      </div>
-
-      <div id="view-inventory" class="view">
-        <h2>🎒 Инвентарь</h2>
-        <div id="inventory"></div>
-      </div>
-
-      <div id="view-shop" class="view">
-        <h2>🏪 Магазин</h2>
-        <div id="shop"></div>
-      </div>
-
-      <div id="view-arena" class="view">
-        <h2>⚔️ Арена</h2>
-        <div id="battle"></div>
-        <div id="enemies"></div>
-      </div>
-
-      <div id="view-casino" class="view">
-        <h2>🎰 Казино</h2>
-        <div class="casino">
-          <label>Ставка <input id="bet" type="number" value="20" min="1" max="500"></label>
-          <div class="slot-machine">
-            <div id="reels">🍒 🍋 🔔</div>
-            <button id="slotsBtn" class="gold">КРУТИТЬ</button>
-          </div>
-          <div class="dice">
-            <div id="diceResult">🎲</div>
-            <button id="diceBtn">БРОСИТЬ КУБИК</button>
-          </div>
-          <small>Казино использует только внутриигровые монеты и не связано с реальными деньгами.</small>
-        </div>
-      </div>
-
-      <div id="view-world" class="view">
-        <h2>🗺️ Мир</h2>
-        <div class="location" id="locations"></div>
-      </div>
-
-      <div id="view-players" class="view">
-        <h2>👥 Игроки онлайн</h2>
-        <div id="players"></div>
-      </div>
-
-      <div id="view-chat" class="view">
-        <h2>💬 Чат</h2>
-        <div id="chatLog" class="chatlog"></div>
-        <div class="chat-input"><input id="chatInput" maxlength="240" placeholder="Сообщение..."><button id="sendChat">➤</button></div>
-      </div>
-    </main>
-
-    <nav>
-      <button data-go="home">⌂<small>Главная</small></button>
-      <button data-go="character">☠<small>Герой</small></button>
-      <button data-go="arena">⚔<small>Бой</small></button>
-      <button data-go="shop">▣<small>Магазин</small></button>
-      <button data-go="chat">☵<small>Чат</small></button>
-      <button data-go="players">👥<small>Игроки</small></button>
-    </nav>
-  </section>
-</div>
-<script src="/app.js"></script>
-</body>
-</html>
+<header class="topbar"><button class="brand" onclick="show('home')">☠ <b>TERITORY</b></button><div class="resources"><span>❤️ <b id="topHp">100/100</b></span><span>🪙 <b id="topCoins">250</b></span><span>🌐 <b id="topOnline">1</b></span></div></header>
+<main>
+<section id="home" class="screen active">
+  <div class="hero"><div class="logoSkull">☠</div><div class="eyebrow">ОНЛАЙН RPG</div><h1>ТЕРРИТОРИЯ ЖДЁТ</h1><p id="welcome">Выживи. Стань сильнее. Забери территорию.</p><button class="gold big" onclick="show('character')">ИГРАТЬ</button></div>
+  <div class="tiles">
+   <button onclick="show('character')">🧍<b>Персонаж</b><small>Уровень и характеристики</small></button>
+   <button onclick="show('inventory')">🎒<b>Инвентарь</b><small>Оружие, броня и вещи</small></button>
+   <button onclick="show('arena')">⚔️<b>Арена</b><small>Сражения и награды</small></button>
+   <button onclick="show('shop')">🏪<b>Магазин</b><small>Покупка предметов</small></button>
+   <button onclick="show('casino')">🎰<b>Казино</b><small>Только игровые монеты</small></button>
+   <button onclick="show('world')">🗺️<b>Мир</b><small>Локации и путешествия</small></button>
+  </div>
+</section>
+<section id="character" class="screen"><h2>🧍 Персонаж</h2><div class="profile card"><div class="avatar">☠</div><div class="grow"><h3 id="name">Игрок</h3><div class="muted">Уровень <b id="level">1</b></div><div class="bar"><i id="xpBar"></i></div><small id="xp">0 / 100 XP</small></div></div><div class="stats"><div>❤️<span>Здоровье</span><b id="hp">100/100</b></div><div>⚔️<span>Атака</span><b id="attack">9</b></div><div>🛡️<span>Защита</span><b id="defense">6</b></div><div>🏆<span>Победы</span><b id="wins">0</b></div><div>💀<span>Поражения</span><b id="losses">0</b></div><div>📍<span>Локация</span><b id="location">Город</b></div></div><h3>Экипировка</h3><div id="equipment"></div><button class="gold" onclick="fullHeal()">🏥 Полностью восстановить — 25 🪙</button></section>
+<section id="inventory" class="screen"><h2>🎒 Инвентарь</h2><p class="muted">Предметы можно надевать, использовать и выбрасывать.</p><div id="inv"></div></section>
+<section id="shop" class="screen"><h2>🏪 Магазин</h2><div class="card shop-head">Твои монеты: <b id="shopCoins">250</b> 🪙</div><div id="shopList"></div></section>
+<section id="arena" class="screen"><h2>⚔️ Арена</h2><div id="battle"></div><div id="enemyList"></div></section>
+<section id="casino" class="screen"><h2>🎰 Казино</h2><div class="card casino"><p class="muted">Азарт только за виртуальные монеты. Реальных денег нет.</p><label>Ставка <input id="bet" type="number" value="20" min="1" max="500" inputmode="numeric"></label><div id="reels" class="reels">🍒　🍋　🔔</div><button class="gold" onclick="slots()">КРУТИТЬ БАРАБАН</button><div id="dice" class="dice">🎲</div><button onclick="rollDice()">БРОСИТЬ КУБИК</button></div></section>
+<section id="world" class="screen"><h2>🗺️ Мир</h2><p class="muted">Переезжай между районами. Арена доступна из любой точки.</p><div id="locations"></div></section>
+<section id="players" class="screen"><h2>👥 Игроки</h2><div class="card"><div class="onlineBig" id="onlineBig">1</div><div class="muted">игроков сейчас онлайн</div></div><div class="card"><b>Твой профиль</b><p id="playerSummary" class="muted"></p></div></section>
+<section id="chat" class="screen"><h2>💬 Онлайн-чат</h2><div id="chatLog" class="chatlog"></div><div class="chatInput"><input id="chatInput" maxlength="240" placeholder="Сообщение..."><button class="gold" onclick="sendChat()">➤</button></div><small class="muted">Чат общий для игроков сервера.</small></section>
+</main>
+<nav><button onclick="show('home')">⌂<small>Главная</small></button><button onclick="show('character')">☠<small>Герой</small></button><button onclick="show('arena')">⚔<small>Бой</small></button><button onclick="show('shop')">▣<small>Магазин</small></button><button onclick="show('chat')">☵<small>Чат</small></button></nav>
+</div><script src="app.js"></script>
+</body></html>
