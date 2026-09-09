@@ -1,97 +1,310 @@
 // ==========================================
-// 1. ГЛОБАЛЬНОЕ СОСТОЯНИЕ ИГРЫ (ДАННЫЕ)
+// 1. ДАННЫЕ ИГРЫ (ПЕРЕМЕННЫЕ)
 // ==========================================
 const S = {
     gold: 1250,
-    ph: 100,        // Текущее здоровье игрока
-    maxPh: 100,     // Максимальное здоровье игрока
-    eh: 100,        // Текущее здоровье врага
-    maxEh: 100,     // Максимальное здоровье врага
-    ap: 3,          // Текущие очки действия (ОД)
-    def: false,     // Флаг защитной стойки игрока
-    enemyName: "Бандит",
+    ph: 100,        // Хитпоинты игрока
+    eh: 100,        // Хитпоинты врага
+    ap: 3,          // Очки действия (ОД)
+    def: false,     // Стойка защиты
     log: ["Бандит выходит на арену.", "Твой ход."],
     
-    // Базовые характеристики персонажа (без учета шмота)
-    baseStats: {
-        atk: 15,
-        def: 10,
-        crit: 12
-    },
-
-    // Надетые слоты экипировки (хранят индексы из массива items или null)
-    equipped: {
-        weapon: 0,   // Клинок
-        armor: 1,    // Щит
-        helmet: 2,   // Шлем
-        gloves: 5,   // Перчатки
-        boots: 6,    // Сапоги
-        ring: 3      // Кольцо
-    },
-
-    // Массив вещей в инвентаре: [Иконка, Название, Описание, ТипСтата, ЗначениеБонуса]
+    // Предметы в вашей сумке
     items: [
-        ["🗡️", "Клинок", "ATK +18", "atk", 18],
-        ["🛡️", "Щит", "DEF +14", "def", 14],
-        ["⛑️", "Шлем", "DEF +7", "def", 7],
-        ["💍", "Кольцо", "ATK +6", "atk", 6],
-        ["🧪", "Зелье HP", "HP +40", "use", 40],
-        ["🥊", "Перчатки", "ATK +5", "atk", 5],
-        ["🥾", "Сапоги", "DEF +4", "def", 4],
-        ["💎", "Кристалл", "Редкий ресурс", "misc", 0]
+        ["🗡️","Клинок","ATK +18"],
+        ["🛡️","Щит","DEF +14"],
+        ["⛑️","Шлем","DEF +7"],
+        ["💍","Кольцо","ATK +6"],
+        ["🧪","Зелье","HP +40"],
+        ["🥊","Перчатки","ATK +5"],
+        ["🥾","Сапоги","DEF +4"],
+        ["💎","Кристалл","Редкий"]
     ]
 };
 
-// Ссылки на DOM-элементы страницы
+// Ссылки на экран и золото из HTML
 const screen = document.getElementById("screen");
 const gold = document.getElementById("gold");
 
-// ==========================================
-// 2. ВСПОМОГАТЕЛЬНЫЕ СИСТЕМНЫЕ ФУНКЦИИ
-// ==========================================
-
-// Инициализация игры при загрузке страницы
+// Инициализация при старте страницы
 window.onload = () => {
     if(gold) gold.textContent = S.gold;
     home();
 };
 
-// Всплывающие уведомления (Toast)
-function toast(t) {
+// Всплывающие подсказки
+function toast(t){
     let x = document.getElementById("toast");
-    if (!x) return;
+    if(!x) return;
     x.textContent = t;
     x.classList.add("show");
     clearTimeout(window.tt);
     window.tt = setTimeout(() => x.classList.remove("show"), 1400);
 }
 
-// Динамический пересчет характеристик игрока (База + Шмот)
-function getFinalStats() {
-    let stats = { atk: S.baseStats.atk, def: S.baseStats.def, crit: S.baseStats.crit };
-    
-    for (let slot in S.equipped) {
-        let itemIndex = S.equipped[slot];
-        if (itemIndex !== null && S.items[itemIndex]) {
-            let item = S.items[itemIndex];
-            let statType = item[3];
-            let bonusValue = item[4];
-            if (stats[statType] !== undefined) {
-                stats[statType] += bonusValue;
-            }
-        }
-    }
-    return stats;
+// ==========================================
+// 2. ИГРОВЫЕ ЭКРАНЫ (ИНТЕРФЕЙС)
+// ==========================================
+
+// Экран: Город
+function home(){
+    screen.innerHTML = `
+        <section class="hero">
+            <h2>⚔️ TERRITORIA ⚔️</h2>
+            <p>Золотой город</p>
+            <div class="herochar">🧙</div>
+            <div class="wolf">🐺</div>
+            <div class="fire">🔥</div>
+            <div class="quick">
+                <button onclick="inventory()">🎒<br>Герой</button>
+                <button onclick="startBattle()">⚔️<br>Арена</button>
+                <button onclick="quests()">📜<br>Задания</button>
+                <button onclick="shop()">🛒<br>Магазин</button>
+            </div>
+        </section>
+        <div class="card">
+            <b>❤️ Здоровье</b>
+            <div class="hp"><span style="width:${S.ph}%"></span></div>
+            ${S.ph}/100 HP
+        </div>
+        <div class="card">
+            <b>📊 Характеристики</b>
+            <div class="stats">
+                <div class="stat">⚔️<b>48</b>Атака</div>
+                <div class="stat">🛡️<b>35</b>Защита</div>
+                <div class="stat">💥<b>12%</b>Крит</div>
+            </div>
+        </div>
+    `;
 }
 
-// Генерирует HTML-точки ОД (звездочки на арене) без багнутых функций
-function generateApDots() {
-    let html = "";
-    for (let i = 0; i < 3; i++) {
-        if (i < S.ap) {
-            html += "<i></i>"; // Горит желтым
-        } else {
-            html += "<i class='off'></i>"; // Потрачено
+// Экран: Инвентарь персонажа
+function inventory(){
+    screen.innerHTML = `
+        <h2 class="title">🎒 Герой</h2>
+        <div class="card">
+            <b>Экипировка</b>
+            <div class="grid">
+                ${["🗡️","🛡️","⛑️","🥊","🥾","💍"].map((x,i) => `
+                    <div class="slot">${x}<small>${["Оружие","Броня","Шлем","Перчатки","Сапоги","Кольцо"][i]}</small></div>
+                `).join("")}
+            </div>
+        </div>
+        <div class="card">
+            <b>Предметы</b>
+            <div class="items">
+                ${S.items.map((x,i) => `
+                    <button class="item" onclick="toast('${x[1]} выбран')">
+                        <i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small>
+                    </button>
+                `).join("")}
+            </div>
+        </div>
+    `;
+}
+
+// Экран: Магазин
+function shop(){
+    let g = [
+        ["🗡️","Железный меч",180],
+        ["🛡️","Щит стража",220],
+        ["🧪","Зелье HP",90],
+        ["💍","Кольцо силы",350],
+        ["⛑️","Шлем охотника",260],
+        ["⚔️","Меч героя",500]
+    ];
+    window.goods = g; // Сохраняем товары для функции покупки
+    
+    screen.innerHTML = `
+        <h2 class="title">🛒 Магазин</h2>
+        <div class="card">
+            <div class="shopgrid">
+                ${g.map((x,i) => `
+                    <div class="shopitem">
+                        <div class="icon">${x[0]}</div>
+                        <b>${x[1]}</b>
+                        <button class="buy" onclick="buy(${i})">🪙 ${x[2]}</button>
+                    </div>
+                `).join("")}
+            </div>
+        </div>
+    `;
+}
+
+// Логика покупки предметов
+function buy(i){
+    let x = goods[i];
+    if(S.gold < x[2]) return toast("Не хватает золота");
+    
+    S.gold -= x[2];
+    if(gold) gold.textContent = S.gold;
+    
+    // Добавляем купленный предмет в инвентарь игрока
+    S.items.push([x[0], x[1], "Куплено"]);
+    toast("Куплено: " + x[1]);
+}
+
+// Экран: Задания
+function quests(){
+    screen.innerHTML = `
+        <h2 class="title">📜 Задания</h2>
+        <div class="card quest">
+            <i>⚔️</i>
+            <div><b>Победи бандита</b><small>Награда: 🪙 120</small></div>
+            <button onclick="startBattle()">В бой</button>
+        </div>
+        <div class="card quest">
+            <i>🪙</i>
+            <div><b>Накопи 2000 золота</b><small>Прогресс: ${S.gold}/2000</small></div>
+        </div>
+        <div class="card quest">
+            <i>🎒</i>
+            <div><b>Собери 5 предметов</b><small>Прогресс: ${S.items.length}/5</small></div>
+        </div>
+    `;
+}
+
+// ==========================================
+// 3. БОЕВАЯ ЛОГИКА (АРЕНА)
+// ==========================================
+
+// Старт боя
+function startBattle(){
+    S.ph = 100;
+    S.eh = 100;
+    S.ap = 3;
+    S.def = false;
+    S.log = ["Бандит выходит на арену.", "Твой ход."];
+    battle();
+}
+
+// Отрисовка арены
+function battle(){
+    screen.innerHTML = `
+        <section class="battle">
+            <div class="turn">
+                <span>${S.ap > 0 ? "ТВОЙ ХОД" : "НЕТ ОЧКОВ ДЕЙСТВИЯ"}</span>
+            </div>
+            <div class="arena">
+                <div class="line"></div>
+                <div class="unit you">
+                    <div class="pic">🧙</div>
+                    <b>Территорианец</b>
+                    <div class="hp"><span style="width:${S.ph}%"></span></div>
+                    <small>${S.ph}/100</small>
+                    <div class="ap">
+                        ${[0,1,2].map(i => `<i class="${i < S.ap ? "" : "off"}"></i>`).join("")}
+                    </div>
+                </div>
+                <div class="unit enemy">
+                    <div class="pic">👹</div>
+                    <b>Бандит</b>
+                    <div class="hp"><span style="width:${S.eh}%"></span></div>
+                    <small>${S.eh}/100</small>
+                </div>
+            </div>
+            <div class="card">
+                <b>📜 Журнал боя</b>
+                <div class="battlelog">
+                    ${S.log.slice(-5).map(x => `<div>• ${x}</div>`).join("")}
+                </div>
+            </div>
+            <div class="actions">
+                <button class="act main" onclick="act('attack')">⚔️ Атака<br><small>1 ОД</small></button>
+                <button class="act" onclick="act('skill')">✨ Сильный удар<br><small>2 ОД</small></button>
+                <button class="act" onclick="act('def')">🛡️ Защита<br><small>1 ОД</small></button>
+                <button class="act heal" onclick="act('heal')">🧪 Зелье<br><small>1 ОД</small></button>
+            </div>
+        </section>
+    `;
+}
+
+// Обработка действий игрока во время боя
+function act(a){
+    if(S.eh <= 0 || S.ph <= 0) return toast("Бой завершен");
+    
+    let cost = a === "skill" ? 2 : 1;
+    if(S.ap < cost) return toast("Недостаточно очков действия");
+    
+    S.ap -= cost;
+    
+    if(a === "attack"){
+        let d = 15 + Math.floor(Math.random() * 9);
+        S.eh = Math.max(0, S.eh - d);
+        S.log.push(`Ты атаковал и нанёс ${d} урона.`);
+    }
+    if(a === "skill"){
+        let d = 28 + Math.floor(Math.random() * 13);
+        S.eh = Math.max(0, S.eh - d);
+        S.log.push(`✨ Сильный удар! ${d} урона.`);
+    }
+    if(a === "def"){
+        S.def = true;
+        S.log.push("🛡️ Ты занял защитную стойку.");
+    }
+    if(a === "heal"){
+        S.ph = Math.min(100, S.ph + 30);
+        S.log.push("🧪 Ты восстановил 30 HP.");
+    }
+    
+    // Проверка победы игрока
+    if(S.eh <= 0){
+        S.log.push("🏆 Победа! +120 золота.");
+        S.gold += 120;
+        if(gold) gold.textContent = S.gold;
+        renderEndControls();
+        return;
+    }
+    
+    // Передача хода монстру, если кончились ОД
+    if(S.ap === 0){
+        battle();
+        setTimeout(enemyTurn, 800);
+    } else {
+        battle();
+    }
+}
+
+// Ход Бандита
+function enemyTurn(){
+    if(S.eh <= 0 || S.ph <= 0) return;
+    
+    let d = 8 + Math.floor(Math.random() * 8);
+    if(S.def){
+        d = Math.ceil(d / 2);
+        S.def = false;
+        S.log.push(`👹 Бандит атакует в щит: -${d} HP.`);
+    } else {
+        S.log.push(`👹 Бандит атакует: -${d} HP.`);
+    }
+    
+    S.ph = Math.max(0, S.ph - d);
+    
+    // Проверка смерти игрока
+    if(S.ph <= 0){
+        S.log.push("💀 Поражение. Нажми «Бой», чтобы начать снова.");
+        S.ap = 0;
+        renderEndControls();
+        return;
+    }
+    
+    S.ap = 3;
+    S.log.push("Твой ход.");
+    battle();
+}
+
+// Замена кнопок управления на кнопку возврата в город
+function renderEndControls() {
+    battle();
+    let actionsBlock = document.querySelector(".actions");
+    if (actionsBlock) {
+        actionsBlock.innerHTML = `
+            <button class="act main" style="grid-column: span 2; background: linear-gradient(#e7bb54,#94491d);" onclick="home()">
+                Вернуться в город
+            </button>
+        `;
+    }
+}
         }
     }
     return html;
