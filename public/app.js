@@ -19,7 +19,7 @@ function syncGear(){s.gear=[];['weapon','armor','helmet','accessory'].forEach(fu
 syncGear();
 function save(){localStorage.setItem(key,JSON.stringify(s))}
 function addXP(n){s.xp+=n;if(s.xp>=s.level*100){s.xp-=s.level*100;s.level++;s.energy=Math.min(100,s.energy+20);toast('Новый уровень: '+s.level+'!')}}
-function toast(t){let x=document.createElement('div');x.className='toast';x.textContent=t;document.body.appendChild(x);setTimeout(()=>x.remove(),1600)}
+function toast(t){let x=document.createElement('div');x.className='toast';x.textContent=(typeof translateText==='function'?translateText(t):t);document.body.appendChild(x);setTimeout(()=>x.remove(),1600)}
 function nav(active){return `<nav class="nav">${[['home','🏠','Главная'],['raid','⚔️','Приключение'],['hero','🛡️','Герой'],['mine','⛏️','Добыча'],['more','☰','Ещё']].map(a=>`<button class="${active===a[0]?'active':''}" onclick="go('${a[0]}')"><span>${a[1]}</span>${a[2]}</button>`).join('')}</nav>`}
 function shell(body,active='home'){document.getElementById('app').innerHTML=`<div class="app"><header class="top"><div class="brand"><div class="logo">⚔️</div><div><div class="title">Territory</div><div class="sub">Глава ${s.chapter} · Уровень ${s.level}</div></div></div><div class="stats"><div class="pill"><b>🪙 ${s.gold}</b><span>Золото</span></div><div class="pill"><b>💎 ${s.diamonds}</b><span>Алмазы</span></div><div class="pill"><b>🪙 ${s.coc.toFixed(2)}</b><span>COC</span></div></div></header><main class="screen">${body}</main>${nav(active)}</div>`}
 function home(){shell(`<div class="hero"><div class="heroart"><span class="anim-float">🧝‍♀️<span class="anim-swing">⚔️</span></span><i class="spark s1"></i><i class="spark s2"></i><i class="spark s3"></i></div><div class="rarity">★ ★ ★ ★ ★</div><h2>${s.hero}</h2><div class="muted">Сила судьбы · ${s.level} уровень</div><div class="bars"><div class="muted">HP ${s.hp}/100</div><div class="bar"><i style="width:${s.hp}%"></i></div><div class="muted">Опыт ${s.xp}/${s.level*100}</div><div class="bar"><i style="width:${s.xp/(s.level*100)*100}%"></i></div></div></div><div class="section"><h2>Быстрые действия</h2></div><div class="grid"><div class="card"><h3>⚔️ Рейд</h3><div class="muted">Автобой и награды</div><button class="btn" onclick="go('raid')">В бой</button></div><div class="card"><h3>⛏️ Добыча</h3><div class="muted">Пассивный доход</div><button class="btn green" onclick="go('mine')">Добывать</button></div><div class="card"><h3>🚢 Плавание</h3><div class="muted">Отправить корабль</div><button class="btn alt" onclick="sail()">Отправить</button></div><div class="card"><h3>🎲 Лотерея</h3><div class="muted">Ежедневные розыгрыши</div><button class="btn alt" onclick="lottery()">Участвовать</button></div></div><div class="section"><h2>События</h2></div><div class="notice">🔥 Чем активнее играешь, тем больше наград. В этой версии экономика учебная: реальные деньги и криптокошельки не подключены.</div>`,'home')}
@@ -147,51 +147,82 @@ function addLanguageButton(){
 }
 
 var RU_EN=[
+ ['Автоматическая добыча награды. Чем выше уровень и вес, тем больше доход.','Automatic reward mining. The higher the level and weight, the higher the income.'],
+ ['Чем активнее играешь, тем больше наград. В этой версии экономика учебная: реальные деньги и криптокошельки не подключены.','The more you play, the more rewards you get. This version uses demo economy: real money and crypto wallets are not connected.'],
+ ['Здесь можно надеть, снять или выбросить предмет. Надетая экипировка сразу меняет характеристики героя.','Here you can equip, unequip or discard items. Equipped gear immediately changes the hero stats.'],
+ ['Команда: 3 героя · награда зависит от главы. Это игровая демо-механика.','Team: 3 heroes · reward depends on the chapter. This is a gameplay demo mechanic.'],
+ ['Выбери навык или включи автобой.','Choose a skill or enable auto battle.'],
+ ['Команда атакует сама каждые 2 секунды','The team attacks automatically every 2 seconds'],
+ ['Бой начался!','Battle started!'],['Отряд готов атаковать.','The squad is ready to attack.'],
+ ['Награда проверена','Reward checked'],['Защита активна','Defense active'],['Предмет снят','Item unequipped'],['Предмет выброшен','Item discarded'],
+ ['Сначала сними предмет','Unequip the item first'],['Не хватает золота','Not enough gold'],['Нужна энергия','Energy required'],['Недостаточно энергии','Not enough energy'],
+ ['Новый уровень:','New level:'],['Победа!','Victory!'],['Получено','Received'],['Куплено:','Purchased:'],['Добыто','Mined'],
+ ['Корабль вернулся:','The ship returned:'],['Успешный грабёж','Successful plunder'],['Выигрыш:','Winnings:'],['Нужно 50 золота','50 gold required'],
+ ['Ускорение активировано на 5 минут','Speed boost activated for 5 minutes'],['Ссылка приглашения скопирована','Invite link copied'],
+ ['Реальные деньги и криптокошельки не подключены.','Real money and crypto wallets are not connected.'],
  ['Главная','Home'],['Приключение','Adventure'],['Герой','Hero'],['Добыча','Mining'],['Ещё','More'],
  ['Золото','Gold'],['Алмазы','Diamonds'],['Глава','Chapter'],['Уровень','Level'],['Сила судьбы','Fate Power'],
  ['Быстрые действия','Quick Actions'],['Рейд','Raid'],['Автобой и награды','Auto battle and rewards'],['В бой','Fight'],
  ['Добывать','Mine'],['Плавание','Sailing'],['Отправить','Send'],['Лотерея','Lottery'],['Участвовать','Enter'],
  ['События','Events'],['Чем активнее играешь, тем больше наград.','The more you play, the more rewards you get.'],
- ['Автобой','Auto battle'],['Хранитель фьорда','Fjord Guardian'],['Сложность','Difficulty'],['Здоровье врага','Enemy health'],
+ ['Автобой','Auto battle'],['Автобой включён','Auto battle enabled'],['Автобой выключен','Auto battle disabled'],
+ ['Хранитель фьорда','Fjord Guardian'],['Хранитель','Guardian'],['Сложность','Difficulty'],['Сложность:','Difficulty:'],['Здоровье врага','Enemy health'],
  ['Награда','Reward'],['НАЧАТЬ АВТОБОЙ','START AUTO BATTLE'],['Руны и усиления','Runes and boosts'],['Руна ярости','Rune of Fury'],
  ['Ускорение','Speed Boost'],['Сокращает время добычи','Reduces mining time'],['Исп.','Use'],['Экипировка','Equipment'],
- ['Оружие','Weapon'],['Броня','Armor'],['Шлем','Helmet'],['Амулет','Amulet'],['Пусто','Empty'],['Снять','Unequip'],
- ['Выбрать','Choose'],['Инвентарь','Inventory'],['Открыть всё','Open all'],['Надеть','Equip'],['НАДЕТО','EQUIPPED'],
- ['Характеристики','Stats'],['Атака','Attack'],['Защита','Defense'],['Крит','Crit'],['Энергия','Energy'],
- ['Обычная атака','Basic attack'],['Грозовой удар','Thunder strike'],['Защита','Defense'],['Автоматический бой','Automatic battle'],
- ['Команда атакует сама каждые 2 секунды','The team attacks automatically every 2 seconds'],['НАЧАТЬ БОЙ','START BATTLE'],
- ['ПОБЕДА!','VICTORY!'],['Следующий рейд','NEXT RAID'],['Открыть','Open'],['Задания','Quests'],['Магазин','Shop'],
- ['Рейтинг','Ranking'],['Сообщество','Community'],['Канал и обсуждение','Channel and discussion'],['Пригласить','Invite'],
- ['Бонус за друзей','Friend bonus'],['Настройки','Settings'],['Сбросить демо','Reset demo'],['Новости Territory','Territory News'],
- ['Чат Territory','Territory Chat'],['Обсуждение канала','Channel Discussion'],['Открыть бота Territory','Open Territory bot'],
- ['Общий чат игроков','Players common chat'],['Обсуждение публикаций Territory','Discuss Territory posts'],['Предмет снят','Item unequipped'],
- ['Нужно 50 золота','50 gold required'],['Недостаточно энергии','Not enough energy'],['Ускорение активировано на 5 минут','Speed boost activated for 5 minutes'],
- ['Ссылка приглашения скопирована','Invite link copied'],['Розыгрыш','Draw'],['Смотреть','View'],['Открыть всё','Open all'],
- ['Это игровая демо-механика.','This is a gameplay demo mechanic.'],['Предмет выброшен','Item discarded'],['Сначала сними предмет','Unequip the item first'],
- ['Оружие','Weapon'],['Броня','Armor'],['Шлем','Helmet'],['Аксессуар','Accessory'],['Золото','Gold'],['Алмазы','Diamonds']
+ ['Оружие','Weapon'],['Броня','Armor'],['Шлем','Helmet'],['Амулет','Amulet'],['Аксессуар','Accessory'],['Пусто','Empty'],['Снять','Unequip'],
+ ['Выбрать','Choose'],['Инвентарь','Inventory'],['Открыть всё','Open all'],['Надеть','Equip'],['НАДЕТО','EQUIPPED'],['Выбросить','Discard'],
+ ['Характеристики','Stats'],['Атака','Attack'],['Защита','Defense'],['Крит','Crit'],['Энергия','Energy'],['Опыт','XP'],
+ ['Обычная атака','Basic attack'],['Грозовой удар','Thunder strike'],['Автоматический бой','Automatic battle'],['НАЧАТЬ БОЙ','START BATTLE'],
+ ['НАЧАТЬ БОЙ · 10','START BATTLE · 10'],['ПОБЕДА!','VICTORY!'],['Следующий рейд','NEXT RAID'],['СЛЕДУЮЩИЙ РЕЙД','NEXT RAID'],
+ ['Открыть','Open'],['Задания','Quests'],['Магазин','Shop'],['Рейтинг','Ranking'],['Сообщество','Community'],
+ ['Канал и обсуждение','Channel and discussion'],['Пригласить','Invite'],['Бонус за друзей','Friend bonus'],['Настройки','Settings'],['Сбросить демо','Reset demo'],
+ ['Новости Territory','Territory News'],['Чат Territory','Territory Chat'],['Обсуждение канала','Channel Discussion'],['Открыть бота Territory','Open Territory bot'],
+ ['Общий чат игроков','Players common chat'],['Обсуждение публикаций Territory','Discuss Territory posts'],['Розыгрыш','Draw'],['Смотреть','View'],
+ ['Это игровая демо-механика.','This is a gameplay demo mechanic.'],['Возвращение к герою','Return to hero'],['Вернуться к герою','Return to hero'],
+ ['Пассивный доход','Passive income'],['Ежедневные розыгрыши','Daily draws'],['Грабить','Plunder'],['Успешных рейдов','Successful raids'],['Уровень корабля','Ship level'],
+ ['Топор берсерка','Berserker Axe'],['Щит викинга','Viking Shield'],['Набор рун','Rune Set'],['Меч северянина','Northern Sword'],['Стальной топор','Steel Axe'],
+ ['Кожаная броня','Leather Armor'],['Броня валькирии','Valkyrie Armor'],['Шлем викинга','Viking Helmet'],['Амулет судьбы','Amulet of Fate'],
+ ['Валькирия','Valkyrie'],['Берсерк','Berserker'],['Следопыт','Ranger'],['Ты','You'],
+ ['урона','damage'],['урон','damage'],['атаки','attack'],['защиты','defense'],['золота','gold'],['алмазов','diamonds'],['рун','runes'],['предметов','items'],['уровень','level'],['прогресс','progress'],
+ ['Награда зависит от главы','Reward depends on the chapter'],['Щит отряда','Squad shield'],['минут добычи','minutes of mining'],['к атаке на 1 бой','to attack for 1 battle'],
+ ['Открой бота Territory','Open Territory bot'],['Канал','Channel'],['Чат','Chat'],['Обсуждение канала','Channel discussion'],
+ ['Все покупки в демо-версии оплачиваются игровой валютой и не являются финансовыми операциями.','All purchases in the demo are paid with in-game currency and are not financial transactions.'],
+ ['Показатель веса:','Weight multiplier:'],['В оригинальной механике проекта награды зависели от прогресса,','In the original project mechanics, rewards depended on progress,'],
+ ['скинов и глав.','skins and chapters.'],['характеристики героя.','hero stats.'],['экипирован','equipped'],['Выигрыш','Winnings'],['Добыто','Mined'],
+ ['НАЧАТЬ БОЙ','START BATTLE']
 ];
+
+// Translate every text node, not only leaf elements. This fixes mixed RU/EN text
+// inside <div><b>...</b>...</div>, battle logs, dynamic labels and descriptions.
+function translateText(txt){
+  var out=txt;
+  var list=RU_EN.slice().sort(function(a,b){return b[0].length-a[0].length});
+  if(currentLang==='en'){
+    for(var i=0;i<list.length;i++)out=out.split(list[i][0]).join(list[i][1]);
+  }else{
+    for(var j=0;j<list.length;j++)out=out.split(list[j][1]).join(list[j][0]);
+  }
+  return out;
+}
 function applyLanguage(){
   var root=document.getElementById('app'); if(!root)return;
   root.setAttribute('lang',currentLang);
-  var nodes=root.querySelectorAll('*');
-  for(var i=0;i<nodes.length;i++){
-    if(nodes[i].id==='languageBtn')continue;
-    if(nodes[i].children.length===0 && nodes[i].textContent.trim()){
-      var txt=nodes[i].textContent;
-      if(currentLang==='en'){
-        for(var j=0;j<RU_EN.length;j++)txt=txt.split(RU_EN[j][0]).join(RU_EN[j][1]);
-      }else{
-        for(var j=0;j<RU_EN.length;j++)txt=txt.split(RU_EN[j][1]).join(RU_EN[j][0]);
-      }
-      nodes[i].textContent=txt;
-    }
+  var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null,false);
+  var texts=[];
+  var n;
+  while((n=walker.nextNode())){
+    var parent=n.parentNode;
+    if(!parent)continue;
+    if(parent.id==='languageBtn'||parent.tagName==='SCRIPT'||parent.tagName==='STYLE')continue;
+    if(n.nodeValue.trim())texts.push(n);
   }
-  // Dynamic strings that are built outside leaf text nodes
+  for(var i=0;i<texts.length;i++)texts[i].nodeValue=translateText(texts[i].nodeValue);
+  var title=root.querySelector('.title'); if(title)title.textContent='Territory';
   var els=root.querySelectorAll('.sub');
   for(var k=0;k<els.length;k++)els[k].textContent=(currentLang==='en'?'Chapter ':'Глава ')+s.chapter+' · '+(currentLang==='en'?'Level ':'Уровень ')+s.level;
-  var title=root.querySelector('.title'); if(title)title.textContent='Territory';
 }
 function setLanguage(v){currentLang=v==='en'?'en':'ru';localStorage.setItem(langKey,currentLang);applyLanguage();addLanguageButton()}
+
 
 home();
 startMotion();
