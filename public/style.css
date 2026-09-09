@@ -57,3 +57,24 @@
 @keyframes v1Particle{0%{transform:translate(0,15px) scale(.3);opacity:0}25%{opacity:1}100%{transform:translate(35px,-55px) scale(1.4);opacity:0}}
 /* Never disable the game animation on v1 */
 @media (prefers-reduced-motion:reduce){.motion-character,.motion-sword,.motion-glow,.motion-particle{animation-iteration-count:infinite!important;animation-duration:1.8s!important}}
+
+/* ===== Territory v2 — animated tactical battle ===== */
+.battle-arena{position:relative;min-height:430px;border:1px solid #31425f;border-radius:22px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#293a56 0,#111b2c 52%,#0a111d 100%);box-shadow:inset 0 0 60px #0008}
+.battle-sky{position:absolute;inset:0;background:radial-gradient(circle at 18% 25%,#60a5fa22,transparent 22%),radial-gradient(circle at 82% 20%,#ef444422,transparent 24%),linear-gradient(180deg,#16233a44,#070c14aa);animation:skyPulse 4s ease-in-out infinite alternate}
+.battle-ground{position:absolute;left:4%;right:4%;bottom:18px;height:92px;border-radius:50%;background:radial-gradient(ellipse at center,#33445e,#121b2a 65%,transparent 70%);filter:blur(.2px)}
+.fighter{position:absolute;z-index:2;text-align:center;transition:transform .15s ease}
+.fighter .unit{font-size:72px;line-height:1;display:block;filter:drop-shadow(0 12px 12px #0009);animation:unitIdle 2.2s ease-in-out infinite}
+.fighter .name{font-weight:900;font-size:12px;margin-top:4px}.fighter .hpmini{width:94px;height:7px;background:#26344b;border-radius:99px;margin:6px auto 0;overflow:hidden}.fighter .hpmini i{display:block;height:100%;background:#22c55e;width:100%;transition:width .25s ease}
+.ally1{left:8%;bottom:82px}.ally2{left:34%;bottom:48px}.ally3{left:18%;bottom:8px}.enemy{right:8%;bottom:92px}.enemy .unit{font-size:108px;animation:bossBattleIdle 1.8s ease-in-out infinite}.enemy .hpmini i{background:#ef4444}
+.attacking{animation:attackLunge .38s ease!important}.hit{animation:hitShake .35s ease!important}.skill-ring{position:absolute;z-index:1;width:115px;height:115px;border:3px solid #60a5fa77;border-radius:50%;left:18%;bottom:90px;box-shadow:0 0 30px #60a5fa44;animation:ringPulse 1.8s ease-in-out infinite}
+.battle-top{position:relative;z-index:3;margin-bottom:8px}.bossbar{background:#0a101a99;border:1px solid #3b4a63;border-radius:12px;padding:9px}.bossbar .label{display:flex;justify-content:space-between;font-size:12px;font-weight:900;margin-bottom:5px}.bossbar .bar{height:10px;margin:0}.bossbar .bar i{background:linear-gradient(90deg,#dc2626,#f97316)}
+.battle-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.skill{border:1px solid #354762;background:#17243a;color:#fff;border-radius:15px;padding:10px;text-align:center;font-weight:900;min-height:66px}.skill b{display:block;font-size:24px}.skill small{color:#9fb0c7}.skill:active{transform:scale(.95)}.skill.primary{background:linear-gradient(135deg,#7c3aed,#4f46e5);border-color:#8b5cf6}.skill.lock{opacity:.45}
+.auto-row{display:flex;align-items:center;justify-content:space-between;background:#141f31;border:1px solid #2d3d57;border-radius:14px;padding:10px 12px;margin-top:10px}.switch{width:48px;height:27px;border-radius:99px;background:#334155;padding:3px;border:0}.switch i{display:block;width:21px;height:21px;border-radius:50%;background:#fff;transition:transform .2s}.switch.on{background:#22c55e}.switch.on i{transform:translateX(21px)}
+.combat-log{height:105px;overflow:hidden;background:#0c1420;border:1px solid #263650;border-radius:14px;padding:9px;margin-top:10px;font-size:11px;color:#aab8cc}.combat-log div{margin-bottom:4px}.combat-log b{color:#fff}.float-damage{position:absolute;z-index:8;right:24%;bottom:47%;font-size:30px;font-weight:1000;color:#fff;text-shadow:0 3px #7f1d1d,0 0 18px #ef4444;pointer-events:none;animation:floatDamage .75s ease-out forwards}
+@keyframes unitIdle{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}}
+@keyframes bossBattleIdle{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-9px) scale(1.04)}}
+@keyframes attackLunge{0%{transform:translateX(0) scale(1)}45%{transform:translateX(45px) scale(1.08)}100%{transform:translateX(0) scale(1)}}
+@keyframes hitShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}50%{transform:translateX(10px)}75%{transform:translateX(-7px)}}
+@keyframes ringPulse{0%,100%{transform:scale(.9);opacity:.45}50%{transform:scale(1.12);opacity:.9}}
+@keyframes skyPulse{0%{opacity:.65;transform:scale(1)}100%{opacity:1;transform:scale(1.04)}}
+@keyframes floatDamage{0%{opacity:0;transform:translateY(15px) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translateY(-80px) scale(1.2)}}
