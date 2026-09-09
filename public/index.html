@@ -161,8 +161,8 @@ function applyTelegramPlayer(){
       tg.ready();
       const u=tg.initDataUnsafe&&tg.initDataUnsafe.user;
       if(u){
-        const nick=u.username ? '@'+u.username : ((u.first_name||'')+' '+(u.last_name||'')).trim();
-        if(nick) nameEl.textContent=nick;
+        const displayName=((u.first_name||'')+' '+(u.last_name||'')).trim() || (u.username ? '@'+u.username : 'Игрок');
+        nameEl.textContent=displayName;
         if(u.photo_url) img.src=u.photo_url;
       }
     }
