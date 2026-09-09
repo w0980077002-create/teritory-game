@@ -98,3 +98,11 @@
 .language-btn{position:absolute;right:8px;top:8px;z-index:20;border:1px solid rgba(255,255,255,.25);background:rgba(15,23,42,.9);color:#fff;border-radius:10px;padding:7px 10px;font-weight:800;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
 .top{position:relative;padding-right:52px}
 .language-btn:active{transform:scale(.94)}
+
+/* Territory v6 — mature Valkyrie character */
+.valkyrie-art{display:block;width:150px;height:208px;object-fit:contain;filter:drop-shadow(0 16px 16px rgba(0,0,0,.58));}
+.heroart .valkyrie-art{width:145px;height:195px;}
+.motion-character .valkyrie-art{width:145px;height:200px;}
+.battle-valkyrie{display:block;width:82px;height:112px;object-fit:contain;filter:drop-shadow(0 12px 12px rgba(0,0,0,.6));}
+.fighter .battle-valkyrie{animation:unitIdle 2.2s ease-in-out infinite;}
+@media(max-width:380px){.heroart .valkyrie-art{width:128px;height:176px}.motion-character .valkyrie-art{width:130px;height:182px}}
