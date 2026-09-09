@@ -1,51 +1,218 @@
 <!doctype html>
-<html lang="ru"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Territory — Sdolars</title><link rel="stylesheet" href="style.css"></head>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Territory — Sdolars</title>
+<style>
+:root{
+  --bg:#020e1d;--panel:#071d34;--panel2:#0a2744;--line:#1685d4;
+  --cyan:#4dc7ff;--gold:#ffbf19;--text:#f4f8ff;--muted:#9fc4e8;
+  --red:#ff3654;--green:#12d88c;--purple:#a33cff;--orange:#f2a500;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#000;color:var(--text);font-family:Arial,Helvetica,sans-serif;height:100%;overflow:hidden}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+#app{width:100%;height:100dvh;max-width:1180px;margin:auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.top{height:154px;background:linear-gradient(180deg,#031a31,#031226);border-bottom:2px solid #1d8cda;display:grid;grid-template-columns:1.15fr 1fr;gap:12px;padding:14px 18px;flex:none}
+.profile{display:flex;gap:12px;align-items:center;min-width:0}
+.avatar{width:112px;height:112px;border:3px solid #66c7ff;border-radius:20px;overflow:hidden;position:relative;background:#092641;flex:none}
+.avatar img{width:100%;height:100%;object-fit:cover;object-position:44% 12%}
+.lvl{position:absolute;left:-3px;bottom:-3px;background:#0b2b4a;border:2px solid #6bcaff;border-radius:14px;padding:4px 12px;font-weight:900;font-size:25px}
+.pname{font-size:36px;font-weight:900;line-height:1;margin-bottom:7px}
+.chapter{color:#72c9ff;font-size:20px;font-weight:800}
+.xp{height:22px;border:2px solid #247bb9;border-radius:14px;background:#06172b;overflow:hidden;margin-top:7px;max-width:320px}
+.xp>i{display:block;height:100%;width:40%;background:linear-gradient(90deg,#10b8e9,#29d5ff)}
+.xpt{font-size:15px;margin-top:3px}
+.rightTop{display:flex;flex-direction:column;gap:10px;justify-content:center}
+.resources{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.res{height:55px;border:2px solid #22699e;border-radius:15px;background:#061b31;display:flex;align-items:center;justify-content:center;gap:7px;font-weight:900;font-size:20px;white-space:nowrap}
+.res b{font-size:25px}
+.res.gold b{color:#ffd33b}.res.dia b{color:#3edaff}.res.energy b{color:#ffd126}
+.res em{font-style:normal;color:#fff;font-size:24px}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.tool{height:60px;background:#08233d;border:2px solid #216fa7;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:15px;font-weight:800;position:relative}
+.tool svg{width:30px;height:30px}
+.badge{position:absolute;right:-5px;top:-9px;background:var(--red);border:2px solid #ff9aae;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:900}
+
+.world{position:relative;flex:1;min-height:0;overflow:hidden;
+background:
+radial-gradient(ellipse at 52% 68%,rgba(28,122,168,.8),transparent 38%),
+linear-gradient(180deg,#6fc9ef 0%,#d4efff 23%,#5aa6cf 35%,#143d5b 65%,#061c2d 100%)}
+.mountain{position:absolute;left:-8%;right:-8%;top:12%;height:42%;
+background:linear-gradient(150deg,transparent 45%,#eaf7ff 46%,#8ab4ce 50%,transparent 51%),
+linear-gradient(28deg,transparent 46%,#d8efff 47%,#6c9fbd 52%,transparent 53%);
+opacity:.72;transform:scale(1.3)}
+.mountain:after{content:"";position:absolute;inset:24% 10% 0;background:linear-gradient(160deg,transparent 44%,#f0f8ff 45%,#4f7894 49%,transparent 50%),linear-gradient(20deg,transparent 48%,#d9f1ff 49%,#557f99 53%,transparent 54%);opacity:.7}
+.castle{position:absolute;top:19%;left:50%;transform:translateX(-50%);width:38%;height:32%;min-width:230px;max-width:430px}
+.castle .body{position:absolute;left:14%;right:14%;bottom:0;height:48%;background:linear-gradient(#566c7d,#243746);border:3px solid #172a39;border-radius:5px}
+.tower{position:absolute;bottom:0;width:20%;height:75%;background:linear-gradient(#718798,#273b4a);border:3px solid #172a39}
+.tower:before{content:"";position:absolute;left:-8%;right:-8%;top:-15%;height:25%;background:#263a49;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.t1{left:4%}.t2{right:4%}.t3{left:40%;height:100%}
+.castle .flag{position:absolute;left:50%;top:-2%;height:34%;width:2px;background:#24313c}.castle .flag:after{content:"";position:absolute;top:0;left:2px;border-style:solid;border-width:8px 18px 8px 0;border-color:#b92e42 transparent transparent transparent}
+.water{position:absolute;bottom:14%;left:47%;width:9%;height:28%;background:linear-gradient(90deg,transparent,#a7edff,transparent);filter:blur(5px);opacity:.8}
+.ground{position:absolute;bottom:0;left:0;right:0;height:31%;background:linear-gradient(180deg,transparent,#082a38 30%,#03151f 100%)}
+.viking{position:absolute;z-index:2;left:4%;bottom:1%;height:67%;max-height:510px;width:auto;filter:drop-shadow(0 10px 16px #000b);pointer-events:none}
+.worldTop{position:absolute;left:2%;right:2%;top:3%;display:flex;justify-content:space-between;gap:12px;z-index:5}
+.quest,.daily{background:linear-gradient(135deg,#0b2946,#06182d);border:2px solid #248fe0;border-radius:18px;box-shadow:0 7px 18px #00101eaa}
+.quest{width:38%;padding:12px 18px}
+.daily{width:31%;padding:10px 16px;border-color:#ffd01f;background:linear-gradient(135deg,#16214d,#180b39);text-align:center}
+.quest small,.daily small{display:block;color:#ffd522;font-weight:900;font-size:18px}
+.quest strong{display:block;font-size:21px;margin-top:4px}.quest span{display:block;color:#9bd1fa;margin-top:5px}
+.daily b{display:block;color:#ffd522;font-size:20px;margin-top:2px}.timer{font-size:21px;font-weight:900}
+.side{position:absolute;z-index:5;top:27%;display:flex;flex-direction:column;gap:10px}
+.left{left:2%}.right{right:2%;width:27%}
+.sideBtn{min-height:76px;border-radius:17px;background:linear-gradient(135deg,#092b49,#061a2e);border:2px solid #2087d1;box-shadow:0 6px 14px #00101eaa;display:flex;align-items:center;gap:10px;padding:8px 13px;text-align:left;position:relative}
+.left .sideBtn{width:88px;flex-direction:column;justify-content:center;text-align:center;padding:7px 4px;font-size:14px;font-weight:900}
+.sideBtn svg{width:42px;height:42px;flex:none}.right .sideBtn svg{width:44px;height:44px}
+.sideBtn strong{font-size:18px}.sideBtn small{color:#a5cce9;font-size:14px;display:block;margin-top:4px}
+.quick{position:absolute;z-index:7;left:2%;right:2%;bottom:15%;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.quick button{height:126px;border-radius:20px;border:3px solid #238de0;background:linear-gradient(150deg,#073f79,#061b38);box-shadow:inset 0 0 20px #2aa7ff33,0 7px 14px #00101eaa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-weight:900;font-size:22px}
+.quick button:nth-child(2){border-color:#f7ad00;background:linear-gradient(150deg,#b46c00,#6a3800)}
+.quick button:nth-child(3){border-color:#a947ff;background:linear-gradient(150deg,#4f1597,#230b50)}
+.quick button:nth-child(4){border-color:#1fd99a;background:linear-gradient(150deg,#08724d,#06412f)}
+.quick svg{width:60px;height:60px}
+.rewards{position:absolute;z-index:7;left:2%;right:2%;bottom:2%;height:76px;background:#061b30;border:2px solid #217fc1;border-radius:18px;display:flex;align-items:center;padding:7px 16px;gap:16px}
+.rewards svg{width:58px;height:58px;flex:none}.rewardsText{font-size:18px;font-weight:900;flex:1}.rewardsText small{display:block;color:#9cc7e7;font-size:14px;margin-top:3px}.rewardsText b{color:#ffd42d}
+.claim{height:54px;min-width:150px;border-radius:15px;border:3px solid #ffd45c;background:linear-gradient(#ffd34d,#c77700);color:#160d00;font-weight:900;font-size:21px}
+.nav{height:104px;background:#021326;border-top:2px solid #164d75;display:grid;grid-template-columns:repeat(6,1fr);flex:none}
+.nav button{background:#031a2f;border-right:1px solid #174361;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#9dbed9;font-weight:800}
+.nav button.active{background:linear-gradient(#152f49,#171d23);color:#ffd62c;box-shadow:inset 0 -5px 0 #ffcc20}
+.nav svg{width:43px;height:43px}.nav span{font-size:14px}
+.modal{position:fixed;inset:0;background:#000b;z-index:50;display:none;align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.panel{width:min(700px,100%);max-height:88dvh;background:linear-gradient(#082541,#031325);border:2px solid #258bd0;border-bottom:0;border-radius:24px 24px 0 0;padding:18px;overflow:auto}
+.panel h2{margin:0 0 12px;font-size:26px;color:#ffd52d}.close{float:right;background:#123553;border:1px solid #398bc5;border-radius:10px;padding:6px 11px}
+.card{background:#071c31;border:1px solid #216fa6;border-radius:15px;padding:13px;margin:9px 0}
+.itemrow{display:flex;align-items:center;gap:12px}.itemicon{width:55px;height:55px;background:#0d3150;border-radius:12px;display:grid;place-items:center}.itemicon svg{width:38px;height:38px}
+.battle{display:grid;gap:12px}.zones{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.zones button{padding:10px 4px;background:#0b2a45;border:1px solid #287fb7;border-radius:10px}.zones button.sel{background:#136ea2;border-color:#6bd7ff;box-shadow:0 0 0 2px #1bbdff66}
+.fight{background:linear-gradient(#ffcf45,#b76700);color:#160c00;border:2px solid #ffe17b;border-radius:13px;padding:13px;font-weight:900;font-size:19px}
+.toast{position:fixed;left:50%;bottom:115px;transform:translateX(-50%);z-index:80;background:#061e35;border:2px solid #29b8ff;border-radius:13px;padding:12px 18px;font-weight:900;display:none}.toast.show{display:block}
+@media(max-width:760px){
+  #app{max-width:none}
+  .top{height:130px;padding:8px 10px;gap:7px;grid-template-columns:1.2fr 1fr}
+  .avatar{width:78px;height:78px;border-radius:14px}.lvl{font-size:16px;padding:2px 8px;border-radius:10px}
+  .pname{font-size:25px}.chapter{font-size:14px}.xp{height:14px;margin-top:5px}.xpt{font-size:12px}
+  .resources{gap:4px}.res{height:39px;font-size:13px;border-radius:10px;gap:3px}.res b{font-size:18px}.res em{font-size:16px}
+  .tools{gap:4px}.tool{height:42px;font-size:0;border-radius:9px}.tool svg{width:25px;height:25px}
+  .worldTop{top:2%;gap:6px}.quest{width:48%;padding:7px 9px;border-radius:12px}.daily{width:40%;padding:7px 5px;border-radius:12px}
+  .quest small,.daily small{font-size:12px}.quest strong{font-size:14px}.quest span{font-size:11px}.timer,.daily b{font-size:13px}
+  .side{top:29%;gap:7px}.left .sideBtn{width:65px;min-height:64px;font-size:10px}.left .sideBtn svg{width:34px;height:34px}
+  .right{width:44%;gap:7px}.right .sideBtn{min-height:62px;padding:5px 7px;border-radius:12px}.right .sideBtn svg{width:33px;height:33px}.sideBtn strong{font-size:13px}.sideBtn small{font-size:10px}
+  .viking{height:52%;left:8%;bottom:3%;opacity:.98}
+  .quick{bottom:14%;gap:6px}.quick button{height:82px;border-radius:13px;border-width:2px;font-size:14px}.quick svg{width:42px;height:42px}
+  .rewards{bottom:1%;height:64px;padding:5px 9px;gap:8px;border-radius:12px}.rewards svg{width:45px;height:45px}.rewardsText{font-size:14px}.rewardsText small{font-size:10px}.claim{height:44px;min-width:105px;font-size:16px;border-radius:12px}
+  .nav{height:76px}.nav svg{width:31px;height:31px}.nav span{font-size:10px}
+}
+@media(max-height:700px) and (max-width:760px){
+  .top{height:112px}.quick button{height:70px}.rewards{height:55px}.nav{height:66px}.nav svg{width:27px;height:27px}
+}
+</style>
+</head>
 <body>
-<div class="game">
-<header class="header">
-  <div class="avatar"><span>🧔🏻‍♂️</span><b>5</b></div>
-  <div class="profile"><h1>Sdolars</h1><strong>Глава 5 · Уровень 3</strong><div class="xp"><i></i></div><small>120/300</small></div>
-  <div class="resources"><div>🪙 <b>1779</b> ＋</div><div>💎 <b>1330</b> ＋</div><div>⚡ <b>191.38</b> ＋</div></div>
-  <div class="headerBtns"><button onclick="page('Настройки')">⚙️<small>Настройки</small></button><button onclick="toast('Язык: RU')">🇷🇺<small>RU</small></button></div>
+<div id="app">
+<header class="top">
+  <div class="profile">
+    <div class="avatar"><img src="viking.png"><div class="lvl">5</div></div>
+    <div style="min-width:0">
+      <div class="pname">Sdolars</div>
+      <div class="chapter">Глава 5 · Уровень 3</div>
+      <div class="xp"><i></i></div><div class="xpt">120/300</div>
+    </div>
+  </div>
+  <div class="rightTop">
+    <div class="resources">
+      <div class="res gold"><b>●</b>1779 <em>＋</em></div>
+      <div class="res dia"><b>◆</b>1330 <em>＋</em></div>
+      <div class="res energy"><b>ϟ</b>191.38 <em>＋</em></div>
+    </div>
+    <div class="tools">
+      <button class="tool" onclick="openPanel('messages')"><span>✉</span>Сообщения<div class="badge">2</div></button>
+      <button class="tool" onclick="openPanel('ach')"><span>🏆</span>Достижения</button>
+      <button class="tool" onclick="openPanel('settings')"><span>⚙</span>Настройки</button>
+      <button class="tool" onclick="toggleLang()"><span id="langIcon">🇬🇧</span><span id="langTxt">EN</span></button>
+    </div>
+  </div>
 </header>
 
-<section class="world">
-  <div class="sky"></div><div class="mountains"></div><div class="castle">🏰</div><div class="water">〰〰〰</div><div class="viking">🧔🏻‍♂️</div>
-
-  <button class="quest panel" onclick="page('Задания')"><span class="ico">📜</span><div><b>Текущее задание</b><strong>Поговори с кузнецом</strong><small>📍 Кузница</small></div><em>›</em></button>
-  <button class="bonus panel" onclick="claim()"><span class="ico">🎁</span><div><b>Ежедневный бонус</b><strong id="timer">23:45:12</strong></div></button>
-
-  <div class="left">
-    <button onclick="page('Бонусы')">🎁<b>Бонусы</b><sup>!</sup></button>
-    <button onclick="page('События')">🗓️<b>События</b><sup>!</sup></button>
-    <button onclick="page('VIP')">👑<b>VIP</b></button>
+<main class="world">
+  <div class="mountain"></div><div class="castle"><div class="body"></div><div class="tower t1"></div><div class="tower t2"></div><div class="tower t3"></div><div class="flag"></div></div><div class="water"></div><div class="ground"></div>
+  <img class="viking" src="viking.png" alt="">
+  <div class="worldTop">
+    <button class="quest" onclick="openPanel('quests')"><small>Текущее задание</small><strong>Поговори с кузнецом　›</strong><span>⌖ Кузница</span></button>
+    <button class="daily" onclick="openPanel('bonus')"><small>Ежедневный бонус</small><b>🎁</b><div class="timer" id="timer1">23:45:12</div></button>
   </div>
-
-  <div class="right">
-    <button onclick="page('Кузница')"><span>⚒️</span><div><b>Кузница</b><small>Улучшение снаряжения</small></div><sup>!</sup></button>
-    <button onclick="page('Таверна')"><span>🍺</span><div><b>Таверна</b><small>Найм героев</small></div><sup>!</sup></button>
-    <button onclick="page('Магазин')"><span>👜</span><div><b>Магазин</b><small>Предметы и снаряжение</small></div><sup>!</sup></button>
+  <div class="side left">
+    <button class="sideBtn" onclick="openPanel('bonus')"><span>🎁</span>Бонусы<div class="badge">!</div></button>
+    <button class="sideBtn" onclick="openPanel('events')"><span>▦</span>События<div class="badge">!</div></button>
+    <button class="sideBtn" onclick="openPanel('vip')"><span>♛</span>VIP</button>
   </div>
-</section>
+  <div class="side right">
+    <button class="sideBtn" onclick="openPanel('forge')"><span>⚒</span><div><strong>Кузница</strong><small>Улучшение снаряжения</small></div><div class="badge">!</div></button>
+    <button class="sideBtn" onclick="openPanel('tavern')"><span>🍺</span><div><strong>Таверна</strong><small>Найм героев</small></div><div class="badge">!</div></button>
+    <button class="sideBtn" onclick="openPanel('shop')"><span>▣</span><div><strong>Магазин</strong><small>Предметы и снаряжение</small></div></button>
+  </div>
+  <div class="quick">
+    <button onclick="battle()"><span>⚔</span>Бой</button>
+    <button onclick="openPanel('inventory')"><span>🎒</span>Инвентарь<div class="badge">!</div></button>
+    <button onclick="openPanel('equipment')"><span>🛡</span>Экипировка</button>
+    <button onclick="openPanel('quests')"><span>📜</span>Задания<div class="badge">!</div></button>
+  </div>
+  <div class="rewards">
+    <span>🎁</span><div class="rewardsText">Бесплатные награды<small>Доступно через <b id="timer2">23:45:12</b></small></div><button class="claim" onclick="claim()">Получить</button>
+  </div>
+</main>
 
-<section class="quick">
- <button class="blue" onclick="battle()">⚔️<b>Бой</b></button>
- <button class="gold" onclick="page('Инвентарь')">🎒<b>Инвентарь</b><sup>!</sup></button>
- <button class="purple" onclick="page('Экипировка')">🛡️<b>Экипировка</b></button>
- <button class="green" onclick="page('Задания')">📜<b>Задания</b><sup>!</sup></button>
-</section>
-
-<section class="reward"><span>🎁</span><div><b>Бесплатные награды</b><small>Доступно через <i id="timer2">23:45:12</i></small></div><button onclick="claim()">Получить</button></section>
-
-<nav>
- <button class="active">🏠<b>Город</b></button><button onclick="page('Герой')">⚔️<b>Герой</b><sup>!</sup></button>
- <button onclick="page('Инвентарь')">🎒<b>Инвентарь</b></button><button onclick="page('Задания')">🛡️<b>Задания</b><sup>!</sup></button>
- <button onclick="page('Гильдия')">👥<b>Гильдия</b></button><button onclick="page('Ещё')">☰<b>Ещё</b></button>
+<nav class="nav">
+  <button class="active" onclick="home()"><span>⌂</span><span>Город</span></button>
+  <button onclick="openPanel('hero')"><span>⚔</span><span>Герой</span></button>
+  <button onclick="openPanel('inventory')"><span>🎒</span><span>Инвентарь</span></button>
+  <button onclick="openPanel('quests')"><span>🛡</span><span>Задания</span></button>
+  <button onclick="openPanel('guild')"><span>♟</span><span>Гильдия</span></button>
+  <button onclick="openPanel('more')"><span>☰</span><span>Ещё</span></button>
 </nav>
 </div>
-<div id="modal"><div class="dialog"><button class="x" onclick="closeModal()">×</button><div id="body"></div></div></div>
-<div id="toast"></div>
-<script src="app.js"></script>
-</body></html>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closePanel()">
+  <section class="panel"><button class="close" onclick="closePanel()">✕</button><h2 id="ptitle"></h2><div id="pbody"></div></section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const modal=document.getElementById('modal'), ptitle=document.getElementById('ptitle'), pbody=document.getElementById('pbody');
+const data={
+ hero:['Герой',`<div class="card"><b>Sdolars</b><p>Уровень 3 · Глава 5</p><p>Сила: 12 · Ловкость: 9 · Выносливость: 14</p><p>Свободные очки: <b>3</b></p></div>`],
+ inventory:['Инвентарь',`<div class="card itemrow"><div class="itemicon">🪓</div><div><b>Боевой топор</b><br>Урон +12<br><button class="fight" onclick="toast('Оружие выбрано')">Выбрать</button></div></div><div class="card itemrow"><div class="itemicon">🧥</div><div><b>Кожаная броня</b><br>Защита +8</div></div>`],
+ equipment:['Экипировка',`<div class="card"><b>Оружие</b><p>🪓 Боевой топор · +12 урона</p></div><div class="card"><b>Броня</b><p>🛡 Кожаная броня · +8 защиты</p></div>`],
+ quests:['Задания',`<div class="card"><b>Текущее задание</b><p>Поговори с кузнецом</p><p>Награда: 150 золота + опыт</p><button class="fight" onclick="toast('Задание принято')">Продолжить</button></div>`],
+ forge:['Кузница',`<div class="card"><b>Улучшение снаряжения</b><p>Боевой топор → уровень 2</p><button class="fight" onclick="toast('Предмет улучшен!')">Улучшить · 100 золота</button></div>`],
+ shop:['Магазин',`<div class="card itemrow"><div class="itemicon">⚔</div><div><b>Стальной меч</b><br>Цена: 450 золота<br><button class="fight" onclick="toast('Куплено!')">Купить</button></div></div>`],
+ tavern:['Таверна',`<div class="card"><b>Найм героев</b><p>В таверне доступны 3 наёмника.</p><button class="fight" onclick="toast('Поиск героев начат')">Искать</button></div>`],
+ bonus:['Бонусы',`<div class="card"><b>Ежедневный сундук</b><p>Большой сундук доступен раз в 24 часа.</p><button class="fight" onclick="claim()">Забрать награду</button></div>`],
+ events:['События',`<div class="card"><b>Осада Sdolars</b><p>До конца события: 2д 14ч</p><p>Награды за победы на арене.</p></div>`],
+ vip:['VIP',`<div class="card"><b>VIP-уровень 1</b><p>Бонус к опыту и дополнительный сундук.</p></div>`],
+ messages:['Сообщения',`<div class="card"><b>Кузнец</b><p>Твой заказ готов. Загляни в кузницу.</p></div>`],
+ ach:['Достижения',`<div class="card"><b>Первый бой</b><p>Победи первого противника.</p></div>`],
+ settings:['Настройки',`<div class="card"><p>Музыка: ВКЛ</p><p>Эффекты: ВКЛ</p><p>Язык: Русский / English</p></div>`],
+ guild:['Гильдия',`<div class="card"><b>Гильдии Sdolars</b><p>Вступай в союз игроков и участвуй в осадах.</p><button class="fight" onclick="toast('Раздел гильдий открыт')">Найти гильдию</button></div>`],
+ more:['Ещё',`<div class="card"><p>Карта · Рейтинг · Достижения · Настройки</p></div>`]
+};
+function openPanel(k){ptitle.textContent=data[k][0];pbody.innerHTML=data[k][1];modal.classList.add('open')}
+function closePanel(){modal.classList.remove('open')}
+function home(){closePanel()}
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1600)}
+function claim(){toast('🎁 Награда получена: 100 золота');}
+function toggleLang(){const en=document.getElementById('langTxt');en.textContent=en.textContent==='EN'?'RU':'EN';document.getElementById('langIcon').textContent=en.textContent==='EN'?'🇬🇧':'🇷🇺';toast(en.textContent==='EN'?'English mode':'Русский режим')}
+function battle(){
+ptitle.textContent='Бой против Бандита';
+pbody.innerHTML=`<div class="battle"><div class="card"><b>Бандит</b><div class="xp"><i style="width:82%"></i></div><p>HP 82/100</p></div><div class="card"><b>1. Выбери зону атаки</b><div class="zones" id="atk">${['Голова','Грудь','Живот','Пояс','Ноги'].map(x=>`<button onclick="sel(this,'atk')">${x}</button>`).join('')}</div></div><div class="card"><b>2. Выбери две зоны защиты</b><div class="zones" id="def">${['Голова','Грудь','Живот','Пояс','Ноги'].map(x=>`<button onclick="defsel(this)">${x}</button>`).join('')}</div><p id="dc">Выбрано: 0/2</p></div><button class="fight" onclick="doFight()">АТАКОВАТЬ</button></div>`;
+modal.classList.add('open')
+}
+function sel(el,id){document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.remove('sel'));el.classList.add('sel')}
+function defsel(el){const all=[...document.querySelectorAll('#def button')];if(el.classList.contains('sel')){el.classList.remove('sel')}else{if(all.filter(x=>x.classList.contains('sel')).length>=2){toast('Можно выбрать только 2 зоны');return}el.classList.add('sel')}document.getElementById('dc').textContent='Выбрано: '+all.filter(x=>x.classList.contains('sel')).length+'/2'}
+function doFight(){const a=document.querySelector('#atk .sel'),d=document.querySelectorAll('#def .sel');if(!a||d.length!==2){toast('Выбери атаку и 2 зоны защиты');return}toast('⚔ Удар нанесён!');setTimeout(()=>closePanel(),900)}
+let sec=23*3600+45*60+12;
+setInterval(()=>{sec=Math.max(0,sec-1);let h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec%3600/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0');document.getElementById('timer1').textContent=h+':'+m+':'+s;document.getElementById('timer2').textContent=h+':'+m+':'+s},1000);
+</script>
+</body>
+</html>
