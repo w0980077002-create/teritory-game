@@ -149,30 +149,77 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 <div class="modal" id="modal" onclick="if(event.target===this)closeP()"><section class="panel"><button class="close" onclick="closeP()">✕</button><h2 id="pt"></h2><div id="pb"></div></section></div><div class="toast" id="toast"></div>
 <script>
 const modal=document.getElementById('modal'),pt=document.getElementById('pt'),pb=document.getElementById('pb');
-const pages={
-hero:['Герой','<div class="card"><b>Sdolars</b><p>Глава 5 · Уровень 3</p><p>Сила 12 · Ловкость 9 · Выносливость 14</p></div>'],
-inventory:['Инвентарь','<div class="card"><b>Боевой топор</b><p>Урон +12</p><button class="goldBtn" onclick="toast(\'Экипировано\')">Экипировать</button></div>'],
-equipment:['Экипировка','<div class="card"><b>Боевой топор</b><p>Урон +12</p><p>Кожаная броня · Защита +8</p></div>'],
-quests:['Задания','<div class="card"><b>Поговори с кузнецом</b><p>Награда: 150 золота + опыт.</p></div>'],
-forge:['Кузница','<div class="card"><b>Боевой топор → уровень 2</b><button class="goldBtn" onclick="toast(\'Улучшено\')">Улучшить</button></div>'],
-tavern:['Таверна','<div class="card"><b>Найм героев</b><p>Доступны новые герои.</p></div>'],
-shop:['Магазин','<div class="card"><b>Стальной меч</b><p>450 золота · Урон +15</p><button class="goldBtn" onclick="toast(\'Куплено\')">Купить</button></div>'],
-bonus:['Бонусы','<div class="card"><b>Ежедневный сундук</b><button class="goldBtn" onclick="toast(\'Награда получена\')">Забрать</button></div>'],
-events:['События','<div class="card"><b>Осада Sdolars</b><p>Активное событие.</p></div>'],
-vip:['VIP','<div class="card"><b>VIP</b><p>Дополнительные награды.</p></div>'],
-messages:['Сообщения','<div class="card"><b>Кузнец</b><p>Твой заказ готов.</p></div>'],
-ach:['Достижения','<div class="card"><b>Первый бой</b><p>Победи первого противника.</p></div>'],
-settings:['Настройки','<div class="card"><p>Музыка: ВКЛ</p><p>Эффекты: ВКЛ</p></div>'],
-guild:['Гильдия','<div class="card"><b>Гильдия Sdolars</b><p>Союзы, осады и награды.</p></div>'],
-more:['Ещё','<div class="card"><p>Карта · Рейтинг · Настройки</p></div>']
-};
-function openP(k){pt.textContent=pages[k][0];pb.innerHTML=pages[k][1];modal.classList.add('open')}
-function closeP(){modal.classList.remove('open')}
+const ZONES=['Голова','Грудь','Живот','Пояс','Ноги'];
+const KEY='sdolars_s1_save';
+let state={coins:1779,level:3,exp:120,items:[
+ {id:'axe',name:'Боевой топор',type:'Оружие',icon:'🪓',damage:12,price:450,equipped:true},
+ {id:'armor',name:'Кожаная броня',type:'Броня',icon:'🛡️',defense:8,price:320,equipped:true},
+ {id:'knife',name:'Нож',type:'Оружие',icon:'🔪',damage:6,price:220,equipped:false},
+ {id:'bandage',name:'Аптечка',type:'Расходник',icon:'🩹',qty:2,price:80,equipped:false}
+]};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s)state=s}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
 function toast(s){const t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400)}
-function battle(){pt.textContent='Бой против Бандита';pb.innerHTML='<div class="card"><b>Бандит</b><p>HP 100/100</p></div><div class="card"><b>Атака — 1 зона</b><div class="zones">'+['Голова','Грудь','Живот','Пояс','Ноги'].map(x=>'<button onclick="pick(this)">'+x+'</button>').join('')+'</div></div><div class="card"><b>Защита — 2 зоны</b><div class="zones" id="defs">'+['Голова','Грудь','Живот','Пояс','Ноги'].map(x=>'<button onclick="defPick(this)">'+x+'</button>').join('')+'</div><p id="dc">0/2</p></div><button class="goldBtn" onclick="strike()">АТАКОВАТЬ</button>';modal.classList.add('open')}
-function pick(e){e.parentNode.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));e.classList.add('sel')}
-function defPick(e){let n=document.querySelectorAll('#defs .sel').length;if(e.classList.contains('sel'))e.classList.remove('sel');else if(n<2)e.classList.add('sel');document.getElementById('dc').textContent=document.querySelectorAll('#defs .sel').length+'/2'}
-function strike(){if(!document.querySelector('.zones button.sel')||document.querySelectorAll('#defs .sel').length!==2){toast('Выбери атаку и 2 зоны защиты');return}toast('⚔ Удар нанесён');setTimeout(closeP,650)}
-let sec=23*3600+45*60;setInterval(()=>{sec=Math.max(0,sec-1);let h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec%3600/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0'),v=h+':'+m+':'+s;timer.textContent=v;rt.textContent=v},1000);
+function openP(k){
+ const fn=views[k]||views.more;pt.textContent=fn[0];pb.innerHTML=fn[1]();modal.classList.add('open');
+}
+function closeP(){modal.classList.remove('open')}
+function refresh(){save()}
+function card(title,body){return '<div class="card"><b>'+title+'</b>'+body+'</div>'}
+const views={
+ hero:['Герой',()=>{
+  return card('Sdolars','<p>Глава 5 · Уровень '+state.level+'</p><div class="card"><b>Характеристики</b><p>⚔️ Сила <strong>12</strong></p><p>🏃 Ловкость <strong>9</strong></p><p>❤️ Выносливость <strong>14</strong></p><p>🛡️ Защита <strong>'+totalDef()+'</strong></p><p>⚔️ Урон <strong>'+totalDamage()+'</strong></p></div><div class="card"><b>Опыт</b><p>'+state.exp+' / 300 XP</p><div style="height:7px;background:#12304a;border-radius:8px;overflow:hidden"><i style="display:block;width:'+Math.min(100,state.exp/3)+'%;height:100%;background:#1da7ff"></i></div></div>')
+ }],
+ inventory:['Инвентарь',renderInventory],
+ equipment:['Экипировка',renderEquipment],
+ quests:['Задания',()=>card('Поговори с кузнецом','<p>Отправляйся в кузницу Sdolars.</p><p>Награда: <b>150 🪙 + 80 XP</b></p><button class="goldBtn" onclick="completeQuest()">Выполнить</button>')],
+ forge:['Кузница',renderForge],
+ tavern:['Таверна',()=>card('Герои Sdolars','<p>Здесь будут наёмники и герои.</p><div class="card"><b>Рагнар</b><p>Воин · 120 HP · Урон 16</p><button class="goldBtn" onclick="toast(\'Рагнар будет доступен в следующем контракте\')">Посмотреть контракт</button></div>')],
+ shop:['Магазин',renderShop],
+ bonus:['Бонусы',()=>card('Ежедневный сундук','<p>Сегодня доступна награда.</p><button class="goldBtn" onclick="claimBonus()">Забрать 250 🪙</button>')],
+ events:['События',()=>card('Осада Sdolars','<p>Сражайся и получай награды.</p><p>Прогресс: <b>0 / 10</b></p><button class="goldBtn" onclick="toast(\'Событие открыто\')">Войти в событие</button>')],
+ vip:['VIP',()=>card('VIP','<p>Особые награды и бонусы.</p><p>Статус: <b>Обычный</b></p><button class="goldBtn" onclick="toast(\'VIP будет добавлен позже\')">Подробнее</button>')],
+ messages:['Сообщения',()=>card('Кузнец','<p>Твой заказ готов. Заходи в кузницу.</p>')],
+ ach:['Достижения',()=>card('Первый бой','<p>Победи первого противника.</p><p>Прогресс: 0 / 1</p>')],
+ settings:['Настройки',()=>'<div class="card"><b>Настройки игры</b><p>🔊 Звуки <button onclick="toast(\'Звуки включены\')">ВКЛ</button></p><p>📳 Эффекты <button onclick="toast(\'Эффекты включены\')">ВКЛ</button></p><p>🌐 Язык <button onclick="toast(\'Русский / English\')">RU / EN</button></p></div>'],
+ guild:['Гильдия',()=>card('Гильдия Sdolars','<p>Уровень гильдии: 1</p><p>Участники: 1 / 20</p><button class="goldBtn" onclick="toast(\'Поиск гильдий будет добавлен\')">Найти гильдию</button>')],
+ more:['Ещё',()=>'<div class="card"><button class="goldBtn" onclick="openP(\'messages\')">✉ Сообщения</button><br><br><button class="goldBtn" onclick="openP(\'ach\')">🏆 Достижения</button><br><br><button class="goldBtn" onclick="openP(\'settings\')">⚙ Настройки</button></div>']
+};
+function totalDamage(){return 15+(state.items.find(x=>x.equipped&&x.type==='Оружие')?.damage||0)}
+function totalDef(){return 5+(state.items.find(x=>x.equipped&&x.type==='Броня')?.defense||0)}
+function renderInventory(){
+ let h='<div class="card"><b>Предметы</b><p>Монеты: <strong>'+state.coins+' 🪙</strong></p></div>';
+ state.items.forEach((it,i)=>{h+='<div class="card"><b>'+it.icon+' '+it.name+'</b><p>'+it.type+(it.damage?' · Урон +'+it.damage:'')+(it.defense?' · Защита +'+it.defense:'')+(it.qty?' · Кол-во '+it.qty:'')+'</p><button onclick="toggleEquip('+i+')">'+(it.equipped?'Снять':'Экипировать')+'</button> <button onclick="dropItem('+i+')">Выбросить</button></div>'});
+ return h;
+}
+function renderEquipment(){
+ const w=state.items.find(x=>x.equipped&&x.type==='Оружие'),a=state.items.find(x=>x.equipped&&x.type==='Броня');
+ return '<div class="card"><b>⚔️ Оружие</b><p>'+(w?w.icon+' '+w.name+' · Урон +'+w.damage:'Пусто')+'</p><button onclick="openP(\'inventory\')">Изменить</button></div><div class="card"><b>🛡️ Броня</b><p>'+(a?a.icon+' '+a.name+' · Защита +'+a.defense:'Пусто')+'</p><button onclick="openP(\'inventory\')">Изменить</button></div><div class="card"><b>Итого</b><p>Урон: '+totalDamage()+'</p><p>Защита: '+totalDef()+'</p></div>';
+}
+function renderForge(){
+ const w=state.items.find(x=>x.equipped&&x.type==='Оружие');
+ return card('Улучшение снаряжения','<p>'+(w?w.icon+' '+w.name:'Нет оружия')+'</p><p>Текущий урон: <b>'+(w?w.damage:0)+'</b></p><p>Стоимость: <b>200 🪙</b></p><button class="goldBtn" onclick="upgradeWeapon()">Улучшить</button>');
+}
+function renderShop(){
+ return '<div class="card"><b>Оружие</b><p>🔪 Нож · Урон +6 · 220 🪙</p><button class="goldBtn" onclick="buyItem(\'knife\')">Купить</button></div><div class="card"><b>🪓 Тяжёлый топор</b><p>Урон +18 · 700 🪙</p><button class="goldBtn" onclick="buyItem(\'heavyaxe\')">Купить</button></div><div class="card"><b>🛡️ Стальная броня</b><p>Защита +15 · 650 🪙</p><button class="goldBtn" onclick="buyItem(\'steel\')">Купить</button></div><div class="card"><b>🩹 Аптечка</b><p>Восстанавливает 30 HP · 80 🪙</p><button class="goldBtn" onclick="buyItem(\'bandage\')">Купить</button></div>';
+}
+function toggleEquip(i){const it=state.items[i];if(it.equipped){it.equipped=false}else{state.items.forEach(x=>{if(x.type===it.type&&it.type!=='Расходник')x.equipped=false});it.equipped=true}save();openP('inventory');toast(it.equipped?'Экипировано':'Снято')}
+function dropItem(i){if(state.items[i].equipped){toast('Сначала сними предмет');return}if(state.items[i].qty&&state.items[i].qty>1)state.items[i].qty--;else state.items.splice(i,1);save();openP('inventory');toast('Предмет выброшен')}
+function upgradeWeapon(){const w=state.items.find(x=>x.equipped&&x.type==='Оружие');if(!w){toast('Нет оружия');return}if(state.coins<200){toast('Не хватает монет');return}state.coins-=200;w.damage+=3;save();save();openP('forge');toast('Оружие улучшено')}
+function buyItem(id){let it=null;if(id==='knife')it={id:'knife'+Date.now(),name:'Нож',type:'Оружие',icon:'🔪',damage:6,price:220,equipped:false};if(id==='heavyaxe')it={id:'heavyaxe'+Date.now(),name:'Тяжёлый топор',type:'Оружие',icon:'🪓',damage:18,price:700,equipped:false};if(id==='steel')it={id:'steel'+Date.now(),name:'Стальная броня',type:'Броня',icon:'🛡️',defense:15,price:650,equipped:false};if(id==='bandage'){let b=state.items.find(x=>x.name==='Аптечка');if(b){if(state.coins<80){toast('Не хватает монет');return}state.coins-=80;b.qty=(b.qty||0)+1;save();save();openP('shop');toast('Аптечка куплена');return}it={id:'bandage'+Date.now(),name:'Аптечка',type:'Расходник',icon:'🩹',qty:1,price:80,equipped:false}}if(!it)return;if(state.coins<it.price){toast('Не хватает монет');return}state.coins-=it.price;state.items.push(it);save();save();openP('shop');toast('Куплено')}
+function completeQuest(){state.coins+=150;state.exp+=80;if(state.exp>=300){state.exp-=300;state.level++}save();save();toast('Задание выполнено +150 🪙');openP('quests')}
+function claimBonus(){state.coins+=250;save();save();toast('Получено +250 🪙');openP('bonus')}
+function battle(){
+ let hp=100,playerHp=120,turn=1,locked=false;
+ pt.textContent='Бой против Бандита';
+ pb.innerHTML='<div class="card"><b>🥷 Бандит</b><p>HP: <span id="enemyHp">100</span>/100</p><div style="height:7px;background:#35151b;border-radius:8px"><i id="enemyBar" style="display:block;width:100%;height:100%;background:#e33;border-radius:8px"></i></div><p>Ход: <b id="turnNo">1</b></p></div><div class="card"><b>Атака — выбери 1 зону</b><div class="zones" id="attacks">'+ZONES.map((x,i)=>'<button onclick="pickAttack('+i+',this)">'+x+'</button>').join('')+'</div></div><div class="card"><b>Защита — выбери 2 зоны</b><div class="zones" id="defs">'+ZONES.map((x,i)=>'<button onclick="pickDef('+i+',this)">'+x+'</button>').join('')+'</div><p>Выбрано: <b id="dc">0/2</b></p></div><button class="goldBtn" id="strikeBtn" onclick="strikeTurn()">⚔️ Сделать ход</button><div class="card"><b>История боя</b><div id="battleLog">Выберите атаку и две зоны защиты.</div></div>';
+ modal.classList.add('open');
+ window._battle={hp,playerHp,turn,locked,attack:null,defs:[]};
+}
+function pickAttack(i,b){document.querySelectorAll('#attacks button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');window._battle.attack=i}
+function pickDef(i,b){const d=window._battle.defs;if(d.includes(i)){window._battle.defs=d.filter(x=>x!==i);b.classList.remove('sel')}else if(d.length<2){d.push(i);b.classList.add('sel')}document.getElementById('dc').textContent=d.length+'/2'}
+function strikeTurn(){const b=window._battle;if(b.locked)return;if(b.attack===null||b.defs.length!==2){toast('Выбери атаку и 2 зоны защиты');return}b.locked=true;const enemyAttack=Math.floor(Math.random()*5);const blocked=b.defs.includes(enemyAttack);let dmg=blocked?0:Math.max(4,Math.round(10+Math.random()*6));let crit=Math.random()<.12;if(crit&&!blocked)dmg+=6;b.hp=Math.max(0,b.hp-(b.attack===enemyAttack?Math.round(totalDamage()*1.15):totalDamage()));let enemyText=blocked?'Враг атаковал в заблокированную зону. Урон: 0':'Бандит попал в '+ZONES[enemyAttack]+'. Урон: '+dmg;if(dmg>0)b.playerHp=Math.max(0,b.playerHp-dmg);document.getElementById('enemyHp').textContent=b.hp;document.getElementById('enemyBar').style.width=(b.hp)+'%';document.getElementById('turnNo').textContent=++b.turn;document.getElementById('battleLog').innerHTML='<div>Твой удар: <b>'+ZONES[b.attack]+'</b>.</div><div>'+enemyText+(crit?' <b>КРИТ!</b>':'')+'</div>';if(b.hp<=0){toast('🏆 Победа!');b.locked=false;setTimeout(closeP,900);return}if(b.playerHp<=0){toast('Поражение');b.locked=false;setTimeout(closeP,900);return}b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));document.getElementById('dc').textContent='0/2';setTimeout(()=>b.locked=false,350)}
+let sec=23*3600+45*60;setInterval(()=>{sec=Math.max(0,sec-1);let h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec%3600/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0'),v=h+':'+m+':'+s;const timer=document.getElementById('timer'),rt=document.getElementById('rt');if(timer)timer.textContent=v;if(rt)rt.textContent=v},1000);
+save();
 </script>
 </body></html>
