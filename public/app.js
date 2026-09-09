@@ -22,7 +22,40 @@ function addXP(n){s.xp+=n;if(s.xp>=s.level*100){s.xp-=s.level*100;s.level++;s.en
 function toast(t){let x=document.createElement('div');x.className='toast';x.textContent=(typeof translateText==='function'?translateText(t):t);document.body.appendChild(x);setTimeout(()=>x.remove(),1600)}
 function nav(active){return `<nav class="nav">${[['home','🏠','Главная'],['raid','⚔️','Приключение'],['hero','🛡️','Герой'],['mine','⛏️','Добыча'],['more','☰','Ещё']].map(a=>`<button class="${active===a[0]?'active':''}" onclick="go('${a[0]}')"><span>${a[1]}</span>${a[2]}</button>`).join('')}</nav>`}
 function shell(body,active='home'){document.getElementById('app').innerHTML=`<div class="app"><header class="top"><div class="brand"><div class="logo">⚔️</div><div><div class="title">Territory</div><div class="sub">Глава ${s.chapter} · Уровень ${s.level}</div></div></div><div class="stats"><div class="pill"><b>🪙 ${s.gold}</b><span>Золото</span></div><div class="pill"><b>💎 ${s.diamonds}</b><span>Алмазы</span></div><div class="pill"><b>🪙 ${s.coc.toFixed(2)}</b><span>COC</span></div></div></header><main class="screen">${body}</main>${nav(active)}</div>`}
-function home(){shell(`<div class="hero"><div class="heroart"><span class="anim-float"><img class="valkyrie-art" src="viking.png" alt="Valkyrie"><span class="anim-swing">⚔️</span></span><i class="spark s1"></i><i class="spark s2"></i><i class="spark s3"></i></div><div class="rarity">★ ★ ★ ★ ★</div><h2>${s.hero}</h2><div class="muted">Сила судьбы · ${s.level} уровень</div><div class="bars"><div class="muted">HP ${s.hp}/100</div><div class="bar"><i style="width:${s.hp}%"></i></div><div class="muted">Опыт ${s.xp}/${s.level*100}</div><div class="bar"><i style="width:${s.xp/(s.level*100)*100}%"></i></div></div></div><div class="section"><h2>Быстрые действия</h2></div><div class="grid"><div class="card"><h3>⚔️ Рейд</h3><div class="muted">Автобой и награды</div><button class="btn" onclick="go('raid')">В бой</button></div><div class="card"><h3>⛏️ Добыча</h3><div class="muted">Пассивный доход</div><button class="btn green" onclick="go('mine')">Добывать</button></div><div class="card"><h3>🚢 Плавание</h3><div class="muted">Отправить корабль</div><button class="btn alt" onclick="sail()">Отправить</button></div><div class="card"><h3>🎲 Лотерея</h3><div class="muted">Ежедневные розыгрыши</div><button class="btn alt" onclick="lottery()">Участвовать</button></div></div><div class="section"><h2>События</h2></div><div class="notice">🔥 Чем активнее играешь, тем больше наград. В этой версии экономика учебная: реальные деньги и криптокошельки не подключены.</div>`,'home')}
+function home(){
+  shell(`
+  <div class="city-wrap">
+    <div class="city-bg"><div class="mountain m1"></div><div class="mountain m2"></div><div class="mountain m3"></div><div class="fjord"></div><div class="castle"><div class="tower t1"></div><div class="tower t2"></div><div class="keep"></div></div><div class="village"><i></i><i></i><i></i><i></i><i></i></div><div class="ship ship1">⛵</div><div class="ship ship2">⛵</div><div class="torch tr1">🔥</div><div class="torch tr2">🔥</div></div>
+    <div class="city-overlay">
+      <div class="quest-banner" onclick="toast('Кузница отмечена на карте')"><div class="quest-icon">📜</div><div class="grow"><b>Текущее задание</b><strong>Поговори с кузнецом</strong><small>📍 Кузница</small></div><span>›</span></div>
+      <div class="daily-banner" onclick="toast('Ежедневный бонус скоро доступен')"><span>🎁</span><div><b>Ежедневный бонус</b><strong>23:45:12</strong></div></div>
+      <div class="side-left"><button class="city-mini" onclick="toast('Бонусы готовы')">🎁<small>Бонусы</small><em>!</em></button><button class="city-mini" onclick="toast('События открыты')">📅<small>События</small><em>!</em></button><button class="city-mini vip" onclick="toast('VIP-центр')">👑<small>VIP</small></button></div>
+      <button class="place castle-btn" onclick="toast('Замок: управление городом')"><span>🛡️</span><div><b>Замок</b><small>Управление</small></div></button>
+      <button class="place port-btn" onclick="sail()"><span>⚓</span><div><b>Порт</b><small>Торговля</small></div></button>
+      <button class="place forge-btn" onclick="equipment()"><span>⚒️</span><div><b>Кузница</b><small>Улучшение снаряжения</small></div><em>!</em></button>
+      <button class="place tavern-btn" onclick="toast('Таверна: найм героев')"><span>🍺</span><div><b>Таверна</b><small>Найм героев</small></div><em>!</em></button>
+      <button class="place shop-btn" onclick="shop()"><span>👜</span><div><b>Магазин</b><small>Предметы и снаряжение</small></div></button>
+      <button class="place arena-btn" onclick="go('raid')"><span>⚔️</span><div><b>Арена</b><small>PvP сражения</small></div></button>
+      <button class="place quest-btn" onclick="quests()"><span>📜</span><div><b>Задания</b><small>Награды и опыт</small></div><em>!</em></button>
+      <button class="free-gift" onclick="claimDaily()"><span>🎁</span><div><b>Бесплатные награды</b><small>Доступно сейчас</small></div><strong>Получить</strong></button>
+    </div>
+  </div>
+  <div class="quick-title">Быстрые действия</div>
+  <div class="quick-grid">
+    <button class="quick q-blue" onclick="go('raid')"><span>⚔️</span><b>Бой</b><small>Рейд и награды</small></button>
+    <button class="quick q-gold" onclick="inventory()"><span>🎒</span><b>Инвентарь</b><small>Предметы</small><em>!</em></button>
+    <button class="quick q-purple" onclick="equipment()"><span>🪖</span><b>Экипировка</b><small>Снаряжение</small></button>
+    <button class="quick q-green" onclick="quests()"><span>📜</span><b>Задания</b><small>Цели и награды</small><em>!</em></button>
+  </div>
+  <div class="notice city-note"><span>📜</span><div><b>Команда: 3 героя</b><small>Исследуй город, улучшай снаряжение и отправляйся в рейды.</small></div></div>
+  `,'home');
+}
+function claimDaily(){
+  var now=Date.now(), last=Number(localStorage.getItem('territory_daily_v1')||0);
+  if(now-last<24*60*60*1000){toast('🎁 Бонус уже получен');return}
+  s.gold+=250; s.diamonds+=20; save(); localStorage.setItem('territory_daily_v1',String(now)); toast('🎁 Получено: +250 золота и +20 алмазов'); home();
+}
+
 function raid(){shell(`<div class="section"><h2>⚔️ Приключение</h2><span class="muted">Глава ${s.chapter}</span></div><div class="hero"><div class="heroart anim-battle"><span class="anim-boss">🐉</span><i class="spark s1"></i><i class="spark s2"></i><i class="spark s3"></i><i class="spark s4"></i></div><h2>Хранитель фьорда</h2><div class="muted">Сложность: ${'★'.repeat(Math.min(5,s.chapter+1))}</div><div class="grid"><div class="card"><b>❤️ 180</b><div class="muted">Здоровье врага</div></div><div class="card"><b>🏆 +${100+s.chapter*20}</b><div class="muted">Награда</div></div></div><button class="btn red" onclick="fight()">НАЧАТЬ АВТОБОЙ</button></div><div class="section"><h2>Руны и усиления</h2></div><div class="list"><div class="row move-row"><div class="ico">🔮</div><div class="grow"><b>Руна ярости</b><small>+15% к атаке на 1 бой</small></div><b>×${s.runes}</b></div><div class="row move-row"><div class="ico">⚡</div><div class="grow"><b>Ускорение</b><small>Сокращает время добычи</small></div><button class="btn alt" style="width:auto;margin:0" onclick="useBoost()">Исп.</button></div></div>`,'raid')}
 function fight(){
  if(s.energy<10){toast('Недостаточно энергии');return}
