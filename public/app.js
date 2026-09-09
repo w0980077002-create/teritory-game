@@ -34,7 +34,64 @@ function render(){const s=stats();$('topHp').textContent=`${p.hp}/${p.maxHp}`;$(
 function renderEquipment(){const slots=[['weapon','Оружие'],['armor','Броня']];$('equipment').innerHTML=slots.map(([slot,title])=>{const id=p.equipment[slot],x=ITEMS[id];return `<div class="item"><span>${x?.icon||'⬜'}</span><div><b>${title}: ${x?esc(x.name):'нет'}</b><small>${x?x.desc:'Слот пуст'}</small></div>${x?`<button onclick="unequip('${id}')">СНЯТЬ</button>`:''}</div>`}).join('')}
 function renderInv(){$('inv').innerHTML=p.inventory.length?p.inventory.map(r=>{const x=ITEMS[r.id];if(!x)return'';const action=x.type==='consumable'?`<button onclick="useItem('${r.id}')">ИСПОЛЬЗОВАТЬ</button>`:`<button onclick="equip('${r.id}')">НАДЕТЬ</button>`;return `<div class="item"><span>${x.icon}</span><div><b>${esc(x.name)} ×${r.qty}</b><small>${x.desc}</small></div><div>${action}<button onclick="dropItem('${r.id}')">ВЫБРОСИТЬ</button></div></div>`}).join(''):'<div class="card muted">Инвентарь пуст.</div>'}
 function renderShop(){$('shopList').innerHTML=Object.entries(ITEMS).map(([id,x])=>`<div class="item"><span>${x.icon}</span><div><b>${esc(x.name)}</b><small>${x.desc} · ${x.price} 🪙</small></div><button class="gold" onclick="buy('${id}')">КУПИТЬ</button></div>`).join('')}
-function renderArena(){if(battle){const e=ENEMIES.find(x=>x.id===battle.id);$('battle').innerHTML=`<div class="card fight"><div id="enemyArt" class="enemyArt">${e.icon}</div><h3>${e.name}</h3><div class="bar"><i style="width:${Math.max(0,battle.hp/e.hp*100)}%"></i></div><b>${battle.hp}/${e.hp} HP</b><div style="margin-top:14px"><button class="gold big" onclick="attack()">⚔️ УДАР</button><button onclick="quickHeal()">🩹 ЛЕЧИТЬ</button><button onclick="retreat()">ОТСТУПИТЬ</button></div></div>`;$('enemyList').innerHTML='';return}$('battle').innerHTML='';$('enemyList').innerHTML=ENEMIES.map(e=>`<div class="item enemy"><span>${e.icon}</span><div><b>${e.name}</b><small>❤️ ${e.hp} · ⚔️ ${e.attack} · 🛡️ ${e.def}<br>+${e.exp} XP · +${e.coins} 🪙</small></div><button class="gold" onclick="startBattle('${e.id}')">АТАКА</button></div>`).join('')}
+const ATTACK_ZONES=[
+ {id:'head',name:'Голова',icon:'🧠'},
+ {id:'chest',name:'Грудь',icon:'🫀'},
+ {id:'stomach',name:'Живот',icon:'🎯'},
+ {id:'waist',name:'Пояс',icon:'〰️'},
+ {id:'legs',name:'Ноги',icon:'🦵'}
+];
+const BLOCK_PAIRS=[
+ {id:'head_chest',name:'Голова + Грудь',zones:['head','chest']},
+ {id:'chest_stomach',name:'Грудь + Живот',zones:['chest','stomach']},
+ {id:'stomach_waist',name:'Живот + Пояс',zones:['stomach','waist']},
+ {id:'waist_legs',name:'Пояс + Ноги',zones:['waist','legs']}
+];
+const zoneName=id=>ATTACK_ZONES.find(z=>z.id===id)?.name||id;
+const blockName=id=>BLOCK_PAIRS.find(z=>z.id===id)?.name||id;
+function renderArena(){
+ if(battle){
+  const e=ENEMIES.find(x=>x.id===battle.id);
+  if(!battle.log)battle.log=[];
+  const canMove=!battle.resolving;
+  $('battle').innerHTML=`
+   <div class="card fight tactical-fight">
+    <div class="enemyArt" id="enemyArt">${e.icon}</div>
+    <h3>Бой против ${esc(e.name)}</h3>
+    <div class="enemy-hp-label">❤️ HP ${esc(e.name)}: <b>${battle.hp}/${e.hp}</b></div>
+    <div class="bar enemyHp"><i style="width:${Math.max(0,battle.hp/e.hp*100)}%"></i></div>
+
+    <div class="battle-columns">
+      <div class="tactical-panel attack-panel">
+       <div class="tactical-title">⚔️ КУДА БЬЁМ</div>
+       <small class="tactical-help">Выбери одну зону атаки</small>
+       <div class="zone-list">
+        ${ATTACK_ZONES.map(z=>`<button class="zone-btn ${battle.attackZone===z.id?'selected':''}" onclick="selectAttackZone('${z.id}')" ${canMove?'':'disabled'}><span>${z.icon}</span><b>${z.name}</b></button>`).join('')}
+       </div>
+      </div>
+
+      <div class="tactical-panel defense-panel">
+       <div class="tactical-title">🛡️ ЧТО БЛОКИРУЕМ</div>
+       <small class="tactical-help">Выбери одну пару зон</small>
+       <div class="zone-list block-list">
+        ${BLOCK_PAIRS.map(z=>`<button class="zone-btn ${battle.blockPair===z.id?'selected':''}" onclick="selectBlockPair('${z.id}')" ${canMove?'':'disabled'}><span>🛡️</span><b>${z.name}</b></button>`).join('')}
+       </div>
+      </div>
+    </div>
+
+    <button class="gold big turn-btn" onclick="makeMove()" ${battle.attackZone&&battle.blockPair&&canMove?'':'disabled'}>⚔️ СДЕЛАТЬ ХОД</button>
+    <div class="battle-status">${battle.attackZone?`Атака: <b>${zoneName(battle.attackZone)}</b>`:'Атака не выбрана'} · ${battle.blockPair?`Блок: <b>${blockName(battle.blockPair)}</b>`:'Блок не выбран'}</div>
+
+    ${battle.log.length?`<div class="round-log"><b>📜 Результаты раундов</b>${battle.log.slice(-4).reverse().map(x=>`<div class="round-entry">${x}</div>`).join('')}</div>`:'<div class="round-log empty-log">Выберите атаку и блок, затем нажмите «Сделать ход».</div>'}
+
+    <div class="battle-actions"><button onclick="quickHeal()" ${canMove?'':'disabled'}>🩹 ЛЕЧИТЬ</button><button onclick="retreat()" ${canMove?'':'disabled'}>ОТСТУПИТЬ</button></div>
+   </div>`;
+  $('enemyList').innerHTML='';
+  return;
+ }
+ $('battle').innerHTML='';
+ $('enemyList').innerHTML=ENEMIES.map(e=>`<div class="item enemy"><span>${e.icon}</span><div><b>${e.name}</b><small>❤️ ${e.hp} · ⚔️ ${e.attack} · 🛡️ ${e.def}<br>+${e.exp} XP · +${e.coins} 🪙</small></div><button class="gold" onclick="startBattle('${e.id}')">АТАКА</button></div>`).join('')
+}
 function renderWorld(){$('locations').innerHTML=LOCATIONS.map(x=>`<button class="location" onclick="travel('${x[0]}')"><span>${x[1]}</span><b>${x[0]}</b><small>${x[2]}</small></button>`).join('')}
 function equip(id){const x=ITEMS[id];if(!x||x.type==='consumable'||!p.inventory.some(r=>r.id===id))return toast('Предмет отсутствует');p.equipment[x.type]=id;save();render();toast(`${x.name} надет`)}
 function unequip(id){const x=ITEMS[id];if(x)p.equipment[x.type]=null;save();render();toast('Предмет снят')}
@@ -43,9 +100,78 @@ function useItem(id){const x=ITEMS[id];if(!x||x.type!=='consumable'||p.hp>=p.max
 function buy(id){const x=ITEMS[id];if(!x)return;if(p.coins<x.price)return toast('Не хватает монет');p.coins-=x.price;add(id);save();render();toast(`Куплено: ${x.name}`)}
 function fullHeal(){if(p.hp>=p.maxHp)return toast('HP уже полное');if(p.coins<25)return toast('Нужно 25 монет');p.coins-=25;p.hp=p.maxHp;save();render();toast('❤️ HP полностью восстановлено')}
 function travel(name){p.location=name;save();render();toast(`📍 Вы прибыли: ${name}`)}
-function startBattle(id){if(p.hp<=0)return toast('Нет HP');battle={id,hp:ENEMIES.find(x=>x.id===id).hp};show('arena');toast('Бой начался')}
-function floatDamage(n){const art=$('enemyArt');if(!art)return;const d=document.createElement('div');d.className='damage';d.textContent='-'+n;d.style.left=(45+Math.random()*20)+'%';d.style.top='28%';art.parentElement.appendChild(d);setTimeout(()=>d.remove(),750)}
-function attack(){if(!battle)return;const e=ENEMIES.find(x=>x.id===battle.id),s=stats();const crit=Math.random()<Math.min(.35,.08+p.level*.01);let dmg=Math.max(1,s.attack-e.def+Math.floor(Math.random()*5));if(crit)dmg*=2;battle.hp=Math.max(0,battle.hp-dmg);const art=$('enemyArt');art?.classList.add('hit');floatDamage(dmg);setTimeout(()=>art?.classList.remove('hit'),350);if(battle.hp<=0){p.wins++;p.exp+=e.exp;p.coins+=e.coins;const ups=levelUp();battle=null;save();render();toast(`🏆 Победа! +${e.exp} XP +${e.coins} 🪙${crit?' · КРИТ!':''}${ups.length?' · Уровень '+ups.join(' → '):''}`);return}const enemyDmg=Math.max(1,e.attack-s.def+Math.floor(Math.random()*4));p.hp=Math.max(0,p.hp-enemyDmg);if(p.hp===0){p.losses++;p.hp=Math.max(1,Math.floor(p.maxHp*.25));battle=null;toast(`💀 Поражение. -${enemyDmg} HP. Вы восстановлены до ${p.hp} HP.`)}else toast(`${crit?'💥 КРИТ! ':''}Ты нанёс ${dmg}, враг нанёс ${enemyDmg}`);save();render()}
+function startBattle(id){
+ const e=ENEMIES.find(x=>x.id===id);
+ if(!e)return;
+ if(p.hp<=0)return toast('Нет HP');
+ battle={id:e.id,hp:e.hp,attackZone:null,blockPair:null,resolving:false,log:[]};
+ show('arena');
+ toast(`Бой против ${e.name}: выбери атаку и блок`);
+}
+function selectAttackZone(id){
+ if(!battle||battle.resolving||!ATTACK_ZONES.some(z=>z.id===id))return;
+ battle.attackZone=id;
+ renderArena();
+}
+function selectBlockPair(id){
+ if(!battle||battle.resolving||!BLOCK_PAIRS.some(z=>z.id===id))return;
+ battle.blockPair=id;
+ renderArena();
+}
+function zoneBlocked(zone,pairId){
+ const pair=BLOCK_PAIRS.find(x=>x.id===pairId);
+ return !!pair?.zones.includes(zone);
+}
+function makeMove(){
+ if(!battle||battle.resolving)return;
+ if(!battle.attackZone||!battle.blockPair)return toast('Сначала выбери атаку и блок');
+ const e=ENEMIES.find(x=>x.id===battle.id),s=stats();
+ if(!e)return;
+ battle.resolving=true;
+ const enemyAttack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)].id;
+ const enemyBlock=BLOCK_PAIRS[Math.floor(Math.random()*BLOCK_PAIRS.length)].id;
+ const playerBlocked=zoneBlocked(enemyAttack,battle.blockPair);
+ const enemyBlocked=zoneBlocked(battle.attackZone,enemyBlock);
+ const playerDamage=enemyBlocked?0:Math.max(1,s.attack);
+ const enemyDamage=playerBlocked?0:Math.max(1,e.attack);
+ const playerAttackName=zoneName(battle.attackZone);
+ const enemyAttackName=zoneName(enemyAttack);
+ const enemyBlockName=blockName(enemyBlock);
+ const attackText=enemyBlocked
+   ? `Вы ударили в <b>${playerAttackName}</b> — Бандит заблокировал эту зону (${enemyBlockName}). <strong>Урон: 0.</strong>`
+   : `Вы ударили в <b>${playerAttackName}</b> — Бандит не заблокировал. <strong>-${playerDamage} HP.</strong>`;
+ const defenseText=playerBlocked
+   ? `Бандит ударил в <b>${enemyAttackName}</b> — Вы заблокировали эту зону. <strong>Урон: 0.</strong>`
+   : `Бандит ударил в <b>${enemyAttackName}</b> — зона не закрыта. <strong>-${enemyDamage} HP.</strong>`;
+ battle.hp=Math.max(0,battle.hp-playerDamage);
+ p.hp=Math.max(0,p.hp-enemyDamage);
+ battle.log.push(`${attackText}<br>${defenseText}`);
+ save();
+ renderArena();
+ const art=$('enemyArt');
+ if(playerDamage>0){art?.classList.add('hit');floatDamage(playerDamage);setTimeout(()=>art?.classList.remove('hit'),350)}
+ if(enemyDamage>0){document.querySelector('.avatar')?.classList.add('player-hit');setTimeout(()=>document.querySelector('.avatar')?.classList.remove('player-hit'),350)}
+ setTimeout(()=>{
+  if(battle&&battle.hp<=0){
+   p.wins++;p.exp+=e.exp;p.coins+=e.coins;
+   const ups=levelUp();
+   battle=null;save();render();
+   toast(`🏆 Победа! +${e.exp} XP +${e.coins} 🪙${ups.length?' · Уровень '+ups.join(' → '):''}`);
+   return;
+  }
+  if(p.hp<=0){
+   p.losses++;p.hp=Math.max(1,Math.floor(p.maxHp*.25));battle=null;save();render();
+   toast(`💀 Поражение. Восстановлено до ${p.hp} HP.`);
+   return;
+  }
+  if(battle){
+   battle.resolving=false;
+   battle.attackZone=null;
+   battle.blockPair=null;
+   render();
+  }
+ },420);
+}
 function retreat(){battle=null;render();toast('Ты отступил')}
 function quickHeal(){const r=p.inventory.find(x=>['bandage','medkit','stim'].includes(x.id));if(r)useItem(r.id);else toast('Нет аптечек')}
 function betValue(){return Math.max(1,Math.min(500,Math.floor(Number($('bet').value)||1)))}
@@ -56,5 +182,5 @@ async function loadChat(){try{const r=await fetch('/api/chat',{cache:'no-store'}
 function connect(){try{const proto=location.protocol==='https:'?'wss':'ws';ws=new WebSocket(`${proto}://${location.host}`);ws.onopen=()=>{ws.send(JSON.stringify({type:'hello',name:p.name}));};ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='online'){$('topOnline').textContent=m.count;$('onlineBig').textContent=m.count;if(m.history){$('chatLog').innerHTML='';m.history.forEach(appendChat)}}if(m.type==='chat')appendChat(m.message)}catch{}};ws.onclose=()=>setTimeout(connect,3000)}catch{setTimeout(connect,3000)}}
 function sendChat(){const input=$('chatInput'),text=input.value.trim();if(!text)return;if(!ws||ws.readyState!==WebSocket.OPEN)return toast('Чат подключается...');ws.send(JSON.stringify({type:'chat',text}));input.value=''}
 $('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat()});
-window.show=show;window.equip=equip;window.unequip=unequip;window.dropItem=dropItem;window.useItem=useItem;window.buy=buy;window.fullHeal=fullHeal;window.travel=travel;window.startBattle=startBattle;window.attack=attack;window.retreat=retreat;window.quickHeal=quickHeal;window.slots=slots;window.rollDice=rollDice;window.sendChat=sendChat;
+window.show=show;window.equip=equip;window.unequip=unequip;window.dropItem=dropItem;window.useItem=useItem;window.buy=buy;window.fullHeal=fullHeal;window.travel=travel;window.startBattle=startBattle;window.selectAttackZone=selectAttackZone;window.selectBlockPair=selectBlockPair;window.makeMove=makeMove;window.retreat=retreat;window.quickHeal=quickHeal;window.slots=slots;window.rollDice=rollDice;window.sendChat=sendChat;
 render();loadChat();connect();
