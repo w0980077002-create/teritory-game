@@ -1,9 +1,544 @@
-<!doctype html>
-<html lang="ru"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Territoria</title><link rel="stylesheet" href="style.css">
-</head><body><div id="app">
-<header><div class="ava">⚔️</div><div class="name"><b>Территорианец</b><small>Уровень 12</small></div><div class="res">🪙 <b id="gold">1250</b><br>💎 <b>240</b></div><button>☰</button></header>
-<main id="screen"></main>
-<nav><button onclick="home()">🏠<small>Город</small></button><button onclick="inventory()">🎒<small>Герой</small></button><button class="fight" onclick="startBattle()">⚔️<small>Бой</small></button><button onclick="quests()">📜<small>Задания</small></button><button onclick="shop()">🛒<small>Магазин</small></button></nav>
-</div><div id="toast"></div><script src="app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width,
+                   initial-scale=1.0,
+                   maximum-scale=1.0,
+                   user-scalable=no">
+
+    <title>Territory</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- THREE.JS -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js"
+        }
+    }
+    </script>
+
+</head>
+
+<body>
+
+    <div id="notice" class="notice">
+        Выберите зоны атаки и защиты!
+    </div>
+
+
+    <!-- ШАПКА -->
+
+    <header>
+
+        <div class="brand">
+
+            <div class="logo-badge">
+                T
+            </div>
+
+            <div class="brand-info">
+
+                <h1>
+                    TERRITORY
+                </h1>
+
+                <small id="header-level">
+                    Уровень 1
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="res">
+            <span>
+                🪙 <b id="coins">1000</b>
+            </span>
+        </div>
+
+    </header>
+
+
+    <!-- ОСНОВНОЙ ЭКРАН -->
+
+    <section class="screen">
+
+
+        <!-- АРЕНА -->
+
+        <div id="page-home" class="game-page">
+
+            <!-- 3D -->
+            <div id="battle-3d"></div>
+
+
+            <!-- ИНТЕРФЕЙС БОЯ -->
+
+            <div class="battle">
+
+                <div class="battle-title">
+                    Бойцовская Арена
+                </div>
+
+                <div class="enemyname">
+                    Местный хулиган <span>🥊</span>
+                </div>
+
+
+                <div class="bars-container">
+
+                    <div class="bar-label">
+
+                        Вы:
+                        <span id="hp-text-player">
+                            120/120
+                        </span>
+
+                        <div class="hp-bar-bg">
+
+                            <div
+                                id="hp-fill-player"
+                                class="hp-fill player-hp">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="bar-label">
+
+                        Враг:
+                        <span id="hp-text-enemy">
+                            100/100
+                        </span>
+
+                        <div class="hp-bar-bg">
+
+                            <div
+                                id="hp-fill-enemy"
+                                class="hp-fill enemy-hp">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="zone-title">
+                    Куда атакуем:
+                </div>
+
+                <div class="powers">
+
+                    <button id="btn-att-head">
+                        Голова
+                    </button>
+
+                    <button id="btn-att-body">
+                        Корпус
+                    </button>
+
+                    <button id="btn-att-legs">
+                        Ноги
+                    </button>
+
+                </div>
+
+
+                <div class="zone-title">
+                    Что блокируем:
+                </div>
+
+                <div class="powers">
+
+                    <button id="btn-blk-head">
+                        Голова
+                    </button>
+
+                    <button id="btn-blk-body">
+                        Корпус
+                    </button>
+
+                    <button id="btn-blk-legs">
+                        Ноги
+                    </button>
+
+                </div>
+
+
+                <button id="attack">
+                    ⚔️ Сделать ход
+                </button>
+
+            </div>
+
+
+            <!-- ИСТОРИЯ -->
+
+            <div class="log-container">
+
+                <div class="log-title">
+                    История боя:
+                </div>
+
+                <div class="combat-log-text">
+                    Ожидание хода...
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- РЫНОК -->
+
+        <div
+            id="page-shop"
+            class="game-page"
+            style="display:none;">
+
+            <div class="hero">
+
+                <div class="battle-title">
+                    Оружейная лавка
+                </div>
+
+                <div class="enemyname">
+                    Рынок <span>🛒</span>
+                </div>
+
+
+                <div class="shop-item">
+
+                    <div>
+
+                        <h3>
+                            🩸 Кастеты
+                        </h3>
+
+                        <small>
+                            Урон +5 | 150 🪙
+                        </small>
+
+                    </div>
+
+                    <button
+                        id="buy-brass"
+                        style="background:#e74c3c;border:none;">
+
+                        Купить
+
+                    </button>
+
+                </div>
+
+
+                <div class="shop-item">
+
+                    <div>
+
+                        <h3>
+                            🔪 Нож
+                        </h3>
+
+                        <small>
+                            Урон +12 | 400 🪙
+                        </small>
+
+                    </div>
+
+                    <button
+                        id="buy-knife"
+                        style="background:#e74c3c;border:none;">
+
+                        Купить
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- РАЙОНЫ -->
+
+        <div
+            id="page-map"
+            class="game-page"
+            style="display:none;">
+
+            <div class="hero">
+
+                <div class="battle-title">
+                    Перемещение
+                </div>
+
+                <div class="enemyname">
+                    Районы <span>🗺️</span>
+                </div>
+
+                <p style="color:#8a8a93;margin-top:10px;">
+                    Доступно со 2 уровня.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ПРОФИЛЬ -->
+
+        <div
+            id="page-profile"
+            class="game-page"
+            style="display:none;">
+
+            <div class="hero">
+
+                <div class="battle-title">
+                    Характеристики
+                </div>
+
+                <div class="enemyname">
+                    Персонаж <span>👤</span>
+                </div>
+
+
+                <div style="margin-bottom:12px;">
+
+                    <div
+                        style="
+                        font-size:12px;
+                        color:#8a8a93;">
+
+                        Опыт:
+
+                        <span
+                            id="exp-text"
+                            style="
+                            float:right;
+                            color:#f1c40f;">
+
+                            0 / 100 XP
+
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="hp-bar-bg"
+                        style="height:6px;">
+
+                        <div
+                            id="exp-fill"
+                            style="
+                            height:100%;
+                            width:0%;
+                            background:#f1c40f;">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <p>
+                    Уровень:
+
+                    <span
+                        id="prof-level"
+                        style="float:right;">
+                        1
+                    </span>
+
+                </p>
+
+
+                <p>
+                    Оружие:
+
+                    <span
+                        id="prof-weapon"
+                        style="
+                        float:right;
+                        color:#e74c3c;">
+                        Кулаки
+                    </span>
+
+                </p>
+
+
+                <p>
+                    Урон:
+
+                    <span
+                        id="prof-damage"
+                        style="float:right;">
+                        15
+                    </span>
+
+                </p>
+
+
+                <p>
+                    Макс. HP:
+
+                    <span
+                        id="prof-maxhp"
+                        style="
+                        float:right;
+                        color:#2ecc71;">
+                        120 HP
+                    </span>
+
+                </p>
+
+
+                <hr
+                    style="
+                    border-color:#252533;
+                    margin:10px 0;">
+
+
+                <div
+                    id="free-points-block"
+                    style="
+                    background:rgba(241,196,15,0.1);
+                    border:1px dashed #f1c40f;
+                    padding:6px;
+                    margin-bottom:10px;
+                    display:none;
+                    color:#f1c40f;
+                    text-align:center;">
+
+                    Очки прокачки:
+
+                    <b id="prof-free">
+                        0
+                    </b>
+
+                </div>
+
+
+                <div
+                    style="
+                    display:flex;
+                    justify-content:space-between;
+                    margin-top:8px;">
+
+                    <span>
+                        💪 Сила:
+                        <b id="prof-str">5</b>
+                    </span>
+
+                    <button
+                        id="add-str"
+                        style="
+                        padding:2px 8px;
+                        background:#f1c40f;
+                        color:#111;
+                        display:none;">
+                        +
+                    </button>
+
+                </div>
+
+
+                <div
+                    style="
+                    display:flex;
+                    justify-content:space-between;
+                    margin-top:8px;">
+
+                    <span>
+                        💨 Ловкость:
+                        <b id="prof-agi">5</b>
+                    </span>
+
+                    <button
+                        id="add-agi"
+                        style="
+                        padding:2px 8px;
+                        background:#f1c40f;
+                        color:#111;
+                        display:none;">
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- НИЖНЕЕ МЕНЮ -->
+
+    <div class="nav-tabs">
+
+        <button
+            id="tab-arena"
+            class="tab active">
+
+            <span>🥊</span>
+            <span>Арена</span>
+
+        </button>
+
+
+        <button
+            id="tab-shop"
+            class="tab">
+
+            <span>🛒</span>
+            <span>Рынок</span>
+
+        </button>
+
+
+        <button
+            id="tab-map"
+            class="tab">
+
+            <span>🗺️</span>
+            <span>Районы</span>
+
+        </button>
+
+
+        <button
+            id="tab-profile"
+            class="tab">
+
+            <span>👤</span>
+            <span>Профиль</span>
+
+        </button>
+
+    </div>
+
+
+    <!-- APP.JS -->
+    <script
+        type="module"
+        src="app.js">
+    </script>
+
+</body>
+
+</html>

@@ -1,1236 +1,1677 @@
-// ==========================================
-// 1. ДАННЫЕ ИГРЫ (ПЕРЕМЕННЫЕ)
-// ==========================================
-const S = {
-    gold: 1250,
-    ph: 100,        // Хитпоинты игрока
-    eh: 100,        // Хитпоинты врага
-    ap: 3,          // Очки действия (ОД)
-    def: false,     // Стойка защиты
-    log: ["Бандит выходит на арену.", "Твой ход."],
-    
-    // Предметы в вашей сумке
-    items: [
-        ["🗡️","Клинок","ATK +18"],
-        ["🛡️","Щит","DEF +14"],
-        ["⛑️","Шлем","DEF +7"],
-        ["💍","Кольцо","ATK +6"],
-        ["🧪","Зелье","HP +40"],
-        ["🥊","Перчатки","ATK +5"],
-        ["🥾","Сапоги","DEF +4"],
-        ["💎","Кристалл","Редкий"]
-    ]
+import * as THREE from "three";
+
+/* =========================
+   TERRITORY — 3D BATTLE
+   ========================= */
+
+var p = {
+    hp: 120,
+    maxHp: 120,
+    coins: 1000,
+    level: 1,
+    exp: 0,
+    maxExp: 100,
+    weapon: "Кулаки",
+    bonusDamage: 0,
+    strength: 5,
+    agility: 5,
+    freePoints: 0
 };
 
-// Ссылки на экран и золото из HTML
-const screen = document.getElementById("screen");
-const gold = document.getElementById("gold");
-
-// Инициализация при старте страницы
-window.onload = () => {
-    if(gold) gold.textContent = S.gold;
-    home();
+var e = {
+    name: "Местный хулиган",
+    hp: 100,
+    maxHp: 100
 };
 
-// Всплывающие подсказки
-function toast(t){
-    let x = document.getElementById("toast");
-    if(!x) return;
-    x.textContent = t;
-    x.classList.add("show");
-    clearTimeout(window.tt);
-    window.tt = setTimeout(() => x.classList.remove("show"), 1400);
-}
+var selA = null;
+var selB = null;
 
-// ==========================================
-// 2. ИГРОВЫЕ ЭКРАНЫ (ИНТЕРФЕЙС)
-// ==========================================
-
-// Экран: Город
-function home(){
-    screen.innerHTML = `
-        <section class="hero">
-            <h2>⚔️ TERRITORIA ⚔️</h2>
-            <p>Золотой город</p>
-            <div class="herochar">🧙</div>
-            <div class="wolf">🐺</div>
-            <div class="fire">🔥</div>
-            <div class="quick">
-                <button onclick="inventory()">🎒<br>Герой</button>
-                <button onclick="startBattle()">⚔️<br>Арена</button>
-                <button onclick="quests()">📜<br>Задания</button>
-                <button onclick="shop()">🛒<br>Магазин</button>
-            </div>
-        </section>
-        <div class="card">
-            <b>❤️ Здоровье</b>
-            <div class="hp"><span style="width:${S.ph}%"></span></div>
-            ${S.ph}/100 HP
-        </div>
-        <div class="card">
-            <b>📊 Характеристики</b>
-            <div class="stats">
-                <div class="stat">⚔️<b>48</b>Атака</div>
-                <div class="stat">🛡️<b>35</b>Защита</div>
-                <div class="stat">💥<b>12%</b>Крит</div>
-            </div>
-        </div>
-    `;
-}
-
-// Экран: Инвентарь персонажа
-function inventory(){
-    screen.innerHTML = `
-        <h2 class="title">🎒 Герой</h2>
-        <div class="card">
-            <b>Экипировка</b>
-            <div class="grid">
-                ${["🗡️","🛡️","⛑️","🥊","🥾","💍"].map((x,i) => `
-                    <div class="slot">${x}<small>${["Оружие","Броня","Шлем","Перчатки","Сапоги","Кольцо"][i]}</small></div>
-                `).join("")}
-            </div>
-        </div>
-        <div class="card">
-            <b>Предметы</b>
-            <div class="items">
-                ${S.items.map((x,i) => `
-                    <button class="item" onclick="toast('${x[1]} выбран')">
-                        <i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small>
-                    </button>
-                `).join("")}
-            </div>
-        </div>
-    `;
-}
-
-// Экран: Магазин
-function shop(){
-    let g = [
-        ["🗡️","Железный меч",180],
-        ["🛡️","Щит стража",220],
-        ["🧪","Зелье HP",90],
-        ["💍","Кольцо силы",350],
-        ["⛑️","Шлем охотника",260],
-        ["⚔️","Меч героя",500]
-    ];
-    window.goods = g; // Сохраняем товары для функции покупки
-    
-    screen.innerHTML = `
-        <h2 class="title">🛒 Магазин</h2>
-        <div class="card">
-            <div class="shopgrid">
-                ${g.map((x,i) => `
-                    <div class="shopitem">
-                        <div class="icon">${x[0]}</div>
-                        <b>${x[1]}</b>
-                        <button class="buy" onclick="buy(${i})">🪙 ${x[2]}</button>
-                    </div>
-                `).join("")}
-            </div>
-        </div>
-    `;
-}
-
-// Логика покупки предметов
-function buy(i){
-    let x = goods[i];
-    if(S.gold < x[2]) return toast("Не хватает золота");
-    
-    S.gold -= x[2];
-    if(gold) gold.textContent = S.gold;
-    
-    // Добавляем купленный предмет в инвентарь игрока
-    S.items.push([x[0], x[1], "Куплено"]);
-    toast("Куплено: " + x[1]);
-}
-
-// Экран: Задания
-function quests(){
-    screen.innerHTML = `
-        <h2 class="title">📜 Задания</h2>
-        <div class="card quest">
-            <i>⚔️</i>
-            <div><b>Победи бандита</b><small>Награда: 🪙 120</small></div>
-            <button onclick="startBattle()">В бой</button>
-        </div>
-        <div class="card quest">
-            <i>🪙</i>
-            <div><b>Накопи 2000 золота</b><small>Прогресс: ${S.gold}/2000</small></div>
-        </div>
-        <div class="card quest">
-            <i>🎒</i>
-            <div><b>Собери 5 предметов</b><small>Прогресс: ${S.items.length}/5</small></div>
-        </div>
-    `;
-}
-
-// ==========================================
-// 3. БОЕВАЯ ЛОГИКА (АРЕНА)
-// ==========================================
-
-// Старт боя
-function startBattle(){
-    S.ph = 100;
-    S.eh = 100;
-    S.ap = 3;
-    S.def = false;
-    S.log = ["Бандит выходит на арену.", "Твой ход."];
-    battle();
-}
-
-// Отрисовка арены
-function battle(){
-    screen.innerHTML = `
-        <section class="battle">
-            <div class="turn">
-                <span>${S.ap > 0 ? "ТВОЙ ХОД" : "НЕТ ОЧКОВ ДЕЙСТВИЯ"}</span>
-            </div>
-            <div class="arena">
-                <div class="line"></div>
-                <div class="unit you">
-                    <div class="pic">🧙</div>
-                    <b>Территорианец</b>
-                    <div class="hp"><span style="width:${S.ph}%"></span></div>
-                    <small>${S.ph}/100</small>
-                    <div class="ap">
-                        ${[0,1,2].map(i => `<i class="${i < S.ap ? "" : "off"}"></i>`).join("")}
-                    </div>
-                </div>
-                <div class="unit enemy">
-                    <div class="pic">👹</div>
-                    <b>Бандит</b>
-                    <div class="hp"><span style="width:${S.eh}%"></span></div>
-                    <small>${S.eh}/100</small>
-                </div>
-            </div>
-            <div class="card">
-                <b>📜 Журнал боя</b>
-                <div class="battlelog">
-                    ${S.log.slice(-5).map(x => `<div>• ${x}</div>`).join("")}
-                </div>
-            </div>
-            <div class="actions">
-                <button class="act main" onclick="act('attack')">⚔️ Атака<br><small>1 ОД</small></button>
-                <button class="act" onclick="act('skill')">✨ Сильный удар<br><small>2 ОД</small></button>
-                <button class="act" onclick="act('def')">🛡️ Защита<br><small>1 ОД</small></button>
-                <button class="act heal" onclick="act('heal')">🧪 Зелье<br><small>1 ОД</small></button>
-            </div>
-        </section>
-    `;
-}
-
-// Обработка действий игрока во время боя
-function act(a){
-    if(S.eh <= 0 || S.ph <= 0) return toast("Бой завершен");
-    
-    let cost = a === "skill" ? 2 : 1;
-    if(S.ap < cost) return toast("Недостаточно очков действия");
-    
-    S.ap -= cost;
-    
-    if(a === "attack"){
-        let d = 15 + Math.floor(Math.random() * 9);
-        S.eh = Math.max(0, S.eh - d);
-        S.log.push(`Ты атаковал и нанёс ${d} урона.`);
+try {
+    var saved = localStorage.getItem("territory_save");
+    if (saved) {
+        p = JSON.parse(saved);
     }
-    if(a === "skill"){
-        let d = 28 + Math.floor(Math.random() * 13);
-        S.eh = Math.max(0, S.eh - d);
-        S.log.push(`✨ Сильный удар! ${d} урона.`);
-    }
-    if(a === "def"){
-        S.def = true;
-        S.log.push("🛡️ Ты занял защитную стойку.");
-    }
-    if(a === "heal"){
-        S.ph = Math.min(100, S.ph + 30);
-        S.log.push("🧪 Ты восстановил 30 HP.");
-    }
-    
-    // Проверка победы игрока
-    if(S.eh <= 0){
-        S.log.push("🏆 Победа! +120 золота.");
-        S.gold += 120;
-        if(gold) gold.textContent = S.gold;
-        renderEndControls();
+} catch (err) {}
+
+function save() {
+    try {
+        localStorage.setItem("territory_save", JSON.stringify(p));
+    } catch (err) {}
+}
+
+/* =========================
+   3D
+   ========================= */
+
+var battle3D = {
+    scene: null,
+    camera: null,
+    renderer: null,
+
+    player: null,
+    enemy: null,
+
+    playerParts: null,
+    enemyParts: null,
+
+    playerBase: null,
+    enemyBase: null,
+
+    ready: false,
+
+    playerAction: null,
+    enemyAction: null,
+
+    actionStart: 0,
+
+    shake: 0,
+    cameraBaseX: 0,
+    cameraBaseY: 0,
+    cameraBaseZ: 0
+};
+
+/* =========================
+   FIGHTER
+   ========================= */
+
+function createFighter(isPlayer) {
+
+    var group = new THREE.Group();
+
+    var bodyColor = isPlayer ? 0x2463ff : 0xb83232;
+    var skinColor = 0xffc08f;
+    var pantsColor = isPlayer ? 0x202c42 : 0x171717;
+    var shoeColor = 0x080808;
+    var hairColor = 0x151515;
+
+    /* BODY */
+
+    var body = new THREE.Mesh(
+        new THREE.BoxGeometry(1.15, 1.45, 0.65),
+        new THREE.MeshStandardMaterial({
+            color: bodyColor,
+            roughness: 0.8
+        })
+    );
+
+    body.position.y = 2.15;
+    group.add(body);
+
+    /* HEAD */
+
+    var head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.48, 20, 16),
+        new THREE.MeshStandardMaterial({
+            color: skinColor,
+            roughness: 0.8
+        })
+    );
+
+    head.position.y = 3.25;
+    group.add(head);
+
+    /* HAIR */
+
+    var hair = new THREE.Mesh(
+        new THREE.SphereGeometry(
+            0.50,
+            20,
+            10,
+            0,
+            Math.PI * 2,
+            0,
+            Math.PI / 2
+        ),
+        new THREE.MeshStandardMaterial({
+            color: hairColor,
+            roughness: 0.9
+        })
+    );
+
+    hair.position.y = 3.48;
+    group.add(hair);
+
+    /* LEGS */
+
+    var legL = new THREE.Mesh(
+        new THREE.BoxGeometry(0.38, 1.15, 0.45),
+        new THREE.MeshStandardMaterial({
+            color: pantsColor,
+            roughness: 0.9
+        })
+    );
+
+    var legR = legL.clone();
+
+    legL.position.set(-0.27, 0.85, 0);
+    legR.position.set(0.27, 0.85, 0);
+
+    group.add(legL);
+    group.add(legR);
+
+    /* SHOES */
+
+    var shoeL = new THREE.Mesh(
+        new THREE.BoxGeometry(0.48, 0.25, 0.65),
+        new THREE.MeshStandardMaterial({
+            color: shoeColor,
+            roughness: 1
+        })
+    );
+
+    var shoeR = shoeL.clone();
+
+    shoeL.position.set(-0.27, 0.22, 0.08);
+    shoeR.position.set(0.27, 0.22, 0.08);
+
+    group.add(shoeL);
+    group.add(shoeR);
+
+    /* ARMS */
+
+    var armL = new THREE.Mesh(
+        new THREE.BoxGeometry(0.28, 1.1, 0.3),
+        new THREE.MeshStandardMaterial({
+            color: skinColor,
+            roughness: 0.8
+        })
+    );
+
+    var armR = armL.clone();
+
+    armL.position.set(-0.78, 2.15, 0);
+    armR.position.set(0.78, 2.15, 0);
+
+    group.add(armL);
+    group.add(armR);
+
+    /* FISTS */
+
+    var fistL = new THREE.Mesh(
+        new THREE.SphereGeometry(0.18, 12, 10),
+        new THREE.MeshStandardMaterial({
+            color: skinColor
+        })
+    );
+
+    var fistR = fistL.clone();
+
+    fistL.position.set(-0.78, 1.60, 0);
+    fistR.position.set(0.78, 1.60, 0);
+
+    group.add(fistL);
+    group.add(fistR);
+
+    /* STORE PARTS */
+
+    group.userData.parts = {
+        body: body,
+        head: head,
+        armL: armL,
+        armR: armR,
+        fistL: fistL,
+        fistR: fistR,
+        legL: legL,
+        legR: legR
+    };
+
+    return group;
+}
+
+/* =========================
+   3D ARENA
+   ========================= */
+
+function init3DArena() {
+
+    var container = document.getElementById("battle-3d");
+
+    if (!container) return;
+
+    if (battle3D.ready) {
+        resize3DArena();
         return;
     }
-    
-    // Передача хода монстру, если кончились ОД
-    if(S.ap === 0){
-        battle();
-        setTimeout(enemyTurn, 800);
-    } else {
-        battle();
-    }
+
+    var scene = new THREE.Scene();
+
+    scene.background = new THREE.Color(0x111119);
+
+    battle3D.scene = scene;
+
+    /* CAMERA */
+
+    var camera = new THREE.PerspectiveCamera(
+        45,
+        container.clientWidth / container.clientHeight,
+        0.1,
+        100
+    );
+
+    camera.position.set(0, 3.8, 8.8);
+    camera.lookAt(0, 2, 0);
+
+    battle3D.camera = camera;
+
+    battle3D.cameraBaseX = camera.position.x;
+    battle3D.cameraBaseY = camera.position.y;
+    battle3D.cameraBaseZ = camera.position.z;
+
+    /* RENDERER */
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: false
+    });
+
+    renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio || 1, 2)
+    );
+
+    renderer.setSize(
+        container.clientWidth,
+        container.clientHeight
+    );
+
+    renderer.shadowMap.enabled = true;
+
+    container.innerHTML = "";
+    container.appendChild(renderer.domElement);
+
+    battle3D.renderer = renderer;
+
+    /* LIGHT */
+
+    var hemi = new THREE.HemisphereLight(
+        0xffffff,
+        0x151522,
+        2.2
+    );
+
+    scene.add(hemi);
+
+    var light = new THREE.DirectionalLight(
+        0xffffff,
+        2.5
+    );
+
+    light.position.set(4, 8, 6);
+    light.castShadow = true;
+
+    scene.add(light);
+
+    var redLight = new THREE.PointLight(
+        0xff3030,
+        15,
+        12
+    );
+
+    redLight.position.set(0, 2, -3);
+
+    scene.add(redLight);
+
+    /* FLOOR */
+
+    var floor = new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            4.1,
+            4.1,
+            0.25,
+            64
+        ),
+        new THREE.MeshStandardMaterial({
+            color: 0x292731,
+            roughness: 0.9,
+            metalness: 0.1
+        })
+    );
+
+    floor.position.y = -0.05;
+    floor.receiveShadow = true;
+
+    scene.add(floor);
+
+    /* INNER RING */
+
+    var ring = new THREE.Mesh(
+        new THREE.TorusGeometry(
+            3.1,
+            0.035,
+            10,
+            80
+        ),
+        new THREE.MeshBasicMaterial({
+            color: 0x9293a8
+        })
+    );
+
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = 0.10;
+
+    scene.add(ring);
+
+    /* RED OUTER RING */
+
+    var outerRing = new THREE.Mesh(
+        new THREE.TorusGeometry(
+            3.9,
+            0.08,
+            12,
+            80
+        ),
+        new THREE.MeshBasicMaterial({
+            color: 0xff4038
+        })
+    );
+
+    outerRing.rotation.x = Math.PI / 2;
+    outerRing.position.y = 0.12;
+
+    scene.add(outerRing);
+
+    /* BACK WALL */
+
+    var wall = new THREE.Mesh(
+        new THREE.BoxGeometry(14, 8, 0.3),
+        new THREE.MeshStandardMaterial({
+            color: 0x1a1a22
+        })
+    );
+
+    wall.position.set(0, 3.5, -3.6);
+
+    scene.add(wall);
+
+    /* FIGHTERS */
+
+    var player = createFighter(true);
+    var enemy = createFighter(false);
+
+    player.position.set(-1.65, 0, 0.1);
+    enemy.position.set(1.65, 0, -0.1);
+
+    /* PLAYER LOOKS RIGHT */
+
+    player.rotation.y = -0.12;
+
+    /* ENEMY LOOKS LEFT */
+
+    enemy.rotation.y = Math.PI + 0.12;
+
+    scene.add(player);
+    scene.add(enemy);
+
+    battle3D.player = player;
+    battle3D.enemy = enemy;
+
+    battle3D.playerParts = player.userData.parts;
+    battle3D.enemyParts = enemy.userData.parts;
+
+    battle3D.playerBase = player.position.clone();
+    battle3D.enemyBase = enemy.position.clone();
+
+    battle3D.ready = true;
+
+    window.addEventListener(
+        "resize",
+        resize3DArena
+    );
+
+    animate3DArena();
 }
 
-// Ход Бандита
-function enemyTurn(){
-    if(S.eh <= 0 || S.ph <= 0) return;
-    
-    let d = 8 + Math.floor(Math.random() * 8);
-    if(S.def){
-        d = Math.ceil(d / 2);
-        S.def = false;
-        S.log.push(`👹 Бандит атакует в щит: -${d} HP.`);
+/* =========================
+   RESIZE
+   ========================= */
+
+function resize3DArena() {
+
+    var container = document.getElementById("battle-3d");
+
+    if (!container || !battle3D.renderer) return;
+
+    var w = container.clientWidth;
+    var h = container.clientHeight;
+
+    if (w <= 0 || h <= 0) return;
+
+    battle3D.camera.aspect = w / h;
+    battle3D.camera.updateProjectionMatrix();
+
+    battle3D.renderer.setSize(w, h);
+}
+
+/* =========================
+   ANIMATION LOOP
+   ========================= */
+
+function animate3DArena() {
+
+    requestAnimationFrame(animate3DArena);
+
+    if (!battle3D.ready) return;
+
+    var now = performance.now();
+
+    updateFighterAnimation(
+        battle3D.player,
+        battle3D.playerParts,
+        battle3D.playerAction,
+        now,
+        true
+    );
+
+    updateFighterAnimation(
+        battle3D.enemy,
+        battle3D.enemyParts,
+        battle3D.enemyAction,
+        now,
+        false
+    );
+
+    /* CAMERA SHAKE */
+
+    if (battle3D.shake > 0) {
+
+        battle3D.shake *= 0.86;
+
+        battle3D.camera.position.x =
+            battle3D.cameraBaseX +
+            (Math.random() - 0.5) * battle3D.shake;
+
+        battle3D.camera.position.y =
+            battle3D.cameraBaseY +
+            (Math.random() - 0.5) * battle3D.shake;
+
     } else {
-        S.log.push(`👹 Бандит атакует: -${d} HP.`);
+
+        battle3D.camera.position.x =
+            battle3D.cameraBaseX;
+
+        battle3D.camera.position.y =
+            battle3D.cameraBaseY;
     }
-    
-    S.ph = Math.max(0, S.ph - d);
-    
-    // Проверка смерти игрока
-    if(S.ph <= 0){
-        S.log.push("💀 Поражение. Нажми «Бой», чтобы начать снова.");
-        S.ap = 0;
-        renderEndControls();
+
+    battle3D.camera.lookAt(0, 2, 0);
+
+    battle3D.renderer.render(
+        battle3D.scene,
+        battle3D.camera
+    );
+}
+
+/* =========================
+   FIGHT ANIMATION
+   ========================= */
+
+function updateFighterAnimation(
+    fighter,
+    parts,
+    action,
+    now,
+    isPlayer
+) {
+
+    if (!fighter || !parts) return;
+
+    var idle = Math.sin(now * 0.002) * 0.025;
+
+    fighter.position.y = idle;
+
+    /* RESET */
+
+    parts.armL.rotation.set(0, 0, 0);
+    parts.armR.rotation.set(0, 0, 0);
+
+    parts.legL.rotation.set(0, 0, 0);
+    parts.legR.rotation.set(0, 0, 0);
+
+    fighter.rotation.x = 0;
+
+    if (!action) return;
+
+    var elapsed = now - action.start;
+    var duration = action.duration;
+
+    if (elapsed >= duration) {
+
+        if (action.type === "attack") {
+            fighter.position.copy(
+                isPlayer
+                    ? battle3D.playerBase
+                    : battle3D.enemyBase
+            );
+        }
+
+        if (action.type === "hit") {
+            fighter.position.copy(
+                isPlayer
+                    ? battle3D.playerBase
+                    : battle3D.enemyBase
+            );
+        }
+
+        if (action.type === "dodge") {
+            fighter.position.copy(
+                isPlayer
+                    ? battle3D.playerBase
+                    : battle3D.enemyBase
+            );
+        }
+
+        if (isPlayer) {
+            battle3D.playerAction = null;
+        } else {
+            battle3D.enemyAction = null;
+        }
+
         return;
     }
-    
-    S.ap = 3;
-    S.log.push("Твой ход.");
-    battle();
-}
 
-// Замена кнопок управления на кнопку возврата в город
-function renderEndControls() {
-    battle();
-    let actionsBlock = document.querySelector(".actions");
-    if (actionsBlock) {
-        actionsBlock.innerHTML = `
-            <button class="act main" style="grid-column: span 2; background: linear-gradient(#e7bb54,#94491d);" onclick="home()">
-                Вернуться в город
-            </button>
-        `;
-    }
-}
+    var t = elapsed / duration;
+
+    /* ATTACK */
+
+    if (action.type === "attack") {
+
+        var punch = Math.sin(t * Math.PI);
+
+        if (action.zone === "head") {
+
+            fighter.position.z =
+                (isPlayer ? 0.1 : -0.1) -
+                punch * 0.30;
+
+            parts.armR.rotation.z =
+                -punch * 1.7;
+
+            parts.armR.rotation.x =
+                -punch * 0.8;
+
+        } else if (action.zone === "body") {
+
+            fighter.position.x +=
+                (isPlayer ? 1 : -1) *
+                punch *
+                0.55;
+
+            parts.armR.rotation.z =
+                -punch * 2.0;
+
+            parts.armL.rotation.z =
+                punch * 0.7;
+
+        } else {
+
+            parts.legR.rotation.z =
+                -punch * 1.0;
+
+            parts.legL.rotation.z =
+                punch * 0.5;
+
+            fighter.rotation.x =
+                punch * 0.18;
         }
     }
-    return html;
+
+    /* HIT REACTION */
+
+    if (action.type === "hit") {
+
+        var recoil = Math.sin(t * Math.PI);
+
+        fighter.position.x +=
+            (isPlayer ? -1 : 1) *
+            recoil *
+            0.55;
+
+        fighter.rotation.z =
+            (isPlayer ? -1 : 1) *
+            recoil *
+            0.18;
+    }
+
+    /* BLOCK */
+
+    if (action.type === "block") {
+
+        parts.armL.rotation.z = 1.1;
+        parts.armR.rotation.z = -1.1;
+
+        parts.armL.rotation.x = -0.5;
+        parts.armR.rotation.x = -0.5;
+    }
+
+    /* DODGE */
+
+    if (action.type === "dodge") {
+
+        var dodge = Math.sin(t * Math.PI);
+
+        fighter.position.x +=
+            (isPlayer ? -1 : 1) *
+            dodge *
+            0.9;
+
+        fighter.rotation.z =
+            (isPlayer ? -1 : 1) *
+            dodge *
+            0.22;
+    }
 }
 
-// ==========================================
-// 3. ЭКРАНЫ И ИНТЕРФЕЙС
-// ==========================================
+/* =========================
+   PLAYER ATTACK
+   ========================= */
 
-// Главный экран (Город)
-function home() {
-    let current = getFinalStats();
-    screen.innerHTML = `
-        <section class="hero">
-            <h2>⚔️ TERRITORIA ⚔️</h2>
-            <p>Золотой город</p>
-            <div class="herochar">🧙</div>
-            <div class="wolf">🐺</div>
-            <div class="fire">🔥</div>
-            <div class="quick">
-                <button onclick="inventory()">🎒<br>Герой</button>
-                <button onclick="startBattle()">⚔️<br>Арена</button>
-                <button onclick="quests()">📜<br>Задания</button>
-                <button onclick="shop()">🛒<br>Магазин</button>
-            </div>
-        </section>
-        <div class="card">
-            <b>❤️ Здоровье</b>
-            <div class="hp"><span style="width:${(S.ph / S.maxPh) * 100}%"></span></div>
-            ${S.ph}/${S.maxPh} HP
-        </div>
-        <div class="card">
-            <b>📊 Характеристики (с экипировкой)</b>
-            <div class="stats">
-                <div class="stat">⚔️<b>${current.atk}</b>Атака</div>
-                <div class="stat">🛡️<b>${current.def}</b>Защита</div>
-                <div class="stat">💥<b>${current.crit}%</b>Крит</div>
-            </div>
-        </div>
-    `;
+function playPlayerAttack(zone, critical) {
+
+    if (!battle3D.ready) return;
+
+    battle3D.playerAction = {
+        type: "attack",
+        zone: zone,
+        start: performance.now(),
+        duration: critical ? 650 : 500
+    };
+
+    battle3D.shake = critical ? 0.18 : 0.07;
+
+    setTimeout(function() {
+
+        if (battle3D.enemy) {
+
+            battle3D.enemyAction = {
+                type: "hit",
+                start: performance.now(),
+                duration: critical ? 520 : 380
+            };
+        }
+
+    }, critical ? 180 : 220);
 }
 
-// Экран персонажа и инвентаря
-function inventory() {
-    let slotsConfig = [
-        { key: "weapon", name: "Оружие" },
-        { key: "armor", name: "Броня" },
-        { key: "helmet", name: "Шлем" },
-        { key: "gloves", name: "Перчатки" },
-        { key: "boots", name: "Сапоги" },
-        { key: "ring", name: "Кольцо" }
-    ];
+/* =========================
+   ENEMY ATTACK
+   ========================= */
 
-    let slotsHtml = slotsConfig.map(slot => {
-        let itemIdx = S.equipped[slot.key];
-        let icon = itemIdx !== null && S.items[itemIdx] ? S.items[itemIdx][0] : "❌";
-        return `<div class="slot" onclick="unequipSlot('${slot.key}')" style="cursor:pointer;">${icon}<small>${slot.name}</small></div>`;
-    }).join("");
+function playEnemyAttack(zone, blocked, dodged) {
 
-    screen.innerHTML = `
-        <h2 class="title">🎒 Герой</h2>
-        <div class="card">
-            <b>Экипировка (Кликните для снятия шмота)</b>
-            <div class="grid">${slotsHtml}</div>
-        </div>
-        <div class="card">
-            <b>Предметы в сумке (Кликните для использования/надевания)</b>
-            <div class="items">
-                ${S.items.map((x, i) => {
-                    let isEquipped = Object.values(S.equipped).includes(i);
-                    if (isEquipped) {
-                        return `<button class="item" style="opacity: 0.4; border-color: #e7b84f;" onclick="toast('Этот предмет уже надет!')">
-                            <i>${x[0]}</i><b>${x[1]}</b><small>Надето</small>
-                        </button>`;
+    if (!battle3D.ready) return;
+
+    battle3D.enemyAction = {
+        type: "attack",
+        zone: zone,
+        start: performance.now(),
+        duration: 520
+    };
+
+    if (blocked || dodged) {
+
+        setTimeout(function() {
+
+            if (blocked) {
+
+                battle3D.enemyAction = {
+                    type: "hit",
+                    start: performance.now(),
+                    duration: 350
+                };
+
+            } else {
+
+                battle3D.playerAction = {
+                    type: "dodge",
+                    start: performance.now(),
+                    duration: 500
+                };
+            }
+
+        }, 250);
+    } else {
+
+        setTimeout(function() {
+
+            battle3D.playerAction = {
+                type: "hit",
+                start: performance.now(),
+                duration: 400
+            };
+
+            battle3D.shake = 0.10;
+
+        }, 300);
+    }
+}
+
+/* =========================
+   FLOATING DAMAGE
+   ========================= */
+
+function showDamage(text, critical, enemySide) {
+
+    var container = document.getElementById("battle-3d");
+
+    if (!container) return;
+
+    var el = document.createElement("div");
+
+    el.innerText = text;
+
+    el.style.position = "absolute";
+    el.style.left = enemySide ? "67%" : "25%";
+    el.style.top = "38%";
+    el.style.zIndex = "20";
+    el.style.pointerEvents = "none";
+
+    el.style.fontWeight = "900";
+    el.style.fontSize = critical ? "30px" : "24px";
+    el.style.color = critical ? "#ffd21f" : "#ffffff";
+
+    el.style.textShadow =
+        "0 3px 10px #000, 0 0 15px rgba(255,60,60,.7)";
+
+    el.style.transition =
+        "transform .8s ease, opacity .8s ease";
+
+    el.style.transform =
+        "translate(-50%, 0) scale(1.15)";
+
+    el.style.opacity = "1";
+
+    container.appendChild(el);
+
+    setTimeout(function() {
+
+        el.style.transform =
+            "translate(-50%, -90px) scale(1)";
+
+        el.style.opacity = "0";
+
+    }, 30);
+
+    setTimeout(function() {
+
+        if (el.parentNode) {
+            el.parentNode.removeChild(el);
+        }
+
+    }, 900);
+}
+
+/* =========================
+   NOTICE
+   ========================= */
+
+function showNotice(text) {
+
+    var n = document.getElementById("notice");
+
+    if (!n) return;
+
+    n.innerText = text;
+    n.style.display = "block";
+
+    setTimeout(function() {
+        n.style.display = "none";
+    }, 2000);
+}
+
+/* =========================
+   DOM READY
+   ========================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        init3DArena();
+
+        /* =====================
+           TABS
+           ===================== */
+
+        var tArena =
+            document.getElementById("tab-arena");
+
+        var tShop =
+            document.getElementById("tab-shop");
+
+        var tMap =
+            document.getElementById("tab-map");
+
+        var tProfile =
+            document.getElementById("tab-profile");
+
+        var pArena =
+            document.getElementById("page-home");
+
+        var pShop =
+            document.getElementById("page-shop");
+
+        var pMap =
+            document.getElementById("page-map");
+
+        var pProfile =
+            document.getElementById("page-profile");
+
+        function showPage(tab, page) {
+
+            if (pArena) pArena.style.display = "none";
+            if (pShop) pShop.style.display = "none";
+            if (pMap) pMap.style.display = "none";
+            if (pProfile) pProfile.style.display = "none";
+
+            if (tArena) tArena.classList.remove("active");
+            if (tShop) tShop.classList.remove("active");
+            if (tMap) tMap.classList.remove("active");
+            if (tProfile) tProfile.classList.remove("active");
+
+            if (page) page.style.display = "block";
+            if (tab) tab.classList.add("active");
+
+            setTimeout(resize3DArena, 50);
+
+            updateUI();
+        }
+
+        if (tArena) {
+            tArena.addEventListener(
+                "click",
+                function() {
+                    showPage(tArena, pArena);
+                }
+            );
+        }
+
+        if (tShop) {
+            tShop.addEventListener(
+                "click",
+                function() {
+                    showPage(tShop, pShop);
+                }
+            );
+        }
+
+        if (tMap) {
+            tMap.addEventListener(
+                "click",
+                function() {
+                    showPage(tMap, pMap);
+                }
+            );
+        }
+
+        if (tProfile) {
+            tProfile.addEventListener(
+                "click",
+                function() {
+                    showPage(tProfile, pProfile);
+                }
+            );
+        }
+
+        /* =====================
+           ATTACK ZONES
+           ===================== */
+
+        var attHead =
+            document.getElementById("btn-att-head");
+
+        var attBody =
+            document.getElementById("btn-att-body");
+
+        var attLegs =
+            document.getElementById("btn-att-legs");
+
+        var blkHead =
+            document.getElementById("btn-blk-head");
+
+        var blkBody =
+            document.getElementById("btn-blk-body");
+
+        var blkLegs =
+            document.getElementById("btn-blk-legs");
+
+        function clearAtt() {
+
+            if (attHead)
+                attHead.classList.remove(
+                    "zone-btn-active"
+                );
+
+            if (attBody)
+                attBody.classList.remove(
+                    "zone-btn-active"
+                );
+
+            if (attLegs)
+                attLegs.classList.remove(
+                    "zone-btn-active"
+                );
+        }
+
+        function clearBlk() {
+
+            if (blkHead)
+                blkHead.classList.remove(
+                    "zone-btn-active"
+                );
+
+            if (blkBody)
+                blkBody.classList.remove(
+                    "zone-btn-active"
+                );
+
+            if (blkLegs)
+                blkLegs.classList.remove(
+                    "zone-btn-active"
+                );
+        }
+
+        if (attHead) {
+            attHead.addEventListener(
+                "click",
+                function() {
+                    clearAtt();
+                    attHead.classList.add(
+                        "zone-btn-active"
+                    );
+                    selA = "head";
+                }
+            );
+        }
+
+        if (attBody) {
+            attBody.addEventListener(
+                "click",
+                function() {
+                    clearAtt();
+                    attBody.classList.add(
+                        "zone-btn-active"
+                    );
+                    selA = "body";
+                }
+            );
+        }
+
+        if (attLegs) {
+            attLegs.addEventListener(
+                "click",
+                function() {
+                    clearAtt();
+                    attLegs.classList.add(
+                        "zone-btn-active"
+                    );
+                    selA = "legs";
+                }
+            );
+        }
+
+        if (blkHead) {
+            blkHead.addEventListener(
+                "click",
+                function() {
+                    clearBlk();
+                    blkHead.classList.add(
+                        "zone-btn-active"
+                    );
+                    selB = "head";
+                }
+            );
+        }
+
+        if (blkBody) {
+            blkBody.addEventListener(
+                "click",
+                function() {
+                    clearBlk();
+                    blkBody.classList.add(
+                        "zone-btn-active"
+                    );
+                    selB = "body";
+                }
+            );
+        }
+
+        if (blkLegs) {
+            blkLegs.addEventListener(
+                "click",
+                function() {
+                    clearBlk();
+                    blkLegs.classList.add(
+                        "zone-btn-active"
+                    );
+                    selB = "legs";
+                }
+            );
+        }
+
+        /* =====================
+           TURN
+           ===================== */
+
+        var turnBtn =
+            document.getElementById("attack");
+
+        if (turnBtn) {
+
+            turnBtn.addEventListener(
+                "click",
+                function() {
+
+                    if (!selA || !selB) {
+
+                        showNotice(
+                            "Выберите зоны атаки и защиты!"
+                        );
+
+                        return;
                     }
-                    return `<button class="item" onclick="interactWithItem(${i})">
-                        <i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small>
-                    </button>`;
-                }).join("")}
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:15px;">
-            <button class="act main" style="padding:10px 20px; display:inline-block; width:auto;" onclick="home()">◀ Назад в город</button>
-        </div>
-    `;
-}
 
-// Взаимодействие с вещью из инвентаря (Надеть или выпить банку)
-function interactWithItem(index) {
-    let item = S.items[index];
-    if (!item) return;
+                    var zones = [
+                        "head",
+                        "body",
+                        "legs"
+                    ];
 
-    if (item[3] === "use") {
-        if (S.ph >= S.maxPh) return toast("У вас уже полное здоровье!");
-        S.ph = Math.min(S.maxPh, S.ph + item[4]);
-        toast(`Выпито: ${item[1]}. Восстановлено +${item[4]} HP`);
-        S.items.splice(index, 1); 
-        
-        for (let slot in S.equipped) {
-            if (S.equipped[slot] !== null && S.equipped[slot] > index) {
-                S.equipped[slot]--;
-            }
-        }
-        inventory();
-        return;
-    }
+                    var zoneText = {
+                        head: "Голову",
+                        body: "Корпус",
+                        legs: "Ноги"
+                    };
 
-    let targetSlot = null;
-    if (item[0] === "🗡️" || item[0] === "⚔️") targetSlot = "weapon";
-    if (item[0] === "🛡️") targetSlot = "armor";
-    if (item[0] === "⛑️") targetSlot = "helmet";
-    if (item[0] === "🥊") targetSlot = "gloves";
-    if (item[0] === "🥾") targetSlot = "boots";
-    if (item[0] === "💍") targetSlot = "ring";
+                    var enemyA =
+                        zones[
+                            Math.floor(
+                                Math.random() * 3
+                            )
+                        ];
 
-    if (targetSlot) {
-        S.equipped[targetSlot] = index;
-        toast(`Вы экипировали: ${item[1]}`);
-        inventory();
-    } else {
-        toast("Этот предмет нельзя экипировать!");
-    }
-}
+                    var enemyB =
+                        zones[
+                            Math.floor(
+                                Math.random() * 3
+                            )
+                        ];
 
-function unequipSlot(slotKey) {
-    if (S.equipped[slotKey] !== null) {
-        S.equipped[slotKey] = null;
-        toast("Предмет снят в сумку");
-        inventory();
-    } else {
-        toast("Этот слот пуст!");
-    }
-}
+                    var logs = [];
 
-// Экран магазина
-function shop() {
-    let g = [
-        ["🗡️", "Железный меч", 180, "atk", 22],
-        ["🛡️", "Щит стража", 220, "def", 18],
-        ["🧪", "Зелье HP", 90, "use", 40],
-        ["💍", "Кольцо силы", 350, "atk", 12],
-        ["⛑️", "Шлем охотника", 260, "def", 10],
-        ["⚔️", "Меч героя", 500, "atk", 35]
-    ];
-    window.goods = g;
-    screen.innerHTML = `
-        <h2 class="title">🛒 Магазин</h2>
-        <div class="card">
-            <div class="shopgrid">
-                ${g.map((x, i) => `
-                    <div class="shopitem">
-                        <div class="icon">${x[0]}</div>
-                        <b>${x[1]}</b>
-                        <small style="display:block; color:#aaa; font-size:10px; margin-bottom:5px;">
-                            ${x[3].toUpperCase()} +${x[4]}
-                        </small>
-                        <button class="buy" onclick="buy(${i})">🪙 ${x[2]}</button>
-                    </div>
-                `).join("")}
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:15px;">
-            <button class="act main" style="padding:10px 20px; display:inline-block; width:auto;" onclick="home()">◀ Назад в город</button>
-        </div>
-    `;
-}
+                    var dmg =
+                        15 + p.bonusDamage;
 
-function buy(i) {
-    let x = goods[i];
-    if (S.gold < x[2]) return toast("Не хватает золота");
-    
-    S.gold -= x[2];
-    if(gold) gold.textContent = S.gold;
-    
-    S.items.push([x[0], x[1], `${x[3].toUpperCase()} +${x[4]}`, x[3], x[4]]);
-    toast("Куплено и положено в сумку: " + x[1]);
-}
+                    var baseEnemyDmg =
+                        15 + (p.level * 2);
 
-// Экран заданий
-function quests() {
-    screen.innerHTML = `
-        <h2 class="title">📜 Задания</h2>
-        <div class="card quest">
-            <i>⚔️</i>
-            <div><b>Победи бандита</b><small>Награда: 🪙 120</small></div>
-            <button onclick="startBattle()">В бой</button>
-        </div>
-        <div class="card quest">
-            <i>🪙</i>
-            <div><b>Накопи 2000 золота</b><small>Прогресс: ${S.gold}/2000</small></div>
-        </div>
-        <div class="card quest">
-            <i>🎒</i>
-            <div><b>Собери шмотки</b><small>Прогресс: ${S.items.length}/10 предметов</small></div>
-        </div>
-        <div style="text-align:center; margin-top:15px;">
-    eh: 100,        
-    maxEh: 100,     
-    ap: 3,          
-    def: false,     
-    enemyName: "Бандит",
-    playerName: getTelegramName(), // Динамическое имя из SDK
-    log: ["Бандит выходит на арену.", "Твой ход."],
-    
-    baseStats: {
-        atk: 15,
-        def: 10,
-        crit: 12
-    },
+                    /* PLAYER ATTACK */
 
-    equipped: {
-        weapon: 0,   
-        armor: 1,    
-        helmet: 2,   
-        gloves: 5,   
-        boots: 6,    
-        ring: 3      
-    },
+                    if (selA === enemyB) {
 
-    items: [
-        ["🗡️", "Клинок", "ATK +18", "atk", 18],
-        ["🛡️", "Щит", "DEF +14", "def", 14],
-        ["⛑️", "Шлем", "DEF +7", "def", 7],
-        ["💍", "Кольцо", "ATK +6", "atk", 6],
-        ["🧪", "Зелье HP", "HP +40", "use", 40],
-        ["🥊", "Перчатки", "ATK +5", "atk", 5],
-        ["🥾", "Сапоги", "DEF +4", "def", 4],
-        ["💎", "Кристалл", "Редкий ресурс", "misc", 0]
-    ]
-};
+                        logs.push(
+                            "🛡️ Вы ударили в <b>" +
+                            zoneText[selA] +
+                            "</b>, но Хулиган заблокировал удар."
+                        );
 
-const screen = document.getElementById("screen");
-const gold = document.getElementById("gold");
+                        battle3D.enemyAction = {
+                            type: "block",
+                            start: performance.now(),
+                            duration: 500
+                        };
 
-// ==========================================
-// 2. ВСПОМОГАТЕЛЬНЫЕ СИСТЕМНЫЕ ФУНКЦИИ
-// ==========================================
+                        setTimeout(function() {
 
-window.onload = () => {
-    if(gold) gold.textContent = S.gold;
-    home();
-};
+                            if (battle3D.player) {
 
-function toast(t) {
-    let x = document.getElementById("toast");
-    if (!x) return;
-    x.textContent = t;
-    x.classList.add("show");
-    clearTimeout(window.tt);
-    window.tt = setTimeout(() => x.classList.remove("show"), 1400);
-}
+                                battle3D.playerAction = {
+                                    type: "hit",
+                                    start: performance.now(),
+                                    duration: 300
+                                };
+                            }
 
-function getFinalStats() {
-    let stats = { atk: S.baseStats.atk, def: S.baseStats.def, crit: S.baseStats.crit };
-    
-    for (let slot in S.equipped) {
-        let itemIndex = S.equipped[slot];
-        if (itemIndex !== null && S.items[itemIndex]) {
-            let item = S.items[itemIndex];
-            let statType = item[3];
-            let bonusValue = item[4];
-            if (stats[statType] !== undefined) {
-                stats[statType] += bonusValue;
-            }
-        }
-    }
-    return stats;
-}
+                        }, 180);
 
-// ==========================================
-// 3. ЭКРАНЫ И ИНТЕРФЕЙС
-// ==========================================
+                    } else {
 
-function home() {
-    vibrate("light");
-    let current = getFinalStats();
-    screen.innerHTML = `
-        <section class="hero">
-            <h2>⚔️ TERRITORIA ⚔️</h2>
-            <p>${S.playerName}</p>
-            <div class="herochar">🧙</div>
-            <div class="wolf">🐺</div>
-            <div class="fire">🔥</div>
-            <div class="quick">
-                <button onclick="inventory()">🎒<br>Герой</button>
-                <button onclick="startBattle()">⚔️<br>Арена</button>
-                <button onclick="quests()">📜<br>Задания</button>
-                <button onclick="shop()">🛒<br>Магазин</button>
-            </div>
-        </section>
-        <div class="card">
-            <b>❤️ Здоровье</b>
-            <div class="hp"><span style="width:${(S.ph / S.maxPh) * 100}%"></span></div>
-            ${S.ph}/${S.maxPh} HP
-        </div>
-        <div class="card">
-            <b>📊 Характеристики (с экипировкой)</b>
-            <div class="stats">
-                <div class="stat">⚔️<b>${current.atk}</b>Атака</div>
-                <div class="stat">🛡️<b>${current.def}</b>Защита</div>
-                <div class="stat">💥<b>${current.crit}%</b>Крит</div>
-            </div>
-        </div>
-    `;
-}
+                        var isCrit =
+                            (Math.random() * 100) <
+                            (p.strength * 3);
 
-function inventory() {
-    vibrate("light");
-    let slotsConfig = [
-        { key: "weapon", name: "Оружие" },
-        { key: "armor", name: "Броня" },
-        { key: "helmet", name: "Шлем" },
-        { key: "gloves", name: "Перчатки" },
-        { key: "boots", name: "Сапоги" },
-        { key: "ring", name: "Кольцо" }
-    ];
+                        var finalPlayerDmg =
+                            isCrit ? dmg * 2 : dmg;
 
-    let slotsHtml = slotsConfig.map(slot => {
-        let itemIdx = S.equipped[slot.key];
-        let icon = itemIdx !== null && S.items[itemIdx] ? S.items[itemIdx][0] : "❌";
-        return `<div class="slot" onclick="unequipSlot('${slot.key}')" style="cursor:pointer;">${icon}<small>${slot.name}</small></div>`;
-    }).join("");
+                        e.hp = Math.max(
+                            0,
+                            e.hp - finalPlayerDmg
+                        );
 
-    screen.innerHTML = `
-        <h2 class="title">🎒 Герой</h2>
-        <div class="card">
-            <b>Экипировка (Кликните для снятия шмота)</b>
-            <div class="grid">${slotsHtml}</div>
-        </div>
-        <div class="card">
-            <b>Предметы в сумке (Кликните для использования/надевания)</b>
-            <div class="items">
-                ${S.items.map((x, i) => {
-                    let isEquipped = Object.values(S.equipped).includes(i);
-                    if (isEquipped) {
-                        return `<button class="item" style="opacity: 0.4; border-color: #e7b84f;" onclick="toast('Этот предмет уже надет!')">
-                            <i>${x[0]}</i><b>${x[1]}</b><small>Надето</small>
-                        </button>`;
+                        playPlayerAttack(
+                            selA,
+                            isCrit
+                        );
+
+                        showDamage(
+                            "-" + finalPlayerDmg,
+                            isCrit,
+                            true
+                        );
+
+                        if (isCrit) {
+
+                            logs.push(
+                                "⚡💥 <b>КРИТ!</b> Вы пробили Хулигана в <b>" +
+                                zoneText[selA] +
+                                "</b>! Урон: -" +
+                                finalPlayerDmg +
+                                "."
+                            );
+
+                        } else {
+
+                            logs.push(
+                                "💥 Вы успешно пробили Хулигана в <b>" +
+                                zoneText[selA] +
+                                "</b>! Урон: -" +
+                                finalPlayerDmg +
+                                "."
+                            );
+                        }
                     }
-                    return `<button class="item" onclick="interactWithItem(${i})">
-                        <i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small>
-                    </button>`;
-                }).join("")}
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:15px;">
-            <button class="act main" style="padding:10px 20px; display:inline-block; width:auto;" onclick="home()">◀ Назад в город</button>
-        </div>
-    `;
-}
 
-function interactWithItem(index) {
-    let item = S.items[index];
-    if (!item) return;
+                    /* ENEMY ATTACK */
 
-    if (item[3] === "use") {
-        if (S.ph >= S.maxPh) return toast("У вас уже полное здоровье!");
-        vibrate("success");
-        S.ph = Math.min(S.maxPh, S.ph + item[4]);
-        toast(`Выпито: ${item[1]}. Восстановлено +${item[4]} HP`);
-        S.items.splice(index, 1); 
-        
-        for (let slot in S.equipped) {
-            if (S.equipped[slot] !== null && S.equipped[slot] > index) {
-                S.equipped[slot]--;
-            }
-        }
-        inventory();
-        return;
-    }
+                    if (enemyA === selB) {
 
-    let targetSlot = null;
-    if (item[0] === "🗡️" || item[0] === "⚔️") targetSlot = "weapon";
-    if (item[0] === "🛡️") targetSlot = "armor";
-    if (item[0] === "⛑️") targetSlot = "helmet";
-    if (item[0] === "🥊") targetSlot = "gloves";
-    if (item[0] === "🥾") targetSlot = "boots";
-    if (item[0] === "💍") targetSlot = "ring";
+                        logs.push(
+                            "🛡️ Хулиган метил в <b>" +
+                            zoneText[enemyA] +
+                            "</b>, но вы заблокировали его."
+                        );
 
-    if (targetSlot) {
-        vibrate("medium");
-        S.equipped[targetSlot] = index;
-        toast(`Вы экипировали: ${item[1]}`);
-        inventory();
-    } else {
-        toast("Этот предмет нельзя экипировать!");
-    }
-}
+                        playEnemyAttack(
+                            enemyA,
+                            true,
+                            false
+                        );
 
-function unequipSlot(slotKey) {
-    if (S.equipped[slotKey] !== null) {
-        vibrate("light");
-        S.equipped[slotKey] = null;
-        toast("Предмет бережно снят в сумку");
-        inventory();
-    } else {
-        toast("Этот слот пуст!");
-    }
-}
+                    } else {
 
-function shop() {
-    vibrate("light");
-    let g = [
-        ["🗡️", "Железный меч", 180, "atk", 22],
-        ["🛡️", "Щит стража", 220, "def", 18],
-        ["🧪", "Зелье HP", 90, "use", 40],
-        ["💍", "Кольцо силы", 350, "atk", 12],
-        ["⛑️", "Шлем охотника", 260, "def", 10],
-        ["⚔️", "Меч героя", 500, "atk", 35]
-    ];
-    window.goods = g;
-    screen.innerHTML = `
-        <h2 class="title">🛒 Магазин</h2>
-        <div class="card">
-            <div class="shopgrid">
-                ${g.map((x, i) => `
-                    <div class="shopitem">
-                        <div class="icon">${x[0]}</div>
-                        <b>${x[1]}</b>
-                        <small style="display:block; color:#aaa; font-size:10px; margin-bottom:5px;">
-                            ${x[3].toUpperCase()} +${x[4]}
-                        </small>
-                        <button class="buy" onclick="buy(${i})">🪙 ${x[2]}</button>
-                    </div>
-                `).join("")}
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:15px;">
-            <button class="act main" style="padding:10px 20px; display:inline-block; width:auto;" onclick="home()">◀ Назад в город</button>
-        </div>
-    `;
-}
+                        var isDodge =
+                            (Math.random() * 100) <
+                            (p.agility * 3);
 
-function buy(i) {
-    let x = goods[i];
-    if (S.gold < x[2]) {
-        vibrate("error");
-        return toast("Не хватает золота");
-    }
-    
-    vibrate("success");
-    S.gold -= x[2];
-    if(gold) gold.textContent = S.gold;
-    
-    S.items.push([x[0], x[1], `${x[3].toUpperCase()} +${x[4]}`, x[3], x[4]]);
-    toast("Куплено и положено в сумку: " + x[1]);
-}
+                        if (isDodge) {
 
-function quests() {
-    vibrate("light");
-    screen.innerHTML = `
-        <h2 class="title">📜 Задания</h2>
-        <div class="card quest">
-            <i>⚔️</i>
-            <div><b>Победи бандита</b><small>Награда: 🪙 120</small></div>
-            <button onclick="startBattle()">В бой</button>
-        </div>
-        <div class="card quest">
-            <i>🪙</i>
-            <div><b>Накопи 2000 золота</b><small>Прогресс: ${S.gold}/2000</small></div>
-        </div>
-    eh: 100,        
-    maxEh: 100,     
-    ap: 3,          
-    def: false,     
-    enemyName: "Бандит",
-    playerName: getTelegramName(), // Динамическое имя из SDK
-    log: ["Бандит выходит на арену.", "Твой ход."],
-    
-    baseStats: {
-        atk: 15,
-        def: 10,
-        crit: 12
-    },
+                            logs.push(
+                                "💨 <b>УВОРОТ!</b> Вы уклонились от удара в <b>" +
+                                zoneText[enemyA] +
+                                "</b>!"
+                            );
 
-    equipped: {
-        weapon: 0,   
-        armor: 1,    
-        helmet: 2,   
-        gloves: 5,   
-        boots: 6,    
-        ring: 3      
-    },
+                            playEnemyAttack(
+                                enemyA,
+                                false,
+                                true
+                            );
 
-    items: [
-        ["🗡️", "Клинок", "ATK +18", "atk", 18],
-        ["🛡️", "Щит", "DEF +14", "def", 14],
-        ["⛑️", "Шлем", "DEF +7", "def", 7],
-        ["💍", "Кольцо", "ATK +6", "atk", 6],
-        ["🧪", "Зелье HP", "HP +40", "use", 40],
-        ["🥊", "Перчатки", "ATK +5", "atk", 5],
-        ["🥾", "Сапоги", "DEF +4", "def", 4],
-        ["💎", "Кристалл", "Редкий ресурс", "misc", 0]
-    ]
-};
+                        } else {
 
-const screen = document.getElementById("screen");
-const gold = document.getElementById("gold");
+                            p.hp = Math.max(
+                                0,
+                                p.hp - baseEnemyDmg
+                            );
 
-// ==========================================
-// 2. ВСПОМОГАТЕЛЬНЫЕ СИСТЕМНЫЕ ФУНКЦИИ
-// ==========================================
+                            logs.push(
+                                "🥊 Хулиган нанес вам удар в <b>" +
+                                zoneText[enemyA] +
+                                "</b>. Урон: -" +
+                                baseEnemyDmg +
+                                "."
+                            );
 
-window.onload = () => {
-    if(gold) gold.textContent = S.gold;
-    home();
-};
+                            playEnemyAttack(
+                                enemyA,
+                                false,
+                                false
+                            );
 
-function toast(t) {
-    let x = document.getElementById("toast");
-    if (!x) return;
-    x.textContent = t;
-    x.classList.add("show");
-    clearTimeout(window.tt);
-    window.tt = setTimeout(() => x.classList.remove("show"), 1400);
-}
-
-function getFinalStats() {
-    let stats = { atk: S.baseStats.atk, def: S.baseStats.def, crit: S.baseStats.crit };
-    
-    for (let slot in S.equipped) {
-        let itemIndex = S.equipped[slot];
-        if (itemIndex !== null && S.items[itemIndex]) {
-            let item = S.items[itemIndex];
-            let statType = item[3];
-            let bonusValue = item[4];
-            if (stats[statType] !== undefined) {
-                stats[statType] += bonusValue;
-            }
-        }
-    }
-    return stats;
-}
-
-// ==========================================
-// 3. ЭКРАНЫ И ИНТЕРФЕЙС
-// ==========================================
-
-function home() {
-    vibrate("light");
-    let current = getFinalStats();
-    screen.innerHTML = `
-        <section class="hero">
-            <h2>⚔️ TERRITORIA ⚔️</h2>
-            <p>${S.playerName}</p>
-            <div class="herochar">🧙</div>
-            <div class="wolf">🐺</div>
-            <div class="fire">🔥</div>
-            <div class="quick">
-                <button onclick="inventory()">🎒<br>Герой</button>
-                <button onclick="startBattle()">⚔️<br>Арена</button>
-                <button onclick="quests()">📜<br>Задания</button>
-                <button onclick="shop()">🛒<br>Магазин</button>
-            </div>
-        </section>
-        <div class="card">
-            <b>❤️ Здоровье</b>
-            <div class="hp"><span style="width:${(S.ph / S.maxPh) * 100}%"></span></div>
-            ${S.ph}/${S.maxPh} HP
-        </div>
-        <div class="card">
-            <b>📊 Характеристики (с экипировкой)</b>
-            <div class="stats">
-                <div class="stat">⚔️<b>${current.atk}</b>Атака</div>
-                <div class="stat">🛡️<b>${current.def}</b>Защита</div>
-                <div class="stat">💥<b>${current.crit}%</b>Крит</div>
-            </div>
-        </div>
-    `;
-}
-
-function inventory() {
-    vibrate("light");
-    let slotsConfig = [
-        { key: "weapon", name: "Оружие" },
-        { key: "armor", name: "Броня" },
-        { key: "helmet", name: "Шлем" },
-        { key: "gloves", name: "Перчатки" },
-        { key: "boots", name: "Сапоги" },
-        { key: "ring", name: "Кольцо" }
-    ];
-
-    let slotsHtml = slotsConfig.map(slot => {
-        let itemIdx = S.equipped[slot.key];
-        let icon = itemIdx !== null && S.items[itemIdx] ? S.items[itemIdx][0] : "❌";
-        return `<div class="slot" onclick="unequipSlot('${slot.key}')" style="cursor:pointer;">${icon}<small>${slot.name}</small></div>`;
-    }).join("");
-
-    screen.innerHTML = `
-        <h2 class="title">🎒 Герой</h2>
-        <div class="card">
-            <b>Экипировка (Кликните для снятия шмота)</b>
-            <div class="grid">${slotsHtml}</div>
-        </div>
-        <div class="card">
-            <b>Предметы в сумке (Кликните для использования/надевания)</b>
-            <div class="items">
-                ${S.items.map((x, i) => {
-                    let isEquipped = Object.values(S.equipped).includes(i);
-                    if (isEquipped) {
-                        return `<button class="item" style="opacity: 0.4; border-color: #e7b84f;" onclick="toast('Этот предмет уже надет!')">
-                            <i>${x[0]}</i><b>${x[1]}</b><small>Надето</small>
-                        </button>`;
+                            showDamage(
+                                "-" + baseEnemyDmg,
+                                false,
+                                false
+                            );
+                        }
                     }
-                    return `<button class="item" onclick="interactWithItem(${i})">
-                        <i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small>
-                    </button>`;
-                }).join("")}
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:15px;">
-            <button class="act main" style="padding:10px 20px; display:inline-block; width:auto;" onclick="home()">◀ Назад в город</button>
-        </div>
-    `;
-}
 
-function interactWithItem(index) {
-    let item = S.items[index];
-    if (!item) return;
+                    /* LOG */
 
-    if (item[3] === "use") {
-        if (S.ph >= S.maxPh) return toast("У вас уже полное здоровье!");
-        vibrate("success");
-        S.ph = Math.min(S.maxPh, S.ph + item[4]);
-        toast(`Выпито: ${item[1]}. Восстановлено +${item[4]} HP`);
-        S.items.splice(index, 1); 
-        
-        for (let slot in S.equipped) {
-            if (S.equipped[slot] !== null && S.equipped[slot] > index) {
-                S.equipped[slot]--;
-            }
-        }
-        inventory();
-        return;
-    }
+                    var logBox =
+                        document.querySelector(
+                            ".combat-log-text"
+                        );
 
-    let targetSlot = null;
-    if (item[0] === "🗡️" || item[0] === "⚔️") targetSlot = "weapon";
-    if (item[0] === "🛡️") targetSlot = "armor";
-    if (item[0] === "⛑️") targetSlot = "helmet";
-    if (item[0] === "🥊") targetSlot = "gloves";
-    if (item[0] === "🥾") targetSlot = "boots";
-    if (item[0] === "💍") targetSlot = "ring";
+                    if (logBox) {
 
-    if (targetSlot) {
-        vibrate("medium");
-        S.equipped[targetSlot] = index;
-        toast(`Вы экипировали: ${item[1]}`);
-        inventory();
-    } else {
-        toast("Этот предмет нельзя экипировать!");
-    }
-}
+                        if (
+                            logBox.innerHTML.includes(
+                                "Ожидание хода..."
+                            )
+                        ) {
+                            logBox.innerHTML = "";
+                        }
 
-function unequipSlot(slotKey) {
-    if (S.equipped[slotKey] !== null) {
-        vibrate("light");
-        S.equipped[slotKey] = null;
-        toast("Предмет бережно снят в сумку");
-        inventory();
-    } else {
-        toast("Этот слот пуст!");
-    }
-}
-
-function shop() {
-    vibrate("light");
-    let g = [
-        ["🗡️", "Железный меч", 180, "atk", 22],
-        ["🛡️", "Щит стража", 220, "def", 18],
-        ["🧪", "Зелье HP", 90, "use", 40],
-        ["💍", "Кольцо силы", 350, "atk", 12],
-        ["⛑️", "Шлем охотника", 260, "def", 10],
-        ["⚔️", "Меч героя", 500, "atk", 35]
-    ];
-    window.goods = g;
-    screen.innerHTML = `
-        <h2 class="title">🛒 Магазин</h2>
-        <div class="card">
-            <div class="shopgrid">
-                ${g.map((x, i) => `
-                    <div class="shopitem">
-                        <div class="icon">${x[0]}</div>
-                        <b>${x[1]}</b>
-                        <small style="display:block; color:#aaa; font-size:10px; margin-bottom:5px;">
-                            ${x[3].toUpperCase()} +${x[4]}
-                        </small>
-                        <button class="buy" onclick="buy(${i})">🪙 ${x[2]}</button>
-                    </div>
-                `).join("")}
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:15px;">
-            <button class="act main" style="padding:10px 20px; display:inline-block; width:auto;" onclick="home()">◀ Назад в город</button>
-        </div>
-    `;
-}
-
-function buy(i) {
-    let x = goods[i];
-    if (S.gold < x[2]) {
-        vibrate("error");
-        return toast("Не хватает золота");
-    }
-    
-    vibrate("success");
-    S.gold -= x[2];
-    if(gold) gold.textContent = S.gold;
-    
-    S.items.push([x[0], x[1], `${x[3].toUpperCase()} +${x[4]}`, x[3], x[4]]);
-    toast("Куплено и положено в сумку: " + x[1]);
-}
-
-function quests() {
-    vibrate("light");
-    screen.innerHTML = `
-        <h2 class="title">📜 Задания</h2>
-        <div class="card quest">
-            <i>⚔️</i>
-            <div><b>Победи бандита</b><small>Награда: 🪙 120</small></div>
-            <button onclick="startBattle()">В бой</button>
-        </div>
-        <div class="card quest">
-            <i>🪙</i>
-            if (stats[statType] !== undefined) {
-                stats[statType] += bonusValue;
-            }
-        }
-    }
-    return stats;
-}
-
-// ==========================================
-// 3. ЭКРАНЫ И ИНТЕРФЕЙС
-// ==========================================
-
-// Главный экран (Город)
-function home() {
-    let current = getFinalStats();
-    screen.innerHTML = `
-        <section class="hero">
-            <h2>⚔️ TERRITORIA ⚔️</h2>
-            <p>Золотой город</p>
-            <div class="herochar">🧙</div>
-            <div class="wolf">🐺</div>
-            <div class="fire">🔥</div>
-            <div class="quick">
-                <button onclick="inventory()">🎒<br>Герой</button>
-                <button onclick="startBattle()">⚔️<br>Арена</button>
-                <button onclick="quests()">📜<br>Задания</button>
-                <button onclick="shop()">🛒<br>Магазин</button>
-            </div>
-        </section>
-        <div class="card">
-            <b>❤️ Здоровье</b>
-            <div class="hp"><span style="width:${(S.ph / S.maxPh) * 100}%"></span></div>
-            ${S.ph}/${S.maxPh} HP
-        </div>
-        <div class="card">
-            <b>📊 Характеристики (с экипировкой)</b>
-            <div class="stats">
-                <div class="stat">⚔️<b>${current.atk}</b>Атака</div>
-                <div class="stat">🛡️<b>${current.def}</b>Защита</div>
-                <div class="stat">💥<b>${current.crit}%</b>Крит</div>
-            </div>
-        </div>
-    `;
-}
-
-// Экран персонажа и инвентаря
-function inventory() {
-    let slotsConfig = [
-        { key: "weapon", name: "Оружие" },
-        { key: "armor", name: "Броня" },
-        { key: "helmet", name: "Шлем" },
-        { key: "gloves", name: "Перчатки" },
-        { key: "boots", name: "Сапоги" },
-        { key: "ring", name: "Кольцо" }
-    ];
-
-    let slotsHtml = slotsConfig.map(slot => {
-        let itemIdx = S.equipped[slot.key];
-        let icon = itemIdx !== null && S.items[itemIdx] ? S.items[itemIdx][0] : "❌";
-        return `<div class="slot" onclick="unequipSlot('${slot.key}')" style="cursor:pointer;">${icon}<small>${slot.name}</small></div>`;
-    }).join("");
-
-    screen.innerHTML = `
-        <h2 class="title">🎒 Герой</h2>
-        <div class="card">
-            <b>Экипировка (Кликните для снятия шмота)</b>
-            <div class="grid">${slotsHtml}</div>
-        </div>
-        <div class="card">
-            <b>Предметы в сумке (Кликните для использования/надевания)</b>
-            <div class="items">
-                ${S.items.map((x, i) => {
-                    // Проверяем, надет ли этот предмет прямо сейчас
-                    let isEquipped = Object.values(S.equipped).includes(i);
-                    if (isEquipped) {
-                        return `<button class="item" style="opacity: 0.4; border-color: #e7b84f;" onclick="toast('Этот предмет уже надет!')">
-                            <i>${x[0]}</i><b>${x[1]}</b><small>Надето</small>
-                        </button>`;
+                        logBox.innerHTML =
+                            logs.join("<br>") +
+                            "<br><hr style='border-color:#2a2a2a'><br>" +
+                            logBox.innerHTML;
                     }
-                    return `<button class="item" onclick="interactWithItem(${i})">
-                        <i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small>
-                    </button>`;
-                }).join("")}
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:15px;">
-            <button class="act main" style="padding:10px 20px; display:inline-block; width:auto;" onclick="home()">◀ Назад в город</button>
-        </div>
-    `;
-}
 
-// Взаимодействие с вещью из инвентаря (Надеть или выпить банку)
-function interactWithItem(index) {
-    let item = S.items[index];
-    if (!item) return;
+                    /* END */
 
-    // Если это зелье лечения
-    if (item[3] === "use") {
-        if (S.ph >= S.maxPh) return toast("У вас уже полное здоровье!");
-        S.ph = Math.min(S.maxPh, S.ph + item[4]);
-        toast(`Выпито: ${item[1]}. Восстановлено +${item[4]} HP`);
-        S.items.splice(index, 1); // Удаляем банку из сумки после выпивания
-        
-        // Корректируем индексы одетых вещей, так как массив сместился после удаления элемента
-        for (let slot in S.equipped) {
-            if (S.equipped[slot] !== null && S.equipped[slot] > index) {
-                S.equipped[slot]--;
-            }
+                    if (
+                        p.hp <= 0 ||
+                        e.hp <= 0
+                    ) {
+
+                        turnBtn.disabled = true;
+
+                        if (
+                            p.hp <= 0 &&
+                            e.hp <= 0
+                        ) {
+
+                            logBox.innerHTML =
+                                "<b>⚔️ Ничья!</b><br>" +
+                                logBox.innerHTML;
+
+                        } else if (
+                            e.hp <= 0
+                        ) {
+
+                            p.coins +=
+                                200 +
+                                p.level * 20;
+
+                            p.exp += 40;
+
+                            logBox.innerHTML =
+                                "<b>🎉 Победа! Награда получена!</b><br>" +
+                                logBox.innerHTML;
+
+                            if (
+                                p.exp >= p.maxExp
+                            ) {
+
+                                p.level += 1;
+
+                                p.exp -= p.maxExp;
+
+                                p.maxExp =
+                                    Math.floor(
+                                        p.maxExp * 1.3
+                                    );
+
+                                p.freePoints += 3;
+
+                                p.maxHp += 20;
+
+                                p.hp = p.maxHp;
+
+                                logBox.innerHTML =
+                                    "<b style='color:#f1c40f'>" +
+                                    "🌟 ЛЕВЕЛ АП! Получен " +
+                                    p.level +
+                                    " уровень!</b><br>" +
+                                    logBox.innerHTML;
+                            }
+
+                        } else {
+
+                            logBox.innerHTML =
+                                "<b>💀 Поражение. Восстановление...</b><br>" +
+                                logBox.innerHTML;
+                        }
+
+                        setTimeout(
+                            function() {
+
+                                p.hp = p.maxHp;
+
+                                e.hp =
+                                    e.maxHp +
+                                    (p.level * 10);
+
+                                turnBtn.disabled = false;
+
+                                if (logBox) {
+                                    logBox.innerHTML =
+                                        "Ожидание хода...";
+                                }
+
+                                updateUI();
+                                save();
+
+                            },
+                            4000
+                        );
+                    }
+
+                    selA = null;
+                    selB = null;
+
+                    clearAtt();
+                    clearBlk();
+
+                    updateUI();
+                    save();
+                }
+            );
         }
-        inventory();
-        return;
+
+        /* =====================
+           SHOP
+           ===================== */
+
+        var buyBrass =
+            document.getElementById("buy-brass");
+
+        var buyKnife =
+            document.getElementById("buy-knife");
+
+        if (buyBrass) {
+
+            buyBrass.addEventListener(
+                "click",
+                function() {
+
+                    if (p.coins >= 150) {
+
+                        p.coins -= 150;
+                        p.weapon = "Кастеты";
+                        p.bonusDamage = 5;
+
+                        showNotice(
+                            "🥊 Куплены Кастеты!"
+                        );
+
+                        updateUI();
+                        save();
+
+                    } else {
+
+                        showNotice(
+                            "Не хватает монет!"
+                        );
+                    }
+                }
+            );
+        }
+
+        if (buyKnife) {
+
+            buyKnife.addEventListener(
+                "click",
+                function() {
+
+                    if (p.coins >= 400) {
+
+                        p.coins -= 400;
+                        p.weapon = "Охотничий нож";
+                        p.bonusDamage = 12;
+
+                        showNotice(
+                            "🔪 Куплен Нож!"
+                        );
+
+                        updateUI();
+                        save();
+
+                    } else {
+
+                        showNotice(
+                            "Не хватает монет!"
+                        );
+                    }
+                }
+            );
+        }
+
+        /* =====================
+           STATS
+           ===================== */
+
+        var addStr =
+            document.getElementById("add-str");
+
+        var addAgi =
+            document.getElementById("add-agi");
+
+        if (addStr) {
+
+            addStr.addEventListener(
+                "click",
+                function() {
+
+                    if (p.freePoints > 0) {
+
+                        p.freePoints--;
+                        p.strength++;
+
+                        updateUI();
+                        save();
+                    }
+                }
+            );
+        }
+
+        if (addAgi) {
+
+            addAgi.addEventListener(
+                "click",
+                function() {
+
+                    if (p.freePoints > 0) {
+
+                        p.freePoints--;
+                        p.agility++;
+
+                        updateUI();
+                        save();
+                    }
+                }
+            );
+        }
+
+        updateUI();
+    }
+);
+
+/* =========================
+   UI
+   ========================= */
+
+function updateUI() {
+
+    var coins =
+        document.getElementById("coins");
+
+    if (coins)
+        coins.innerText = p.coins;
+
+    var level =
+        document.getElementById("header-level");
+
+    if (level)
+        level.innerText =
+            "Уровень " + p.level;
+
+    var pTxt =
+        document.getElementById(
+            "hp-text-player"
+        );
+
+    if (pTxt)
+        pTxt.innerText =
+            p.hp + "/" + p.maxHp;
+
+    var eTxt =
+        document.getElementById(
+            "hp-text-enemy"
+        );
+
+    if (eTxt)
+        eTxt.innerText =
+            e.hp + "/" + e.maxHp;
+
+    var pFill =
+        document.getElementById(
+            "hp-fill-player"
+        );
+
+    if (pFill)
+        pFill.style.width =
+            ((p.hp / p.maxHp) * 100) +
+            "%";
+
+    var eFill =
+        document.getElementById(
+            "hp-fill-enemy"
+        );
+
+    if (eFill)
+        eFill.style.width =
+            ((e.hp / e.maxHp) * 100) +
+            "%";
+
+    var profLevel =
+        document.getElementById(
+            "prof-level"
+        );
+
+    if (profLevel)
+        profLevel.innerText =
+            p.level;
+
+    var profWeapon =
+        document.getElementById(
+            "prof-weapon"
+        );
+
+    if (profWeapon)
+        profWeapon.innerText =
+            p.weapon;
+
+    var profDamage =
+        document.getElementById(
+            "prof-damage"
+        );
+
+    if (profDamage)
+        profDamage.innerText =
+            15 + p.bonusDamage;
+
+    var profHp =
+        document.getElementById(
+            "prof-maxhp"
+        );
+
+    if (profHp)
+        profHp.innerText =
+            p.maxHp + " HP";
+
+    var profStr =
+        document.getElementById(
+            "prof-str"
+        );
+
+    if (profStr)
+        profStr.innerText =
+            p.strength;
+
+    var profAgi =
+        document.getElementById(
+            "prof-agi"
+        );
+
+    if (profAgi)
+        profAgi.innerText =
+            p.agility;
+
+    var profFree =
+        document.getElementById(
+            "prof-free"
+        );
+
+    if (profFree)
+        profFree.innerText =
+            p.freePoints;
+
+    var freeBlock =
+        document.getElementById(
+            "free-points-block"
+        );
+
+    var btnS =
+        document.getElementById(
+            "add-str"
+        );
+
+    var btnA =
+        document.getElementById(
+            "add-agi"
+        );
+
+    if (freeBlock) {
+
+        if (p.freePoints > 0) {
+
+            freeBlock.style.display =
+                "block";
+
+            if (btnS)
+                btnS.style.display =
+                    "inline-block";
+
+            if (btnA)
+                btnA.style.display =
+                    "inline-block";
+
+        } else {
+
+            freeBlock.style.display =
+                "none";
+
+            if (btnS)
+                btnS.style.display =
+                    "none";
+
+            if (btnA)
+                btnA.style.display =
+                    "none";
+        }
     }
 
-    // Если это шмот, определяем слот на кукле персонажа
-    let targetSlot = null;
-    if (item[0] === "🗡️" || item[0] === "⚔️") targetSlot = "weapon";
-    if (item[0] === "🛡️") targetSlot = "armor";
-    if (item[0] === "⛑️") targetSlot = "helmet";
-    if (item[0] === "🥊") targetSlot = "gloves";
-    if (item[0] === "🥾") targetSlot = "boots";
-    if (item[0] === "💍") targetSlot = "ring";
+    var expTxt =
+        document.getElementById(
+            "exp-text"
+        );
 
-    if (targetSlot) {
-        S.equipped[targetSlot] = index;
-        toast(`Вы экипировали: ${item[1]}`);
-        inventory();
-    } else {
-        toast("Этот предмет нельзя экипировать!");
-    }
+    if (expTxt)
+        expTxt.innerText =
+            p.exp +
+            " / " +
+            p.maxExp +
+            " XP";
+
+    var expFill =
+        document.getElementById(
+            "exp-fill"
+        );
+
+    if (expFill)
+        expFill.style.width =
+            ((p.exp / p.maxExp) * 100) +
+            "%";
 }
-
-// Функция для снятия шмота в инвентаре
-function unequipSlot(slotKey) {
-    if (S.equipped[slotKey] !== null) {
-        S.equipped[slotKey] = null;
-        toast("Предмет бережно снят в сумку");
-        inventory();
-    } else {
-        toast("Этот слот пуст!");
-    }
-}
-
-// Экран магазина
-function shop() {
-    let g = [
-        ["🗡️", "Железный меч", 180, "atk", 22],
-        ["🛡️", "Щит стража", 220, "def", 18],
-        ["🧪", "Зелье HP", 90, "use", 40],
-        ["💍", "Кольцо силы", 350, "atk", 12],
-        ["⛑️", "Шлем охотника", 260, "def", 10],
-        ["⚔️", "Меч героя", 500, "atk", 35]
-    ];
-    window.goods = g;
-    screen.innerHTML = `
-        <h2 class="title">🛒 Магазин</h2>
-        <div class="card">
-            <div class="shopgrid">
-                ${g.map((x, i) => `
-                    <div class="shopitem">
-                        <div class="icon">${x[0]}</div>
-                        <b>${x[1]}</b>
-                        <small style="display:block; color:#aaa; font-size:10px; margin-bottom:5px;">
-                            ${x[3].toUpperCase()} +${x[4]}
-                        </small>
-                        <button class="buy" onclick="buy(${i})">🪙 ${x[2]}</button>
-                    </div>
-                `).join("")}
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:15px;">
-            <button class="act main" style="padding:10px 20px; display:inline-block; width:auto;" onclick="home()">◀ Назад в город</button>
-        </div>
-    `;
-}
-
-// Покупка предмета
-function buy(i) {
-    let x = goods[i];
-    if (S.gold < x[2]) return toast("Не хватает золота");
-    
-    S.gold -= x[2];
-    if(gold) gold.textContent = S.gold;
-    
-    // Пушим вещь в массив предметов игрока
-    S.items.push([x[0], x[1], `${x[3].toUpperCase()} +${x[4]}`, x[3], x[4]]);
-    toast("Куплено и положено в сумку: " + x[1]);
-}
-
-// Экран заданий
-function quests() {
-    screen.innerHTML = `
-        <h2 class="title">📜 Задания</h2>
-        <div class="card quest">
-            <i>⚔️</i>
-            <div><b>Победи бандита</b><small>Награда: 🪙 120</small></div>
-            <button onclick="startBattle()">В бой</button>
-        </div>
-        <div class="card quest">
-            <i>🪙</i>
-            <div><b>Накопи 2000 золота</b><small>Прогресс: ${S.gold}/2000</small></div>
-        </div>
-        <div class="card quest">
-            <i>🎒</i>
-            <div><b>Собери шмотки</b><small>Прогресс: ${S.items.length}/10 предметов</small></div>
-        </div>
