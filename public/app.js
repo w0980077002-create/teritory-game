@@ -22,7 +22,7 @@ globalChat:[
 ['Седой','После полуночи в промзоне лучше быть осторожнее.']
 ],
 log:['[СИСТЕМА] Добро пожаловать в город.','[ГОРОД] Улица тихая, но ненадолго.']};
-let S=JSON.parse(localStorage.getItem(KEY)||'null')||defaults; S.chatTab=S.chatTab||'global';
+let S=JSON.parse(localStorage.getItem(KEY)||'null')||defaults;
 let enemy={name:'Карманник',level:1,hp:50,maxHp:50,reward:35,xp:24,damage:8};
 let target='Голова',block='Голова + Грудь';
 
@@ -69,108 +69,76 @@ const shopItems=[
 ];
 function shop(){return `<h1 class="page-title">МАГАЗИН</h1><p class="lead">Официальная витрина · наличный расчёт</p><div class="notice" style="margin-bottom:10px">Баланс: <span class="gold">${S.ria} Ria</span>. Некоторые товары требуют определённого уровня.</div><div class="list">${shopItems.map((it,i)=>`<div class="row"><div class="row-left"><div class="iconbox">${it[2]}</div><div><b>${it[1]}</b><small>${it[4]==='weapon'?'оружие · +'+it[5]+' сила':it[4]==='armor'?'броня · +'+it[5]+' защита':it[4]==='med'?'восстановление HP':'инструмент'}</small></div></div><div style="text-align:right"><div class="value">${it[3]} Ria</div><button class="btn secondary" style="padding:7px;margin-top:3px" onclick="buy(${i})">Купить</button></div></div>`).join('')}</div>`}
 function missions(){let q=[['courier','Ночной курьер','Передай конверт в Северный район.',55,35],['rat','Зачистка двора','Победи первого уличного противника.',35,24],['debt','Старый долг','Собери 100 Ria любым способом.',80,50],['boss','Поставить точку','Победи Авторитета на арене.',190,130]];return `<h1 class="page-title">ЗАДАНИЯ</h1><p class="lead">Контракты города</p><div class="tabs"><button class="tab active">АКТИВНЫЕ</button><button class="tab" onclick="toast('Архив будет доступен после первых завершённых контрактов')">АРХИВ</button></div>${q.map(m=>`<article class="quest"><h3>${m[1]}</h3><p>${m[2]}</p><div class="quest-foot"><span class="reward">НАГРАДА: ${m[3]} Ria · ${m[4]} XP</span><button class="btn secondary" style="padding:7px 10px" onclick="mission('${m[0]}')">${S.missions[m[0]]?'Выполнено':'Начать'}</button></div></article>`).join('')}` }
-function chat(){
-  render();
-if(S.route==='chat') loadChats();
-  loadChats();
-}
-function chatTab(type){
-  S.chatTab=type;
-  render();
-  loadChats();
-}
-function chatView(){
+function chat(){ return chatPage(); }
+function chatTab(type){ S.chatTab=type; save(); render(); loadChats(); }
+function chatPage(){
   const type=S.chatTab||'global';
-  const title=type==='global'?'ОБЩИЙ ЧАТ':'КЛАНОВЫЙ ЧАТ';
-  const arr=type==='global'?S.globalChat:S.chat;
-  return `<h1 class="page-title">ЧАТ</h1>
-  <p class="lead">Общий городской чат · клановый чат · онлайн</p>
-  <div class="tabs">
-    <button class="tab ${type==='global'?'active':''}" onclick="chatTab('global')">ОБЩИЙ</button>
-    <button class="tab ${type==='clan'?'active':''}" onclick="chatTab('clan')">КЛАНОВЫЙ</button>
-  </div>
-  <section class="panel">
-    <div class="panel-head">${title}<span id="chatStatus" class="chat-status">подключение...</span></div>
-    <div class="panel-body">
-      <div class="chat" id="onlineChat">${arr.map(x=>`<div class="msg"><b>${escapeHtml(x[0])}</b><p>${escapeHtml(x[1])}</p></div>`).join('')}</div>
-      <div class="chatbar">
-        <input id="onlineInput" placeholder="${type==='global'?'Написать всем игрокам...':'Сообщение участникам клана...'}" maxlength="240"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();sendOnlineChat()}">
-        <button class="btn" onclick="sendOnlineChat()">Отправить</button>
-      </div>
-    </div>
-  </section>`;
+  const arr=type==='clan'?S.chat:S.globalChat;
+  return `<h1 class="page-title">ЧАТ</h1><p class="lead">Общий городской чат · клановый чат · онлайн</p>
+  <div class="tabs"><button class="tab ${type==='global'?'active':''}" onclick="chatTab('global')">ОБЩИЙ</button><button class="tab ${type==='clan'?'active':''}" onclick="chatTab('clan')">КЛАНОВЫЙ</button></div>
+  <div class="panel"><div class="panel-head">${type==='global'?'ОБЩИЙ ГОРОДСКОЙ ЧАТ':'КЛАНОВЫЙ ЧАТ'}<span id="chatStatus" class="chat-status">подключение...</span></div>
+  <div class="panel-body"><div class="chat" id="onlineChat">${arr.map(x=>`<div class="msg"><b>${escapeHtml(x[0])}</b><p>${escapeHtml(x[1])}</p></div>`).join('')}</div>
+  <div class="chatbar"><input id="onlineInput" placeholder="${type==='global'?'Написать всем игрокам...':'Сообщение участникам клана...'}" maxlength="240"><button class="btn" onclick="sendOnlineChat()">Отправить</button></div></div></div>
+  <div class="notice">${type==='global'?'Сообщения видят все игроки сервера.':'Сообщения видят участники твоего клана.'}</div>`;
 }
-function escapeHtml(v){
-  return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-async function api(path, options={}){
-  const tg=window.Telegram?.WebApp;
-  const headers=Object.assign({'Content-Type':'application/json'}, options.headers||{});
-  if(tg?.initData) headers['X-Telegram-Init-Data']=tg.initData;
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function api(path,options={}){
+  const headers=Object.assign({'Content-Type':'application/json'},options.headers||{});
+  const initData=window.Telegram?.WebApp?.initData||'';
+  if(initData) headers['X-Telegram-Init-Data']=initData;
   const r=await fetch(path,Object.assign({},options,{headers}));
   if(!r.ok) throw new Error(await r.text());
   return r.json();
 }
 async function loadChats(){
   try{
-    const [g,c]=await Promise.all([
-      api('/api/chat/general?limit=60'),
-      api('/api/chat/clan?limit=60')
-    ]);
+    const g=await api('/api/chat/general?limit=60');
+    const c=await api('/api/chat/clan?limit=60');
     S.globalChat=(g.messages||[]).map(m=>[m.name,m.text]);
     S.chat=(c.messages||[]).map(m=>[m.name,m.text]);
     save();
-    const box=$('#onlineChat');
-    if(box) box.innerHTML=(S.chatTab==='clan'?S.chat:S.globalChat).map(x=>`<div class="msg"><b>${escapeHtml(x[0])}</b><p>${escapeHtml(x[1])}</p></div>`).join('');
-    const st=$('#chatStatus'); if(st) st.textContent='онлайн';
-  }catch(e){
-    const st=$('#chatStatus'); if(st) st.textContent='офлайн';
-  }
+    if(S.route==='chat'){
+      const box=$('#onlineChat');
+      if(box) box.innerHTML=(S.chatTab==='clan'?S.chat:S.globalChat).map(x=>`<div class="msg"><b>${escapeHtml(x[0])}</b><p>${escapeHtml(x[1])}</p></div>`).join('');
+      const st=$('#chatStatus'); if(st) st.textContent='онлайн';
+    }
+  }catch(e){const st=$('#chatStatus');if(st)st.textContent='сервер не подключён';}
 }
 async function sendOnlineChat(){
-  const i=$('#onlineInput'); if(!i||!i.value.trim()) return;
-  const text=i.value.trim(); i.value='';
-  try{
-    const path=(S.chatTab||'global')==='clan'?'/api/chat/clan':'/api/chat/general';
-    await api(path,{method:'POST',body:JSON.stringify({text})});
-    await loadChats();
-    render();
-    toast('Сообщение отправлено');
-  }catch(e){
-    toast('Не удалось отправить сообщение');
-    i.value=text;
-  }
+  const i=$('#onlineInput'); if(!i) return; const text=i.value.trim(); if(!text)return;
+  i.value=''; const channel=S.chatTab==='clan'?'clan':'general';
+  try{await api('/api/chat/'+channel,{method:'POST',body:JSON.stringify({text})});await loadChats();render();toast('Сообщение отправлено');}
+  catch(e){i.value=text;toast('Чат недоступен: проверь сервер');}
 }
-function sendChat(){ S.chatTab='clan'; return sendOnlineChat(); }
-function sendGlobalChat(){ S.chatTab='global'; return sendOnlineChat(); }
-function sendClanChat(){ S.chatTab='clan'; return sendOnlineChat(); }
-function sendClanInline(){ S.chatTab='clan'; route('chat'); }
+function sendGlobalChat(){S.chatTab='global';return sendOnlineChat();}
+function sendClanChat(){S.chatTab='clan';return sendOnlineChat();}
+function sendChat(){S.chatTab='clan';return sendOnlineChat();}
+function sendClanInline(){S.chatTab='clan';route('chat');}
 function district(name,desc){openModal(`<div class="modalhead"><div><b style="font:500 19px Oswald">${name}</b><small style="display:block;color:#877b6d">${desc}</small></div><button class="close" onclick="closeModal()">X</button></div><div class="notice">Район является частью общей карты города. Здесь будут размещаться реальные NPC, магазины и события.</div><div class="section"><button class="btn wide" onclick="closeModal();route('missions')">Посмотреть задания</button><button class="btn secondary wide" onclick="closeModal();route('arena')">Идти на улицу</button></div>`)}
 function openModal(h){$('#modal').innerHTML='<div class="modal">'+h+'</div>';$('#modal').classList.add('show')}
 function closeModal(){$('#modal').classList.remove('show')}
 window.route=route;window.toast=toast;window.upgrade=upgrade;window.equip=equip;window.useMed=useMed;window.buy=buy;window.chooseEnemy=chooseEnemy;window.setTarget=setTarget;window.setBlock=setBlock;window.attack=attack;window.defend=defend;window.pvp=pvp;window.mission=mission;window.hospital=hospital;window.bank=bank;window.deposit=deposit;window.withdraw=withdraw;window.capture=capture;window.chat=chat;window.chatTab=chatTab;window.sendChat=sendChat;window.sendGlobalChat=sendGlobalChat;window.sendClanChat=sendClanChat;window.sendClanInline=sendClanInline;window.district=district;window.openModal=openModal;window.closeModal=closeModal;
 try{window.Telegram?.WebApp?.ready();window.Telegram?.WebApp?.expand()}catch(e){}
+window.addEventListener('error',e=>{const v=document.querySelector('#view');if(v&&(!v.innerHTML||v.innerHTML.trim()===''))v.innerHTML='<div class=\"notice\">Ошибка загрузки игры: '+escapeHtml(e.message)+'</div>';});
 render();
+if(S.route==='chat') loadChats();
+connectChatSocket();
 
-let socket=null;
 function connectChatSocket(){
   try{
     const proto=location.protocol==='https:'?'wss':'ws';
-    socket=new WebSocket(proto+'://'+location.host+'/ws');
-    socket.onopen=()=>{const s=$('#chatStatus');if(s)s.textContent='онлайн';};
-    socket.onmessage=ev=>{
+    const ws=new WebSocket(proto+'://'+location.host+'/ws');
+    ws.onopen=()=>{const e=$('#chatStatus');if(e)e.textContent='онлайн'};
+    ws.onmessage=ev=>{
       try{
         const m=JSON.parse(ev.data);
         if(m.channel==='general') S.globalChat.push([m.name,m.text]);
-        if(m.channel==='clan') S.chat.push([m.name,m.text]);
-        if(S.globalChat.length>100) S.globalChat=S.globalChat.slice(-100);
-        if(S.chat.length>100) S.chat=S.chat.slice(-100);
-        save();
+        else if(m.channel==='clan' && (!m.clan || m.clan===S.clan.name)) S.chat.push([m.name,m.text]);
+        else return;
+        S.globalChat=S.globalChat.slice(-100); S.chat=S.chat.slice(-100); save();
         if(S.route==='chat') render();
-      }catch(_){}
+      }catch(_){ }
     };
-    socket.onclose=()=>{setTimeout(connectChatSocket,3000)};
-  }catch(_){}
+    ws.onclose=()=>setTimeout(connectChatSocket,3000);
+  }catch(_){ }
 }
-connectChatSocket();
