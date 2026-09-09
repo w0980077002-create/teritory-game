@@ -1,127 +1,23 @@
-const state={
-  gold:1250,gems:240,level:12,hp:74,energy:82,
-  inventory:[
-    {name:"Клинок тени",icon:"🗡️",type:"Оружие",power:"+18 ATK"},
-    {name:"Щит стража",icon:"🛡️",type:"Броня",power:"+14 DEF"},
-    {name:"Шлем",icon:"⛑️",type:"Шлем",power:"+7 DEF"},
-    {name:"Кольцо силы",icon:"💍",type:"Аксессуар",power:"+6 ATK"},
-    {name:"Зелье HP",icon:"🧪",type:"Расходник",power:"+40 HP"},
-    {name:"Кристалл",icon:"💎",type:"Ресурс",power:"Редкий"},
-    {name:"Перчатки",icon:"🥊",type:"Перчатки",power:"+5 ATK"},
-    {name:"Сапоги",icon:"🥾",type:"Ботинки",power:"+4 DEF"}
-  ],
-  enemyHp:100, playerHp:100, turn:"player", battleLog:["Бандит выходит на арену.","Твой ход."]
-};
+const S={gold:1250,ph:100,eh:100,ap:3,def:false,log:["Бандит выходит на арену.","Твой ход."],items:[
+["🗡️","Клинок","ATK +18"],["🛡️","Щит","DEF +14"],["⛑️","Шлем","DEF +7"],["💍","Кольцо","ATK +6"],["🧪","Зелье","HP +40"],["🥊","Перчатки","ATK +5"],["🥾","Сапоги","DEF +4"],["💎","Кристалл","Редкий"]
+]};
 
-const $=id=>document.getElementById(id);
-function sync(){
-  $("gold").textContent=state.gold.toLocaleString("ru-RU");
-  $("gems").textContent=state.gems.toLocaleString("ru-RU");
-  $("level").textContent=state.level;
-}
-function toast(t){
-  const x=$("toast"); x.textContent=t; x.classList.add("show");
-  clearTimeout(window._toast); window._toast=setTimeout(()=>x.classList.remove("show"),1500);
-}
-function show(name){
-  document.querySelectorAll(".bottom button").forEach(b=>b.classList.toggle("active",b.dataset.screen===name));
-  if(name==="home") home();
-  if(name==="inventory") inventory();
-  if(name==="shop") shop();
-  if(name==="quests") quests();
-  if(name==="battle") battle();
-}
-function home(){
- $("screen").innerHTML=`
- <section class="hero">
-   <div class="title">⚔️ TERRITORIA ⚔️</div>
-   <div style="text-align:center;color:#d7c6df">Золотой город • Глава 1</div>
-   <div class="stage">🧙</div><div class="pet">🐺</div><div class="campfire">🔥</div>
-   <div class="quick">
-    <button onclick="show('inventory')">🎒<br>Герой</button>
-    <button onclick="show('battle')">⚔️<br>Арена</button>
-    <button onclick="show('quests')">📜<br>Задания</button>
-    <button onclick="show('shop')">🛒<br>Магазин</button>
-   </div>
- </section>
- <div class="panel"><h3>❤️ Здоровье</h3><div class="bar"><span style="width:${state.hp}%"></span></div><small>${state.hp}% • Энергия ${state.energy}%</small></div>
- <div class="panel"><h3>📈 Характеристики</h3><div class="stats">
-   <div class="stat">⚔️<b>48</b>Атака</div><div class="stat">🛡️<b>35</b>Защита</div><div class="stat">❤️<b>100</b>HP</div>
- </div></div>`;
- sync();
-}
-function inventory(){
- $("screen").innerHTML=`
- <h2 class="screenTitle">🎒 Инвентарь</h2>
- <div class="panel"><h3>Экипировка</h3><div class="gear">
-  <div class="slot">🗡️<small>Оружие</small></div><div class="slot">🛡️<small>Броня</small></div><div class="slot">⛑️<small>Шлем</small></div>
-  <div class="slot">🥊<small>Перчатки</small></div><div class="slot">🥾<small>Сапоги</small></div><div class="slot">💍<small>Кольцо</small></div>
- </div></div>
- <div class="panel"><h3>Предметы <span class="badge">${state.inventory.length}/24</span></h3>
- <div class="items">${state.inventory.map((i,n)=>`<button class="item" onclick="equip(${n})"><div class="icon">${i.icon}</div><b>${i.name}</b><small>${i.power}</small></button>`).join("")}</div></div>`;
-}
-function equip(n){toast(`${state.inventory[n].name}: предмет выбран`)}
-function shop(){
- const goods=[
-  ["🗡️","Железный клинок",180,"+12 ATK"],
-  ["🛡️","Щит рыцаря",220,"+10 DEF"],
-  ["🧪","Большое зелье",90,"+60 HP"],
-  ["💍","Кольцо удачи",350,"+5 CRIT"],
-  ["⛑️","Шлем охотника",260,"+8 DEF"],
-  ["⚔️","Меч героя",500,"+24 ATK"]
- ];
- $("screen").innerHTML=`<h2 class="screenTitle">🛒 Магазин</h2><div class="panel"><h3>Снаряжение</h3><div class="shopGrid">${goods.map((g,n)=>`
- <div class="shopItem"><div class="icon">${g[0]}</div><b>${g[1]}</b><small>${g[3]}</small><button class="buy" onclick="buy(${n})">🪙 ${g[2]}</button></div>`).join("")}</div></div>`;
- window.goods=goods;
-}
-function buy(n){
- const g=window.goods[n]; if(state.gold<g[2]) return toast("Не хватает золота");
- state.gold-=g[2]; state.inventory.push({name:g[1],icon:g[0],type:"Предмет",power:g[3]});
- toast("Куплено: "+g[1]); sync(); shop();
-}
-function quests(){
- $("screen").innerHTML=`<h2 class="screenTitle">📜 Задания</h2>
- <div class="panel"><div class="quest"><div class="qicon">⚔️</div><div><b>Победи бандита</b><br><small>Одержи победу на арене</small></div><button onclick="show('battle')">В бой</button></div></div>
- <div class="panel"><div class="quest"><div class="qicon">🪙</div><div><b>Собери 1000 золота</b><br><small>Награда: 💎 50</small></div><span class="badge">35%</span></div></div>
- <div class="panel"><div class="quest"><div class="qicon">🎒</div><div><b>Найди редкий предмет</b><br><small>Открой 3 сундука</small></div><span class="badge">1/3</span></div></div>`;
-}
-function battle(){
- $("screen").innerHTML=`
- <section class="battle">
-  <div class="turn"><span>${state.turn==="player"?"ТВОЙ ХОД":"ХОД ВРАГА"}</span></div>
-  <div class="fighters">
-   <div class="fighter"><div class="body">🧙</div><b>Территорианец</b><div class="hp"><div class="bar"><span style="width:${state.playerHp}%"></span></div><small>${state.playerHp}/100</small></div></div>
-   <div class="vs">VS</div>
-   <div class="fighter enemy"><div class="body">👹</div><b>Бандит</b><div class="hp"><div class="bar"><span style="width:${state.enemyHp}%"></span></div><small>${state.enemyHp}/100</small></div></div>
-  </div>
-  <div class="panel"><b>Журнал боя</b><div class="battleLog">${state.battleLog.slice(-5).map(x=>`<div>• ${x}</div>`).join("")}</div></div>
-  <div class="actions">
-   <button class="action primary" onclick="act('attack')">⚔️ Атака</button>
-   <button class="action" onclick="act('skill')">✨ Умение</button>
-   <button class="action" onclick="act('defend')">🛡️ Защита</button>
-   <button class="action" onclick="act('potion')">🧪 Зелье</button>
-  </div>
- </section>`;
-}
-function act(type){
- if(state.turn!=="player") return;
- if(state.enemyHp<=0||state.playerHp<=0) return;
- let dmg=0,msg="";
- if(type==="attack"){dmg=14+Math.floor(Math.random()*10);msg=`Ты наносишь ${dmg} урона.`}
- if(type==="skill"){dmg=22+Math.floor(Math.random()*12);msg=`Умение наносит ${dmg} урона!`}
- if(type==="defend"){dmg=5;msg="Ты защищаешься. Следующий удар слабее."}
- if(type==="potion"){state.playerHp=Math.min(100,state.playerHp+28);msg="Зелье восстановило 28 HP."}
- state.enemyHp=Math.max(0,state.enemyHp-dmg); state.battleLog.push(msg);
- if(state.enemyHp===0){state.battleLog.push("🏆 Победа! Ты получил 120 золота.");state.gold+=120;state.turn="player";battle();sync();return}
- state.turn="enemy"; battle();
- setTimeout(enemyTurn,650);
-}
-function enemyTurn(){
- if(state.playerHp<=0)return;
- const dmg=7+Math.floor(Math.random()*9); state.playerHp=Math.max(0,state.playerHp-dmg);
- state.battleLog.push(`Бандит наносит ${dmg} урона.`);
- if(state.playerHp===0){state.battleLog.push("💀 Поражение. Попробуй ещё раз.");state.turn="player"}
- else state.turn="player";
- battle();sync();
-}
-sync();show("home");
+const screen=document.getElementById("screen"),gold=document.getElementById("gold");
+function toast(t){let x=document.getElementById("toast");x.textContent=t;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),1400)}
+function home(){screen.innerHTML=`<section class="hero"><h2>⚔️ TERRITORIA ⚔️</h2><p>Золотой город</p><div class="herochar">🧙</div><div class="wolf">🐺</div><div class="fire">🔥</div><div class="quick"><button onclick="inventory()">🎒<br>Герой</button><button onclick="startBattle()">⚔️<br>Арена</button><button onclick="quests()">📜<br>Задания</button><button onclick="shop()">🛒<br>Магазин</button></div></section><div class="card"><b>❤️ Здоровье</b><div class="hp"><span style="width:${S.ph}%"></span></div>${S.ph}/100 HP</div><div class="card"><b>📊 Характеристики</b><div class="stats"><div class="stat">⚔️<b>48</b>Атака</div><div class="stat">🛡️<b>35</b>Защита</div><div class="stat">💥<b>12%</b>Крит</div></div></div>`}
+function inventory(){screen.innerHTML=`<h2 class="title">🎒 Герой</h2><div class="card"><b>Экипировка</b><div class="grid">${["🗡️","🛡️","⛑️","🥊","🥾","💍"].map((x,i)=>`<div class="slot">${x}<small>${["Оружие","Броня","Шлем","Перчатки","Сапоги","Кольцо"][i]}</small></div>`).join("")}</div></div><div class="card"><b>Предметы</b><div class="items">${S.items.map((x,i)=>`<button class="item" onclick="toast('${x[1]} выбран')"><i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small></button>`).join("")}</div></div>`}
+function shop(){let g=[["🗡️","Железный меч",180],["🛡️","Щит стража",220],["🧪","Зелье HP",90],["💍","Кольцо силы",350],["⛑️","Шлем охотника",260],["⚔️","Меч героя",500]];window.goods=g;screen.innerHTML=`<h2 class="title">🛒 Магазин</h2><div class="card"><div class="shopgrid">${g.map((x,i)=>`<div class="shopitem"><div class="icon">${x[0]}</div><b>${x[1]}</b><button class="buy" onclick="buy(${i})">🪙 ${x[2]}</button></div>`).join("")}</div></div>`}
+function buy(i){let x=goods[i];if(S.gold<x[2])return toast("Не хватает золота");S.gold-=x[2];gold.textContent=S.gold;toast("Куплено: "+x[1])}
+function quests(){screen.innerHTML=`<h2 class="title">📜 Задания</h2><div class="card quest"><i>⚔️</i><div><b>Победи бандита</b><small>Награда: 🪙 120</small></div><button onclick="startBattle()">В бой</button></div><div class="card quest"><i>🪙</i><div><b>Накопи 2000 золота</b><small>Прогресс: ${S.gold}/2000</small></div></div><div class="card quest"><i>🎒</i><div><b>Собери 5 предметов</b><small>Прогресс: 4/5</small></div></div>`}
+function startBattle(){S.ph=100;S.eh=100;S.ap=3;S.def=false;S.log=["Бандит выходит на арену.","Твой ход."];battle()}
+function battle(){screen.innerHTML=`<section class="battle"><div class="turn"><span>${S.ap>0?"ТВОЙ ХОД":"НЕТ ОЧКОВ ДЕЙСТВИЯ"}</span></div><div class="arena"><div class="line"></div><div class="unit you"><div class="pic">🧙</div><b>Территорианец</b><div class="hp"><span style="width:${S.ph}%"></span></div><small>${S.ph}/100</small><div class="ap">${[0,1,2].map(i=>`<i class="${i<S.ap?"":"off"}"></i>`).join("")}</div></div><div class="unit enemy"><div class="pic">👹</div><b>Бандит</b><div class="hp"><span style="width:${S.eh}%"></span></div><small>${S.eh}/100</small></div></div><div class="card"><b>📜 Журнал боя</b><div class="battlelog">${S.log.slice(-5).map(x=>`<div>• ${x}</div>`).join("")}</div></div><div class="actions"><button class="act main" onclick="act('attack')">⚔️ Атака<br><small>1 ОД</small></button><button class="act" onclick="act('skill')">✨ Сильный удар<br><small>2 ОД</small></button><button class="act" onclick="act('def')">🛡️ Защита<br><small>1 ОД</small></button><button class="act heal" onclick="act('heal')">🧪 Зелье<br><small>1 ОД</small></button></div></section>`}
+function act(a){let cost=a==="skill"?2:1;if(S.ap<cost)return toast("Недостаточно очков действия");if(S.eh<=0||S.ph<=0)return;
+S.ap-=cost;
+if(a==="attack"){let d=15+Math.floor(Math.random()*9);S.eh=Math.max(0,S.eh-d);S.log.push(`Ты атаковал и нанёс ${d} урона.`)}
+if(a==="skill"){let d=28+Math.floor(Math.random()*13);S.eh=Math.max(0,S.eh-d);S.log.push(`✨ Сильный удар! ${d} урона.`)}
+if(a==="def"){S.def=true;S.log.push("🛡️ Ты занял защитную стойку.")}
+if(a==="heal"){S.ph=Math.min(100,S.ph+30);S.log.push("🧪 Ты восстановил 30 HP.")}
+if(S.eh<=0){S.log.push("🏆 Победа! +120 золота.");S.gold+=120;gold.textContent=S.gold;battle();return}
+if(S.ap===0){enemyTurn();return}battle()}
+function enemyTurn(){let d=8+Math.floor(Math.random()*8);if(S.def){d=Math.ceil(d/2);S.def=false}S.ph=Math.max(0,S.ph-d);S.log.push(`👹 Бандит атакует: -${d} HP.`);S.ap=3;if(S.ph<=0){S.log.push("💀 Поражение. Нажми «Бой», чтобы начать снова.");S.ap=0}battle()}
+home();
