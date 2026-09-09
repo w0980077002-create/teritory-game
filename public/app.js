@@ -33,3 +33,5 @@ let m=e.target.closest("[data-m]");if(m){let log=$("#log");if(!log)return;if(m.d
 });
 function upgrade(){if(S.gold<300)return toast("Нужно 300 золота");S.gold-=300;S.atk+=8;save();toast("Оружие улучшено")}
 function hire(){if(S.gold<600)return toast("Нужно 600 золота");S.gold-=600;S.atk+=8;save();toast("Герой нанят")}
+
+window.addEventListener("error",e=>{try{console.error(e.message)}catch(_){}},{capture:true});
