@@ -1,1 +1,51 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#111827"><title>Territory — Game</title><link rel="stylesheet" href="style.css?v=1"></head><body><div id="app"></div><script src="app.js?v=1"></script></body></html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Territory: Vikings</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ С РЕСУРСАМИ -->
+        <header>
+            <div class="user-profile">
+                <div class="lvl-badge">5</div>
+                <div class="user-info">
+                    <span class="user-name">Territory</span>
+                    <span class="chapter-info">Глава 5 • Уровень 3</span>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" style="width: 40%;"></div>
+                        <small>120/300</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resources">
+                <div class="res-item gold-res">🪙 <span id="gold">1779</span> <button class="plus">+</button></div>
+                <div class="res-item crystal-res">💎 <span>1330</span> <button class="plus">+</button></div>
+                <div class="res-item energy-res">⚡ <span>191.38</span> <button class="plus">+</button></div>
+            </div>
+        </header>
+
+        <!-- ГЛАВНЫЙ ЭКРАН ИГРЫ -->
+        <main id="screen">
+            <!-- Сюда скрипт подставляет контент. По умолчанию "Город" -->
+        </main>
+
+        <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ -->
+        <nav>
+            <button id="nav-home" onclick="home()" class="active">🏠<small>Город</small></button>
+            <button id="nav-hero" onclick="toast('Герой в разработке')">⚔️<small>Герой</small><span class="badge-dot"></span></button>
+            <button id="nav-inv" onclick="inventory()">🎒<small>Инвентарь</small></button>
+            <button id="nav-quests" onclick="quests()">📜<small>Задания</small><span class="badge-dot"></span></button>
+            <button onclick="toast('Гильдии с 15 уровня')">👥<small>Гильдия</small></button>
+            <button onclick="toast('Настройки')">☰<small>Ещё</small></button>
+        </nav>
+    </div>
+
+    <div id="toast"></div>
+    <script src="js/app.js"></script>
+</body>
+</html>
