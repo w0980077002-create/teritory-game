@@ -1,9 +1,8 @@
 <!doctype html><html lang="ru"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Teritory — FULL</title><link rel="stylesheet" href="style.css"></head><body>
-<div id="auth" class="auth"><div class="auth-box"><h1>☠ TERITORY</h1><p>Онлайн RPG</p>
-<input id="authName" placeholder="Имя игрока" maxlength="18"><input id="authPass" type="password" placeholder="Пароль">
-<div class="auth-buttons"><button onclick="login()">ВОЙТИ</button><button onclick="register()">РЕГИСТРАЦИЯ</button></div><div id="authMsg"></div></div></div>
+<title>Teritory</title><link rel="stylesheet" href="style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script></head><body>
+<div id="auth" class="auth"><div class="auth-box"><h1>☠ TERITORY</h1><p>Онлайн RPG</p><div class="tg-icon">✈</div><div id="authStatus">Подключение к Telegram...</div><button id="playBtn" class="play-btn hidden" onclick="telegramLogin()">ИГРАТЬ</button><button id="demoBtn" class="demo-btn hidden" onclick="demoLogin()">ТЕСТОВЫЙ ВХОД</button><div id="authMsg"></div></div></div>
 <div id="game" class="game-wrapper hidden">
 <header class="character-header"><div class="header-row"><span>☠ <b id="playerName"></b> · ур. <b id="level"></b></span><span class="money-text">🪙 <b id="coins"></b></span></div>
 <div class="header-bars"><div>HP <div class="bar-border"><div id="hpBar" class="bar-fill hp-bg"></div><span id="hpText"></span></div></div><div>EXP <div class="bar-border"><div id="expBar" class="bar-fill exp-bg"></div><span id="expText"></span></div></div></div></header>
@@ -16,7 +15,6 @@
 <section id="arena" class="screen hidden"><button class="back" onclick="show('home')">← Назад</button><div class="panel"><h2>⚔ Арена</h2><div id="enemy"></div><div id="fightLog">Выбери противника.</div><div class="enemy-buttons"><button onclick="fightStart('rat')">🐀 Крыса</button><button onclick="fightStart('bandit')">🥷 Бандит</button><button onclick="fightStart('boss')">👹 Босс</button></div><button id="attack" class="attack hidden" onclick="hit()">⚔ УДАР</button></div></section>
 <section id="casino" class="screen hidden"><button class="back" onclick="show('home')">← Назад</button><div class="panel"><h2>🎰 Казино</h2><div class="notice">Только виртуальные монеты. Реальные деньги отсутствуют.</div><h3>Слоты</h3><div id="slots">🍒 | 🍋 | ⭐</div><div class="bet">Ставка <button onclick="betChange(-10)">−</button> <b id="bet"></b> <button onclick="betChange(10)">+</button></div><button class="big" onclick="slots()">КРУТИТЬ</button><div id="slotResult"></div><h3>🎲 Кубик</h3><button onclick="dice('even')">ЧЁТ</button><button onclick="dice('odd')">НЕЧЁТ</button><div id="diceResult"></div></div></section>
 <section id="world" class="screen hidden"><button class="back" onclick="show('home')">← Назад</button><div class="panel"><h2>🗺 Мир</h2><div class="world-card">🏚 <b>Площадь</b><br>Безопасная зона.</div><div class="world-card">🌲 <b>Тёмный лес</b><br>Опасные монстры.</div><div class="world-card">🏰 <b>Руины</b><br>Элитные противники.</div></div></section>
-<section id="players" class="screen hidden"><button class="back" onclick="show('home')">← Назад</button><div class="panel"><h2>👥 Игроки онлайн</h2><div id="playerList"></div></div></section>
-</main>
-<div class="chat"><div id="chatBox"></div><form onsubmit="chatSend(event)"><input id="chatInput" placeholder="Написать..." maxlength="200"><button>➤</button></form></div>
+<section id="players" class="screen hidden"><button class="back" onclick="show('home')">← Назад</button><div class="panel"><h2>👥 Игроки онлайн</h2><div id="playerList"><div class="item">Список игроков подключается...</div></div></div></section>
+</main><div class="chat"><div id="chatBox"></div><form onsubmit="chatSend(event)"><input id="chatInput" placeholder="Написать..." maxlength="200"><button>➤</button></form></div>
 </div><div id="fx"></div><script src="app.js"></script></body></html>
