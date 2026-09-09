@@ -1,67 +1,26 @@
-<!doctype html>
-<html lang="ru"><head>
+<!doctype html><html lang="ru"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#06162b"><title>Territory — Sdolars</title>
-<link rel="stylesheet" href="style.css">
-</head><body>
-<div id="game">
-<header class="header">
-  <button class="profile" data-page="hero"><div class="portrait"><div class="hair"></div><div class="face">ᛒ</div><div class="beard"></div></div><span class="lvl">5</span></button>
-  <div class="identity"><div class="title">Territory</div><div class="sub">Глава 5 · Уровень 3</div><div class="xp"><i></i></div><small>180/300</small></div>
-  <div class="resources">
-    <button onclick="gain('gold')">🪙 <b id="gold">1779</b> <strong>＋</strong></button>
-    <button onclick="gain('gems')">💎 <b id="gems">1330</b> <strong>＋</strong></button>
-    <button onclick="gain('energy')">⚡ <b id="energy">191.38</b> <strong>＋</strong></button>
-  </div>
-  <div class="headActions">
-    <button data-page="messages">✉️<sup>2</sup><small>Сообщения</small></button>
-    <button data-page="achievements">🏆<small>Достижения</small></button>
-    <button data-page="settings">⚙️<small>Настройки</small></button>
-    <button onclick="toast('Язык: EN')">🇬🇧<small>EN</small></button>
-  </div>
+<meta name="theme-color" content="#06172b"><title>Territory — Sdolars</title><link rel="stylesheet" href="style.css"></head><body>
+<div id="app">
+<header class="top">
+ <button class="avatar" data-p="hero"><img src="viking.jpg"><span>5</span></button>
+ <div class="name"><b>Territory</b><strong>Глава 5 · Уровень 3</strong><div class="xp"><i></i></div><small>120/300</small></div>
+ <div class="money"><button>🪙 <b>1779</b> ＋</button><button>💎 <b>1330</b> ＋</button><button>⚡ <b>191.38</b> ＋</button></div>
+ <div class="head"><button data-p="messages">✉️<em>2</em><small>Сообщения</small></button><button data-p="achievements">🏆<small>Достижения</small></button><button data-p="settings">⚙️<small>Настройки</small></button><button data-p="lang">🇬🇧<small>EN</small></button></div>
 </header>
-
-<main class="content">
+<main>
 <section class="scene">
-  <div class="sky"></div><div class="mountain m1"></div><div class="mountain m2"></div>
-  <div class="castle"><div class="tower t1"></div><div class="tower t2"></div><div class="tower t3"></div><div class="keep"></div></div>
-  <div class="lake"></div><div class="town"></div>
-  <div class="heroArt"><div class="hood"></div><div class="head"></div><div class="torso"></div><div class="fur"></div><div class="axe"></div></div>
-
-  <button class="quest" data-page="quests"><span>📜</span><div><b>Текущее задание</b><strong>Поговори с кузнецом</strong><small>📍 Кузница</small></div><i>›</i></button>
-  <button class="daily" onclick="claim()"><span>🎁</span><div><b>Ежедневный бонус</b><strong id="clock">23:44:24</strong></div></button>
-
-  <div class="side left">
-    <button data-page="bonuses">🎁<b>Бонусы</b><sup>!</sup></button>
-    <button data-page="events">🗓️<b>События</b><sup>!</sup></button>
-    <button data-page="vip">👑<b>VIP</b></button>
-  </div>
-  <div class="side right">
-    <button data-page="forge"><span>⚒️</span><div><b>Кузница</b><small>Улучшение снаряжения</small></div><sup>!</sup></button>
-    <button data-page="tavern"><span>🍺</span><div><b>Таверна</b><small>Найм героев</small></div><sup>!</sup></button>
-    <button data-page="shop"><span>👜</span><div><b>Магазин</b><small>Предметы и снаряжение</small></div></button>
-  </div>
+ <img class="bg" src="city-bg.jpg"><div class="shade"></div>
+ <button class="quest" data-p="quests"><span>📜</span><div><b>Текущее задание</b><strong>Поговори с кузнецом</strong><small>📍 Кузница</small></div><i>›</i></button>
+ <button class="daily" onclick="reward()"><span>🎁</span><div><b>Ежедневный бонус</b><strong id="time">23:45:12</strong></div></button>
+ <div class="left"><button data-p="bonuses">🎁<b>Бонусы</b><em>!</em></button><button data-p="events">🗓️<b>События</b><em>!</em></button><button data-p="vip">👑<b>VIP</b></button></div>
+ <img class="viking" src="viking.jpg">
+ <div class="places"><button data-p="forge"><span>⚒️</span><div><b>Кузница</b><small>Улучшение снаряжения</small></div><em>!</em></button><button data-p="tavern"><span>🍺</span><div><b>Таверна</b><small>Найм героев</small></div><em>!</em></button><button data-p="shop"><span>👜</span><div><b>Магазин</b><small>Предметы и снаряжение</small></div></button></div>
 </section>
-
-<section class="quick">
- <button class="blue" data-page="battle">⚔️<b>Бой</b></button>
- <button class="gold" data-page="inventory">🎒<b>Инвентарь</b><sup>!</sup></button>
- <button class="purple" data-page="equipment">🛡️<b>Экипировка</b></button>
- <button class="green" data-page="quests">📜<b>Задания</b><sup>!</sup></button>
-</section>
-<section class="reward"><span>🎁</span><div><b>Бесплатные награды</b><small>Доступно через <i id="clock2">23:44:24</i></small></div><button onclick="claim()">Получить</button></section>
+<section class="quick"><button data-p="battle" class="blue">⚔️<b>Бой</b></button><button data-p="inventory" class="orange">🎒<b>Инвентарь</b><em>!</em></button><button data-p="equipment" class="purple">🛡️<b>Экипировка</b></button><button data-p="quests" class="green">📜<b>Задания</b><em>!</em></button></section>
+<section class="reward"><span>🎁</span><div><b>Бесплатные награды</b><small>Доступно через <i id="time2">23:45:12</i></small></div><button onclick="reward()">Получить</button></section>
 </main>
-
-<nav>
- <button class="active" data-page="city">🏠<b>Город</b></button>
- <button data-page="hero">⚔️<b>Герой</b><sup>!</sup></button>
- <button data-page="inventory">🎒<b>Инвентарь</b></button>
- <button data-page="quests">🛡️<b>Задания</b><sup>!</sup></button>
- <button data-page="guild">👥<b>Гильдия</b></button>
- <button data-page="more">☰<b>Ещё</b></button>
-</nav>
+<nav><button class="active" data-p="city">🏠<b>Город</b></button><button data-p="hero">⚔️<b>Герой</b><em>!</em></button><button data-p="inventory">🎒<b>Инвентарь</b></button><button data-p="quests">🛡️<b>Задания</b><em>!</em></button><button data-p="guild">👥<b>Гильдия</b></button><button data-p="more">☰<b>Ещё</b></button></nav>
 </div>
-<div id="panel"><div class="panel"><button class="close" onclick="closePanel()">×</button><div id="panelBody"></div></div></div>
-<div id="toast"></div>
-<script src="app.js"></script>
-</body></html>
+<div id="modal"><div class="box"><button class="x" onclick="closeM()">×</button><div id="body"></div></div></div><div id="toast"></div>
+<script src="app.js"></script></body></html>
