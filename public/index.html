@@ -1,58 +1,58 @@
 <!doctype html>
-<html lang="ru"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#031326"><title>Sdolars — Territory</title><link rel="stylesheet" href="styles.css">
-</head><body><div id="game">
-<header class="header">
-  <div class="player">
-    <div class="miniHero">🧔</div>
-    <div><h1>Sdolars</h1><p>Глава 5 · Уровень <b id="lvl">3</b></p><div class="xp"><i id="xp"></i></div><small><span id="xpN">120</span>/300</small></div>
-  </div>
-  <div class="currency">
-    <button data-add="gold">🪙 <b id="gold">1779</b> <strong>＋</strong></button>
-    <button data-add="gems">💎 <b id="gems">1330</b> <strong>＋</strong></button>
-    <button data-add="energy">⚡ <b id="energy">191.38</b> <strong>＋</strong></button>
-  </div>
-  <div class="quick">
-    <button data-open="messages">✉️<em>2</em><span>Сообщения</span></button>
-    <button data-open="achievements">🏆<span>Достижения</span></button>
-    <button data-open="settings">⚙️<span>Настройки</span></button>
-    <button>🇷🇺<span>RU</span></button>
-  </div>
-</header>
-
-<main class="city">
-  <div class="backdrop"></div>
-  <section class="quest card" data-open="quests">
-    <div class="bigIcon">📜</div><div><b>Текущее задание</b><h2 id="questName">Поговори с кузнецом</h2><span>📍 Кузница</span></div><strong>›</strong>
-  </section>
-  <section class="daily card"><div class="chest">🎁</div><div><b>Ежедневный бонус</b><h2 id="timer">23:45:12</h2></div></section>
-
-  <aside class="leftMenu">
-    <button data-open="bonuses">🎁<span>Бонусы</span><em>!</em></button>
-    <button data-open="events">🗓️<span>События</span><em>!</em></button>
-    <button data-open="vip">👑<span>VIP</span></button>
-  </aside>
-
-  <div class="viking">🧔<div>ВИКИНГ</div></div>
-
-  <aside class="locations">
-    <button data-open="forge">🔨<div><b>Кузница</b><small>Улучшение снаряжения</small></div><em>!</em></button>
-    <button data-open="tavern">🍺<div><b>Таверна</b><small>Найм героев</small></div><em>!</em></button>
-    <button data-open="shop">👜<div><b>Магазин</b><small>Предметы и снаряжение</small></div></button>
-  </aside>
-
-  <div class="actions">
-    <button class="blue" data-open="battle">⚔️<b>Бой</b></button>
-    <button class="gold" data-open="inventory">👜<b>Инвентарь</b><em id="inv">!</em></button>
-    <button class="purple" data-open="equipment">🛡️<b>Экипировка</b></button>
-    <button class="green" data-open="quests">📜<b>Задания</b><em>!</em></button>
-  </div>
-  <section class="reward card"><div>🎁</div><p><b>Бесплатные награды</b><small>Доступно через <strong id="timer2">23:45:12</strong></small></p><button id="claim">Получить</button></section>
-</main>
-
-<nav class="bottom">
- <button class="active">🏠<span>Город</span></button><button data-open="hero">⚔️<span>Герой</span></button><button data-open="inventory">🎒<span>Инвентарь</span></button><button data-open="quests">🛡️<span>Задания</span><em>!</em></button><button data-open="guild">👥<span>Гильдия</span></button><button data-open="more">☰<span>Ещё</span></button>
-</nav>
-<div id="modal" class="modal"><div class="window"><button id="close">×</button><div id="content"></div></div></div><div id="toast"></div>
-<script src="app.js"></script></body></html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#041326">
+<title>Territory — Sdolars</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#000;color:#fff;font-family:Arial,sans-serif}
+body{min-height:100vh;display:flex;justify-content:center;align-items:flex-start;overflow-x:hidden}
+#game{position:relative;width:min(100vw,1052px);aspect-ratio:1052/1536;background:#071529 url("assets/reference.png") top center/100% 100% no-repeat;overflow:hidden}
+.hot{position:absolute;border:0;background:transparent;border-radius:18px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hot:active{background:#36a9ff22;box-shadow:inset 0 0 25px #4db8ff33}
+#settings{left:77.5%;top:6.3%;width:11%;height:5.4%}
+#lang{left:89.3%;top:6.3%;width:9.3%;height:5.4%}
+#quest{left:1.8%;top:11.4%;width:38.5%;height:8.6%}
+#bonus{left:1.8%;top:23.0%;width:9%;height:6.5%}
+#events{left:1.8%;top:30.1%;width:9%;height:6.5%}
+#vip{left:1.8%;top:38.2%;width:9%;height:6.4%}
+#forge{left:70.5%;top:31.0%;width:28%;height:6.2%}
+#tavern{left:70.5%;top:39.4%;width:28%;height:6.2%}
+#shop{left:70.5%;top:48.0%;width:28%;height:6.4%}
+#battle{left:2.5%;top:57.1%;width:24.2%;height:10.4%}
+#inventory{left:28.3%;top:57.1%;width:24.2%;height:10.4%}
+#equipment{left:53.5%;top:57.1%;width:23%;height:10.4%}
+#quests{left:78%;top:57.1%;width:19.5%;height:10.4%}
+#claim{left:76.5%;top:70.4%;width:21%;height:7%}
+#navcity{left:1.2%;bottom:0;width:17.5%;height:12.5%}
+#navhero{left:18.8%;bottom:0;width:17%;height:12.5%}
+#navinv{left:36%;bottom:0;width:18%;height:12.5%}
+#navquests{left:54%;bottom:0;width:18%;height:12.5%}
+#navguild{left:72%;bottom:0;width:17%;height:12.5%}
+#navmore{left:89%;bottom:0;width:11%;height:12.5%}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+.modal.show{display:flex}.box{width:min(680px,94vw);max-height:88vh;overflow:auto;border:2px solid #258be0;border-radius:20px;background:linear-gradient(145deg,#061a31,#0a2a49);box-shadow:0 20px 70px #000;padding:22px;position:relative}
+.close{position:absolute;right:9px;top:7px;width:36px;height:36px;border:0;border-radius:50%;background:#9a1f28;color:#fff;font-size:25px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{padding:13px;border:1px solid #286eaa;border-radius:12px;background:#06172b}.tile button,.primary{margin-top:8px;border:0;border-radius:9px;padding:9px 13px;background:#0876c9;color:#fff;font-weight:800}
+.moves{display:grid;grid-template-columns:1fr 1fr;gap:8px}.moves button{padding:13px;border:1px solid #3587bc;border-radius:10px;background:#092f50;color:#fff}
+.hp{height:14px;background:#2b0810;border-radius:9px;overflow:hidden}.hp i{display:block;height:100%;background:#e83b4b}
+.arena{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:15px}.fighter{font-size:70px}.muted{color:#9fc6e5}
+#toast{position:fixed;z-index:100;left:50%;bottom:25px;transform:translate(-50%,20px);opacity:0;background:#071d34;border:1px solid #4baaf0;border-radius:12px;padding:11px 17px;transition:.2s;font-weight:800}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:700px){#game{width:100vw}.box{padding:17px}.grid{grid-template-columns:1fr 1fr}.fighter{font-size:55px}}
+</style>
+</head>
+<body>
+<div id="game">
+<button class="hot" id="settings"></button><button class="hot" id="lang"></button>
+<button class="hot" id="quest"></button><button class="hot" id="bonus"></button><button class="hot" id="events"></button><button class="hot" id="vip"></button>
+<button class="hot" id="forge"></button><button class="hot" id="tavern"></button><button class="hot" id="shop"></button>
+<button class="hot" id="battle"></button><button class="hot" id="inventory"></button><button class="hot" id="equipment"></button><button class="hot" id="quests"></button>
+<button class="hot" id="claim"></button>
+<button class="hot" id="navcity"></button><button class="hot" id="navhero"></button><button class="hot" id="navinv"></button><button class="hot" id="navquests"></button><button class="hot" id="navguild"></button><button class="hot" id="navmore"></button>
+</div>
+<div class="modal" id="modal"><div class="box"><button class="close" id="close">×</button><div id="content"></div></div></div>
+<div id="toast"></div>
+<script src="app.js"></script>
+</body></html>
