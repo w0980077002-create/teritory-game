@@ -1,94 +1,58 @@
 <!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#06182c">
-  <title>Sdolars — Territory</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div id="app">
-    <header class="topbar">
-      <div class="profile" data-action="hero">
-        <div class="avatar"><span id="avatarLevel">5</span></div>
-        <div class="profileText">
-          <div class="gameName">Sdolars</div>
-          <div class="chapter">Глава 5 · Уровень <b id="level">3</b></div>
-          <div class="xp"><i id="xpBar"></i></div>
-          <small><span id="xpText">120</span>/300 XP</small>
-        </div>
-      </div>
-      <div class="resources">
-        <button class="res" data-add="gold">🪙 <b id="gold">1779</b> <span>+</span></button>
-        <button class="res" data-add="gems">💎 <b id="gems">1330</b> <span>+</span></button>
-        <button class="res" data-add="energy">⚡ <b id="energy">191.38</b> <span>+</span></button>
-      </div>
-      <div class="topActions">
-        <button data-action="messages">✉️<em>2</em><span>Сообщения</span></button>
-        <button data-action="achievements">🏆<span>Достижения</span></button>
-        <button data-action="settings">⚙️<span>Настройки</span></button>
-        <button id="langBtn">🇷🇺<span>RU</span></button>
-      </div>
-    </header>
-
-    <main class="screen cityScreen">
-      <div class="cityBackdrop"></div>
-      <section class="questCard panel" data-action="quests">
-        <div class="scrollIcon">📜</div>
-        <div><strong>Текущее задание</strong><h3 id="questTitle">Поговори с кузнецом</h3><small>📍 Кузница</small></div>
-        <b class="arrow">›</b>
-      </section>
-
-      <div class="leftButtons">
-        <button data-action="bonuses">🎁<span>Бонусы</span><em>!</em></button>
-        <button data-action="events">🗓️<span>События</span><em>!</em></button>
-        <button data-action="vip">👑<span>VIP</span></button>
-      </div>
-
-      <div class="heroVisual">
-        <div class="heroGlow"></div>
-        <div class="heroFigure">⚔️</div>
-        <div class="heroCaption">ВИКИНГ</div>
-      </div>
-
-      <div class="rightBuildings">
-        <button data-action="forge">🔨<div><b>Кузница</b><small>Улучшение снаряжения</small></div><em>!</em></button>
-        <button data-action="tavern">🍺<div><b>Таверна</b><small>Найм героев</small></div><em>!</em></button>
-        <button data-action="shop">👜<div><b>Магазин</b><small>Предметы и снаряжение</small></div></button>
-      </div>
-
-      <div class="mainActions">
-        <button class="blue" data-action="battle">⚔️<b>Бой</b></button>
-        <button class="gold" data-action="inventory">👜<b>Инвентарь</b><em id="invBadge">!</em></button>
-        <button class="purple" data-action="equipment">🛡️<b>Экипировка</b></button>
-        <button class="green" data-action="quests">📜<b>Задания</b><em>!</em></button>
-      </div>
-
-      <section class="freeReward panel">
-        <div class="chest">🎁</div>
-        <div><b>Бесплатные награды</b><small>Доступно через <strong id="timer">23:45:12</strong></small></div>
-        <button id="claimReward">Получить</button>
-      </section>
-    </main>
-
-    <nav class="bottomNav">
-      <button class="active" data-action="city">🏠<span>Город</span></button>
-      <button data-action="hero">⚔️<span>Герой</span><em>!</em></button>
-      <button data-action="inventory">🎒<span>Инвентарь</span></button>
-      <button data-action="quests">🛡️<span>Задания</span><em>!</em></button>
-      <button data-action="guild">👥<span>Гильдия</span></button>
-      <button data-action="more">☰<span>Ещё</span></button>
-    </nav>
-
-    <div id="modal" class="modal hidden">
-      <div class="modalBox">
-        <button class="close" id="closeModal">×</button>
-        <div id="modalContent"></div>
-      </div>
-    </div>
-    <div id="toast"></div>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#031326"><title>Sdolars — Territory</title><link rel="stylesheet" href="styles.css">
+</head><body><div id="game">
+<header class="header">
+  <div class="player">
+    <div class="miniHero">🧔</div>
+    <div><h1>Sdolars</h1><p>Глава 5 · Уровень <b id="lvl">3</b></p><div class="xp"><i id="xp"></i></div><small><span id="xpN">120</span>/300</small></div>
   </div>
-  <script src="app.js"></script>
-</body>
-</html>
+  <div class="currency">
+    <button data-add="gold">🪙 <b id="gold">1779</b> <strong>＋</strong></button>
+    <button data-add="gems">💎 <b id="gems">1330</b> <strong>＋</strong></button>
+    <button data-add="energy">⚡ <b id="energy">191.38</b> <strong>＋</strong></button>
+  </div>
+  <div class="quick">
+    <button data-open="messages">✉️<em>2</em><span>Сообщения</span></button>
+    <button data-open="achievements">🏆<span>Достижения</span></button>
+    <button data-open="settings">⚙️<span>Настройки</span></button>
+    <button>🇷🇺<span>RU</span></button>
+  </div>
+</header>
+
+<main class="city">
+  <div class="backdrop"></div>
+  <section class="quest card" data-open="quests">
+    <div class="bigIcon">📜</div><div><b>Текущее задание</b><h2 id="questName">Поговори с кузнецом</h2><span>📍 Кузница</span></div><strong>›</strong>
+  </section>
+  <section class="daily card"><div class="chest">🎁</div><div><b>Ежедневный бонус</b><h2 id="timer">23:45:12</h2></div></section>
+
+  <aside class="leftMenu">
+    <button data-open="bonuses">🎁<span>Бонусы</span><em>!</em></button>
+    <button data-open="events">🗓️<span>События</span><em>!</em></button>
+    <button data-open="vip">👑<span>VIP</span></button>
+  </aside>
+
+  <div class="viking">🧔<div>ВИКИНГ</div></div>
+
+  <aside class="locations">
+    <button data-open="forge">🔨<div><b>Кузница</b><small>Улучшение снаряжения</small></div><em>!</em></button>
+    <button data-open="tavern">🍺<div><b>Таверна</b><small>Найм героев</small></div><em>!</em></button>
+    <button data-open="shop">👜<div><b>Магазин</b><small>Предметы и снаряжение</small></div></button>
+  </aside>
+
+  <div class="actions">
+    <button class="blue" data-open="battle">⚔️<b>Бой</b></button>
+    <button class="gold" data-open="inventory">👜<b>Инвентарь</b><em id="inv">!</em></button>
+    <button class="purple" data-open="equipment">🛡️<b>Экипировка</b></button>
+    <button class="green" data-open="quests">📜<b>Задания</b><em>!</em></button>
+  </div>
+  <section class="reward card"><div>🎁</div><p><b>Бесплатные награды</b><small>Доступно через <strong id="timer2">23:45:12</strong></small></p><button id="claim">Получить</button></section>
+</main>
+
+<nav class="bottom">
+ <button class="active">🏠<span>Город</span></button><button data-open="hero">⚔️<span>Герой</span></button><button data-open="inventory">🎒<span>Инвентарь</span></button><button data-open="quests">🛡️<span>Задания</span><em>!</em></button><button data-open="guild">👥<span>Гильдия</span></button><button data-open="more">☰<span>Ещё</span></button>
+</nav>
+<div id="modal" class="modal"><div class="window"><button id="close">×</button><div id="content"></div></div></div><div id="toast"></div>
+<script src="app.js"></script></body></html>
