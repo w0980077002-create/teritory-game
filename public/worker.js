@@ -70,7 +70,7 @@ const ENEMIES=[
     const idx=Math.min(ENEMIES.length-1,Math.floor((state.wins||0)/3)); const e=ENEMIES[idx];
     const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const pname=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||state.playerName||'Игрок';
     const pimg=document.querySelector('.avatar img')?.src||'';
-    const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(state.hp??state.maxHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
+    const safeBattleHp=(Number(state.hp)>0?Number(state.hp):Number(state.maxHp)); if(Number(state.hp)<=0){state.hp=state.maxHp; save(); toast('❤️ HP восстановлено перед боем')} const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(safeBattleHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
     pt.textContent='⚔️ Бой — арена Sdolars';
     pb.innerHTML=\`<div class="vikingBattle">
       <div class="fighters">
@@ -470,7 +470,7 @@ function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked||b.ended)re
   const eHp=document.getElementById('enemyHp'),pHp=document.getElementById('playerHp');if(eHp)eHp.textContent=b.hp+'/100 HP';if(pHp)pHp.textContent=b.playerHp+'/'+state.maxHp+' HP';const eb=document.getElementById('enemyBar'),pbar=document.getElementById('playerBar');if(eb)eb.style.width=b.hp+'%';if(pbar)pbar.style.width=Math.max(0,b.playerHp/state.maxHp*100)+'%';const turn=document.getElementById('turnNo');if(turn)turn.textContent=b.turn;
   const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⚔️ Ты: <b>'+ZONES[b.attack]+'</b> — '+(playerAttackHits?'попадание':'промах')+(crit?' · <b>КРИТ!</b>':'')+' · '+playerDamage+' урона</div><div>🛡️ Твоя защита: '+ZONES[b.defs[0]]+', '+ZONES[b.defs[1]]+' — '+(blocked?'блок':'не блок')+(dodged?' · уклонение':'')+'</div><div>🪓 Тролль: <b>'+ZONES[b.enemyAttack]+'</b> — '+(blocked?'заблокировано':dodged?'уклонение':'урон '+enemyDamage)+'</div>';
   if(b.hp<=0){b.ended=true;stopAutoBattle();state.coins+=200;state.exp+=40;state.wins++;state.eventProgress=Math.min(10,state.eventProgress+1);checkLevelUp();save();if(log)log.innerHTML='<b>🏆 Победа над Ледяным троллем! +200 🪙 +40 XP</b><br>'+log.innerHTML;setTimeout(closeP,1100);return}
-  if(b.playerHp<=0){b.ended=true;stopAutoBattle();if(log)log.innerHTML='<b>💀 Ледяной тролль победил.</b><br>'+log.innerHTML;setTimeout(closeP,1100);return}
+  if(b.playerHp<=0){b.ended=true;stopAutoBattle();state.hp=state.maxHp;save();if(log)log.innerHTML='<b>💀 Ледяной тролль победил.</b><br>❤️ HP восстановлено до '+state.maxHp+'.<br>'+log.innerHTML;setTimeout(closeP,1100);return}
   b.attack=null;b.defs=[];b.turn++;document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));const dc=document.getElementById('dc');if(dc)dc.textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},fromAuto?350:250)
 }
 function checkLevelUp(){state.maxExp??=100;while(state.exp>=state.maxExp){state.exp-=state.maxExp;state.level++;state.freePoints=(state.freePoints||0)+2;state.maxHp+=10;toast('⬆️ Новый уровень! +2 очка характеристик');}save()}
@@ -502,7 +502,7 @@ const ENEMIES=[
     const idx=Math.min(ENEMIES.length-1,Math.floor((state.wins||0)/3)); const e=ENEMIES[idx];
     const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const pname=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||state.playerName||'Игрок';
     const pimg=document.querySelector('.avatar img')?.src||'';
-    const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(state.hp??state.maxHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
+    const safeBattleHp=(Number(state.hp)>0?Number(state.hp):Number(state.maxHp)); if(Number(state.hp)<=0){state.hp=state.maxHp; save(); toast('❤️ HP восстановлено перед боем')} const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(safeBattleHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
     pt.textContent='⚔️ Бой — арена Sdolars';
     pb.innerHTML=\`<div class="vikingBattle">
       <div class="fighters">
@@ -908,7 +908,7 @@ export class GameHub extends DurableObject {
   }
   action(pid,name,a){let s=this.getState(pid);if(!s)return json({ok:false,error:'player_not_initialized'},400);const type=String(a.type||'');
     if(type==='battle.reward'){const idx=Math.min(ENEMIES.length-1,Math.floor((s.wins||0)/3)),e=ENEMIES[idx];s.coins+=e.reward;s.exp+=e.xp;s.wins++;s.battles++;s.hp=s.maxHp;while(s.exp>=s.maxExp){s.exp-=s.maxExp;s.level++;s.maxExp=Math.round(s.maxExp*1.25);s.maxHp+=8;s.hp=s.maxHp;s.freePoints+=2}s=this.putState(pid,name,s);return json({ok:true,player:s,reward:{coins:e.reward,xp:e.xp}})}
-    if(type==='battle.loss'){s.losses++;s.battles++;s.hp=Math.max(1,Math.round(s.maxHp*.35));s=this.putState(pid,name,s);return json({ok:true,player:s})}
+    if(type==='battle.loss'){s.losses++;s.battles++;s.hp=s.maxHp;s=this.putState(pid,name,s);return json({ok:true,player:s})}
     if(type==='quest.complete'){if(s.questDone)return json({ok:false,error:'already_claimed'},409);s.questDone=true;s.coins+=150;s.exp+=80;s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s})}
     if(type==='bonus.claim'){if(s.bonusClaimed)return json({ok:false,error:'already_claimed'},409);s.bonusClaimed=true;s.coins+=250;s.exp+=20;s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s})}
     if(type==='stat.add'){const k=a.stat;if(!['strength','agility'].includes(k)||s.freePoints<=0)return json({ok:false,error:'invalid_stat'},400);s[k]++;s.freePoints--;s=this.putState(pid,name,s);return json({ok:true,player:s})}
