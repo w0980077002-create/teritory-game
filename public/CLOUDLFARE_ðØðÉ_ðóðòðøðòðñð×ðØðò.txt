@@ -1,0 +1,9 @@
+s39 — Territory Sdolars
+
+В репозиторий загружаются только:
+worker.js
+package.json
+wrangler.jsonc
+
+Cloudflare Workers & Pages → territory-sdolars-server → Deployments.
+После публикации открыть игру по адресу Worker и проверить город → Бой.

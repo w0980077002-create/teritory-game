@@ -44,9 +44,13 @@ async function telegramAuth(initData,botToken,maxAge=86400){
 async function authRequest(request,env){
   const init=request.headers.get('X-Telegram-Init-Data')||new URL(request.url).searchParams.get('initData');
   if(env.TELEGRAM_BOT_TOKEN){return telegramAuth(init,env.TELEGRAM_BOT_TOKEN)}
-  if(env.ALLOW_GUESTS==='true'){
+  /* Development/test fallback: if Telegram bot secret is not configured,
+     keep the game playable on Cloudflare using a stable guest id.
+     Telegram authentication becomes authoritative automatically once
+     TELEGRAM_BOT_TOKEN is added as a Worker secret. */
+  {
     const gid=cleanId(request.headers.get('X-Guest-Id')||'guest_'+(crypto.randomUUID?.()||Math.random().toString(36).slice(2)));
-    return {playerId:gid,name:safeName(request.headers.get('X-Guest-Name')||'Гость'),telegramId:null,username:''};
+    return {playerId:gid,name:safeName(request.headers.get('X-Guest-Name')||'Игрок'),telegramId:null,username:'',guest:true};
   }
   return null;
 }
@@ -924,6 +928,15 @@ const ENEMIES=[
     return previousOpenP(k);
   };
 })();
+<script>
+/* ===== s39 SERVER AUTHORITATIVE PVE ===== */
+(function(){
+  const oldBattle=window.battle, oldStrike=window.strikeTurn;
+  function authHeaders(){const h={'Content-Type':'application/json'};const d=window.Telegram?.WebApp?.initData||'';if(d)h['X-Telegram-Init-Data']=d;else{h['X-Guest-Id']=localStorage.getItem('territory_guest_id')||'';h['X-Guest-Name']=state.playerName||'Игрок'}return h}
+  async function api(type,payload){try{const r=await fetch('/api/action',{method:'POST',headers:authHeaders(),body:JSON.stringify({type,...payload})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'server_error');return j}catch(e){console.warn('s39',type,e);return null}}
+  window.battle=async function(){oldBattle();const b=window._battle;if(!b)return;b.serverReady=false;const btn=document.querySelector('.goldBtn');if(btn){btn.disabled=true;btn.textContent='⌛ Подготовка боя...'}const j=await api('battle.start',{});if(j?.battle){b.serverId=j.battle.id;b.hp=j.battle.enemyHp;b.playerHp=j.battle.playerHp;b.maxPlayerHp=j.battle.maxPlayerHp;b.maxHp=j.battle.enemy.hp;b.enemy=j.battle.enemy;b.turn=j.battle.turn;b.serverReady=true;if(btn){btn.disabled=false;btn.textContent='⚔️ Сделать ход'}document.getElementById('enemyHp').textContent=b.hp+'/'+b.maxHp+' HP';document.getElementById('playerHp').textContent=b.playerHp+'/'+b.maxPlayerHp+' HP';}else{if(btn)btn.disabled=false;toast('Сервер боя недоступен')}};
+  window.strikeTurn=async function(){const b=window._battle;if(!b||b.locked||b.hp<=0||b.playerHp<=0)return;if(b.attack===null||b.defs.length!==2){toast('Выбери атаку и 2 зоны защиты');return}if(!b.serverId)return oldStrike();b.locked=true;const j=await api('battle.move',{battleId:b.serverId,attack:b.attack,defs:b.defs});if(!j?.battle){b.locked=false;toast('Ход не принят сервером');return}const x=j.battle;if(j.player)Object.assign(state,j.player);b.hp=x.enemyHp;b.playerHp=x.playerHp;b.turn=x.turn;state.hp=b.playerHp;const Z=window.ZONES||['Голова','Грудь','Живот','Пояс','Ноги'];const eb=document.getElementById('enemyBar'),pb=document.getElementById('playerBar');if(eb)eb.style.width=(b.hp/b.maxHp*100)+'%';if(pb)pb.style.width=(b.playerHp/b.maxPlayerHp*100)+'%';document.getElementById('enemyHp').textContent=b.hp+'/'+b.maxHp+' HP';document.getElementById('playerHp').textContent=b.playerHp+'/'+b.maxPlayerHp+' HP';document.getElementById('turnNo').textContent=b.turn;const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⚔️ '+Z[x.attack]+' — '+(x.hit?'попадание':'промах')+(x.crit?' · <b>КРИТ!</b>':'')+' · '+x.playerDamage+' урона</div><div>🛡️ '+Z[x.defs[0]]+', '+Z[x.defs[1]]+' — '+(x.blocked?'блок':'не блок')+'</div><div>👹 '+Z[x.enemyAttack]+' — '+(x.dodge?'уклонение':x.blocked?'заблокировано':'-'+x.enemyDamage+' HP')+'</div>';if(x.result==='win'){log.innerHTML='<b>🏆 ПОБЕДА!</b> +'+x.reward.coins+' 🪙 +'+x.reward.xp+' XP<br>'+log.innerHTML;toast('🏆 Победа!');setTimeout(closeP,900);return}if(x.result==='loss'){log.innerHTML='<b>💀 ПОРАЖЕНИЕ</b><br>'+log.innerHTML;toast('💀 Поражение');setTimeout(closeP,1000);return}b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(q=>q.classList.remove('sel'));document.getElementById('dc').textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},220);if(typeof save==='function')save()};
+})();
 </script></body></html>
 
 state.maxHp??=120; state.strength??=12; state.agility??=9; state.wins??=0; state.eventProgress??=0; state.guildMembers??=1; state.recruited??=[]; state.settings??={sound:true,fx:true}; state.lang??='RU';
@@ -933,10 +946,20 @@ export default {
   async fetch(request,env){
     const url=new URL(request.url);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'Content-Type,Authorization,X-Telegram-Init-Data,X-Guest-Id,X-Guest-Name'}});
-    if(url.pathname==='/api/health')return json({ok:true,service:'Territory Sdolars',version:'s37',serverTime:Date.now(),telegramAuth:!!env.TELEGRAM_BOT_TOKEN});
+    if(url.pathname==='/api/health')return json({ok:true,service:'Territory Sdolars',version:'s39',serverTime:Date.now(),telegramAuth:!!env.TELEGRAM_BOT_TOKEN});
     if(url.pathname==='/api/auth'&&request.method==='POST'){
       const auth=await authRequest(request,env); if(!auth)return json({ok:false,error:'telegram_auth_required'},401);
       const id=env.GAME_HUB.idFromName('main'); return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/auth',request.url),{method:'POST',headers:{'content-type':'application/json','x-player-id':auth.playerId,'x-player-name':auth.name,'x-telegram-id':auth.telegramId||''},body:JSON.stringify({seed:await request.json().catch(()=>null),auth})}));
+    }
+    if((url.pathname.startsWith('/api/player/')) && (request.method==='GET' || request.method==='POST')){
+      const auth=await authRequest(request,env);if(!auth)return json({ok:false,error:'auth_required'},401);
+      const requested=cleanId(decodeURIComponent(url.pathname.slice('/api/player/'.length)));
+      /* Only allow the authenticated player id; never let a client read another player. */
+      if(requested && requested!==auth.playerId)return json({ok:false,error:'forbidden'},403);
+      const id=env.GAME_HUB.idFromName('main');
+      if(request.method==='GET')return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/me',request.url),{headers:{'x-player-id':auth.playerId,'x-player-name':auth.name}}));
+      const body=await request.text();
+      return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/auth',request.url),{method:'POST',headers:{'content-type':'application/json','x-player-id':auth.playerId,'x-player-name':auth.name,'x-telegram-id':auth.telegramId||''},body}));
     }
     if(url.pathname==='/api/me'&&request.method==='GET'){
       const auth=await authRequest(request,env);if(!auth)return json({ok:false,error:'telegram_auth_required'},401);
@@ -965,7 +988,7 @@ export default {
 };
 
 export class GameHub extends DurableObject {
-  constructor(ctx,env){super(ctx,env);this.ctx=ctx;this.env=env;this.sql=ctx.storage.sql;this.sql.exec(`CREATE TABLE IF NOT EXISTS players (player_id TEXT PRIMARY KEY,name TEXT NOT NULL,state_json TEXT NOT NULL,updated_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS guilds (guild_id TEXT PRIMARY KEY,name TEXT NOT NULL,owner_id TEXT NOT NULL,created_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS guild_members (guild_id TEXT NOT NULL,player_id TEXT NOT NULL,role TEXT NOT NULL,PRIMARY KEY(guild_id,player_id));`);this.matches=new Map();this.pending=new Map()}
+  constructor(ctx,env){super(ctx,env);this.ctx=ctx;this.env=env;this.sql=ctx.storage.sql;this.sql.exec(`CREATE TABLE IF NOT EXISTS players (player_id TEXT PRIMARY KEY,name TEXT NOT NULL,state_json TEXT NOT NULL,updated_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS guilds (guild_id TEXT PRIMARY KEY,name TEXT NOT NULL,owner_id TEXT NOT NULL,created_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS guild_members (guild_id TEXT NOT NULL,player_id TEXT NOT NULL,role TEXT NOT NULL,PRIMARY KEY(guild_id,player_id));`);this.matches=new Map();this.pending=new Map();this.pveBattles=new Map()}
   sockets(){return this.ctx.getWebSockets()}
   attachment(ws){return ws.deserializeAttachment?.()||null}
   ensureMeta(s){
@@ -1002,6 +1025,33 @@ export class GameHub extends DurableObject {
     return new Response('not found',{status:404});
   }
   action(pid,name,a){let s=this.getState(pid);if(!s)return json({ok:false,error:'player_not_initialized'},400);const type=String(a.type||'');
+    if(type==='battle.start'){
+      const existing=[...this.pveBattles.values()].find(x=>x.playerId===pid&&!x.done);
+      if(existing)return json({ok:true,player:s,battle:{id:existing.id,enemy:existing.enemy,enemyIndex:existing.enemyIndex,playerHp:existing.playerHp,maxPlayerHp:existing.maxPlayerHp,enemyHp:existing.enemyHp,turn:existing.turn}});
+      const idx=Math.min(ENEMIES.length-1,Math.floor((s.wins||0)/3)),e=ENEMIES[idx];
+      const id='pve_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
+      const b={id,playerId:pid,enemyIndex:idx,enemy:e,playerHp:Math.min(Number(s.hp)||s.maxHp,s.maxHp),maxPlayerHp:s.maxHp,enemyHp:e.hp,turn:1,done:false,createdAt:Date.now()};
+      this.pveBattles.set(id,b);
+      return json({ok:true,player:s,battle:{id,enemy:e,enemyIndex:idx,playerHp:b.playerHp,maxPlayerHp:b.maxPlayerHp,enemyHp:b.enemyHp,turn:1}});
+    }
+    if(type==='battle.move'){
+      const id=safeName(a.battleId||''),b=this.pveBattles.get(id);
+      if(!b||b.playerId!==pid||b.done)return json({ok:false,error:'battle_not_found'},404);
+      if(Date.now()-b.createdAt>30*60*1000){this.pveBattles.delete(id);return json({ok:false,error:'battle_expired'},410)}
+      const attack=Number(a.attack),defs=Array.isArray(a.defs)?a.defs.map(Number):[];
+      if(!Number.isInteger(attack)||!ZONES.includes(attack)||defs.length!==2||defs[0]===defs[1]||!defs.every(x=>Number.isInteger(x)&&ZONES.includes(x)))return json({ok:false,error:'invalid_move'},400);
+      const enemyAttack=Math.floor(Math.random()*5),enemyDefs=[];while(enemyDefs.length<2){const x=Math.floor(Math.random()*5);if(!enemyDefs.includes(x))enemyDefs.push(x)}
+      const weapon=(s.items||[]).find(x=>x.equipped&&x.type==='Оружие'),armor=(s.items||[]).find(x=>x.equipped&&x.type==='Броня');
+      const totalDamage=15+(weapon?.damage||0)+Math.floor((s.strength||0)*.7),totalDefense=(armor?.defense||0)+Math.floor((s.agility||0)*.35);
+      const hit=!enemyDefs.includes(attack),crit=hit&&Math.random()<Math.min(.45,.06+(s.strength||0)*.012),dodge=Math.random()<Math.min(.35,.03+(s.agility||0)*.012);
+      const playerDamage=hit?(crit?Math.round(totalDamage*1.5):totalDamage):0,blocked=defs.includes(enemyAttack),enemyDamage=blocked||dodge?0:Math.max(1,b.enemy.damage+Math.floor(Math.random()*5)-Math.floor(totalDefense*.35));
+      b.enemyHp=Math.max(0,b.enemyHp-playerDamage);b.playerHp=Math.max(0,b.playerHp-enemyDamage);b.turn++;
+      let result='continue';if(b.enemyHp<=0)result='win';else if(b.playerHp<=0)result='loss';
+      if(result==='win'){b.done=true;s.coins+=b.enemy.reward;s.exp+=b.enemy.xp;s.wins++;s.battles++;s.hp=s.maxHp;const wm=s.dailyMissions?.items?.find(x=>x.id==='wins');if(wm)wm.progress=Math.min(wm.goal,(wm.progress||0)+1);this.level(s);this.putState(pid,name,s);this.pveBattles.delete(id)}
+      else if(result==='loss'){b.done=true;s.losses++;s.battles++;s.hp=Math.max(1,Math.round(s.maxHp*.35));this.putState(pid,name,s);this.pveBattles.delete(id)}
+      else{this.putState(pid,name,{...s,hp:b.playerHp})}
+      return json({ok:true,player:s,battle:{id,turn:b.turn,enemyHp:b.enemyHp,playerHp:b.playerHp,enemyAttack,enemyDefs,attack,defs,hit,crit,dodge,blocked,playerDamage,enemyDamage,result,reward:result==='win'?{coins:b.enemy.reward,xp:b.enemy.xp}:null}});
+    }
     if(type==='battle.reward'){const idx=Math.min(ENEMIES.length-1,Math.floor((s.wins||0)/3)),e=ENEMIES[idx];s.coins+=e.reward;s.exp+=e.xp;s.wins++;s.battles++;s.hp=s.maxHp;const wm=s.dailyMissions?.items?.find(x=>x.id==='wins');if(wm)wm.progress=Math.min(wm.goal,(wm.progress||0)+1);while(s.exp>=s.maxExp){s.exp-=s.maxExp;s.level++;s.maxExp=Math.round(s.maxExp*1.25);s.maxHp+=8;s.hp=s.maxHp;s.freePoints+=2}s=this.putState(pid,name,s);return json({ok:true,player:s,reward:{coins:e.reward,xp:e.xp}})}
     if(type==='battle.loss'){s.losses++;s.battles++;s.hp=Math.max(1,Math.round(s.maxHp*.35));s=this.putState(pid,name,s);return json({ok:true,player:s})}
     if(type==='quest.complete'){if(s.questDone)return json({ok:false,error:'already_claimed'},409);s.questDone=true;s.coins+=150;s.exp+=80;s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s})}
