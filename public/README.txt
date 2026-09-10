@@ -1,3 +1,2 @@
-Territory — Sdolars GAME s11
-Language switching RU / EN implemented.
-Main page layout preserved.
+Territory — Sdolars s12 FIX
+База: s11. Исправлены кнопки чата, добавлены 10 смайликов и онлайн WebSocket-чат. Остальные игровые кнопки не заменялись. Для реального онлайна: npm install && npm start и открыть игру через этот сервер.
