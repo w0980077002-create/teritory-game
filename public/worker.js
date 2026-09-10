@@ -1,121 +1,10 @@
-import { DurableObject } from "cloudflare:workers";
-
-const MAX_STATE_BYTES = 900_000;
-const ZONES = [0,1,2,3,4];
-const MAX_NAME = 40;
-const START = {coins:1779, gems:1330, energy:191.38, hp:120, maxHp:120, level:3, exp:120, maxExp:150, strength:12, agility:9, freePoints:0, wins:0, losses:0, battles:0};
-const ENEMIES = [
-  {name:'Уличный боец',hp:90,damage:8,def:3,reward:90,xp:25},
-  {name:'Наёмник',hp:125,damage:11,def:6,reward:130,xp:35},
-  {name:'Ледяной тролль',hp:170,damage:14,def:9,reward:200,xp:50},
-  {name:'Арена чемпион',hp:230,damage:18,def:12,reward:320,xp:80}
-];
-function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','access-control-allow-origin':'*','access-control-allow-headers':'Content-Type,Authorization,X-Telegram-Init-Data'}})}
-function cleanId(v){return String(v??'').replace(/[^a-zA-Z0-9_:@.-]/g,'').slice(0,120)}
-function safeName(v){return String(v??'Игрок').replace(/[<>]/g,'').slice(0,MAX_NAME)||'Игрок'}
-function validMove(m){const attack=Number(m.attack),defs=Array.isArray(m.defs)?m.defs.map(Number):[];return Number.isInteger(attack)&&ZONES.includes(attack)&&defs.length===2&&defs[0]!==defs[1]&&defs.every(x=>Number.isInteger(x)&&ZONES.includes(x))}
-function esc(s){return String(s??'').replace(/[<>]/g,'')}
-
-async function hmacHex(keyBytes,data){const key=await crypto.subtle.importKey('raw',keyBytes,{name:'HMAC',hash:'SHA-256'},false,['sign']);const sig=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(data));return [...new Uint8Array(sig)].map(b=>b.toString(16).padStart(2,'0')).join('')}
-async function telegramAuth(initData,botToken,maxAge=86400){
-  if(!initData||!botToken)return null;
-  const p=new URLSearchParams(initData), hash=p.get('hash'); if(!hash)return null;
-  const authDate=Number(p.get('auth_date')||0); if(!authDate||Date.now()/1000-authDate>maxAge)return null;
-  p.delete('hash'); const dataCheck=[...p.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>`${k}=${v}`).join('\n');
-  const secretBuf=await crypto.subtle.sign('HMAC',await crypto.subtle.importKey('raw',new TextEncoder().encode('WebAppData'),{name:'HMAC',hash:'SHA-256'},false,['sign']),new TextEncoder().encode(botToken));
-  const calc=await hmacHex(secretBuf,dataCheck); if(calc!==hash)return null;
-  let user; try{user=JSON.parse(p.get('user')||'{}')}catch{return null}
-  if(!user?.id)return null;
-  return {playerId:'tg_'+String(user.id),name:safeName([user.first_name,user.last_name].filter(Boolean).join(' ')||user.username||'Игрок'),telegramId:String(user.id),username:safeName(user.username||'')};
-}
-async function authRequest(request,env){
-  const init=request.headers.get('X-Telegram-Init-Data')||new URL(request.url).searchParams.get('initData');
-  if(env.TELEGRAM_BOT_TOKEN){return telegramAuth(init,env.TELEGRAM_BOT_TOKEN)}
-  if(env.ALLOW_GUESTS==='true'){
-    const gid=cleanId(request.headers.get('X-Guest-Id')||'guest_'+(crypto.randomUUID?.()||Math.random().toString(36).slice(2)));
-    return {playerId:gid,name:safeName(request.headers.get('X-Guest-Name')||'Гость'),telegramId:null,username:''};
-  }
-  return null;
-}
-function sanitizedSeed(seed,auth){
-  const s=seed&&typeof seed==='object'?seed:{};
-  const items=Array.isArray(s.items)?s.items.slice(0,80).map(x=>({id:String(x.id||''),name:safeName(x.name||'Предмет'),type:safeName(x.type||'Предмет'),icon:String(x.icon||'🎒').slice(0,8),damage:Math.min(100,Math.max(0,Number(x.damage)||0)),defense:Math.min(100,Math.max(0,Number(x.defense)||0)),qty:Math.min(99,Math.max(1,Number(x.qty)||1)),equipped:!!x.equipped})):[];
-  return {playerName:auth.name,coins:Math.min(5000,Math.max(0,Number(s.coins)||START.coins)),gems:Math.min(5000,Math.max(0,Number(s.gems)||START.gems)),energy:Math.min(500,Math.max(0,Number(s.energy)||START.energy)),hp:Math.min(START.maxHp,Math.max(1,Number(s.hp)||START.hp)),maxHp:Math.min(500,Math.max(100,Number(s.maxHp)||START.maxHp)),level:Math.min(50,Math.max(1,Number(s.level)||START.level)),exp:Math.min(9999,Math.max(0,Number(s.exp)||START.exp)),maxExp:Math.min(9999,Math.max(100,Number(s.maxExp)||START.maxExp)),strength:Math.min(100,Math.max(1,Number(s.strength)||START.strength)),agility:Math.min(100,Math.max(1,Number(s.agility)||START.agility)),freePoints:Math.min(100,Math.max(0,Number(s.freePoints)||0)),wins:Math.min(99999,Math.max(0,Number(s.wins)||0)),losses:Math.min(99999,Math.max(0,Number(s.losses)||0)),battles:Math.min(99999,Math.max(0,Number(s.battles)||0)),items,lang:s.lang==='EN'?'EN':'RU',questDone:!!s.questDone,bonusClaimed:!!s.bonusClaimed,recruited:Array.isArray(s.recruited)?s.recruited.slice(0,20).map(x=>safeName(x)):[],guildMembers:Math.min(100,Math.max(1,Number(s.guildMembers)||1))};
-}
-
-const INDEX_HTML = String.raw`<!doctype html>
+// Territory — Sdolars s47 VIDEO BASE
+// Frontend is the recovered s12-era build matching the supplied gameplay video.
+const HTML = String.raw`<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<script src="https://telegram.org/js/telegram-web-app.js">
-
-/* ===== s15 PLAYABLE GAME LOOP ===== */
-(function(){
-  const Z=window.ZONES||['Голова','Грудь','Живот','Пояс','Ноги'];
-  const ENEMY_FALLBACK='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 260"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#263f4b"/><stop offset="1" stop-color="#07131e"/></linearGradient></defs><rect width="320" height="260" rx="22" fill="#071522"/><path d="M55 250Q60 145 160 135Q260 145 265 250Z" fill="url(#g)" stroke="#6d858d" stroke-width="7"/><path d="M72 95Q75 30 125 28Q160 8 195 28Q245 30 248 95L230 155Q205 190 160 195Q115 190 90 155Z" fill="#82998f" stroke="#304a43" stroke-width="7"/><path d="M75 65Q45 42 57 7Q70 39 103 38M245 65Q275 42 263 7Q250 39 217 38" fill="#d7ceb1" stroke="#68614e" stroke-width="6"/><path d="M95 94Q116 76 137 94M183 94Q204 76 225 94" stroke="#263832" stroke-width="13" fill="none" stroke-linecap="round"/><circle cx="120" cy="102" r="8" fill="#ffd84d"/><circle cx="200" cy="102" r="8" fill="#ffd84d"/><path d="M125 140Q160 160 195 140Q187 180 160 181Q133 180 125 140Z" fill="#243934"/><path d="M145 157L153 174M175 157L167 174" stroke="#efe6ca" stroke-width="8" stroke-linecap="round"/><path d="M82 54Q160 15 238 54L230 75Q160 45 90 75Z" fill="#253d4b" stroke="#6b8792" stroke-width="6"/></svg>');
-const ENEMIES=[
-    {name:'Уличный боец',role:'Разбойник',hp:90,damage:8,def:3,reward:90,xp:25},
-    {name:'Наёмник',role:'Воин Sdolars',hp:125,damage:11,def:6,reward:130,xp:35},
-    {name:'Ледяной тролль',role:'Монстр',hp:170,damage:14,def:9,reward:200,xp:50},
-    {name:'Арена чемпион',role:'Элитный боец',hp:230,damage:18,def:12,reward:320,xp:80}
-  ];
-  state.maxExp=state.maxExp||150; state.level=state.level||1; state.hp=state.hp??state.maxHp; state.freePoints=state.freePoints||0; state.battles=state.battles||0; state.losses=state.losses||0;
-  function levelUp(){ while(state.exp>=state.maxExp){state.exp-=state.maxExp;state.level++;state.maxExp=Math.round(state.maxExp*1.25);state.maxHp+=8;state.freePoints+=2;state.hp=state.maxHp;toast('⬆️ Уровень повышен! +2 очка');} }
-  const oldSave=window.save; window.save=function(){levelUp(); oldSave();};
-  function totalD(){return 15+(state.items.find(x=>x.equipped&&x.type==='Оружие')?.damage||0)+Math.floor((state.strength||0)*.7)}
-  function totalA(){return state.agility||0}
-  window.totalDamage=totalD;
-  window.battle=function(){
-    if(window.stopAutoBattle)try{stopAutoBattle()}catch(e){}
-    const idx=Math.min(ENEMIES.length-1,Math.floor((state.wins||0)/3)); const e=ENEMIES[idx];
-    const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const pname=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||state.playerName||'Игрок';
-    const pimg=document.querySelector('.avatar img')?.src||'';
-    const safeBattleHp=(Number(state.hp)>0?Number(state.hp):Number(state.maxHp)); if(Number(state.hp)<=0){state.hp=state.maxHp; save(); toast('❤️ HP восстановлено перед боем')} const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(safeBattleHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
-    pt.textContent='⚔️ Бой — арена Sdolars';
-    pb.innerHTML=\`<div class="vikingBattle">
-      <div class="fighters">
-       <div class="fighter"><img id="battlePlayerImg" src="\${pimg}"><div class="fighterName">\${chatEsc(pname)}</div><div class="fighterRole">⚔️ Уровень \${state.level}</div><div class="fhp"><i id="playerBar" style="width:\${b.playerHp/state.maxHp*100}%"></i></div><div class="fhpText" id="playerHp">\${b.playerHp}/\${state.maxHp} HP</div></div>
-       <div class="fighter enemy"><img id="battleEnemyImg" src="\${e.image||ENEMY_FALLBACK}" onerror="this.onerror=null;this.src=ENEMY_FALLBACK"><div class="fighterName">\${e.name}</div><div class="fighterRole">👹 \${e.role}</div><div class="fhp"><i id="enemyBar" style="width:100%"></i></div><div class="fhpText" id="enemyHp">\${e.hp}/\${e.hp} HP</div></div>
-      </div>
-      <div class="card"><b>Противник: \${e.name}</b><p>❤️ \${e.hp} HP · ⚔️ \${e.damage} · 🛡️ \${e.def}</p></div>
-      <div class="autoRow"><button class="autoBtn" id="autoBtn" onclick="toggleAutoBattle()">▶ АВТОБОЙ</button></div>
-      <div class="autoHint" id="autoHint">Автобой сам выбирает атаку и 2 зоны защиты.</div>
-      <div class="card"><b>Ход: <span id="turnNo">1</span></b></div>
-      <div class="card"><b>Атака — выбери 1 зону</b><div class="zones" id="attacks">\${Z.map((x,i)=>\`<button onclick="pickAttack(\${i},this)">\${x}</button>\`).join('')}</div></div>
-      <div class="card"><b>Защита — выбери 2 зоны</b><div class="zones" id="defs">\${Z.map((x,i)=>\`<button onclick="pickDef(\${i},this)">\${x}</button>\`).join('')}</div><p>Выбрано: <b id="dc">0/2</b></p></div>
-      <button class="goldBtn" onclick="strikeTurn()">⚔️ Сделать ход</button>
-      <div class="card"><b>История боя</b><div id="battleLog">Выбери атаку и две зоны защиты.</div></div>
-    </div>\`;
-    modal.classList.add('open'); window._battle=b;
-  };
-  window.strikeTurn=function(){
-    const b=window._battle;if(!b||b.locked||b.hp<=0||b.playerHp<=0)return;
-    if(b.attack===null||b.defs.length!==2){toast('Выбери атаку и 2 зоны защиты');return;}
-    b.locked=true;
-    const enemyAttack=Math.floor(Math.random()*5), enemyDef=[]; while(enemyDef.length<2){let x=Math.floor(Math.random()*5);if(!enemyDef.includes(x))enemyDef.push(x)}
-    const hit=b.attack!==enemyDef[0]&&b.attack!==enemyDef[1];
-    const crit=hit&&Math.random()<Math.min(.4,.08+(state.strength||0)*.012);
-    const dodge=Math.random()<Math.min(.3,.03+(state.agility||0)*.012);
-    const raw=Math.max(1,totalD()-Math.floor(b.enemy.def*.35)); const pd=hit?(crit?Math.round(raw*1.5):raw):0;
-    const blocked=b.defs.includes(enemyAttack); const ed=blocked||dodge?0:Math.max(1,b.enemy.damage+Math.floor(Math.random()*5)-Math.floor(totalDef()*.35));
-    b.hp=Math.max(0,b.hp-pd); b.playerHp=Math.max(0,b.playerHp-ed); state.hp=b.playerHp;
-    document.getElementById('enemyBar').style.width=(b.hp/b.maxHp*100)+'%'; document.getElementById('playerBar').style.width=(b.playerHp/b.maxPlayerHp*100)+'%';
-    document.getElementById('enemyHp').textContent=b.hp+'/'+b.maxHp+' HP'; document.getElementById('playerHp').textContent=b.playerHp+'/'+b.maxPlayerHp+' HP'; document.getElementById('turnNo').textContent=++b.turn;
-    const log=document.getElementById('battleLog'); log.innerHTML=\`<div>⚔️ Ты: <b>\${Z[b.attack]}</b> — \${hit?'попадание':'промах'}\${crit?' · <b>КРИТ!</b>':''} · \${pd} урона</div><div>🛡️ Твоя защита: \${Z[b.defs[0]]}, \${Z[b.defs[1]]} — \${blocked?'блок':'не блок'}</div><div>👹 \${b.enemy.name}: \${Z[enemyAttack]} — \${dodge?'уклонение':blocked?'заблокировано':'нанесено '+ed}</div>\`;
-    if(pd){document.querySelector('.enemy')?.classList.add('vikingHit');setTimeout(()=>document.querySelector('.enemy')?.classList.remove('vikingHit'),260)}
-    if(b.hp<=0){b.locked=true;state.eventProgress=Math.min(10,(state.eventProgress||0)+1);const finish=window.territoryServerAction?window.territoryServerAction('battle.reward'):Promise.resolve(false);finish.then(ok=>{if(ok){log.innerHTML='<b>🏆 ПОБЕДА!</b> +'+b.enemy.reward+' 🪙 +'+b.enemy.xp+' XP<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('🏆 Победа! Следующий противник сильнее.');},900)}else{b.locked=false;toast('Сервер не подтвердил награду')}});return}
-    if(b.playerHp<=0){b.locked=true;const finish=window.territoryServerAction?window.territoryServerAction('battle.loss'):Promise.resolve(false);finish.then(ok=>{if(ok){log.innerHTML='<b>💀 ПОРАЖЕНИЕ</b><br>❤️ Восстановление рассчитано сервером.<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('💀 Поражение. HP восстановлено сервером');},1100)}else{b.locked=false;toast('Сервер не подтвердил результат')}});return}
-    b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));document.getElementById('dc').textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},280);
-  };
-  window.autoBattleStep=function(){const b=window._battle;if(!b||!b.auto||b.locked)return;b.attack=Math.floor(Math.random()*5);b.defs=[];while(b.defs.length<2){let x=Math.floor(Math.random()*5);if(!b.defs.includes(x))b.defs.push(x)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===b.attack));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(),500)};
-  window.toggleAutoBattle=function(){const b=window._battle;if(!b)return;if(b.auto){b.auto=false;if(b.autoTimer)clearTimeout(b.autoTimer);document.getElementById('autoBtn').textContent='▶ АВТОБОЙ';document.getElementById('autoHint').textContent='Автобой сам выбирает атаку и 2 зоны защиты.';return}b.auto=true;document.getElementById('autoBtn').textContent='■ ОСТАНОВИТЬ АВТОБОЙ';document.getElementById('autoHint').textContent='Автобой включён.';autoBattleStep()};
-  window.stopAutoBattle=function(){const b=window._battle;if(b){b.auto=false;if(b.autoTimer)clearTimeout(b.autoTimer);b.autoTimer=null}};
-  const oldUse=window.useItem; window.useItem=function(i){const it=state.items[i];if(it?.name==='Аптечка'){state.hp=Math.min(state.maxHp,(state.hp??state.maxHp)+30);it.qty--;if(it.qty<=0)state.items.splice(i,1);save();toast('❤️ +30 HP');openP('inventory');return} oldUse(i)};
-  const oldComplete=window.completeQuest; window.completeQuest=function(){oldComplete();state.questDone=true;save()};
-  save();
-})();
-
-</script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Territory — Sdolars</title>
 <style>
@@ -156,8 +45,11 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .location{height:50px;border:2px solid #1688d5;border-radius:10px;background:#082b48;display:flex;align-items:center;gap:5px;padding:3px 5px;position:relative;text-align:left}
 .location .icon{font-size:17px;width:22px;text-align:center;flex:none}
 .location strong{font-size:11px}.location small{display:block;color:#a5cce7;font-size:8px;margin-top:1px}
-.actions{left:50%;right:auto;bottom:13%;width:168px;transform:translateX(-50%);display:grid;grid-template-columns:1fr;gap:6px;z-index:6}
-.action{width:168px;height:168px;justify-self:center;border-radius:50%;border:3px solid #29b9ff;background:radial-gradient(circle at 50% 42%,#0b5e91 0%,#063052 46%,#041729 72%,#020b14 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:24px;position:relative;box-shadow:0 0 0 5px rgba(8,31,49,.92),0 0 24px rgba(20,180,255,.45),0 8px 22px rgba(0,0,0,.55),inset 0 0 24px rgba(30,190,255,.25);overflow:hidden}.action::before{content:"";position:absolute;inset:8px;border-radius:50%;border:2px solid rgba(255,215,100,.85);box-shadow:inset 0 0 18px rgba(255,215,100,.18);pointer-events:none}.action::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.16),transparent 38%),linear-gradient(120deg,rgba(255,255,255,.08),transparent 45%,rgba(20,175,255,.12));pointer-events:none}.action .battleArt{width:78px;height:78px;margin-bottom:4px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.7)) drop-shadow(0 0 8px rgba(60,200,255,.35));z-index:1}.action span{z-index:1;text-shadow:0 2px 5px #000,0 0 10px rgba(255,210,70,.35)}
+.actions{left:2%;right:2%;bottom:13%;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.action{height:58px;border-radius:10px;border:2px solid #148fe4;background:linear-gradient(#0a4d89,#071e3d);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:11px;position:relative}
+.action:nth-child(2){border-color:#f0a900;background:linear-gradient(#c77c00,#704000)}
+.action:nth-child(3){border-color:#a646ff;background:linear-gradient(#5b18aa,#260b58)}
+.action:nth-child(4){border-color:#13d895;background:linear-gradient(#087950,#06432f)}
 .action .icon{font-size:17px;line-height:17px;margin-bottom:1px}
 .reward{left:2%;right:2%;bottom:1%;height:46px;border:2px solid #1986ca;border-radius:10px;background:#061c32;display:flex;align-items:center;padding:3px 6px;gap:5px}
 .reward .icon{font-size:19px}.rewardText{font-size:10px;font-weight:900;flex:1}.rewardText small{display:block;color:#a4cce6;font-size:8px;margin-top:1px}.rewardText b{color:#ffd42b}
@@ -274,24 +166,6 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 </style>
 <style>
 .chatEmojiBar{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;padding:5px 6px;background:#071d30;border-top:1px solid #164c6b}.chatEmoji{height:27px;border:1px solid #236f99;border-radius:6px;background:#0a3150;color:#fff;font-size:15px;line-height:1;cursor:pointer;padding:0}.chatEmoji:active{transform:scale(.94)}.chatStatus{margin-left:5px;font-size:8px;color:#67f29d;font-weight:900}.chatOffline{color:#ff7c89}.serverTag{float:right;margin-right:5px;color:#67f29d;font-size:7px;font-weight:900}@media(max-width:500px){.chatEmoji{height:25px;font-size:14px}.chatEmojiBar{gap:2px;padding:4px}}</style>
-
-<style>
-/* s19 — compact centered battle emblem */
-@media (max-width:420px){.actions{width:158px;bottom:13%}.action{width:158px;height:158px}.action .battleArt{width:70px;height:70px}.action span{font-size:22px}}
-/* s15 — compact mobile battle */
-.vikingBattle{padding:6px;border-radius:12px}.fighters{gap:5px}.fighter{padding:4px;border-radius:10px}.fighter img,.fighter .vikingSvg{height:108px;object-fit:cover}.fighterName{font-size:11px;margin:3px 0 2px}.fighterRole{font-size:7px;margin-bottom:2px}.fhp{height:7px}.fhpText{font-size:8px}.vikingBattle>.card{padding:7px;margin:5px 0}.vikingBattle>.card p{margin:4px 0}.autoRow{margin:4px 0}.autoBtn{height:34px}.autoHint{font-size:8px;margin:1px 0 4px}.vikingBattle .zones{gap:3px}.vikingBattle .zones button{padding:7px 1px;font-size:10px}.vikingBattle .goldBtn{padding:9px 8px;font-size:12px}.vikingBattle #battleLog{font-size:10px;line-height:1.25}.panel{padding:10px}.panel h2{font-size:18px;margin:2px 0 7px}
-</style>
-
-<style id="s22-battle-button">
-/* s22 — compact centered battle emblem, about half the previous size */
-.actions{left:50%!important;right:auto!important;width:86px!important;transform:translateX(-50%)!important;bottom:13%!important;display:grid!important;grid-template-columns:1fr!important;justify-items:center!important;z-index:6!important}
-.actions .action{width:86px!important;min-width:86px!important;max-width:86px!important;height:86px!important;min-height:86px!important;max-height:86px!important;margin:0!important;padding:4px!important;box-sizing:border-box!important;border-radius:50%!important;border:2px solid #29b9ff!important;box-shadow:0 0 0 3px rgba(8,31,49,.92),0 0 16px rgba(20,180,255,.42),0 5px 12px rgba(0,0,0,.55),inset 0 0 15px rgba(30,190,255,.25)!important}
-.actions .action:before{inset:5px!important;border-width:1.5px!important}
-.actions .action .battleArt{width:52px!important;height:52px!important;margin-bottom:0!important;filter:drop-shadow(0 2px 4px rgba(0,0,0,.75)) drop-shadow(0 0 6px rgba(255,170,40,.35))!important}
-.actions .action span{font-size:13px!important;line-height:13px!important;margin-top:-1px!important;text-shadow:0 2px 4px #000,0 0 7px rgba(255,210,70,.35)!important}
-@media(max-width:420px){.actions{width:80px!important}.actions .action{width:80px!important;min-width:80px!important;max-width:80px!important;height:80px!important;min-height:80px!important;max-height:80px!important}.actions .action .battleArt{width:48px!important;height:48px!important}.actions .action span{font-size:12px!important;line-height:12px!important}}
-</style>
-
 </head>
 <body>
 <div id="app">
@@ -305,8 +179,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 <button class="daily" onclick="openP(&quot;bonus&quot;)"><span class="chest">🎁</span><b>Ежедневный бонус</b><time id="timer">23:45:00</time></button>
 <div class="left"><button class="smallBtn" onclick="openP(&quot;bonus&quot;)"><span class="icon">🎁</span>Бонусы<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;events&quot;)"><span class="icon">▦</span>События<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;vip&quot;)"><span class="icon">♛</span>VIP</button></div>
 <div class="right"><button class="location" onclick="openP(&quot;forge&quot;)"><span class="icon">⚒</span><div><strong>Кузница</strong><small>Улучшение снаряжения</small></div><div class="badge">!</div></button><button class="location" onclick="openP(&quot;tavern&quot;)"><span class="icon">🍺</span><div><strong>Таверна</strong><small>Найм героев</small></div><div class="badge">!</div></button><button class="location" onclick="openP(&quot;shop&quot;)"><span class="icon">🎒</span><div><strong>Магазин</strong><small>Предметы и снаряжение</small></div></button></div>
-<div class="actions"><button class="action" onclick="battle()"><svg class="battleArt" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="axeSteel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#b8d8e8"/><stop offset=".7" stop-color="#647c8d"/><stop offset="1" stop-color="#263844"/></linearGradient><linearGradient id="axeWood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9b5a27"/><stop offset=".5" stop-color="#5c2d16"/><stop offset="1" stop-color="#24140e"/></linearGradient><linearGradient id="axeGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe77a"/><stop offset=".5" stop-color="#d99a24"/><stop offset="1" stop-color="#6d3d0a"/></linearGradient></defs><g transform="rotate(-7 50 50)"><path d="M49 18L31 83" stroke="url(#axeWood)" stroke-width="7" stroke-linecap="round"/><path d="M24 24Q7 22 8 42Q9 58 27 54L38 47L31 39L20 43Q18 38 20 34Q22 31 32 34Z" fill="url(#axeSteel)" stroke="#172a35" stroke-width="2"/><path d="M22 28L31 30" stroke="#fff" stroke-width="2" opacity=".55"/></g><g transform="rotate(7 50 50)"><path d="M51 18L69 83" stroke="url(#axeWood)" stroke-width="7" stroke-linecap="round"/><path d="M76 24Q93 22 92 42Q91 58 73 54L62 47L69 39L80 43Q82 38 80 34Q78 31 68 34Z" fill="url(#axeSteel)" stroke="#172a35" stroke-width="2"/><path d="M78 28L69 30" stroke="#fff" stroke-width="2" opacity=".55"/></g><circle cx="50" cy="50" r="9" fill="url(#axeGold)" stroke="#6b3e0b" stroke-width="2"/><path d="M46 50h8M50 46v8" stroke="#fff2a3" stroke-width="1.5"/></svg><span>Бой</span></button></div>
-<div id="cityOnlineBox" class="cityOnlineBox"></div>
+<div class="actions"><button class="action" onclick="battle()"><span class="icon">⚔</span>Бой</button><button class="action" onclick="openP(&quot;inventory&quot;)"><span class="icon">🎒</span>Инвентарь<div class="badge">!</div></button><button class="action" onclick="openP(&quot;equipment&quot;)"><span class="icon">🛡</span>Экипировка</button><button class="action" onclick="openP(&quot;quests&quot;)"><span class="icon">📜</span>Задания<div class="badge">!</div></button></div>
 <button class="reward chatReward" onclick="openP(&quot;messages&quot;)"><span class="icon">💬</span><div class="rewardText"><b>Чат игры</b><small>Общий чат и чат клана</small></div><span class="chatGo">Открыть ›</span></button>
 </main>
 <nav class="bottom"><button class="active"><span>🏠</span>Город</button><button onclick="openP(&quot;hero&quot;)"><span>⚔</span>Герой</button><button onclick="openP(&quot;inventory&quot;)"><span>🎒</span>Инвентарь</button><button onclick="openP(&quot;quests&quot;)"><span>🛡</span>Задания</button><button onclick="openP(&quot;guild&quot;)"><span>👥</span>Гильдия</button><button onclick="openP(&quot;more&quot;)"><span>☰</span>Ещё</button></nav>
@@ -342,7 +215,7 @@ let state={coins:1779,level:3,exp:120,items:[
  {id:'bandage',name:'Аптечка',type:'Расходник',icon:'🩹',qty:2,price:80,equipped:false}
 ]};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s)state=s}catch(e){}
-state.maxHp??=120;state.maxExp??=100;state.freePoints??=0;state.vip??='Нет';state.playerName??='Игрок';state.strength??=12;state.agility??=9;state.wins??=0;state.eventProgress??=0;state.guildMembers??=1;state.recruited??=[];state.settings??={sound:true,fx:true};state.lang??='RU';state.questDone??=false;state.bonusClaimed??=false;state.chat??={tab:'global',collapsed:false,global:[{name:'Система Sdolars',text:'Добро пожаловать в общий чат игры!',time:'сейчас',system:true},{name:'Рагнар',text:'Кто идёт на арену?',time:'сейчас'}],clan:[{name:'Клан Sdolars',text:'Чат клана открыт. Добро пожаловать!',time:'сейчас',system:true}]};
+state.maxHp??=120;state.strength??=12;state.agility??=9;state.wins??=0;state.eventProgress??=0;state.guildMembers??=1;state.recruited??=[];state.settings??={sound:true,fx:true};state.lang??='RU';state.questDone??=false;state.bonusClaimed??=false;state.chat??={tab:'global',collapsed:false,global:[{name:'Система Sdolars',text:'Добро пожаловать в общий чат игры!',time:'сейчас',system:true},{name:'Рагнар',text:'Кто идёт на арену?',time:'сейчас'}],clan:[{name:'Клан Sdolars',text:'Чат клана открыт. Добро пожаловать!',time:'сейчас',system:true}]};
 state.onlinePlayers??=['Рагнар','Астрид','Ивар','Фрейя','Бьёрн','Олаф','Торстейн'];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));if(typeof updateHud==='function')updateHud()}catch(e){}}
 function toast(s){const t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400)}
@@ -350,7 +223,7 @@ const I18N={
  'Territory — Sdolars':'Territory — Sdolars','Sdolars':'Sdolars',
  'Глава 5 · Уровень ':'Chapter 5 · Level ', 'Текущее задание':'Current quest','Поговори с кузнецом ›':'Talk to the blacksmith ›','⌖ Кузница':'⌖ Forge','Ежедневный бонус':'Daily bonus','Бонусы':'Bonuses','События':'Events','VIP':'VIP','Кузница':'Forge','Улучшение снаряжения':'Equipment upgrade','Таверна':'Tavern','Найм героев':'Hero recruitment','Магазин':'Shop','Предметы и снаряжение':'Items and equipment','Бой':'Battle','Инвентарь':'Inventory','Экипировка':'Equipment','Задания':'Quests','Чат игры':'Game chat','Общий чат и чат клана':'Global chat and clan chat','Открыть ›':'Open ›','Город':'City','Герой':'Hero','Гильдия':'Guild','Ещё':'More',
  'Глава 5 · Уровень':'Chapter 5 · Level','Сила':'Strength','Ловкость':'Agility','Защита':'Defense','Опыт':'Experience','＋ Сила':'＋ Strength','＋ Ловкость':'＋ Agility','Предметы':'Items','Монеты:':'Coins:','Инвентарь пуст.':'Inventory is empty.','Снять':'Unequip','Экипировать':'Equip','Использовать':'Use','Выбросить':'Discard','Изменить':'Change','Оружие':'Weapon','Броня':'Armor','Пусто':'Empty','Урон':'Damage','Нет оружия':'No weapon','Текущий урон:':'Current damage:','Следующее улучшение:':'Next upgrade:','Стоимость:':'Cost:','Улучшить':'Upgrade','Купить':'Buy','Расходник':'Consumable','Количество':'Quantity',
- 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s18':'Version: s27',
+ 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s12':'Version: s10',
  'Чат':'Chat','Общий чат':'Global chat','Чат клана':'Clan chat','Общий':'Global','Клан':'Clan','Онлайн игроки':'Online players','Сейчас находятся в Sdolars':'Currently in Sdolars','Развернуть':'Expand','Свернуть':'Collapse','Написать сообщение...':'Write a message...','Отправить':'Send','Добро пожаловать в общий чат игры!':'Welcome to the global game chat!','Кто идёт на арену?':'Who is going to the arena?','Чат клана открыт. Добро пожаловать!':'Clan chat is open. Welcome!','Система Sdolars':'Sdolars System','Клан Sdolars':'Sdolars Clan',
  'Бой — Викингская арена':'Battle — Viking arena','⚔️ Викинг Sdolars':'⚔️ Viking of Sdolars','👹 Монстр':'👹 Monster','Ледяной тролль':'Frost troll','Атака — выбери 1 зону':'Attack — choose 1 zone','Защита — выбери 2 зоны':'Defense — choose 2 zones','Выбрано:':'Selected:','Сделать ход':'Make a move','История боя':'Battle log','Выберите атаку и две зоны защиты.':'Choose an attack and two defense zones.','АВТОБОЙ':'AUTO BATTLE','ОСТАНОВИТЬ АВТОБОЙ':'STOP AUTO BATTLE','Автобой сам выбирает атаку и 2 зоны защиты каждый ход.':'Auto battle chooses an attack and 2 defense zones each turn.','Автобой включён — ходы выполняются автоматически.':'Auto battle is on — turns are performed automatically.','Ход:':'Turn:','попадание':'hit','промах':'miss','КРИТ!':'CRIT!','блок':'blocked','не блок':'not blocked','заблокировано':'blocked','урон':'damage','Победа над Ледяной тролльом!':'Victory over the Frost troll!','Ледяной тролль победил.':'The Frost troll won.',
  'Голова':'Head','Грудь':'Chest','Живот':'Stomach','Пояс':'Waist','Ноги':'Legs',
@@ -382,9 +255,9 @@ function chatEsc(x){return String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt
 function currentChatName(){try{const u=window.Telegram?.WebApp?.initDataUnsafe?.user;if(u){return (((u.first_name||'')+' '+(u.last_name||'')).trim()||(u.username?'@'+u.username:'Игрок'));}}catch(e){}return state.playerName||'Игрок'}
 const CHAT_EMOJIS=['😀','😂','😍','😎','🔥','⚔️','🏆','❤️','👍','💪'];
 let chatSocket=null,chatConnected=false,chatReconnectTimer=null,chatOnlineNames=[];
-function chatServerUrl(){if(location.protocol==='https:')return 'wss://'+location.host+'/ws';if(location.protocol==='http:')return 'ws://'+location.host+'/ws';return ''}
+function chatServerUrl(){if(location.protocol==='https:')return 'wss://'+location.host;if(location.protocol==='http:')return 'ws://'+location.host;return ''}
 function renderChatOnline(){const box=document.getElementById('chatOnlineBox');if(!box)return;const names=(chatOnlineNames.length?chatOnlineNames:[currentChatName()]).filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,20);const en=state.lang==='EN';box.innerHTML='<div class="chatOnline"><div class="onlineHead"><span class="onlineDot"></span>'+(en?'Online players':'Онлайн игроки')+' <span class="onlineCount">'+names.length+'</span><span class="chatStatus '+(chatConnected?'':'chatOffline')+'">'+(chatConnected?(en?'● LIVE':'● ОНЛАЙН'):(en?'○ OFFLINE':'○ НЕТ СВЯЗИ'))+'</span></div><div class="onlineList">'+names.map(n=>'<span class="onlinePlayer"><i></i>'+chatEsc(n)+'</span>').join('')+'</div><div class="chatOnlineHint">'+(en?'Players currently in Sdolars':'Сейчас находятся в Sdolars')+'</div></div>'}
-function connectGameChat(){const url=chatServerUrl();if(!url||chatSocket||chatConnected)return;try{chatSocket=new WebSocket(url);chatSocket.onopen=()=>{chatConnected=true;chatSocket.send(JSON.stringify({type:'hello',name:currentChatName(),playerId:(window.s25ServerSync?.playerId?.()||''),room:state.chat?.tab==='clan'?'clan':'global'}));renderChatOnline()};chatSocket.onmessage=(ev)=>{try{const m=JSON.parse(ev.data);if(m.type==='history'){state.chat[m.room]=Array.isArray(m.messages)?m.messages:[];save();if(modal.classList.contains('open')&&state.chat.tab===m.room)openP('messages')}else if(m.type==='message'){state.chat[m.room]??=[];state.chat[m.room].push(m.message);if(state.chat[m.room].length>60)state.chat[m.room].splice(0,state.chat[m.room].length-60);save();if(modal.classList.contains('open')&&state.chat.tab===m.room)openP('messages')}else if(m.type==='online'){chatOnlineNames=Array.isArray(m.names)?m.names:[];window.__pvpPlayers=Array.isArray(m.players)?m.players.filter(x=>x.playerId!==(window.s25ServerSync?.playerId?.()||'')):[];renderChatOnline()}}catch(e){}};chatSocket.onclose=()=>{chatConnected=false;chatSocket=null;renderChatOnline();clearTimeout(chatReconnectTimer);chatReconnectTimer=setTimeout(connectGameChat,4000)};chatSocket.onerror=()=>{try{chatSocket.close()}catch(e){}}}catch(e){chatSocket=null;chatConnected=false;renderChatOnline()}}
+function connectGameChat(){const url=chatServerUrl();if(!url||chatSocket||chatConnected)return;try{chatSocket=new WebSocket(url);chatSocket.onopen=()=>{chatConnected=true;chatSocket.send(JSON.stringify({type:'hello',name:currentChatName(),room:state.chat?.tab==='clan'?'clan':'global'}));renderChatOnline()};chatSocket.onmessage=(ev)=>{try{const m=JSON.parse(ev.data);if(m.type==='history'){state.chat[m.room]=Array.isArray(m.messages)?m.messages:[];save();if(modal.classList.contains('open')&&state.chat.tab===m.room)openP('messages')}else if(m.type==='message'){state.chat[m.room]??=[];state.chat[m.room].push(m.message);if(state.chat[m.room].length>60)state.chat[m.room].splice(0,state.chat[m.room].length-60);save();if(modal.classList.contains('open')&&state.chat.tab===m.room)openP('messages')}else if(m.type==='online'){chatOnlineNames=Array.isArray(m.names)?m.names:[];renderChatOnline()}}catch(e){}};chatSocket.onclose=()=>{chatConnected=false;chatSocket=null;renderChatOnline();clearTimeout(chatReconnectTimer);chatReconnectTimer=setTimeout(connectGameChat,4000)};chatSocket.onerror=()=>{try{chatSocket.close()}catch(e){}}}catch(e){chatSocket=null;chatConnected=false;renderChatOnline()}}
 function sendServerMessage(text){if(chatSocket&&chatConnected){chatSocket.send(JSON.stringify({type:'message',room:state.chat.tab==='clan'?'clan':'global',message:{name:currentChatName(),text,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),online:true}}));return true}return false}
 function renderChat(){const tab=state.chat.tab==='clan'?'clan':'global',list=state.chat[tab]||[],en=state.lang==='EN',title=tab==='clan'?'👥 '+(en?'Clan chat':'Чат клана'):'🌍 '+(en?'Global chat':'Общий чат');let h='<div class="chatWrap">';if(state.chat.collapsed){return '<div class="chatWrap"><div class="chatCollapsed"><b>'+title+'</b><span class="chatUnread">'+list.length+'</span><button type="button" class="chatCollapse" id="chatExpandBtn">'+(en?'Expand':'Развернуть')+'</button></div></div>'}h+='<div class="chatHead"><span class="chatTitle">'+title+'</span><span class="chatMini">Sdolars <span class="chatStatus '+(chatConnected?'':'chatOffline')+'">'+(chatConnected?'● LIVE':'○ OFFLINE')+'</span></span><button type="button" class="chatCollapse" id="chatCollapseBtn">'+(en?'Collapse':'Свернуть')+'</button></div>';h+='<div class="chatTabs"><button type="button" class="chatTab '+(tab==='global'?'active':'')+'" data-chat-tab="global">🌍 '+(en?'Global':'Общий')+'</button><button type="button" class="chatTab '+(tab==='clan'?'active':'')+'" data-chat-tab="clan">👥 '+(en?'Clan':'Клан')+'</button></div><div id="chatOnlineBox"></div><div class="chatMessages" id="chatMessages">';list.forEach(m=>{h+='<div class="chatMsg '+(m.name===currentChatName()?'me':'')+'"><b>'+chatEsc(m.name)+'</b>'+(m.online?'<span class="serverTag">● online</span>':'')+'<small>'+chatEsc(m.time||'сейчас')+'</small><br>'+chatEsc(m.text)+'</div>'});h+='</div><div class="chatEmojiBar">'+CHAT_EMOJIS.map(e=>'<button type="button" class="chatEmoji" data-emoji="'+e+'">'+e+'</button>').join('')+'</div><div class="chatInputRow"><input id="chatInput" class="chatInput" maxlength="180" placeholder="'+(en?'Write a message...':'Написать сообщение...')+'"><button type="button" class="chatSend" id="chatSendBtn">'+(en?'Send':'Отправить')+'</button></div></div>';return h}
 function bindChatControls(){const input=document.getElementById('chatInput');const send=()=>{if(!input)return;const text=input.value.trim();if(!text)return;if(sendServerMessage(text)){input.value='';return}const tab=state.chat.tab==='clan'?'clan':'global';state.chat[tab]??=[];state.chat[tab].push({name:currentChatName(),text,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),online:false});if(state.chat[tab].length>60)state.chat[tab].splice(0,state.chat[tab].length-60);save();input.value='';openP('messages')};document.getElementById('chatSendBtn')?.addEventListener('click',send);input?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();send()}});document.getElementById('chatCollapseBtn')?.addEventListener('click',()=>{state.chat.collapsed=true;save();openP('messages')});document.getElementById('chatExpandBtn')?.addEventListener('click',()=>{state.chat.collapsed=false;save();openP('messages')});document.querySelectorAll('[data-chat-tab]').forEach(b=>b.addEventListener('click',()=>{state.chat.tab=b.dataset.chatTab==='clan'?'clan':'global';state.chat.collapsed=false;save();openP('messages');setTimeout(()=>{if(chatSocket&&chatConnected)chatSocket.send(JSON.stringify({type:'room',room:state.chat.tab}));else connectGameChat()},50)}));document.querySelectorAll('[data-emoji]').forEach(b=>b.addEventListener('click',()=>{if(input){input.value+=b.dataset.emoji;input.focus()}}));setTimeout(()=>{renderChatOnline();connectGameChat();const box=document.getElementById('chatMessages');if(box)box.scrollTop=box.scrollHeight},0)}
@@ -405,12 +278,12 @@ const views={
  ach:['Достижения',()=>'<div class="card"><b>🏆 Первый бой</b><p>Победи первого противника.</p><p>Прогресс: <b>'+(state.wins>0?'1':'0')+' / 1</b></p></div><div class="card"><b>💰 Богач</b><p>Накопи 2000 монет.</p><p>Прогресс: <b>'+Math.min(state.coins,2000)+' / 2000</b></p></div><div class="card"><b>⚔️ Воин Sdolars</b><p>Победи 10 противников.</p><p>Прогресс: <b>'+state.wins+' / 10</b></p></div>'],
  settings:['Настройки',()=>'<div class="card"><b>⚙️ Настройки игры</b><p>🔊 Звуки <button onclick="toggleSetting(&quot;sound&quot;)">'+(state.settings.sound?'ВКЛ':'ВЫКЛ')+'</button></p><p>📳 Эффекты <button onclick="toggleSetting(&quot;fx&quot;)">'+(state.settings.fx?'ВКЛ':'ВЫКЛ')+'</button></p><p>🌐 Язык <button onclick="toggleLang()">'+state.lang+'</button></p><p>📱 Telegram ID <b>'+(window.Telegram?.WebApp?.initDataUnsafe?.user?.id||'гостевой режим')+'</b></p></div>'],
  guild:['Гильдия',()=>'<div class="card"><b>🛡️ Гильдия Sdolars</b><p>Уровень: <b>1</b></p><p>Участники: <b>'+state.guildMembers+' / 20</b></p><p>Казна: <b>2 450 🪙</b></p></div><div class="grid2"><button class="goldBtn" onclick="guildAction(&quot;Найти гильдию&quot;)">Найти гильдию</button><button class="goldBtn" onclick="guildAction(&quot;Приглашения&quot;)">Приглашения</button></div>'],
- more:['Ещё',()=>'<div class="grid2"><button class="goldBtn" onclick="openP(&quot;messages&quot;)">✉ Сообщения</button><button class="goldBtn" onclick="openP(&quot;ach&quot;)">🏆 Достижения</button><button class="goldBtn" onclick="openP(&quot;settings&quot;)">⚙ Настройки</button><button class="goldBtn" onclick="openP(&quot;guild&quot;)">👥 Гильдия</button></div><div class="card"><b>ℹ️ О Territory</b><p>Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.</p><p>Версия: s27</p></div>']
+ more:['Ещё',()=>'<div class="grid2"><button class="goldBtn" onclick="openP(&quot;messages&quot;)">✉ Сообщения</button><button class="goldBtn" onclick="openP(&quot;ach&quot;)">🏆 Достижения</button><button class="goldBtn" onclick="openP(&quot;settings&quot;)">⚙ Настройки</button><button class="goldBtn" onclick="openP(&quot;guild&quot;)">👥 Гильдия</button></div><div class="card"><b>ℹ️ О Territory</b><p>Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.</p><p>Версия: s12</p></div>']
 };
 applyTelegramPlayer();
 function totalDamage(){return 15+(state.items.find(x=>x.equipped&&x.type==='Оружие')?.damage||0)}
 function totalDef(){return 5+(state.items.find(x=>x.equipped&&x.type==='Броня')?.defense||0)}
-function renderInventory(){let h='<div class="card"><b>🎒 Предметы</b><p>Монеты: <strong>'+state.coins+' 🪙</strong></p></div>';if(!state.items.length)h+='<div class="card">Инвентарь пуст.</div>';state.items.forEach((it,i)=>{h+='<div class="card"><b>'+it.icon+' '+it.name+'</b><p>'+it.type+(it.damage?' · Урон +'+it.damage:'')+(it.defense?' · Защита +'+it.defense:'')+(it.qty?' · Кол-во '+it.qty:'')+'</p>'+(it.type!=='Расходник'?'<button onclick="toggleEquip('+i+')">'+(it.equipped?'Снять':'Экипировать')+'</button>':'<button onclick="useItem('+i+')">Использовать</button>')+' <button class="danger" onclick="dropItem('+i+')">Выбросить</button></div>'});return h}
+function renderInventory(){let h='<div class="card"><b>🎒 Предметы</b><p>Монеты: <strong>'+state.coins+' 🪙</strong></p></div>';if(!state.items.length)h+='<div class="card">Инвентарь пуст.</div>';state.items.forEach((it,i)=>{h+='<div class="card"><b>'+it.icon+' '+it.name+'</b><p>'+it.type+(it.damage?' · Урон +'+it.damage:'')+(it.defense?' · Защита +'+it.defense:'')+(it.qty?' · Кол-во '+it.qty:'')+'</p>'+(it.type!=='Расходник'?'<button onclick="toggleEquip(&quot;+i+&quot;)">'+(it.equipped?'Снять':'Экипировать')+'</button>':'<button onclick="useItem(&quot;+i+&quot;)">Использовать</button>')+' <button class="danger" onclick="dropItem(&quot;+i+&quot;)">Выбросить</button></div>'});return h}
 function renderEquipment(){const w=state.items.find(x=>x.equipped&&x.type==='Оружие'),a=state.items.find(x=>x.equipped&&x.type==='Броня');return '<div class="card"><b>⚔️ Оружие</b><p>'+(w?w.icon+' '+w.name+' · Урон +'+w.damage:'Пусто')+'</p><button onclick="openP(&quot;inventory&quot;)">Изменить</button></div><div class="card"><b>🛡️ Броня</b><p>'+(a?a.icon+' '+a.name+' · Защита +'+a.defense:'Пусто')+'</p><button onclick="openP(&quot;inventory&quot;)">Изменить</button></div><div class="statgrid"><div class="statbox">⚔️ Урон<b>'+totalDamage()+'</b></div><div class="statbox">🛡️ Защита<b>'+totalDef()+'</b></div></div>'}
 function renderForge(){const w=state.items.find(x=>x.equipped&&x.type==='Оружие');return card('⚒️ Улучшение снаряжения','<p>'+(w?w.icon+' '+w.name:'Нет оружия')+'</p><p>Текущий урон: <b>'+(w?w.damage:0)+'</b></p><p>Следующее улучшение: <b>+3 урона</b></p><p>Стоимость: <b>200 🪙</b></p><button class="goldBtn" onclick="upgradeWeapon()">Улучшить</button>')}
 function renderShop(){return '<div class="card"><b>🔪 Нож</b><p>Урон +6 · 220 🪙</p><button class="goldBtn" onclick="buyItem(&quot;knife&quot;)">Купить</button></div><div class="card"><b>🪓 Тяжёлый топор</b><p>Урон +18 · 700 🪙</p><button class="goldBtn" onclick="buyItem(&quot;heavyaxe&quot;)">Купить</button></div><div class="card"><b>🛡️ Стальная броня</b><p>Защита +15 · 650 🪙</p><button class="goldBtn" onclick="buyItem(&quot;steel&quot;)">Купить</button></div><div class="card"><b>🩹 Аптечка</b><p>Восстанавливает 30 HP · 80 🪙</p><button class="goldBtn" onclick="buyItem(&quot;bandage&quot;)">Купить</button></div>'}
@@ -421,23 +294,22 @@ function upgradeWeapon(){const w=state.items.find(x=>x.equipped&&x.type==='Ор�
 function buyItem(id){let it;if(id==='knife')it={id:'knife'+Date.now(),name:'Нож',type:'Оружие',icon:'🔪',damage:6,price:220,equipped:false};if(id==='heavyaxe')it={id:'heavyaxe'+Date.now(),name:'Тяжёлый топор',type:'Оружие',icon:'🪓',damage:18,price:700,equipped:false};if(id==='steel')it={id:'steel'+Date.now(),name:'Стальная броня',type:'Броня',icon:'🛡️',defense:15,price:650,equipped:false};if(id==='bandage'){let b=state.items.find(x=>x.name==='Аптечка');if(b){if(state.coins<80){toast('Не хватает монет');return}state.coins-=80;b.qty=(b.qty||0)+1;save();openP('shop');toast('Аптечка куплена');return}it={id:'bandage'+Date.now(),name:'Аптечка',type:'Расходник',icon:'🩹',qty:1,price:80,equipped:false}}if(!it)return;if(state.coins<it.price){toast('Не хватает монет');return}state.coins-=it.price;state.items.push(it);save();openP('shop');toast('Куплено')}
 function addStat(k){if((state.freePoints||0)<=0){toast('Нет свободных очков');return}state[k]++;state.freePoints--;save();openP('hero');toast('Характеристика повышена')}
 function recruit(name,cost){if(state.coins<cost){toast('Не хватает монет');return}if(state.recruited.includes(name)){toast('Герой уже в команде');return}state.coins-=cost;state.recruited.push(name);state.guildMembers=Math.min(20,state.guildMembers+1);save();openP('tavern');toast(name+' присоединился к команде')}
-function eventFight(){state.eventProgress=Math.min(10,state.eventProgress+1);state.coins+=100;state.exp+=25;state.wins++;checkLevelUp();save();openP('events');toast('🏰 Победа! +100 🪙 +25 XP')}
+function eventFight(){state.eventProgress=Math.min(10,state.eventProgress+1);state.coins+=100;state.exp+=25;state.wins++;save();openP('events');toast('🏰 Победа! +100 🪙 +25 XP')}
 function toggleSetting(k){state.settings[k]=!state.settings[k];save();openP('settings')}
 function toggleLang(){state.lang=state.lang==='RU'?'EN':'RU';save();applyLanguage();toast(state.lang==='EN'?'Language: EN':'Язык: RU');openP('settings')}
 function guildAction(x){toast('👥 '+x+' открыто')}
-function completeQuest(){if(state.questDone){toast('Задание уже выполнено');return}state.questDone=true;state.coins+=150;state.exp+=80;checkLevelUp();save();openP('quests');toast('📜 +150 🪙 +80 XP')}
-function claimBonus(){if(state.bonusClaimed){toast('Награда уже получена');return}state.bonusClaimed=true;state.coins+=250;state.exp+=20;checkLevelUp();save();openP('bonus');toast('🎁 +250 🪙 +20 XP')}
+function completeQuest(){if(state.questDone){toast('Задание уже выполнено');return}state.questDone=true;state.coins+=150;state.exp+=80;save();openP('quests');toast('📜 +150 🪙 +80 XP')}
+function claimBonus(){if(state.bonusClaimed){toast('Награда уже получена');return}state.bonusClaimed=true;state.coins+=250;state.exp+=20;save();openP('bonus');toast('🎁 +250 🪙 +20 XP')}
 function battle(){
   stopAutoBattle();
-  const tg=window.Telegram?.WebApp?.initDataUnsafe?.user;
-  const playerName=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||'Игрок';
+  const playerName=(window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name||'Игрок')+' '+(window.Telegram?.WebApp?.initDataUnsafe?.user?.last_name||'');
   const playerImg=document.querySelector('.avatar img')?.src||'';
-  const enemySvg='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(\`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300"><defs><radialGradient id="s" cx="50%" cy="35%"><stop stop-color="#a7c0b4"/><stop offset="1" stop-color="#405951"/></radialGradient><linearGradient id="f"><stop stop-color="#30474a"/><stop offset="1" stop-color="#0d1b21"/></linearGradient><filter id="g"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect width="320" height="300" rx="18" fill="#071522"/><path d="M20 300Q35 190 100 174H220Q285 190 300 300Z" fill="url(#f)" stroke="#667b7a" stroke-width="6"/><path d="M116 155h88v62h-88z" fill="url(#s)"/><path d="M70 70Q74 20 125 24Q160 5 195 24Q246 20 250 70l-14 91q-14 48-76 54-62-6-76-54z" fill="url(#s)" stroke="#29403b" stroke-width="7"/><path d="M91 63Q45 45 57 5q8 35 49 31zM229 63Q275 45 263 5q-8 35-49 31z" fill="#ded6b9" stroke="#6b6653" stroke-width="6"/><path d="M90 91q22-22 49 0M181 91q27-22 49 0" fill="none" stroke="#263b37" stroke-width="15" stroke-linecap="round"/><ellipse cx="121" cy="101" rx="15" ry="10" fill="#ffd84d" filter="url(#g)"/><ellipse cx="199" cy="101" rx="15" ry="10" fill="#ffd84d" filter="url(#g)"/><path d="M121 95v12M199 95v12" stroke="#1b211e" stroke-width="5"/><path d="M145 105q15-9 30 0l8 33q-23 18-46 0z" fill="#718e84" stroke="#314b45" stroke-width="5"/><path d="M105 145q55 35 110 0-3 55-55 57-52-2-55-57z" fill="#263a36" stroke="#172723" stroke-width="6"/><path d="M137 166q-12 35 9 24M183 166q12 35-9 24" fill="#eee5c7" stroke="#8e866c" stroke-width="5"/><path d="M96 54q64-43 128 0l-8 21q-56-31-112 0z" fill="#263f4c" stroke="#66818b" stroke-width="6"/><circle cx="160" cy="58" r="10" fill="#a8d5df"/><path d="M260 190q35 14 36 54" fill="none" stroke="#405951" stroke-width="24" stroke-linecap="round"/><path d="M293 238l12 34M282 238l3 38M271 236l-7 34" stroke="#a8bbb1" stroke-width="9" stroke-linecap="round"/></svg>\`);
-  const b={hp:100,playerHp:state.maxHp,turn:1,locked:false,attack:null,defs:[],enemyAttack:null,enemyDefs:[],auto:false,autoTimer:null,ended:false};
+  const enemySvg='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(\`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300"><defs><radialGradient id="s" cx="50%" cy="35%"><stop stop-color="#a7c0b4"/><stop offset="1" stop-color="#405951"/></radialGradient><linearGradient id="f"><stop stop-color="#30474a"/><stop offset="1" stop-color="#0d1b21"/></linearGradient><filter id="g"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect width="320" height="300" rx="18" fill="#071522"/><path d="M20 300Q35 190 100 174H220Q285 190 300 300Z" fill="url(#f)" stroke="#667b7a" stroke-width="6"/><path d="M116 155h88v62h-88z" fill="url(#s)"/><path d="M70 70Q74 20 125 24Q160 5 195 24Q246 20 250 70l-14 91q-14 48-76 54-62-6-76-54z" fill="url(#s)" stroke="#29403b" stroke-width="7"/><path d="M91 63Q45 45 57 5q8 35 49 31zM229 63Q275 45 263 5q-8 35-49 31z" fill="#ded6b9" stroke="#6b6653" stroke-width="6"/><path d="M90 91q22-22 49 0M181 91q27-22 49 0" fill="none" stroke="#263b37" stroke-width="15" stroke-linecap="round"/><ellipse cx="121" cy="101" rx="15" ry="10" fill="#ffd84d" filter="url(#g)"/><ellipse cx="199" cy="101" rx="15" ry="10" fill="#ffd84d" filter="url(#g)"/><path d="M121 95v12M199 95v12" stroke="#1b211e" stroke-width="5"/><path d="M145 105q15-9 30 0l8 33q-23 18-46 0z" fill="#718e84" stroke="#314b45" stroke-width="5"/><path d="M105 145q55 35 110 0-3 55-55 57-52-2-55-57z" fill="#263a36" stroke="#172723" stroke-width="6"/><path d="M137 166q-12 35 9 24M183 166q12 35-9 24" fill="#eee5c7" stroke="#8e866c" stroke-width="5"/><path d="M96 54q64-43 128 0l-8 21q-56-31-112 0z" fill="#263f4c" stroke="#66818b" stroke-width="6"/><circle cx="160" cy="58" r="10" fill="#a8d5df"/><path d="M260 190q35 14 36 54" fill="none" stroke="#405951" stroke-width="24" stroke-linecap="round"/><path d="M293 238l12 34M282 238l3 38M271 236l-7 34" stroke="#a8bbb1" stroke-width="9" stroke-linecap="round"/></svg>\`);;
+  const b={hp:100,playerHp:state.maxHp,turn:1,locked:false,attack:null,defs:[],auto:false,autoTimer:null};
   pt.textContent='Бой — Викингская арена';
   pb.innerHTML=\`<div class="vikingBattle">
     <div class="fighters">
-      <div class="fighter" id="playerFighter"><img id="battlePlayerImg" src="\${playerImg}"><div class="fighterName">\${chatEsc(playerName)}</div><div class="fighterRole">⚔️ Викинг Sdolars</div><div class="fhp"><i id="playerBar" style="width:100%"></i></div><div class="fhpText" id="playerHp">\${state.maxHp}/\${state.maxHp} HP</div></div>
+      <div class="fighter" id="playerFighter"><img id="battlePlayerImg" src="\${playerImg}"><div class="fighterName">\${playerName.trim()||'Игрок'}</div><div class="fighterRole">⚔️ Викинг Sdolars</div><div class="fhp"><i id="playerBar"></i></div><div class="fhpText" id="playerHp">\${state.maxHp}/\${state.maxHp} HP</div></div>
       <div class="fighter enemy" id="enemyFighter"><img id="battleEnemyImg" src="\${enemySvg}"><div class="fighterName">Ледяной тролль</div><div class="fighterRole">👹 Монстр</div><div class="fhp"><i id="enemyBar" style="width:100%"></i></div><div class="fhpText" id="enemyHp">100/100 HP</div></div>
     </div>
     <div class="autoRow"><button class="autoBtn" id="autoBtn" onclick="toggleAutoBattle()">▶ АВТОБОЙ</button></div>
@@ -445,411 +317,27 @@ function battle(){
     <div class="card"><b>Ход: <span id="turnNo">1</span></b></div>
     <div class="card"><b>Атака — выбери 1 зону</b><div class="zones" id="attacks">\${ZONES.map((x,i)=>'<button onclick="pickAttack('+i+',this)">'+x+'</button>').join('')}</div></div>
     <div class="card"><b>Защита — выбери 2 зоны</b><div class="zones" id="defs">\${ZONES.map((x,i)=>'<button onclick="pickDef('+i+',this)">'+x+'</button>').join('')}</div><p>Выбрано: <b id="dc">0/2</b></p></div>
-    <button class="goldBtn" id="strikeBtn" onclick="strikeTurn()">⚔️ Сделать ход</button>
+    <button class="goldBtn" onclick="strikeTurn()">⚔️ Сделать ход</button>
     <div class="card"><b>История боя</b><div id="battleLog">Выберите атаку и две зоны защиты.</div></div>
   </div>\`;
   modal.classList.add('open');window._battle=b;
 }
-function toggleAutoBattle(){const b=window._battle;if(!b||b.ended)return;if(b.auto){stopAutoBattle();return}b.auto=true;const btn=document.getElementById('autoBtn'),hint=document.getElementById('autoHint');if(btn){btn.classList.add('on');btn.textContent='■ ОСТАНОВИТЬ АВТОБОЙ'}if(hint)hint.textContent='Автобой включён — ходы выполняются автоматически.';autoBattleStep()}
-function stopAutoBattle(){const b=window._battle;if(b)b.auto=false;if(b?.autoTimer)clearTimeout(b.autoTimer);if(b)b.autoTimer=null;const btn=document.getElementById('autoBtn');if(btn){btn.classList.remove('on');btn.textContent='▶ АВТОБОЙ'}const hint=document.getElementById('autoHint');if(hint)hint.textContent='Автобой сам выбирает атаку и 2 зоны защиты.'}
-function autoBattleStep(){const b=window._battle;if(!b||!b.auto||b.locked||b.ended)return;if(b.hp<=0||b.playerHp<=0){stopAutoBattle();return}b.attack=Math.floor(Math.random()*5);b.defs=[];while(b.defs.length<2){const z=Math.floor(Math.random()*5);if(!b.defs.includes(z))b.defs.push(z)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===b.attack));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));const dc=document.getElementById('dc');if(dc)dc.textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(true),450)}
-function pickAttack(i,el){const b=window._battle;if(!b||b.locked||b.ended)return;document.querySelectorAll('#attacks button').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');b.attack=i}
-function pickDef(i,el){const b=window._battle;if(!b||b.locked||b.ended)return;const d=b.defs;if(d.includes(i)){b.defs=d.filter(x=>x!==i);el.classList.remove('sel')}else if(d.length<2){d.push(i);el.classList.add('sel')}const dc=document.getElementById('dc');if(dc)dc.textContent=d.length+'/2'}
-function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked||b.ended)return;if(b.attack===null||b.defs.length!==2){if(b.auto)autoBattleStep();else toast('Выбери атаку и 2 зоны защиты');return}b.locked=true;
-  b.enemyAttack=Math.floor(Math.random()*5);b.enemyDefs=[];while(b.enemyDefs.length<2){const z=Math.floor(Math.random()*5);if(!b.enemyDefs.includes(z))b.enemyDefs.push(z)}
-  const playerAttackHits=!b.enemyDefs.includes(b.attack);
-  const crit=playerAttackHits&&Math.random()<Math.min(.35,.08+state.strength*.01);
-  const base=totalDamage();
-  const playerDamage=playerAttackHits?base+(crit?Math.max(2,Math.round(base*.5)):0):0;
-  const blocked=b.defs.includes(b.enemyAttack);
-  const dodged=!blocked&&Math.random()<Math.min(.30,.04+state.agility*.012);
-  const enemyBase=10+Math.floor(Math.random()*7);
-  const enemyDamage=(blocked||dodged)?0:Math.max(2,enemyBase-Math.floor(totalDef()/5));
-  b.hp=Math.max(0,b.hp-playerDamage);b.playerHp=Math.max(0,b.playerHp-enemyDamage);
-  const pf=document.getElementById('playerFighter'),ef=document.getElementById('enemyFighter');if(pf)pf.classList.remove('vikingAttack','vikingAction');if(ef)ef.classList.remove('vikingAttack','vikingAction');void document.body.offsetWidth;if(pf&&enemyDamage)pf.classList.add('vikingHit');if(ef&&playerDamage)ef.classList.add('vikingHit');
-  const eHp=document.getElementById('enemyHp'),pHp=document.getElementById('playerHp');if(eHp)eHp.textContent=b.hp+'/100 HP';if(pHp)pHp.textContent=b.playerHp+'/'+state.maxHp+' HP';const eb=document.getElementById('enemyBar'),pbar=document.getElementById('playerBar');if(eb)eb.style.width=b.hp+'%';if(pbar)pbar.style.width=Math.max(0,b.playerHp/state.maxHp*100)+'%';const turn=document.getElementById('turnNo');if(turn)turn.textContent=b.turn;
-  const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⚔️ Ты: <b>'+ZONES[b.attack]+'</b> — '+(playerAttackHits?'попадание':'промах')+(crit?' · <b>КРИТ!</b>':'')+' · '+playerDamage+' урона</div><div>🛡️ Твоя защита: '+ZONES[b.defs[0]]+', '+ZONES[b.defs[1]]+' — '+(blocked?'блок':'не блок')+(dodged?' · уклонение':'')+'</div><div>🪓 Тролль: <b>'+ZONES[b.enemyAttack]+'</b> — '+(blocked?'заблокировано':dodged?'уклонение':'урон '+enemyDamage)+'</div>';
-  if(b.hp<=0){b.ended=true;stopAutoBattle();state.coins+=200;state.exp+=40;state.wins++;state.eventProgress=Math.min(10,state.eventProgress+1);checkLevelUp();save();if(log)log.innerHTML='<b>🏆 Победа над Ледяным троллем! +200 🪙 +40 XP</b><br>'+log.innerHTML;setTimeout(closeP,1100);return}
-  if(b.playerHp<=0){b.ended=true;stopAutoBattle();state.hp=state.maxHp;save();if(log)log.innerHTML='<b>💀 Ледяной тролль победил.</b><br>❤️ HP восстановлено до '+state.maxHp+'.<br>'+log.innerHTML;setTimeout(closeP,1100);return}
-  b.attack=null;b.defs=[];b.turn++;document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));const dc=document.getElementById('dc');if(dc)dc.textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},fromAuto?350:250)
-}
-function checkLevelUp(){state.maxExp??=100;while(state.exp>=state.maxExp){state.exp-=state.maxExp;state.level++;state.freePoints=(state.freePoints||0)+2;state.maxHp+=10;toast('⬆️ Новый уровень! +2 очка характеристик');}save()}
+function toggleAutoBattle(){const b=window._battle;if(!b)return;if(b.auto){stopAutoBattle();return}b.auto=true;const btn=document.getElementById('autoBtn'),hint=document.getElementById('autoHint');if(btn){btn.classList.add('on');btn.textContent='■ ОСТАНОВИТЬ АВТОБОЙ'}if(hint)hint.textContent='Автобой включён — ходы выполняются автоматически.';autoBattleStep();}
+function stopAutoBattle(){const b=window._battle;if(b)b.auto=false;if(b?.autoTimer)clearTimeout(b.autoTimer);if(b?.autoTimer)b.autoTimer=null;const btn=document.getElementById('autoBtn');if(btn){btn.classList.remove('on');btn.textContent='▶ АВТОБОЙ'}const hint=document.getElementById('autoHint');if(hint)hint.textContent='Автобой сам выбирает атаку и 2 зоны защиты каждый ход.'}
+function autoBattleStep(){const b=window._battle;if(!b||!b.auto||b.locked)return;if(b.hp<=0||b.playerHp<=0){stopAutoBattle();return}b.attack=Math.floor(Math.random()*5);b.defs=[];while(b.defs.length<2){const z=Math.floor(Math.random()*5);if(!b.defs.includes(z))b.defs.push(z)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===b.attack));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(true),450)}
+
+function pickAttack(i,b){document.querySelectorAll('#attacks button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');window._battle.attack=i}
+function pickDef(i,b){const d=window._battle.defs;if(d.includes(i)){window._battle.defs=d.filter(x=>x!==i);b.classList.remove('sel')}else if(d.length<2){d.push(i);b.classList.add('sel')}document.getElementById('dc').textContent=d.length+'/2'}
+function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked)return;if(b.attack===null||b.defs.length!==2){if(b.auto)autoBattleStep();else toast('Выбери атаку и 2 зоны защиты');return}b.locked=true;const enemyAttack=Math.floor(Math.random()*5),blocked=b.defs.includes(enemyAttack),base=totalDamage(),crit=Math.random()<Math.min(.35,.08+state.strength*.01),hit=b.attack!==enemyAttack,playerDamage=hit?base+(crit?Math.round(base*.5):0):0,enemyDamage=blocked?0:Math.max(4,10+Math.floor(Math.random()*7));b.hp=Math.max(0,b.hp-playerDamage);b.playerHp=Math.max(0,b.playerHp-(blocked?0:enemyDamage));
+const pf=document.getElementById('playerFighter'),ef=document.getElementById('enemyFighter');if(pf)pf.classList.remove('vikingAttack','vikingAction');if(ef)ef.classList.remove('vikingAttack','vikingAction');void document.body.offsetWidth;if(pf)pf.classList.add('vikingAttack');if(ef)ef.classList.add(playerDamage?'vikingAction':'vikingAttack');
+const eHp=document.getElementById('enemyHp'),pHp=document.getElementById('playerHp');if(eHp)eHp.textContent=b.hp+'/100 HP';if(pHp)pHp.textContent=b.playerHp+'/'+state.maxHp+' HP';const eb=document.getElementById('enemyBar'),pbar=document.getElementById('playerBar');if(eb)eb.style.width=b.hp+'%';if(pbar)pbar.style.width=Math.max(0,b.playerHp/state.maxHp*100)+'%';const turn=document.getElementById('turnNo');if(turn)turn.textContent=++b.turn;const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⚔️ Твоя атака: <b>'+ZONES[b.attack]+'</b> — '+(hit?'попадание':'промах')+(crit?' · <b>КРИТ!</b>':'')+' · Урон: <b>'+playerDamage+'</b></div><div>🛡️ Защита: '+ZONES[b.defs[0]]+', '+ZONES[b.defs[1]]+' — '+(blocked?'блок':'не блок')+'</div><div>🪓 Ледяной тролль атаковал: <b>'+ZONES[enemyAttack]+'</b> — '+(blocked?'заблокировано':'урон '+(blocked?0:enemyDamage))+'</div>';
+if(b.hp<=0){stopAutoBattle();state.coins+=200;state.exp+=40;state.wins++;save();if(log)log.innerHTML='<b>🏆 Победа над Ледяной тролльом! +200 🪙 +40 XP</b><br>'+log.innerHTML;setTimeout(closeP,1000);return}if(b.playerHp<=0){stopAutoBattle();if(log)log.innerHTML='<b>💀 Ледяной тролль победил.</b><br>'+log.innerHTML;setTimeout(closeP,1000);return}b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));const dc=document.getElementById('dc');if(dc)dc.textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},fromAuto?350:250)}
+
 let sec=23*3600+45*60;setInterval(()=>{sec=Math.max(0,sec-1);let h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec%3600/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0'),v=h+':'+m+':'+s;const timer=document.getElementById('timer'),rt=document.getElementById('rt');if(timer)timer.textContent=v;if(rt)rt.textContent=v},1000);
 save();
 function updateHud(){document.querySelectorAll(".res")[0].innerHTML="<b>●</b>"+state.coins+" ＋";document.querySelector(".chapter").textContent=(state.lang==='EN'?"Chapter 5 · Level ":"Глава 5 · Уровень ")+state.level;document.querySelector(".xpt").textContent=state.exp+"/"+state.maxExp}
 updateHud();
 applyLanguage();
-
-
-/* ===== s15 PLAYABLE GAME LOOP ===== */
-(function(){
-  const Z=window.ZONES||['Голова','Грудь','Живот','Пояс','Ноги'];
-  const ENEMY_FALLBACK='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 260"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#263f4b"/><stop offset="1" stop-color="#07131e"/></linearGradient></defs><rect width="320" height="260" rx="22" fill="#071522"/><path d="M55 250Q60 145 160 135Q260 145 265 250Z" fill="url(#g)" stroke="#6d858d" stroke-width="7"/><path d="M72 95Q75 30 125 28Q160 8 195 28Q245 30 248 95L230 155Q205 190 160 195Q115 190 90 155Z" fill="#82998f" stroke="#304a43" stroke-width="7"/><path d="M75 65Q45 42 57 7Q70 39 103 38M245 65Q275 42 263 7Q250 39 217 38" fill="#d7ceb1" stroke="#68614e" stroke-width="6"/><path d="M95 94Q116 76 137 94M183 94Q204 76 225 94" stroke="#263832" stroke-width="13" fill="none" stroke-linecap="round"/><circle cx="120" cy="102" r="8" fill="#ffd84d"/><circle cx="200" cy="102" r="8" fill="#ffd84d"/><path d="M125 140Q160 160 195 140Q187 180 160 181Q133 180 125 140Z" fill="#243934"/><path d="M145 157L153 174M175 157L167 174" stroke="#efe6ca" stroke-width="8" stroke-linecap="round"/><path d="M82 54Q160 15 238 54L230 75Q160 45 90 75Z" fill="#253d4b" stroke="#6b8792" stroke-width="6"/></svg>');
-const ENEMIES=[
-    {name:'Уличный боец',role:'Разбойник',hp:90,damage:8,def:3,reward:90,xp:25},
-    {name:'Наёмник',role:'Воин Sdolars',hp:125,damage:11,def:6,reward:130,xp:35},
-    {name:'Ледяной тролль',role:'Монстр',hp:170,damage:14,def:9,reward:200,xp:50},
-    {name:'Арена чемпион',role:'Элитный боец',hp:230,damage:18,def:12,reward:320,xp:80}
-  ];
-  state.maxExp=state.maxExp||150; state.level=state.level||1; state.hp=state.hp??state.maxHp; state.freePoints=state.freePoints||0; state.battles=state.battles||0; state.losses=state.losses||0;
-  function levelUp(){ while(state.exp>=state.maxExp){state.exp-=state.maxExp;state.level++;state.maxExp=Math.round(state.maxExp*1.25);state.maxHp+=8;state.freePoints+=2;state.hp=state.maxHp;toast('⬆️ Уровень повышен! +2 очка');} }
-  const oldSave=window.save; window.save=function(){levelUp(); oldSave();};
-  function totalD(){return 15+(state.items.find(x=>x.equipped&&x.type==='Оружие')?.damage||0)+Math.floor((state.strength||0)*.7)}
-  function totalA(){return state.agility||0}
-  window.totalDamage=totalD;
-  window.battle=function(){
-    if(window.stopAutoBattle)try{stopAutoBattle()}catch(e){}
-    const idx=Math.min(ENEMIES.length-1,Math.floor((state.wins||0)/3)); const e=ENEMIES[idx];
-    const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const pname=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||state.playerName||'Игрок';
-    const pimg=document.querySelector('.avatar img')?.src||'';
-    const safeBattleHp=(Number(state.hp)>0?Number(state.hp):Number(state.maxHp)); if(Number(state.hp)<=0){state.hp=state.maxHp; save(); toast('❤️ HP восстановлено перед боем')} const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(safeBattleHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
-    pt.textContent='⚔️ Бой — арена Sdolars';
-    pb.innerHTML=\`<div class="vikingBattle">
-      <div class="fighters">
-       <div class="fighter"><img id="battlePlayerImg" src="\${pimg}"><div class="fighterName">\${chatEsc(pname)}</div><div class="fighterRole">⚔️ Уровень \${state.level}</div><div class="fhp"><i id="playerBar" style="width:\${b.playerHp/state.maxHp*100}%"></i></div><div class="fhpText" id="playerHp">\${b.playerHp}/\${state.maxHp} HP</div></div>
-       <div class="fighter enemy"><img id="battleEnemyImg" src="\${e.image||ENEMY_FALLBACK}" onerror="this.onerror=null;this.src=ENEMY_FALLBACK"><div class="fighterName">\${e.name}</div><div class="fighterRole">👹 \${e.role}</div><div class="fhp"><i id="enemyBar" style="width:100%"></i></div><div class="fhpText" id="enemyHp">\${e.hp}/\${e.hp} HP</div></div>
-      </div>
-      <div class="card"><b>Противник: \${e.name}</b><p>❤️ \${e.hp} HP · ⚔️ \${e.damage} · 🛡️ \${e.def}</p></div>
-      <div class="autoRow"><button class="autoBtn" id="autoBtn" onclick="toggleAutoBattle()">▶ АВТОБОЙ</button></div>
-      <div class="autoHint" id="autoHint">Автобой сам выбирает атаку и 2 зоны защиты.</div>
-      <div class="card"><b>Ход: <span id="turnNo">1</span></b></div>
-      <div class="card"><b>Атака — выбери 1 зону</b><div class="zones" id="attacks">\${Z.map((x,i)=>\`<button onclick="pickAttack(\${i},this)">\${x}</button>\`).join('')}</div></div>
-      <div class="card"><b>Защита — выбери 2 зоны</b><div class="zones" id="defs">\${Z.map((x,i)=>\`<button onclick="pickDef(\${i},this)">\${x}</button>\`).join('')}</div><p>Выбрано: <b id="dc">0/2</b></p></div>
-      <button class="goldBtn" onclick="strikeTurn()">⚔️ Сделать ход</button>
-      <div class="card"><b>История боя</b><div id="battleLog">Выбери атаку и две зоны защиты.</div></div>
-    </div>\`;
-    modal.classList.add('open'); window._battle=b;
-  };
-  window.strikeTurn=function(){
-    const b=window._battle;if(!b||b.locked||b.hp<=0||b.playerHp<=0)return;
-    if(b.attack===null||b.defs.length!==2){toast('Выбери атаку и 2 зоны защиты');return;}
-    b.locked=true;
-    const enemyAttack=Math.floor(Math.random()*5), enemyDef=[]; while(enemyDef.length<2){let x=Math.floor(Math.random()*5);if(!enemyDef.includes(x))enemyDef.push(x)}
-    const hit=b.attack!==enemyDef[0]&&b.attack!==enemyDef[1];
-    const crit=hit&&Math.random()<Math.min(.4,.08+(state.strength||0)*.012);
-    const dodge=Math.random()<Math.min(.3,.03+(state.agility||0)*.012);
-    const raw=Math.max(1,totalD()-Math.floor(b.enemy.def*.35)); const pd=hit?(crit?Math.round(raw*1.5):raw):0;
-    const blocked=b.defs.includes(enemyAttack); const ed=blocked||dodge?0:Math.max(1,b.enemy.damage+Math.floor(Math.random()*5)-Math.floor(totalDef()*.35));
-    b.hp=Math.max(0,b.hp-pd); b.playerHp=Math.max(0,b.playerHp-ed); state.hp=b.playerHp;
-    document.getElementById('enemyBar').style.width=(b.hp/b.maxHp*100)+'%'; document.getElementById('playerBar').style.width=(b.playerHp/b.maxPlayerHp*100)+'%';
-    document.getElementById('enemyHp').textContent=b.hp+'/'+b.maxHp+' HP'; document.getElementById('playerHp').textContent=b.playerHp+'/'+b.maxPlayerHp+' HP'; document.getElementById('turnNo').textContent=++b.turn;
-    const log=document.getElementById('battleLog'); log.innerHTML=\`<div>⚔️ Ты: <b>\${Z[b.attack]}</b> — \${hit?'попадание':'промах'}\${crit?' · <b>КРИТ!</b>':''} · \${pd} урона</div><div>🛡️ Твоя защита: \${Z[b.defs[0]]}, \${Z[b.defs[1]]} — \${blocked?'блок':'не блок'}</div><div>👹 \${b.enemy.name}: \${Z[enemyAttack]} — \${dodge?'уклонение':blocked?'заблокировано':'нанесено '+ed}</div>\`;
-    if(pd){document.querySelector('.enemy')?.classList.add('vikingHit');setTimeout(()=>document.querySelector('.enemy')?.classList.remove('vikingHit'),260)}
-    if(b.hp<=0){b.locked=true;state.eventProgress=Math.min(10,(state.eventProgress||0)+1);const finish=window.territoryServerAction?window.territoryServerAction('battle.reward'):Promise.resolve(false);finish.then(ok=>{if(ok){log.innerHTML='<b>🏆 ПОБЕДА!</b> +'+b.enemy.reward+' 🪙 +'+b.enemy.xp+' XP<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('🏆 Победа! Следующий противник сильнее.');},900)}else{b.locked=false;toast('Сервер не подтвердил награду')}});return}
-    if(b.playerHp<=0){b.locked=true;const finish=window.territoryServerAction?window.territoryServerAction('battle.loss'):Promise.resolve(false);finish.then(ok=>{if(ok){log.innerHTML='<b>💀 ПОРАЖЕНИЕ</b><br>❤️ Восстановление рассчитано сервером.<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('💀 Поражение. HP восстановлено сервером');},1100)}else{b.locked=false;toast('Сервер не подтвердил результат')}});return}
-    b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));document.getElementById('dc').textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},280);
-  };
-  window.autoBattleStep=function(){const b=window._battle;if(!b||!b.auto||b.locked)return;b.attack=Math.floor(Math.random()*5);b.defs=[];while(b.defs.length<2){let x=Math.floor(Math.random()*5);if(!b.defs.includes(x))b.defs.push(x)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===b.attack));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(),500)};
-  window.toggleAutoBattle=function(){const b=window._battle;if(!b)return;if(b.auto){b.auto=false;if(b.autoTimer)clearTimeout(b.autoTimer);document.getElementById('autoBtn').textContent='▶ АВТОБОЙ';document.getElementById('autoHint').textContent='Автобой сам выбирает атаку и 2 зоны защиты.';return}b.auto=true;document.getElementById('autoBtn').textContent='■ ОСТАНОВИТЬ АВТОБОЙ';document.getElementById('autoHint').textContent='Автобой включён.';autoBattleStep()};
-  window.stopAutoBattle=function(){const b=window._battle;if(b){b.auto=false;if(b.autoTimer)clearTimeout(b.autoTimer);b.autoTimer=null}};
-  const oldUse=window.useItem; window.useItem=function(i){const it=state.items[i];if(it?.name==='Аптечка'){state.hp=Math.min(state.maxHp,(state.hp??state.maxHp)+30);it.qty--;if(it.qty<=0)state.items.splice(i,1);save();toast('❤️ +30 HP');openP('inventory');return} oldUse(i)};
-  const oldComplete=window.completeQuest; window.completeQuest=function(){oldComplete();state.questDone=true;save()};
-  save();
-})();
-
-</script>
-
-<script>
-/* ===== s25 SERVER SAVE SYNC ===== */
-(function(){
-  const SYNC_KEY='sdolars_server_player_id';
-  let syncBusy=false;
-  function telegramId(){try{return window.Telegram?.WebApp?.initDataUnsafe?.user?.id||null}catch(e){return null}}
-  function localId(){let id=localStorage.getItem(SYNC_KEY);if(!id){id='web_'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem(SYNC_KEY,id)}return id}
-  function playerId(){return String(telegramId()||localId())}
-  async function serverLoad(){
-    try{
-      const r=await fetch('/api/player/'+encodeURIComponent(playerId()),{cache:'no-store'}); if(!r.ok)return;
-      const j=await r.json();
-      if(j.state && typeof j.state==='object'){
-        const serverState={...j.state};
-        const localUpdated=Number(state._updatedAt||0), serverUpdated=Number(j.state._updatedAt||0); delete serverState._updatedAt;
-        if(serverUpdated>=localUpdated){ Object.assign(state,serverState); try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}; if(typeof updateHud==='function')updateHud(); if(typeof applyLanguage==='function')applyLanguage(); }
-        else await serverSave();
-      } else await serverSave();
-    }catch(e){ /* offline: localStorage remains active */ }
-  }
-  async function serverSave(){
-    if(syncBusy)return; syncBusy=true;
-    try{const copy=JSON.parse(JSON.stringify(state));copy._updatedAt=Date.now();state._updatedAt=copy._updatedAt;
-      await fetch('/api/player/'+encodeURIComponent(playerId()),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({state:copy}),keepalive:true});
-    }catch(e){} finally{syncBusy=false}
-  }
-  const oldSave=window.save;
-  window.save=function(){ try{oldSave();}catch(e){}; serverSave(); };
-  window.s25ServerSync={load:serverLoad,save:serverSave,playerId};
-  setTimeout(serverLoad,900);
-  setInterval(()=>{ if(document.visibilityState==='visible')serverSave(); },30000);
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')serverSave()});
-})();
-</script>
-<style>
-/* ===== s26 ONLINE PLAYERS + PVP ===== */
-.pvpOnlineBtn{border:1px solid #2d7ea6;background:#0b3047;color:#dff5ff;border-radius:6px;font-size:8px;font-weight:900;padding:4px 6px;cursor:pointer}.onlinePlayer{cursor:default}.pvpOverlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:99999;display:none;align-items:center;justify-content:center;padding:12px}.pvpOverlay.open{display:flex}.pvpBox{width:min(390px,96vw);max-height:92vh;overflow:auto;background:#061522;border:1px solid #236f99;border-radius:12px;box-shadow:0 12px 50px #000;padding:10px;color:#eaf7ff}.pvpTitle{font-size:15px;font-weight:1000;text-align:center;margin-bottom:8px}.pvpHp{display:flex;justify-content:space-between;font-size:10px;margin:5px 0}.pvpBar{height:8px;background:#172d3a;border-radius:5px;overflow:hidden}.pvpBar i{display:block;height:100%;width:100%;background:#2fd879}.pvpZones{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:7px 0}.pvpZones button{min-width:0;height:32px;border:1px solid #245b78;background:#09283c;color:#d9eef8;border-radius:6px;font-size:8px;font-weight:900}.pvpZones button.sel{border-color:#f0c94b;background:#4b3b0b;color:#fff0a5}.pvpAction{width:100%;height:38px;border:1px solid #d0a63d;background:#8c6416;color:#fff;font-weight:1000;border-radius:7px;margin-top:6px}.pvpClose{width:100%;height:30px;margin-top:6px;border:1px solid #285f7b;background:#0a2a40;color:#bfe4f7;border-radius:6px;font-weight:900;font-size:9px}.pvpStatus{text-align:center;font-size:10px;color:#8fc6df;min-height:18px;margin:5px}.pvpLog{background:#04121f;border:1px solid #164c6b;border-radius:7px;padding:7px;font-size:9px;line-height:1.5;min-height:35px}.pvpChallengeBtns{display:flex;gap:6px}.pvpChallengeBtns button{flex:1;height:34px;border-radius:6px;font-size:10px;font-weight:900}
-
-/* ===== s27 VISIBLE ONLINE PLAYERS ===== */
-.cityOnlineBox{position:absolute;left:3%;right:3%;bottom:8.2%;z-index:7;pointer-events:none}.cityOnlineCard{background:rgba(5,25,43,.96);border:2px solid #1688d5;border-radius:10px;min-height:42px;padding:4px 6px;box-shadow:0 4px 14px rgba(0,0,0,.5);pointer-events:auto}.cityOnlineHead{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:900}.cityOnlineHead b{color:#ffd52a}.cityLiveDot{width:7px;height:7px;border-radius:50%;background:#25df76;box-shadow:0 0 7px #25df76}.cityOnlineStatus{margin-left:auto;font-size:8px;color:#67f29d}.cityOnlineList{display:flex;gap:5px;overflow-x:auto;margin-top:4px;padding-bottom:1px}.cityPlayer{display:flex;align-items:center;gap:4px;white-space:nowrap;background:#092c47;border:1px solid #1b72a9;border-radius:6px;padding:3px 5px;font-size:8px}.cityPlayer i{width:5px;height:5px;border-radius:50%;background:#25df76}.cityDuel{height:22px;padding:0 6px;border:1px solid #e0b83e;border-radius:5px;background:#6d4c0c;color:#fff0a5;font-size:8px;font-weight:900}.cityPlayersBtn{margin-left:auto;height:25px;padding:0 8px;border:1px solid #2d8dc1;border-radius:6px;background:#0b3d5b;color:#dff5ff;font-size:8px;font-weight:900}.cityEmpty{font-size:8px;color:#91b5ca;padding:3px 0}.cityOnlineBox .cityOnlineList::-webkit-scrollbar{height:2px}.cityOnlineBox .cityOnlineList::-webkit-scrollbar-thumb{background:#236f99;border-radius:2px}@media(max-width:420px){.cityOnlineBox{bottom:8.1%;left:2%;right:2%}.cityOnlineCard{min-height:40px;padding:4px}.cityOnlineHead{font-size:9px}.cityPlayer{font-size:7px}.cityDuel{font-size:7px;height:20px;padding:0 5px}}
-</style>
-<div id="pvpOverlay" class="pvpOverlay"><div class="pvpBox" id="pvpBox"></div></div>
-<script>
-(function(){
-  const ZP=['Голова','Грудь','Живот','Пояс','Ноги']; let pvp=null, pendingChallenge=null;
-  window.__pvpPlayers=[];
-  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-  function myPid(){return window.s25ServerSync?.playerId?.()||('web_'+location.hostname)}
-  function sock(){return window.chatSocket||null}
-  function send(o){try{if(sock()&&chatConnected)sock().send(JSON.stringify(o));else toast('Нет соединения с сервером')}catch(e){toast('Ошибка соединения')}}
-  function openPvp(){document.getElementById('pvpOverlay')?.classList.add('open')}
-  function closePvp(){document.getElementById('pvpOverlay')?.classList.remove('open');pvp=null}
-  function renderPlayers(){
-    const box=document.getElementById('chatOnlineBox'); if(!box)return;
-    const list=window.__pvpPlayers||[]; const en=state.lang==='EN';
-    box.innerHTML='<div class="chatOnline"><div class="onlineHead"><span class="onlineDot"></span>'+(en?'Online players':'Онлайн игроки')+' <span class="onlineCount">'+list.length+'</span><span class="chatStatus '+(chatConnected?'':'chatOffline')+'">'+(chatConnected?'● LIVE':'○ OFFLINE')+'</span></div><div class="onlineList">'+(list.length?list.map(x=>'<span class="onlinePlayer"><i></i>'+esc(x.name)+' <button class="pvpOnlineBtn" data-pvp-target="'+esc(x.playerId)+'">⚔️ '+(en?'DUEL':'ДУЭЛЬ')+'</button></span>').join(''):'<span class="onlinePlayer">'+(en?'No other players':'Других игроков пока нет')+'</span>')+'</div><div class="chatOnlineHint">'+(en?'Choose a player and send a duel request.':'Выбери игрока и отправь вызов на дуэль.')+'</div></div>';
-    box.querySelectorAll('[data-pvp-target]').forEach(b=>b.onclick=()=>{send({type:'pvp.challenge',target:b.dataset.pvpTarget});toast(en?'Duel request sent':'Вызов на дуэль отправлен')});
-  }
-  const oldRender=window.renderChatOnline; window.renderChatOnline=renderPlayers;
-  function renderBattle(){const b=pvp,box=document.getElementById('pvpBox');if(!b||!box)return;const en=state.lang==='EN';box.innerHTML='<div class="pvpTitle">⚔️ '+esc(b.opponent)+'</div><div class="pvpHp"><span>Ты</span><b>'+b.yourHp+'/100 HP</b></div><div class="pvpBar"><i style="width:'+b.yourHp+'%"></i></div><div class="pvpHp"><span>'+esc(b.opponent)+'</span><b>'+b.oppHp+'/100 HP</b></div><div class="pvpBar"><i style="width:'+b.oppHp+'%"></i></div><div class="pvpStatus">'+esc(b.status||'Выбери атаку и 2 зоны защиты')+'</div><b style="font-size:10px">'+(en?'Attack — 1 zone':'Атака — 1 зона')+'</b><div class="pvpZones" id="pvpAttack">'+ZP.map((z,i)=>'<button data-a="'+i+'">'+(en?['Head','Chest','Stomach','Waist','Legs'][i]:z)+'</button>').join('')+'</div><b style="font-size:10px">'+(en?'Defense — 2 zones':'Защита — 2 зоны')+'</b><div class="pvpZones" id="pvpDef">'+ZP.map((z,i)=>'<button data-d="'+i+'">'+(en?['Head','Chest','Stomach','Waist','Legs'][i]:z)+'</button>').join('')+'</div><button class="pvpAction" id="pvpMove">⚔️ '+(en?'MAKE MOVE':'СДЕЛАТЬ ХОД')+'</button><div class="pvpLog">'+esc(b.log||'')+'</div><button class="pvpClose" id="pvpClose">'+(en?'Close':'Закрыть')+'</button>';
-    let a=null,d=[];box.querySelectorAll('[data-a]').forEach(x=>x.onclick=()=>{a=+x.dataset.a;box.querySelectorAll('[data-a]').forEach(y=>y.classList.toggle('sel',y===x))});box.querySelectorAll('[data-d]').forEach(x=>x.onclick=()=>{const v=+x.dataset.d;if(d.includes(v))d=d.filter(q=>q!==v);else if(d.length<2)d.push(v);box.querySelectorAll('[data-d]').forEach(y=>y.classList.toggle('sel',d.includes(+y.dataset.d)))});box.querySelector('#pvpMove').onclick=()=>{if(a===null||d.length!==2){toast(en?'Choose 1 attack and 2 defenses':'Выбери 1 атаку и 2 защиты');return}send({type:'pvp.move',matchId:b.matchId,playerId:myPid(),attack:a,defs:d});b.status=en?'Waiting for opponent…':'Ждём ход противника…';renderBattle()};box.querySelector('#pvpClose').onclick=closeP;openPvp()}
-  function challenge(name,from){pendingChallenge={from,name};const box=document.getElementById('pvpBox');box.innerHTML='<div class="pvpTitle">⚔️ '+esc(name)+'</div><div class="pvpStatus">'+(state.lang==='EN'?'Player challenges you to a duel.':'Игрок вызывает тебя на дуэль.')+'</div><div class="pvpChallengeBtns"><button class="pvpAction" id="pvpAccept">ПРИНЯТЬ</button><button class="pvpClose" id="pvpDecline">ОТКАЗАТЬСЯ</button></div>';openPvp();box.querySelector('#pvpAccept').onclick=()=>{send({type:'pvp.accept',from});pendingChallenge=null;box.innerHTML='<div class="pvpTitle">⚔️</div><div class="pvpStatus">Ждём запуска боя…</div>'};box.querySelector('#pvpDecline').onclick=closePvp}
-  window.__handlePvp=function(m){
-    if(m.type==='pvp.challenge'){challenge(m.name,m.from);return}
-    if(m.type==='pvp.start'){pvp={matchId:m.matchId,opponent:m.opponent,opponentPlayerId:m.opponentPlayerId,yourHp:100,oppHp:100,turn:m.turn,status:'Выбери атаку и 2 зоны защиты',log:''};renderBattle();return}
-    if(m.type==='pvp.waiting'){if(pvp){pvp.status='Ждём ход противника…';renderBattle()}return}
-    if(m.type==='pvp.result'){if(!pvp)return;pvp.turn=m.turn;pvp.yourHp=m.yourHp;pvp.oppHp=m.opponentHp;pvp.log='Твой урон: '+m.dmgYou+' · Урон противника: '+m.dmgOpponent;if(m.winner){pvp.status=m.winner==='draw'?'НИЧЬЯ':m.winner===myPid()?'🏆 ПОБЕДА!':'💀 ПОРАЖЕНИЕ';renderBattle()}else{pvp.status='Ход '+(m.turn+1)+': выбери атаку и 2 защиты';renderBattle()}return}
-    if(m.type==='pvp.end'){if(pvp){pvp.status='Противник вышел из боя';renderBattle()}}
-  };
-  // Patch existing chat handler to pass PvP packets.
-  const oldConnect=window.connectGameChat;
-  window.connectGameChat=function(){oldConnect();setTimeout(()=>{try{if(chatSocket&&!chatSocket.__pvpHook){chatSocket.__pvpHook=true;const prev=chatSocket.onmessage;chatSocket.addEventListener('message',ev=>{try{const m=JSON.parse(ev.data);if(m.type&&m.type.indexOf('pvp.')===0)window.__handlePvp(m);if(m.type==='online'&&Array.isArray(m.players)){window.__pvpPlayers=m.players.filter(x=>x.playerId!==myPid());renderPlayers()}}catch(e){}})} }catch(e){}},100)};
-  // Existing connection sends hello before our wrapper can attach; send player id whenever possible.
-  const oldSendServer=window.sendServerMessage;
-  window.setTimeout(()=>{if(chatSocket&&chatConnected)chatSocket.send(JSON.stringify({type:'hello',name:currentChatName(),playerId:myPid(),room:state.chat?.tab==='clan'?'clan':'global'}));},1200);
-  // Also observe online packets from the existing handler by wrapping the render data through periodic refresh.
-  setInterval(()=>{if(chatSocket&&chatConnected&&window.__pvpPlayers.length===0)chatSocket.send(JSON.stringify({type:'hello',name:currentChatName(),playerId:myPid(),room:state.chat?.tab==='clan'?'clan':'global'}))},7000);
-  document.getElementById('pvpOverlay')?.addEventListener('click',e=>{if(e.target.id==='pvpOverlay')closePvp()});
-})();
-</script>
-
-<script>
-(function(){
-  function escCity(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-  function citySend(o){try{if(window.chatSocket&&window.chatConnected){window.chatSocket.send(JSON.stringify(o));return true}}catch(e){}return false}
-  window.cityPvpChallenge=function(pid,name){
-    if(citySend({type:'pvp.challenge',target:pid})){
-      if(typeof toast==='function')toast((state.lang==='EN'?'Duel request sent to ':'Вызов отправлен игроку ')+name);
-    }else if(typeof toast==='function')toast(state.lang==='EN'?'Server connection unavailable':'Нет соединения с сервером');
-  };
-  window.renderCityOnline=function(){
-    const box=document.getElementById('cityOnlineBox');if(!box)return;
-    const list=(window.__pvpPlayers||[]).filter(x=>x&&x.playerId).slice(0,5);
-    const en=window.state?.lang==='EN';
-    let html='<div class="cityOnlineCard"><div class="cityOnlineHead"><span class="cityLiveDot"></span><b>'+(en?'PLAYERS ONLINE':'ИГРОКИ ОНЛАЙН')+'</b><span>'+(list.length?list.length:'0')+'</span><span class="cityOnlineStatus">'+(window.chatConnected?'● LIVE':'○ OFFLINE')+'</span><button class="cityPlayersBtn" onclick="openP(&quot;messages&quot;)">'+(en?'ALL':'ВСЕ')+'</button></div>';
-    if(list.length){html+='<div class="cityOnlineList">'+list.map(x=>'<span class="cityPlayer"><i></i>'+escCity(x.name)+' <button class="cityDuel" onclick="cityPvpChallenge(\\''+escCity(x.playerId)+'\\',\\''+escCity(x.name)+'\\')">⚔️ '+(en?'DUEL':'ДУЭЛЬ')+'</button></span>').join('')+'</div>';}
-    else html+='<div class="cityEmpty">'+(window.chatConnected?(en?'No other players online yet':'Пока нет других игроков онлайн'):(en?'Connect the server to see players':'Подключи сервер, чтобы видеть игроков'))+'</div>';
-    html+='</div>';box.innerHTML=html;
-  };
-  function bootCityOnline(){
-    if(typeof connectGameChat==='function')connectGameChat();
-    renderCityOnline();
-    setInterval(renderCityOnline,1000);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(bootCityOnline,350));
-  else setTimeout(bootCityOnline,350);
-})();
-</script>
-
-<script>
-/* ===== s29 AUTH + AUTHORITATIVE SERVER SYNC ===== */
-(function(){
-  let authReady=false, authBusy=false, lastServerPlayer=null;
-  const TG=()=>window.Telegram?.WebApp;
-  function initData(){try{return TG()?.initData||''}catch(e){return ''}}
-  function guestId(){let x=localStorage.getItem('territory_guest_id');if(!x){x='guest_'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('territory_guest_id',x)}return x}
-  function headers(){const h={'Content-Type':'application/json'};const d=initData();if(d)h['X-Telegram-Init-Data']=d;else{h['X-Guest-Id']=guestId();h['X-Guest-Name']=currentChatName?.()||state.playerName||'Гость'}return h}
-  function applyServerPlayer(player){if(!player)return;lastServerPlayer=player;const keep={...state};Object.assign(state,player);state.playerName=player.playerName||keep.playerName;state.chat=keep.chat||state.chat||{global:[],clan:[],tab:'global',collapsed:false};state.settings=keep.settings||state.settings||{sound:true,fx:true};try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){};if(typeof updateHud==='function')updateHud();if(typeof applyLanguage==='function')applyLanguage()}
-  async function auth(){if(authBusy)return;authBusy=true;try{TG()?.ready?.();TG()?.expand?.();const seed=JSON.parse(JSON.stringify(state));const r=await fetch('/api/auth',{method:'POST',headers:headers(),body:JSON.stringify({state:seed})});const j=await r.json().catch(()=>({}));if(!r.ok){console.warn('Territory auth failed',j);return false}applyServerPlayer(j.player);authReady=true;window.territoryAuth={ok:true,playerId:j.playerId,telegram:!!initData()};return true}catch(e){console.warn('Territory auth offline',e);return false}finally{authBusy=false}}
-  async function serverMe(){if(!authReady)return;try{const r=await fetch('/api/me',{headers:headers(),cache:'no-store'});if(!r.ok)return;const j=await r.json();if(j.player)applyServerPlayer(j.player)}catch(e){}}
-  async function action(type,payload={}){if(!authReady){await auth()}try{const r=await fetch('/api/action',{method:'POST',headers:headers(),body:JSON.stringify({type,...payload})});const j=await r.json().catch(()=>({}));if(!r.ok){toast((state.lang==='EN'?'Server rejected action: ':'Сервер отклонил действие: ')+(j.error||'ошибка'));return false}if(j.player)applyServerPlayer(j.player);return true}catch(e){toast(state.lang==='EN'?'Server unavailable':'Сервер недоступен');return false}}
-  const localSave=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));if(typeof updateHud==='function')updateHud()}catch(e){}};
-  window.save=localSave;
-  window.territoryServerAction=action;
-  window.s29Auth={auth,serverMe,initData,action,applyServerPlayer};
-  window.s25ServerSync=window.s25ServerSync||{};window.s25ServerSync.playerId=()=>{try{const u=TG()?.initDataUnsafe?.user;if(u?.id)return 'tg_'+String(u.id)}catch(e){}return guestId()};
-
-  /* Server-backed economy actions. */
-  window.completeQuest=async function(){await action('quest.complete');openP('quests')};
-  window.claimBonus=async function(){await action('bonus.claim');openP('bonus')};
-  window.addStat=async function(k){await action('stat.add',{stat:k});openP('hero')};
-  window.buyItem=async function(id){await action('item.buy',{item:id});openP('shop')};
-  window.useItem=async function(i){await action('item.use',{index:i});openP('inventory')};
-  window.upgradeWeapon=async function(){await action('forge.upgrade');openP('forge')};
-
-  /* The WebSocket now carries authenticated Telegram initData. */
-  window.chatServerUrl=function(){const proto=location.protocol==='https:'?'wss:':'ws:';const d=initData();return proto+'//'+location.host+'/ws'+(d?'?initData='+encodeURIComponent(d):'')};
-  const oldConnect=window.connectGameChat;
-  window.connectGameChat=function(){return oldConnect()};
-
-  async function boot(){
-    const ok=await auth();
-    if(ok){if(typeof connectGameChat==='function')connectGameChat();setTimeout(serverMe,15000);setInterval(serverMe,45000)}
-  }
-  setTimeout(boot,150);
-})();
-</script>
-
-<style>
-/* ===== TERRITORY FULL BUILD ===== */
-#fullGameDock{position:fixed;left:3%;right:3%;bottom:58px;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:4px;background:rgba(3,16,26,.94);border:1px solid #225b75;border-radius:10px;box-shadow:0 4px 18px #0008}
-.fgd{height:34px;border:1px solid #286b8b;border-radius:7px;background:#0a2b3d;color:#d9f3ff;font-size:8px;font-weight:900}
-.fgd:active{transform:scale(.96)}
-#fullGamePanel{position:fixed;inset:7% 3% 8%;z-index:90;display:none;background:#061a28;border:2px solid #2b8bb8;border-radius:12px;box-shadow:0 12px 45px #000b;overflow:auto;padding:10px}
-.fgpHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.fgpHead b{font-size:15px;color:#ffd34d}
-.fgpClose{width:30px;height:28px;border:1px solid #50788b;border-radius:6px;background:#112e3e;color:#fff;font-size:17px}
-.fgpGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.fgpCard{background:#092b3e;border:1px solid #205d78;border-radius:8px;padding:8px}
-.fgpCard h4{margin:0 0 5px;color:#ffd34d;font-size:10px}
-.fgpCard p{margin:2px 0;color:#b5cfdb;font-size:8px;line-height:1.4}
-.fgpBtn{height:27px;width:100%;margin-top:5px;border:1px solid #328bb4;border-radius:6px;background:#0d405a;color:#e7f8ff;font-size:8px;font-weight:900}
-.fgpWide{grid-column:1/-1}
-.fgpStat{display:flex;justify-content:space-between;border-bottom:1px solid #17445a;padding:3px 0;color:#bcd7e2;font-size:8px}
-@media(max-width:420px){#fullGameDock{bottom:56px}.fgd{font-size:7px;height:31px}.fgpGrid{gap:4px}.fgpCard{padding:6px}}
-</style>
-
-<div id="fullGameDock">
-  <button class="fgd" onclick="FG.open('hero')">👤 ГЕРОЙ</button>
-  <button class="fgd" onclick="FG.open('world')">🗺️ МИР</button>
-  <button class="fgd" onclick="FG.open('gear')">🎒 ИНВЕНТАРЬ</button>
-  <button class="fgd" onclick="FG.open('guild')">🏰 ГИЛЬДИЯ</button>
-  <button class="fgd" onclick="FG.open('more')">☰ ЕЩЁ</button>
-</div>
-<div id="fullGamePanel">
-  <div class="fgpHead"><b id="fgpTitle">Territory — Sdolars</b><button class="fgpClose" onclick="FG.close()">×</button></div>
-  <div id="fgpBody"></div>
-</div>
-
-<script>
-/* ===== FULL PLAYABLE GAME HUB ===== */
-(function(){
-  const LS='territory_full_hub_v1';
-  const fallback={
-    stamina:20,maxStamina:20,materials:0,arenaRating:1000,guild:'Sdolars',guildLevel:1,
-    guildTreasury:1200,heroes:[],daily:0,dailyClaimed:false,season:1,seasonPoints:0,
-    equipmentUpgrades:0,contracts:0
-  };
-  let hub=fallback;
-  try{hub=Object.assign({},fallback,JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){}
-  function save(){try{localStorage.setItem(LS,JSON.stringify(hub))}catch(e){}}
-  function S(){return window.state||{}}
-  function toast43(t){try{if(typeof toast==='function')toast(t)}catch(e){}}
-  function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-  const enemies=[
-    ['Бандит',110,14,35],['Наёмник',145,18,50],['Варяг',180,21,70],
-    ['Охотник',210,25,90],['Страж крепости',250,29,120],['Чемпион арены',300,34,160]
-  ];
-  const items=[
-    ['🔪','Нож','Оружие','+6 урона',220],['🪓','Тяжёлый топор','Оружие','+14 урона',650],
-    ['🛡️','Стальная броня','Броня','+12 защиты',800],['🩹','Аптечка','Расходник','+45 HP',80]
-  ];
-  const heroes=[['⚔️','Рагнар','Урон 18','120'],['🏹','Астрид','Урон 15','95'],['🪓','Ивар','Урон 22','140']];
-
-  function card(title,body,button,label){
-    return '<div class="fgpCard"><h4>'+title+'</h4><p>'+body+'</p>'+(button?'<button class="fgpBtn" onclick="'+button+'">'+label+'</button>':'')+'</div>';
-  }
-
-  window.FG={
-    close(){document.getElementById('fullGamePanel').style.display='none'},
-    open(tab){
-      const p=document.getElementById('fullGamePanel'),b=document.getElementById('fgpBody');
-      if(!p||!b)return;
-      const st=S(), lang=st.lang==='EN';
-      let title='Territory — Sdolars';
-      let html='';
-      if(tab==='hero'){
-        title='👤 Герой';
-        const weapon=st.weapon||'Кулаки';
-        html='<div class="fgpGrid">'+
-          card('⚔️ Персонаж','Уровень: '+(st.level||1)+' · Опыт: '+(st.exp||0)+'/'+(st.maxExp||100)+'<br>Оружие: '+esc(weapon))+
-          card('📊 Характеристики','Сила: '+(st.strength||0)+' · Ловкость: '+(st.agility||0)+'<br>Свободных очков: '+(st.freePoints||0),
-            'FG.addStat()','РАЗВИТЬ СИЛУ')+
-          card('❤️ Выносливость','HP: '+(st.hp||0)+'/'+(st.maxHp||120)+'<br>Энергия: '+hub.stamina+'/'+hub.maxStamina,
-            'FG.rest()','ВОССТАНОВИТЬ')+
-          card('🏆 Прогресс','Победы: '+(st.wins||0)+' · Рейтинг: '+hub.arenaRating+'<br>Сезон: '+hub.season+' · очки: '+hub.seasonPoints)+'</div>';
-      } else if(tab==='world'){
-        title='🗺️ Мир Sdolars';
-        const wins=Number(st.wins||0);
-        const zones=[
-          ['⚓','Старый порт',0,'Контракты и первые бои'],
-          ['⚒️','Железный квартал',5,'Кузницы и тяжёлое оружие'],
-          ['🗡️','Чёрный рынок',10,'Редкие предметы и опасные враги'],
-          ['🏰','Крепость Севера',20,'Элитные противники и осада'],
-          ['👑','Трон Sdolars',35,'Финал первой кампании']
-        ];
-        html='<div class="fgpGrid">'+zones.map((z,i)=>{
-          const open=wins>=z[2], status=open?'ОТКРЫТО':'ЗАКРЫТО';
-          return card(z[0]+' '+z[1],z[3]+'<br>'+status+(open?'':' · нужно побед: '+z[2]),
-            open?'FG.goBattle()':null,open?'В БОЙ':'');
-        }).join('')+
-        card('📜 Контракты','Выполнено сегодня: '+hub.contracts+'/3 · награда за серию: 120 🪙 + 40 XP',
-          'FG.contract()','ВЫПОЛНИТЬ')+
-        card('🎯 Арена','Рейтинг: '+hub.arenaRating+'<br>Победа: +25 · поражение: −18',
-          'FG.arena()','ВЫЗВАТЬ СОПЕРНИКА')+
-        card('⚔️ Кампания','Следующий противник выбирается по прогрессу побед.',
-          'FG.goBattle()','НАЧАТЬ БОЙ')+'</div>';
-      } else if(tab==='gear'){
-        title='🎒 Инвентарь и снаряжение';
-        const inv=Array.isArray(st.inventory)?st.inventory:[];
-        html='<div class="fgpGrid">'+items.map(it=>card(it[0]+' '+it[1],it[2]+' · '+it[3]+'<br>Цена: '+it[4]+' 🪙',
-          'FG.buy('+it[4]+','+JSON.stringify(it[1])+')','КУПИТЬ')).join('')+
-          card('🎒 Твои предметы',(inv.length?inv.map(x=>esc(typeof x==='string'?x:(x.name||x.id||'Предмет'))).join(', '):'Инвентарь пуст.')+
-          '<br>Улучшений: '+hub.equipmentUpgrades,
-          'FG.upgrade()','УЛУЧШИТЬ')+
-          card('🔨 Кузница','Материалы: '+hub.materials+'<br>Улучшай оружие и броню за материалы.',
-            'FG.forge()','КУЗНИЦА')+'</div>';
-      } else if(tab==='guild'){
-        title='🏰 Гильдия Sdolars';
-        html='<div class="fgpGrid">'+
-          card('🏰 '+esc(hub.guild),'Уровень: '+hub.guildLevel+' · участников: '+(st.guildMembers||1)+'<br>Казна: '+hub.guildTreasury+' 🪙')+
-          card('⚔️ Вклад','Участвуй в боях и пополняй казну.',
-            'FG.contribute()','ВНЕСТИ 50 🪙')+
-          card('🛡️ Осада Sdolars','Общая цель: 10 побед гильдии.<br>Твой вклад сохраняется.',
-            'FG.siege()','УЧАСТВОВАТЬ')+
-          card('👥 Герои таверны','Доступно героев: '+heroes.length+'<br>Найм открывает помощников.',
-            'FG.recruit()','НАЙНЯТЬ ГЕРОЯ')+'</div>';
-      } else {
-        title='☰ Все системы';
-        html='<div class="fgpGrid">'+
-          card('🎁 Ежедневная награда','День входа: '+((st.loginStreak||1))+' · награда 150 🪙',
-            'FG.daily()','ЗАБРАТЬ')+
-          card('🏆 Достижения','Первый бой · Богач · Воин Sdolars<br>Победы: '+(st.wins||0))+
-          card('💬 Чат','Глобальный и клановый чат уже доступны в игре.',
-            'FG.chat()','ОТКРЫТЬ ЧАТ')+
-          card('🏅 Рейтинг','Арена: '+hub.arenaRating+'<br>Сезонные очки: '+hub.seasonPoints)+
-          card('⚙️ Настройки','Язык: '+(st.lang||'RU')+' · Звук: '+((st.settings&&st.settings.sound)?'ВКЛ':'ВЫКЛ'),
-            'FG.lang()','СМЕНИТЬ ЯЗЫК')+
-          card('📖 О Territory','Sdolars — город, где герой строит репутацию через бои, задания, экипировку и гильдии.')+
-          '</div>';
-      }
-      document.getElementById('fgpTitle').textContent=title;
-      b.innerHTML=html;p.style.display='block';
-    },
-    addStat(){if((S().freePoints||0)>0){S().strength=(S().strength||0)+1;S().freePoints--;if(typeof save==='function')save();toast43('💪 Сила увеличена')}else toast43('Нет свободных очков');this.open('hero')},
-    rest(){S().hp=S().maxHp||120;hub.stamina=hub.maxStamina;save();if(typeof save==='function')save();toast43('❤️ Герой восстановлен');this.open('hero')},
-    goBattle(){this.close();setTimeout(()=>{if(typeof openP==='function')openP('battle');else toast43('Открой раздел Бой')},60)},
-    contract(){hub.contracts=Math.min(3,hub.contracts+1);hub.seasonPoints+=10;hub.materials+=2;save();toast43('📜 Контракт +1');this.open('world')},
-    arena(){if(hub.stamina<=0){toast43('⚡ Нет энергии');return}hub.stamina--;hub.arenaRating+=25;hub.seasonPoints+=15;save();toast43('🏆 Арена: +25 рейтинга');this.open('world')},
-    buy(price,name){if((S().coins||0)<price){toast43('Недостаточно монет');return}S().coins-=price;S().inventory??=[];S().inventory.push({name:name,type:'Оборудование'});if(typeof save==='function')save();toast43('🛒 Куплено: '+name);this.open('gear')},
-    upgrade(){if(hub.materials<3){toast43('⛏️ Нужно 3 материала');return}hub.materials-=3;hub.equipmentUpgrades++;hub.seasonPoints+=5;save();toast43('🔨 Снаряжение улучшено');this.open('gear')},
-    forge(){hub.materials+=2;save();toast43('⛏️ Получено 2 материала');this.open('gear')},
-    contribute(){if((S().coins||0)<50){toast43('Нужно 50 монет');return}S().coins-=50;hub.guildTreasury+=50;hub.seasonPoints+=5;if(typeof save==='function')save();save();toast43('🏰 Вклад внесён');this.open('guild')},
-    siege(){hub.seasonPoints+=20;hub.guildTreasury+=20;save();toast43('⚔️ Вклад в осаду засчитан');this.open('guild')},
-    recruit(){const h=heroes[hub.heroes%heroes.length];hub.heroes++;hub.seasonPoints+=10;save();toast43('👤 Нанят '+h[1]);this.open('guild')},
-    daily(){if(hub.dailyClaimed){toast43('🎁 Награда уже получена');return}S().coins=(S().coins||0)+150;hub.dailyClaimed=true;hub.seasonPoints+=10;if(typeof save==='function')save();save();toast43('🎁 +150 монет');this.open('more')},
-    chat(){this.close();setTimeout(()=>{if(typeof openP==='function')openP('chat');else toast43('Чат находится в нижнем меню')},60)},
-    lang(){S().lang=S().lang==='EN'?'RU':'EN';if(typeof save==='function')save();toast43('🌐 Язык: '+S().lang);this.open('more')}
-  };
-  setInterval(()=>{if(hub.stamina<hub.maxStamina){hub.stamina++;save()}},60000);
-})();
 </script>
 </body></html>
 
@@ -857,75 +345,10 @@ state.maxHp??=120; state.strength??=12; state.agility??=9; state.wins??=0; state
 `;
 
 export default {
-  async fetch(request,env){
-    const url=new URL(request.url);
-    if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'Content-Type,Authorization,X-Telegram-Init-Data,X-Guest-Id,X-Guest-Name'}});
-    if(url.pathname==='/api/health')return json({ok:true,service:'Territory Sdolars',version:'s30',serverTime:Date.now(),telegramAuth:!!env.TELEGRAM_BOT_TOKEN});
-    if(url.pathname==='/api/auth'&&request.method==='POST'){
-      const auth=await authRequest(request,env); if(!auth)return json({ok:false,error:'telegram_auth_required'},401);
-      const id=env.GAME_HUB.idFromName('main'); return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/auth',request.url),{method:'POST',headers:{'content-type':'application/json','x-player-id':auth.playerId,'x-player-name':auth.name,'x-telegram-id':auth.telegramId||''},body:JSON.stringify({seed:await request.json().catch(()=>null),auth})}));
-    }
-    if(url.pathname==='/api/me'&&request.method==='GET'){
-      const auth=await authRequest(request,env);if(!auth)return json({ok:false,error:'telegram_auth_required'},401);
-      const id=env.GAME_HUB.idFromName('main');return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/me',request.url),{headers:{'x-player-id':auth.playerId,'x-player-name':auth.name}}));
-    }
-    if(url.pathname==='/api/action'&&request.method==='POST'){
-      const auth=await authRequest(request,env);if(!auth)return json({ok:false,error:'telegram_auth_required'},401);
-      const id=env.GAME_HUB.idFromName('main');return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/action',request.url),{method:'POST',headers:{'content-type':'application/json','x-player-id':auth.playerId,'x-player-name':auth.name},body:await request.text()}));
-    }
-    if(url.pathname==='/ws'){
-      if(request.headers.get('Upgrade')?.toLowerCase()!=='websocket')return new Response('Expected WebSocket',{status:426});
-      const auth=await authRequest(request,env);if(!auth)return new Response('Telegram authentication required',{status:401});
-      const id=env.GAME_HUB.idFromName('main');
-      const h=new Headers(request.headers);h.set('x-player-id',auth.playerId);h.set('x-player-name',auth.name);h.set('x-telegram-id',auth.telegramId||'');
-      return env.GAME_HUB.get(id).fetch(new Request(request.url,{method:'GET',headers:h}));
-    }
-    if(url.pathname==='/api/players'&&request.method==='GET'){
-      const id=env.GAME_HUB.idFromName('main');return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/players',request.url),request));
-    }
-    if(url.pathname==='/' || url.pathname==='/index.html') return new Response(INDEX_HTML,{headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
-    return new Response('Not found',{status:404});
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    if (url.pathname === '/api/health') return Response.json({ok:true, version:'s47-video-base'});
+    if (url.pathname === '/api/ping') return Response.json({ok:true, version:'s47-video-base'});
+    return new Response(HTML, {headers:{'content-type':'text/html; charset=UTF-8','cache-control':'no-store'}});
   }
 };
-
-export class GameHub extends DurableObject {
-  constructor(ctx,env){super(ctx,env);this.ctx=ctx;this.env=env;this.sql=ctx.storage.sql;this.sql.exec(`CREATE TABLE IF NOT EXISTS players (player_id TEXT PRIMARY KEY,name TEXT NOT NULL,state_json TEXT NOT NULL,updated_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS guilds (guild_id TEXT PRIMARY KEY,name TEXT NOT NULL,owner_id TEXT NOT NULL,created_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS guild_members (guild_id TEXT NOT NULL,player_id TEXT NOT NULL,role TEXT NOT NULL,PRIMARY KEY(guild_id,player_id));`);this.matches=new Map();this.pending=new Map()}
-  sockets(){return this.ctx.getWebSockets()}
-  attachment(ws){return ws.deserializeAttachment?.()||null}
-  send(ws,o){if(!ws)return;try{ws.send(JSON.stringify(o))}catch{}}
-  online(){return this.sockets().map(ws=>this.attachment(ws)).filter(x=>x?.playerId).map(x=>({playerId:x.playerId,name:x.name}))}
-  broadcastOnline(){const list=this.online();for(const ws of this.sockets())this.send(ws,{type:'online',players:list,names:list.map(x=>x.name)})}
-  socketByPlayer(pid){return this.sockets().find(ws=>this.attachment(ws)?.playerId===pid)||null}
-  getState(pid){const row=this.sql.exec('SELECT state_json FROM players WHERE player_id=?',pid).one();return row?.state_json?JSON.parse(row.state_json):null}
-  putState(pid,name,state){const now=Date.now();state.playerName=name;state._serverUpdatedAt=now;this.sql.exec('INSERT INTO players(player_id,name,state_json,updated_at) VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET name=excluded.name,state_json=excluded.state_json,updated_at=excluded.updated_at',pid,name,JSON.stringify(state),now);return state}
-  async fetch(request){const url=new URL(request.url),pid=cleanId(request.headers.get('x-player-id')),name=safeName(request.headers.get('x-player-name')||'Игрок');
-    if(url.pathname==='/hub/players')return json({ok:true,players:this.online()});
-    if(url.pathname==='/hub/auth'&&request.method==='POST'){const body=await request.json().catch(()=>({}));let state=this.getState(pid);const firstLogin=!state;if(firstLogin){state=sanitizedSeed(body.seed?.state||body.seed,{name});state=this.putState(pid,name,state)}else{state.playerName=name;state=this.putState(pid,name,state)}return json({ok:true,player:state,playerId:pid,firstLogin});}
-    if(url.pathname==='/hub/me'&&request.method==='GET'){const state=this.getState(pid);return json({ok:true,authenticated:!!pid,player:state||null,online:this.online()});}
-    if(url.pathname==='/hub/action'&&request.method==='POST')return this.action(pid,name,await request.json().catch(()=>({})));
-    if(url.pathname==='/ws'){const pair=new WebSocketPair(),client=pair[0],server=pair[1];if(!pid)return new Response('Unauthorized',{status:401});this.ctx.acceptWebSocket(server);server.serializeAttachment({playerId:pid,name});this.putState(pid,name,this.getState(pid)||{...START,playerName:name,items:[],lang:'RU'});this.send(server,{type:'hello.ok',playerId:pid,name});this.broadcastOnline();return new Response(null,{status:101,webSocket:client})}
-    return new Response('not found',{status:404});
-  }
-  action(pid,name,a){let s=this.getState(pid);if(!s)return json({ok:false,error:'player_not_initialized'},400);const type=String(a.type||'');
-    if(type==='battle.reward'){const idx=Math.min(ENEMIES.length-1,Math.floor((s.wins||0)/3)),e=ENEMIES[idx];s.coins+=e.reward;s.exp+=e.xp;s.wins++;s.battles++;s.hp=s.maxHp;while(s.exp>=s.maxExp){s.exp-=s.maxExp;s.level++;s.maxExp=Math.round(s.maxExp*1.25);s.maxHp+=8;s.hp=s.maxHp;s.freePoints+=2}s=this.putState(pid,name,s);return json({ok:true,player:s,reward:{coins:e.reward,xp:e.xp}})}
-    if(type==='battle.loss'){s.losses++;s.battles++;s.hp=s.maxHp;s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='quest.complete'){if(s.questDone)return json({ok:false,error:'already_claimed'},409);s.questDone=true;s.coins+=150;s.exp+=80;s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='bonus.claim'){if(s.bonusClaimed)return json({ok:false,error:'already_claimed'},409);s.bonusClaimed=true;s.coins+=250;s.exp+=20;s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='stat.add'){const k=a.stat;if(!['strength','agility'].includes(k)||s.freePoints<=0)return json({ok:false,error:'invalid_stat'},400);s[k]++;s.freePoints--;s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='item.buy'){const catalog={knife:{name:'Нож',type:'Оружие',icon:'🔪',damage:6,price:220},heavyaxe:{name:'Тяжёлый топор',type:'Оружие',icon:'🪓',damage:18,price:700},steel:{name:'Стальная броня',type:'Броня',icon:'🛡️',defense:15,price:650},bandage:{name:'Аптечка',type:'Расходник',icon:'🩹',qty:1,price:80}};const c=catalog[a.item];if(!c||s.coins<c.price)return json({ok:false,error:'not_enough_or_unknown'},400);s.coins-=c.price;const old=(s.items||[]).find(x=>x.name===c.name);if(old&&c.qty)old.qty=(old.qty||0)+1;else s.items=[...(s.items||[]),{...c,id:c.name+'_'+Date.now(),equipped:false}];s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='item.use'){const i=Number(a.index),it=(s.items||[])[i];if(!it||it.name!=='Аптечка')return json({ok:false,error:'invalid_item'},400);s.hp=Math.min(s.maxHp,s.hp+30);it.qty--;if(it.qty<=0)s.items.splice(i,1);s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='forge.upgrade'){const w=(s.items||[]).find(x=>x.equipped&&x.type==='Оружие');if(!w||s.coins<200)return json({ok:false,error:'cannot_upgrade'},400);s.coins-=200;w.damage=Math.min(100,(w.damage||0)+3);s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    return json({ok:false,error:'unknown_action'},400);
-  }
-  level(s){while(s.exp>=s.maxExp){s.exp-=s.maxExp;s.level++;s.maxExp=Math.round(s.maxExp*1.25);s.maxHp+=8;s.hp=s.maxHp;s.freePoints+=2}return s}
-  async webSocketMessage(ws,message){let m;try{m=JSON.parse(typeof message==='string'?message:new TextDecoder().decode(message))}catch{return}const meta=this.attachment(ws)||{};if(m.type==='hello'){this.send(ws,{type:'hello.ok',playerId:meta.playerId,name:meta.name});this.broadcastOnline();return}if(!meta.playerId)return;
-    if(m.type==='message'){const msg={name:meta.name,text:esc(m.message?.text).slice(0,180),time:String(m.message?.time||''),online:true};for(const c of this.sockets())this.send(c,{type:'message',room:m.room==='clan'?'clan':'global',message:msg});return}
-    if(m.type==='pvp.challenge'){const target=cleanId(m.target),to=this.socketByPlayer(target);if(to&&target!==meta.playerId){this.pending.set(target,{from:meta.playerId,to:target});this.send(to,{type:'pvp.challenge',from:meta.playerId,name:meta.name})}return}
-    if(m.type==='pvp.accept'){const from=cleanId(m.from),challenger=this.socketByPlayer(from);if(challenger){const a=this.attachment(challenger);this.pending.delete(meta.playerId);this.startMatch(a,meta,challenger,ws)}return}
-    if(m.type==='pvp.move'){const match=this.matches.get(String(m.matchId||''));if(!match||!validMove(m))return;if(meta.playerId!==match.a.playerId&&meta.playerId!==match.b.playerId)return;if(match.choices[meta.playerId])return;match.choices[meta.playerId]={attack:Number(m.attack),defs:m.defs.map(Number)};this.send(ws,{type:'pvp.waiting'});if(match.choices[match.a.playerId]&&match.choices[match.b.playerId])this.resolve(match)}
-  }
-  startMatch(a,b,aw,bw){const id='m_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8),m={id,a,b,turn:1,hp:{[a.playerId]:100,[b.playerId]:100},choices:{},aw,bw};this.matches.set(id,m);this.send(aw,{type:'pvp.start',matchId:id,turn:1,opponent:b.name,opponentPlayerId:b.playerId});this.send(bw,{type:'pvp.start',matchId:id,turn:1,opponent:a.name,opponentPlayerId:a.playerId})}
-  resolve(m){const A=m.choices[m.a.playerId],B=m.choices[m.b.playerId],sa=this.getState(m.a.playerId)||START,sb=this.getState(m.b.playerId)||START;const hitA=!B.defs.includes(A.attack),hitB=!A.defs.includes(B.attack);const critA=Math.random()<Math.min(.5,(sa.strength||0)/100),critB=Math.random()<Math.min(.5,(sb.strength||0)/100);const dodgeA=Math.random()<Math.min(.35,(sa.agility||0)/100),dodgeB=Math.random()<Math.min(.35,(sb.agility||0)/100);const baseA=10+Math.floor((sa.strength||0)*.7),baseB=10+Math.floor((sb.strength||0)*.7);const dmgA=hitA&&!dodgeB?(critA?Math.round(baseA*1.8):baseA):0,dmgB=hitB&&!dodgeA?(critB?Math.round(baseB*1.8):baseB):0;m.hp[m.a.playerId]=Math.max(0,m.hp[m.a.playerId]-dmgB);m.hp[m.b.playerId]=Math.max(0,m.hp[m.b.playerId]-dmgA);let winner=null;if(!m.hp[m.a.playerId]&&!m.hp[m.b.playerId])winner='draw';else if(!m.hp[m.a.playerId])winner=m.b.playerId;else if(!m.hp[m.b.playerId])winner=m.a.playerId;this.send(m.aw,{type:'pvp.result',matchId:m.id,turn:m.turn,dmgYou:dmgA,dmgOpponent:dmgB,yourHp:m.hp[m.a.playerId],opponentHp:m.hp[m.b.playerId],winner,critYou:critA,dodgeOpponent:dodgeB});this.send(m.bw,{type:'pvp.result',matchId:m.id,turn:m.turn,dmgYou:dmgB,dmgOpponent:dmgA,yourHp:m.hp[m.b.playerId],opponentHp:m.hp[m.a.playerId],winner,critYou:critB,dodgeOpponent:dodgeA});if(winner){const winnerPid=winner==='draw'?null:winner;for(const pid of [m.a.playerId,m.b.playerId]){const s=this.getState(pid);if(s){s.battles++;if(winner==='draw'){s.hp=s.maxHp}else if(pid===winnerPid){s.wins++;s.coins+=100;s.exp+=30;s.hp=s.maxHp;this.level(s)}else{s.losses++;s.hp=Math.max(1,Math.round(s.maxHp*.35))}this.putState(pid,pid===m.a.playerId?m.a.name:m.b.name,s)}}this.matches.delete(m.id)}else{m.turn++;m.choices={}}}
-  async webSocketClose(ws){const meta=this.attachment(ws);if(!meta?.playerId)return;for(const [id,m] of this.matches){if(m.a.playerId===meta.playerId||m.b.playerId===meta.playerId){const other=m.a.playerId===meta.playerId?m.b:m.a;this.send(this.socketByPlayer(other.playerId),{type:'pvp.end',reason:'opponent_offline'});this.matches.delete(id)}}this.broadcastOnline()}
-  async webSocketError(ws){await this.webSocketClose(ws)}
-}
