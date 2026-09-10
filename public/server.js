@@ -14,7 +14,7 @@ const server=http.createServer(async(req,res)=>{if(req.method==='OPTIONS'){res.w
  if(u.startsWith('/api/player/')){const key=cleanKey(u.slice(12));if(!key)return sendJson(res,400,{error:'bad player id'});if(req.method==='GET')return sendJson(res,200,{ok:true,state:players[key]||null});if(req.method==='POST'){try{const b=await body(req);if(!b.state||typeof b.state!=='object')return sendJson(res,400,{error:'state required'});players[key]={...b.state,_updatedAt:Date.now()};persist();return sendJson(res,200,{ok:true,savedAt:players[key]._updatedAt})}catch(e){return sendJson(res,400,{error:'invalid json'})}}}
  staticFile(req,res);
 });
-const wss=new WebSocket.Server({server}),clients=new Set(),online=new Map(),rooms={global:[],clan:[]},matches=new Map(),pending=new Map();
+const wss=new WebSocket.Server({server, path:'/ws'}),clients=new Set(),online=new Map(),rooms={global:[],clan:[]},matches=new Map(),pending=new Map();
 function send(ws,o){if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify(o))}
 function onlineList(){return [...online.values()].map(x=>({playerId:x.playerId,name:x.name}))}
 function broadcastOnline(){const list=onlineList();for(const ws of clients)send(ws,{type:'online',names:list.map(x=>x.name),players:list})}

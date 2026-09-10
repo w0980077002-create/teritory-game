@@ -58,8 +58,8 @@ const ENEMIES=[
     document.getElementById('enemyHp').textContent=b.hp+'/'+b.maxHp+' HP'; document.getElementById('playerHp').textContent=b.playerHp+'/'+b.maxPlayerHp+' HP'; document.getElementById('turnNo').textContent=++b.turn;
     const log=document.getElementById('battleLog'); log.innerHTML=`<div>⚔️ Ты: <b>${Z[b.attack]}</b> — ${hit?'попадание':'промах'}${crit?' · <b>КРИТ!</b>':''} · ${pd} урона</div><div>🛡️ Твоя защита: ${Z[b.defs[0]]}, ${Z[b.defs[1]]} — ${blocked?'блок':'не блок'}</div><div>👹 ${b.enemy.name}: ${Z[enemyAttack]} — ${dodge?'уклонение':blocked?'заблокировано':'нанесено '+ed}</div>`;
     if(pd){document.querySelector('.enemy')?.classList.add('vikingHit');setTimeout(()=>document.querySelector('.enemy')?.classList.remove('vikingHit'),260)}
-    if(b.hp<=0){b.locked=true;state.wins++;state.battles++;state.coins+=b.enemy.reward;state.exp+=b.enemy.xp;state.eventProgress=Math.min(10,(state.eventProgress||0)+1);save();log.innerHTML='<b>🏆 ПОБЕДА!</b> +'+b.enemy.reward+' 🪙 +'+b.enemy.xp+' XP<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('🏆 Победа! Следующий противник сильнее.');},900);return}
-    if(b.playerHp<=0){b.locked=true;state.losses++;state.battles++;state.hp=Math.max(1,Math.round(state.maxHp*.35));save();log.innerHTML='<b>💀 ПОРАЖЕНИЕ</b><br>❤️ Восстановлено до '+state.hp+' HP.<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('💀 Поражение. Восстановлено '+state.hp+' HP');},1100);return}
+    if(b.hp<=0){b.locked=true;state.eventProgress=Math.min(10,(state.eventProgress||0)+1);const finish=window.territoryServerAction?window.territoryServerAction('battle.reward'):Promise.resolve(false);finish.then(ok=>{if(ok){log.innerHTML='<b>🏆 ПОБЕДА!</b> +'+b.enemy.reward+' 🪙 +'+b.enemy.xp+' XP<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('🏆 Победа! Следующий противник сильнее.');},900)}else{b.locked=false;toast('Сервер не подтвердил награду')}});return}
+    if(b.playerHp<=0){b.locked=true;const finish=window.territoryServerAction?window.territoryServerAction('battle.loss'):Promise.resolve(false);finish.then(ok=>{if(ok){log.innerHTML='<b>💀 ПОРАЖЕНИЕ</b><br>❤️ Восстановление рассчитано сервером.<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('💀 Поражение. HP восстановлено сервером');},1100)}else{b.locked=false;toast('Сервер не подтвердил результат')}});return}
     b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));document.getElementById('dc').textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},280);
   };
   window.autoBattleStep=function(){const b=window._battle;if(!b||!b.auto||b.locked)return;b.attack=Math.floor(Math.random()*5);b.defs=[];while(b.defs.length<2){let x=Math.floor(Math.random()*5);if(!b.defs.includes(x))b.defs.push(x)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===b.attack));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(),500)};
@@ -337,7 +337,7 @@ function chatEsc(x){return String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt
 function currentChatName(){try{const u=window.Telegram?.WebApp?.initDataUnsafe?.user;if(u){return (((u.first_name||'')+' '+(u.last_name||'')).trim()||(u.username?'@'+u.username:'Игрок'));}}catch(e){}return state.playerName||'Игрок'}
 const CHAT_EMOJIS=['😀','😂','😍','😎','🔥','⚔️','🏆','❤️','👍','💪'];
 let chatSocket=null,chatConnected=false,chatReconnectTimer=null,chatOnlineNames=[];
-function chatServerUrl(){if(location.protocol==='https:')return 'wss://'+location.host;if(location.protocol==='http:')return 'ws://'+location.host;return ''}
+function chatServerUrl(){if(location.protocol==='https:')return 'wss://'+location.host+'/ws';if(location.protocol==='http:')return 'ws://'+location.host+'/ws';return ''}
 function renderChatOnline(){const box=document.getElementById('chatOnlineBox');if(!box)return;const names=(chatOnlineNames.length?chatOnlineNames:[currentChatName()]).filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,20);const en=state.lang==='EN';box.innerHTML='<div class="chatOnline"><div class="onlineHead"><span class="onlineDot"></span>'+(en?'Online players':'Онлайн игроки')+' <span class="onlineCount">'+names.length+'</span><span class="chatStatus '+(chatConnected?'':'chatOffline')+'">'+(chatConnected?(en?'● LIVE':'● ОНЛАЙН'):(en?'○ OFFLINE':'○ НЕТ СВЯЗИ'))+'</span></div><div class="onlineList">'+names.map(n=>'<span class="onlinePlayer"><i></i>'+chatEsc(n)+'</span>').join('')+'</div><div class="chatOnlineHint">'+(en?'Players currently in Sdolars':'Сейчас находятся в Sdolars')+'</div></div>'}
 function connectGameChat(){const url=chatServerUrl();if(!url||chatSocket||chatConnected)return;try{chatSocket=new WebSocket(url);chatSocket.onopen=()=>{chatConnected=true;chatSocket.send(JSON.stringify({type:'hello',name:currentChatName(),playerId:(window.s25ServerSync?.playerId?.()||''),room:state.chat?.tab==='clan'?'clan':'global'}));renderChatOnline()};chatSocket.onmessage=(ev)=>{try{const m=JSON.parse(ev.data);if(m.type==='history'){state.chat[m.room]=Array.isArray(m.messages)?m.messages:[];save();if(modal.classList.contains('open')&&state.chat.tab===m.room)openP('messages')}else if(m.type==='message'){state.chat[m.room]??=[];state.chat[m.room].push(m.message);if(state.chat[m.room].length>60)state.chat[m.room].splice(0,state.chat[m.room].length-60);save();if(modal.classList.contains('open')&&state.chat.tab===m.room)openP('messages')}else if(m.type==='online'){chatOnlineNames=Array.isArray(m.names)?m.names:[];window.__pvpPlayers=Array.isArray(m.players)?m.players.filter(x=>x.playerId!==(window.s25ServerSync?.playerId?.()||'')):[];renderChatOnline()}}catch(e){}};chatSocket.onclose=()=>{chatConnected=false;chatSocket=null;renderChatOnline();clearTimeout(chatReconnectTimer);chatReconnectTimer=setTimeout(connectGameChat,4000)};chatSocket.onerror=()=>{try{chatSocket.close()}catch(e){}}}catch(e){chatSocket=null;chatConnected=false;renderChatOnline()}}
 function sendServerMessage(text){if(chatSocket&&chatConnected){chatSocket.send(JSON.stringify({type:'message',room:state.chat.tab==='clan'?'clan':'global',message:{name:currentChatName(),text,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),online:true}}));return true}return false}
@@ -490,8 +490,8 @@ const ENEMIES=[
     document.getElementById('enemyHp').textContent=b.hp+'/'+b.maxHp+' HP'; document.getElementById('playerHp').textContent=b.playerHp+'/'+b.maxPlayerHp+' HP'; document.getElementById('turnNo').textContent=++b.turn;
     const log=document.getElementById('battleLog'); log.innerHTML=`<div>⚔️ Ты: <b>${Z[b.attack]}</b> — ${hit?'попадание':'промах'}${crit?' · <b>КРИТ!</b>':''} · ${pd} урона</div><div>🛡️ Твоя защита: ${Z[b.defs[0]]}, ${Z[b.defs[1]]} — ${blocked?'блок':'не блок'}</div><div>👹 ${b.enemy.name}: ${Z[enemyAttack]} — ${dodge?'уклонение':blocked?'заблокировано':'нанесено '+ed}</div>`;
     if(pd){document.querySelector('.enemy')?.classList.add('vikingHit');setTimeout(()=>document.querySelector('.enemy')?.classList.remove('vikingHit'),260)}
-    if(b.hp<=0){b.locked=true;state.wins++;state.battles++;state.coins+=b.enemy.reward;state.exp+=b.enemy.xp;state.eventProgress=Math.min(10,(state.eventProgress||0)+1);save();log.innerHTML='<b>🏆 ПОБЕДА!</b> +'+b.enemy.reward+' 🪙 +'+b.enemy.xp+' XP<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('🏆 Победа! Следующий противник сильнее.');},900);return}
-    if(b.playerHp<=0){b.locked=true;state.losses++;state.battles++;state.hp=Math.max(1,Math.round(state.maxHp*.35));save();log.innerHTML='<b>💀 ПОРАЖЕНИЕ</b><br>❤️ Восстановлено до '+state.hp+' HP.<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('💀 Поражение. Восстановлено '+state.hp+' HP');},1100);return}
+    if(b.hp<=0){b.locked=true;state.eventProgress=Math.min(10,(state.eventProgress||0)+1);const finish=window.territoryServerAction?window.territoryServerAction('battle.reward'):Promise.resolve(false);finish.then(ok=>{if(ok){log.innerHTML='<b>🏆 ПОБЕДА!</b> +'+b.enemy.reward+' 🪙 +'+b.enemy.xp+' XP<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('🏆 Победа! Следующий противник сильнее.');},900)}else{b.locked=false;toast('Сервер не подтвердил награду')}});return}
+    if(b.playerHp<=0){b.locked=true;const finish=window.territoryServerAction?window.territoryServerAction('battle.loss'):Promise.resolve(false);finish.then(ok=>{if(ok){log.innerHTML='<b>💀 ПОРАЖЕНИЕ</b><br>❤️ Восстановление рассчитано сервером.<br>'+log.innerHTML;setTimeout(()=>{closeP();toast('💀 Поражение. HP восстановлено сервером');},1100)}else{b.locked=false;toast('Сервер не подтвердил результат')}});return}
     b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));document.getElementById('dc').textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},280);
   };
   window.autoBattleStep=function(){const b=window._battle;if(!b||!b.auto||b.locked)return;b.attack=Math.floor(Math.random()*5);b.defs=[];while(b.defs.length<2){let x=Math.floor(Math.random()*5);if(!b.defs.includes(x))b.defs.push(x)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===b.attack));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(),500)};
@@ -610,6 +610,45 @@ const ENEMIES=[
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(bootCityOnline,350));
   else setTimeout(bootCityOnline,350);
+})();
+</script>
+
+<script>
+/* ===== s29 AUTH + AUTHORITATIVE SERVER SYNC ===== */
+(function(){
+  let authReady=false, authBusy=false, lastServerPlayer=null;
+  const TG=()=>window.Telegram?.WebApp;
+  function initData(){try{return TG()?.initData||''}catch(e){return ''}}
+  function guestId(){let x=localStorage.getItem('territory_guest_id');if(!x){x='guest_'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('territory_guest_id',x)}return x}
+  function headers(){const h={'Content-Type':'application/json'};const d=initData();if(d)h['X-Telegram-Init-Data']=d;else{h['X-Guest-Id']=guestId();h['X-Guest-Name']=currentChatName?.()||state.playerName||'Гость'}return h}
+  function applyServerPlayer(player){if(!player)return;lastServerPlayer=player;const keep={...state};Object.assign(state,player);state.playerName=player.playerName||keep.playerName;state.chat=keep.chat||state.chat||{global:[],clan:[],tab:'global',collapsed:false};state.settings=keep.settings||state.settings||{sound:true,fx:true};try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){};if(typeof updateHud==='function')updateHud();if(typeof applyLanguage==='function')applyLanguage()}
+  async function auth(){if(authBusy)return;authBusy=true;try{TG()?.ready?.();TG()?.expand?.();const seed=JSON.parse(JSON.stringify(state));const r=await fetch('/api/auth',{method:'POST',headers:headers(),body:JSON.stringify({state:seed})});const j=await r.json().catch(()=>({}));if(!r.ok){console.warn('Territory auth failed',j);return false}applyServerPlayer(j.player);authReady=true;window.territoryAuth={ok:true,playerId:j.playerId,telegram:!!initData()};return true}catch(e){console.warn('Territory auth offline',e);return false}finally{authBusy=false}}
+  async function serverMe(){if(!authReady)return;try{const r=await fetch('/api/me',{headers:headers(),cache:'no-store'});if(!r.ok)return;const j=await r.json();if(j.player)applyServerPlayer(j.player)}catch(e){}}
+  async function action(type,payload={}){if(!authReady){await auth()}try{const r=await fetch('/api/action',{method:'POST',headers:headers(),body:JSON.stringify({type,...payload})});const j=await r.json().catch(()=>({}));if(!r.ok){toast((state.lang==='EN'?'Server rejected action: ':'Сервер отклонил действие: ')+(j.error||'ошибка'));return false}if(j.player)applyServerPlayer(j.player);return true}catch(e){toast(state.lang==='EN'?'Server unavailable':'Сервер недоступен');return false}}
+  const localSave=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));if(typeof updateHud==='function')updateHud()}catch(e){}};
+  window.save=localSave;
+  window.territoryServerAction=action;
+  window.s29Auth={auth,serverMe,initData,action,applyServerPlayer};
+  window.s25ServerSync=window.s25ServerSync||{};window.s25ServerSync.playerId=()=>{try{const u=TG()?.initDataUnsafe?.user;if(u?.id)return 'tg_'+String(u.id)}catch(e){}return guestId()};
+
+  /* Server-backed economy actions. */
+  window.completeQuest=async function(){await action('quest.complete');openP('quests')};
+  window.claimBonus=async function(){await action('bonus.claim');openP('bonus')};
+  window.addStat=async function(k){await action('stat.add',{stat:k});openP('hero')};
+  window.buyItem=async function(id){await action('item.buy',{item:id});openP('shop')};
+  window.useItem=async function(i){await action('item.use',{index:i});openP('inventory')};
+  window.upgradeWeapon=async function(){await action('forge.upgrade');openP('forge')};
+
+  /* The WebSocket now carries authenticated Telegram initData. */
+  window.chatServerUrl=function(){const proto=location.protocol==='https:'?'wss:':'ws:';const d=initData();return proto+'//'+location.host+'/ws'+(d?'?initData='+encodeURIComponent(d):'')};
+  const oldConnect=window.connectGameChat;
+  window.connectGameChat=function(){return oldConnect()};
+
+  async function boot(){
+    const ok=await auth();
+    if(ok){if(typeof connectGameChat==='function')connectGameChat();setTimeout(serverMe,15000);setInterval(serverMe,45000)}
+  }
+  setTimeout(boot,150);
 })();
 </script>
 </body></html>

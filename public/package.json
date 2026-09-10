@@ -1,7 +1,12 @@
 {
-  "name": "territory-sdolars-s25",
+  "name": "territory-sdolars-s29",
   "version": "1.0.0",
   "private": true,
-  "scripts": {"start":"node server.js"},
-  "dependencies": {"ws":"^8.18.0"}
+  "scripts": {
+    "start": "node server.js",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": { "ws": "^8.18.0" },
+  "devDependencies": { "wrangler": "^4.33.1" }
 }
