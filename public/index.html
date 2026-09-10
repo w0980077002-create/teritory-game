@@ -237,28 +237,36 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .vikingBattle{padding:6px;border-radius:12px}.fighters{gap:5px}.fighter{padding:4px;border-radius:10px}.fighter img,.fighter .vikingSvg{height:108px;object-fit:cover}.fighterName{font-size:11px;margin:3px 0 2px}.fighterRole{font-size:7px;margin-bottom:2px}.fhp{height:7px}.fhpText{font-size:8px}.vikingBattle>.card{padding:7px;margin:5px 0}.vikingBattle>.card p{margin:4px 0}.autoRow{margin:4px 0}.autoBtn{height:34px}.autoHint{font-size:8px;margin:1px 0 4px}.vikingBattle .zones{gap:3px}.vikingBattle .zones button{padding:7px 1px;font-size:10px}.vikingBattle .goldBtn{padding:9px 8px;font-size:12px}.vikingBattle #battleLog{font-size:10px;line-height:1.25}.panel{padding:10px}.panel h2{font-size:18px;margin:2px 0 7px}
 </style>
 
-<style id="s20-battle-button">
-/* s20: compact centered Battle button */
-.battleAction, .battle-btn, .fight-btn, .action:has([class*="battleArt"]), button[onclick*="battle()"] {
-  width: 148px !important;
-  min-width: 148px !important;
-  max-width: 148px !important;
-  height: 148px !important;
-  min-height: 148px !important;
-  max-height: 148px !important;
-  margin: 12px auto !important;
-  border-radius: 28px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 10px !important;
+<style id="s21-battle-button">
+/* s21: compact centered Battle button — fixes the off-screen oversized button */
+.actions {
+  left: 50% !important;
+  right: auto !important;
+  width: 150px !important;
+  transform: translateX(-50%) !important;
+  bottom: 13% !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  justify-items: center !important;
+}
+.actions .action {
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+  height: 150px !important;
+  min-height: 150px !important;
+  max-height: 150px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  padding: 8px !important;
   box-sizing: border-box !important;
 }
-button[onclick*="battle()"] .icon, .battleAction .icon, .battle-btn .icon, .fight-btn .icon, .action .battleArt {
-  font-size: 48px !important;
-  line-height: 1 !important;
+.actions .action .battleArt {
+  width: 68px !important;
+  height: 68px !important;
+  margin-bottom: 2px !important;
 }
+.actions .action span { font-size: 20px !important; }
 </style>
 
 </head>
@@ -318,7 +326,7 @@ const I18N={
  'Territory — Sdolars':'Territory — Sdolars','Sdolars':'Sdolars',
  'Глава 5 · Уровень ':'Chapter 5 · Level ', 'Текущее задание':'Current quest','Поговори с кузнецом ›':'Talk to the blacksmith ›','⌖ Кузница':'⌖ Forge','Ежедневный бонус':'Daily bonus','Бонусы':'Bonuses','События':'Events','VIP':'VIP','Кузница':'Forge','Улучшение снаряжения':'Equipment upgrade','Таверна':'Tavern','Найм героев':'Hero recruitment','Магазин':'Shop','Предметы и снаряжение':'Items and equipment','Бой':'Battle','Инвентарь':'Inventory','Экипировка':'Equipment','Задания':'Quests','Чат игры':'Game chat','Общий чат и чат клана':'Global chat and clan chat','Открыть ›':'Open ›','Город':'City','Герой':'Hero','Гильдия':'Guild','Ещё':'More',
  'Глава 5 · Уровень':'Chapter 5 · Level','Сила':'Strength','Ловкость':'Agility','Защита':'Defense','Опыт':'Experience','＋ Сила':'＋ Strength','＋ Ловкость':'＋ Agility','Предметы':'Items','Монеты:':'Coins:','Инвентарь пуст.':'Inventory is empty.','Снять':'Unequip','Экипировать':'Equip','Использовать':'Use','Выбросить':'Discard','Изменить':'Change','Оружие':'Weapon','Броня':'Armor','Пусто':'Empty','Урон':'Damage','Нет оружия':'No weapon','Текущий урон:':'Current damage:','Следующее улучшение:':'Next upgrade:','Стоимость:':'Cost:','Улучшить':'Upgrade','Купить':'Buy','Расходник':'Consumable','Количество':'Quantity',
- 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s18':'Version: s19',
+ 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s18':'Version: s21',
  'Чат':'Chat','Общий чат':'Global chat','Чат клана':'Clan chat','Общий':'Global','Клан':'Clan','Онлайн игроки':'Online players','Сейчас находятся в Sdolars':'Currently in Sdolars','Развернуть':'Expand','Свернуть':'Collapse','Написать сообщение...':'Write a message...','Отправить':'Send','Добро пожаловать в общий чат игры!':'Welcome to the global game chat!','Кто идёт на арену?':'Who is going to the arena?','Чат клана открыт. Добро пожаловать!':'Clan chat is open. Welcome!','Система Sdolars':'Sdolars System','Клан Sdolars':'Sdolars Clan',
  'Бой — Викингская арена':'Battle — Viking arena','⚔️ Викинг Sdolars':'⚔️ Viking of Sdolars','👹 Монстр':'👹 Monster','Ледяной тролль':'Frost troll','Атака — выбери 1 зону':'Attack — choose 1 zone','Защита — выбери 2 зоны':'Defense — choose 2 zones','Выбрано:':'Selected:','Сделать ход':'Make a move','История боя':'Battle log','Выберите атаку и две зоны защиты.':'Choose an attack and two defense zones.','АВТОБОЙ':'AUTO BATTLE','ОСТАНОВИТЬ АВТОБОЙ':'STOP AUTO BATTLE','Автобой сам выбирает атаку и 2 зоны защиты каждый ход.':'Auto battle chooses an attack and 2 defense zones each turn.','Автобой включён — ходы выполняются автоматически.':'Auto battle is on — turns are performed automatically.','Ход:':'Turn:','попадание':'hit','промах':'miss','КРИТ!':'CRIT!','блок':'blocked','не блок':'not blocked','заблокировано':'blocked','урон':'damage','Победа над Ледяной тролльом!':'Victory over the Frost troll!','Ледяной тролль победил.':'The Frost troll won.',
  'Голова':'Head','Грудь':'Chest','Живот':'Stomach','Пояс':'Waist','Ноги':'Legs',
