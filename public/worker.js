@@ -4,19 +4,6 @@ const MAX_STATE_BYTES = 900_000;
 const ZONES = [0,1,2,3,4];
 const MAX_NAME = 40;
 const START = {coins:1779, gems:1330, energy:191.38, hp:120, maxHp:120, level:3, exp:120, maxExp:150, strength:12, agility:9, freePoints:0, wins:0, losses:0, battles:0};
-const DISTRICTS = [
-  {id:'square',name:'Центральная площадь',level:1,cost:0,icon:'🏰'},
-  {id:'forest',name:'Северный лес',level:3,cost:3,icon:'🌲'},
-  {id:'harbor',name:'Порт Sdolars',level:8,cost:5,icon:'⚓'},
-  {id:'industrial',name:'Промзона',level:12,cost:7,icon:'🏭'},
-  {id:'fortress',name:'Старая крепость',level:18,cost:10,icon:'🏛️'}
-];
-const ADVENTURE_QUESTS = [
-  {id:'forest_patrol',district:'forest',name:'Патруль Северного леса',goal:3,reward:180,xp:45,energy:8},
-  {id:'harbor_run',district:'harbor',name:'Контрабандисты порта',goal:5,reward:320,xp:80,energy:12},
-  {id:'industrial_raid',district:'industrial',name:'Рейд на промзону',goal:7,reward:520,xp:120,energy:16},
-  {id:'fortress_siege',district:'fortress',name:'Штурм старой крепости',goal:10,reward:900,xp:220,energy:22}
-];
 const ENEMIES = [
   {name:'Уличный боец',hp:90,damage:8,def:3,reward:90,xp:25},
   {name:'Наёмник',hp:125,damage:11,def:6,reward:130,xp:35},
@@ -53,7 +40,7 @@ async function authRequest(request,env){
 function sanitizedSeed(seed,auth){
   const s=seed&&typeof seed==='object'?seed:{};
   const items=Array.isArray(s.items)?s.items.slice(0,80).map(x=>({id:String(x.id||''),name:safeName(x.name||'Предмет'),type:safeName(x.type||'Предмет'),icon:String(x.icon||'🎒').slice(0,8),damage:Math.min(100,Math.max(0,Number(x.damage)||0)),defense:Math.min(100,Math.max(0,Number(x.defense)||0)),qty:Math.min(99,Math.max(1,Number(x.qty)||1)),equipped:!!x.equipped})):[];
-  return {playerName:auth.name,coins:Math.min(5000,Math.max(0,Number(s.coins)||START.coins)),gems:Math.min(5000,Math.max(0,Number(s.gems)||START.gems)),energy:Math.min(500,Math.max(0,Number(s.energy)||START.energy)),hp:Math.min(500,Math.max(1,Number(s.hp)||START.hp)),maxHp:Math.min(500,Math.max(100,Number(s.maxHp)||START.maxHp)),level:Math.min(50,Math.max(1,Number(s.level)||START.level)),exp:Math.min(9999,Math.max(0,Number(s.exp)||START.exp)),maxExp:Math.min(9999,Math.max(100,Number(s.maxExp)||START.maxExp)),strength:Math.min(100,Math.max(1,Number(s.strength)||START.strength)),agility:Math.min(100,Math.max(1,Number(s.agility)||START.agility)),freePoints:Math.min(100,Math.max(0,Number(s.freePoints)||0)),wins:Math.min(99999,Math.max(0,Number(s.wins)||0)),losses:Math.min(99999,Math.max(0,Number(s.losses)||0)),battles:Math.min(99999,Math.max(0,Number(s.battles)||0)),items,lang:s.lang==='EN'?'EN':'RU',questDone:!!s.questDone,bonusClaimed:!!s.bonusClaimed,dailyStreak:Math.min(365,Math.max(0,Number(s.dailyStreak)||0)),dailyLast:String(s.dailyLast||''),eventProgress:Math.min(100,Math.max(0,Number(s.eventProgress)||0)),recruited:Array.isArray(s.recruited)?s.recruited.slice(0,20).map(x=>safeName(x)):[],guildId:s.guildId?safeName(s.guildId):'',guildName:s.guildName?safeName(s.guildName):'',guildMembers:Math.min(100,Math.max(1,Number(s.guildMembers)||1)),rating:Math.min(5000,Math.max(0,Number(s.rating)||1000)),achievements:Array.isArray(s.achievements)?s.achievements.slice(0,50).map(x=>safeName(x)):[],mail:Array.isArray(s.mail)?s.mail.slice(0,30):[],district:String(s.district||'square'),completedQuests:Array.isArray(s.completedQuests)?s.completedQuests.slice(0,50):[],activeQuest:s.activeQuest&&typeof s.activeQuest==='object'?s.activeQuest:null,heroes:Array.isArray(s.heroes)?s.heroes.slice(0,20):[],forgeLevel:Math.min(20,Math.max(0,Number(s.forgeLevel)||0)),lastEnergyAt:Number(s.lastEnergyAt)||Date.now()};
+  return {playerName:auth.name,coins:Math.min(5000,Math.max(0,Number(s.coins)||START.coins)),gems:Math.min(5000,Math.max(0,Number(s.gems)||START.gems)),energy:Math.min(500,Math.max(0,Number(s.energy)||START.energy)),hp:Math.min(START.maxHp,Math.max(1,Number(s.hp)||START.hp)),maxHp:Math.min(500,Math.max(100,Number(s.maxHp)||START.maxHp)),level:Math.min(50,Math.max(1,Number(s.level)||START.level)),exp:Math.min(9999,Math.max(0,Number(s.exp)||START.exp)),maxExp:Math.min(9999,Math.max(100,Number(s.maxExp)||START.maxExp)),strength:Math.min(100,Math.max(1,Number(s.strength)||START.strength)),agility:Math.min(100,Math.max(1,Number(s.agility)||START.agility)),freePoints:Math.min(100,Math.max(0,Number(s.freePoints)||0)),wins:Math.min(99999,Math.max(0,Number(s.wins)||0)),losses:Math.min(99999,Math.max(0,Number(s.losses)||0)),battles:Math.min(99999,Math.max(0,Number(s.battles)||0)),items,lang:s.lang==='EN'?'EN':'RU',questDone:!!s.questDone,bonusClaimed:!!s.bonusClaimed,recruited:Array.isArray(s.recruited)?s.recruited.slice(0,20).map(x=>safeName(x)):[],guildMembers:Math.min(100,Math.max(1,Number(s.guildMembers)||1))};
 }
 
 const INDEX_HTML = String.raw`<!doctype html>
@@ -79,13 +66,11 @@ const ENEMIES=[
   function totalA(){return state.agility||0}
   window.totalDamage=totalD;
   window.battle=function(){
-  state.hp=state.maxHp;
-  save();
     if(window.stopAutoBattle)try{stopAutoBattle()}catch(e){}
     const idx=Math.min(ENEMIES.length-1,Math.floor((state.wins||0)/3)); const e=ENEMIES[idx];
     const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const pname=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||state.playerName||'Игрок';
     const pimg=document.querySelector('.avatar img')?.src||'';
-    const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(state.hp??state.maxHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
+    const safeBattleHp=(Number(state.hp)>0?Number(state.hp):Number(state.maxHp)); if(Number(state.hp)<=0){state.hp=state.maxHp; save(); toast('❤️ HP восстановлено перед боем')} const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(safeBattleHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
     pt.textContent='⚔️ Бой — арена Sdolars';
     pb.innerHTML=\`<div class="vikingBattle">
       <div class="fighters">
@@ -365,7 +350,7 @@ const I18N={
  'Territory — Sdolars':'Territory — Sdolars','Sdolars':'Sdolars',
  'Глава 5 · Уровень ':'Chapter 5 · Level ', 'Текущее задание':'Current quest','Поговори с кузнецом ›':'Talk to the blacksmith ›','⌖ Кузница':'⌖ Forge','Ежедневный бонус':'Daily bonus','Бонусы':'Bonuses','События':'Events','VIP':'VIP','Кузница':'Forge','Улучшение снаряжения':'Equipment upgrade','Таверна':'Tavern','Найм героев':'Hero recruitment','Магазин':'Shop','Предметы и снаряжение':'Items and equipment','Бой':'Battle','Инвентарь':'Inventory','Экипировка':'Equipment','Задания':'Quests','Чат игры':'Game chat','Общий чат и чат клана':'Global chat and clan chat','Открыть ›':'Open ›','Город':'City','Герой':'Hero','Гильдия':'Guild','Ещё':'More',
  'Глава 5 · Уровень':'Chapter 5 · Level','Сила':'Strength','Ловкость':'Agility','Защита':'Defense','Опыт':'Experience','＋ Сила':'＋ Strength','＋ Ловкость':'＋ Agility','Предметы':'Items','Монеты:':'Coins:','Инвентарь пуст.':'Inventory is empty.','Снять':'Unequip','Экипировать':'Equip','Использовать':'Use','Выбросить':'Discard','Изменить':'Change','Оружие':'Weapon','Броня':'Armor','Пусто':'Empty','Урон':'Damage','Нет оружия':'No weapon','Текущий урон:':'Current damage:','Следующее улучшение:':'Next upgrade:','Стоимость:':'Cost:','Улучшить':'Upgrade','Купить':'Buy','Расходник':'Consumable','Количество':'Quantity',
- 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s45':'Version: s45',
+ 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s18':'Version: s27',
  'Чат':'Chat','Общий чат':'Global chat','Чат клана':'Clan chat','Общий':'Global','Клан':'Clan','Онлайн игроки':'Online players','Сейчас находятся в Sdolars':'Currently in Sdolars','Развернуть':'Expand','Свернуть':'Collapse','Написать сообщение...':'Write a message...','Отправить':'Send','Добро пожаловать в общий чат игры!':'Welcome to the global game chat!','Кто идёт на арену?':'Who is going to the arena?','Чат клана открыт. Добро пожаловать!':'Clan chat is open. Welcome!','Система Sdolars':'Sdolars System','Клан Sdolars':'Sdolars Clan',
  'Бой — Викингская арена':'Battle — Viking arena','⚔️ Викинг Sdolars':'⚔️ Viking of Sdolars','👹 Монстр':'👹 Monster','Ледяной тролль':'Frost troll','Атака — выбери 1 зону':'Attack — choose 1 zone','Защита — выбери 2 зоны':'Defense — choose 2 zones','Выбрано:':'Selected:','Сделать ход':'Make a move','История боя':'Battle log','Выберите атаку и две зоны защиты.':'Choose an attack and two defense zones.','АВТОБОЙ':'AUTO BATTLE','ОСТАНОВИТЬ АВТОБОЙ':'STOP AUTO BATTLE','Автобой сам выбирает атаку и 2 зоны защиты каждый ход.':'Auto battle chooses an attack and 2 defense zones each turn.','Автобой включён — ходы выполняются автоматически.':'Auto battle is on — turns are performed automatically.','Ход:':'Turn:','попадание':'hit','промах':'miss','КРИТ!':'CRIT!','блок':'blocked','не блок':'not blocked','заблокировано':'blocked','урон':'damage','Победа над Ледяной тролльом!':'Victory over the Frost troll!','Ледяной тролль победил.':'The Frost troll won.',
  'Голова':'Head','Грудь':'Chest','Живот':'Stomach','Пояс':'Waist','Ноги':'Legs',
@@ -444,8 +429,6 @@ function completeQuest(){if(state.questDone){toast('Задание уже вып
 function claimBonus(){if(state.bonusClaimed){toast('Награда уже получена');return}state.bonusClaimed=true;state.coins+=250;state.exp+=20;checkLevelUp();save();openP('bonus');toast('🎁 +250 🪙 +20 XP')}
 function battle(){
   stopAutoBattle();
-  state.hp=state.maxHp;
-  save();
   const tg=window.Telegram?.WebApp?.initDataUnsafe?.user;
   const playerName=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||'Игрок';
   const playerImg=document.querySelector('.avatar img')?.src||'';
@@ -487,7 +470,7 @@ function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked||b.ended)re
   const eHp=document.getElementById('enemyHp'),pHp=document.getElementById('playerHp');if(eHp)eHp.textContent=b.hp+'/100 HP';if(pHp)pHp.textContent=b.playerHp+'/'+state.maxHp+' HP';const eb=document.getElementById('enemyBar'),pbar=document.getElementById('playerBar');if(eb)eb.style.width=b.hp+'%';if(pbar)pbar.style.width=Math.max(0,b.playerHp/state.maxHp*100)+'%';const turn=document.getElementById('turnNo');if(turn)turn.textContent=b.turn;
   const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⚔️ Ты: <b>'+ZONES[b.attack]+'</b> — '+(playerAttackHits?'попадание':'промах')+(crit?' · <b>КРИТ!</b>':'')+' · '+playerDamage+' урона</div><div>🛡️ Твоя защита: '+ZONES[b.defs[0]]+', '+ZONES[b.defs[1]]+' — '+(blocked?'блок':'не блок')+(dodged?' · уклонение':'')+'</div><div>🪓 Тролль: <b>'+ZONES[b.enemyAttack]+'</b> — '+(blocked?'заблокировано':dodged?'уклонение':'урон '+enemyDamage)+'</div>';
   if(b.hp<=0){b.ended=true;stopAutoBattle();state.coins+=200;state.exp+=40;state.wins++;state.eventProgress=Math.min(10,state.eventProgress+1);checkLevelUp();save();if(log)log.innerHTML='<b>🏆 Победа над Ледяным троллем! +200 🪙 +40 XP</b><br>'+log.innerHTML;setTimeout(closeP,1100);return}
-  if(b.playerHp<=0){b.ended=true;stopAutoBattle();if(log)log.innerHTML='<b>💀 Ледяной тролль победил.</b><br>'+log.innerHTML;setTimeout(closeP,1100);return}
+  if(b.playerHp<=0){b.ended=true;stopAutoBattle();state.hp=state.maxHp;save();if(log)log.innerHTML='<b>💀 Ледяной тролль победил.</b><br>❤️ HP восстановлено до '+state.maxHp+'.<br>'+log.innerHTML;setTimeout(closeP,1100);return}
   b.attack=null;b.defs=[];b.turn++;document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));const dc=document.getElementById('dc');if(dc)dc.textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},fromAuto?350:250)
 }
 function checkLevelUp(){state.maxExp??=100;while(state.exp>=state.maxExp){state.exp-=state.maxExp;state.level++;state.freePoints=(state.freePoints||0)+2;state.maxHp+=10;toast('⬆️ Новый уровень! +2 очка характеристик');}save()}
@@ -515,13 +498,11 @@ const ENEMIES=[
   function totalA(){return state.agility||0}
   window.totalDamage=totalD;
   window.battle=function(){
-  state.hp=state.maxHp;
-  save();
     if(window.stopAutoBattle)try{stopAutoBattle()}catch(e){}
     const idx=Math.min(ENEMIES.length-1,Math.floor((state.wins||0)/3)); const e=ENEMIES[idx];
     const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const pname=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||state.playerName||'Игрок';
     const pimg=document.querySelector('.avatar img')?.src||'';
-    const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(state.hp??state.maxHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
+    const safeBattleHp=(Number(state.hp)>0?Number(state.hp):Number(state.maxHp)); if(Number(state.hp)<=0){state.hp=state.maxHp; save(); toast('❤️ HP восстановлено перед боем')} const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(safeBattleHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
     pt.textContent='⚔️ Бой — арена Sdolars';
     pb.innerHTML=\`<div class="vikingBattle">
       <div class="fighters">
@@ -715,106 +696,159 @@ const ENEMIES=[
   setTimeout(boot,150);
 })();
 </script>
+
+<style>
+/* ===== TERRITORY FULL BUILD ===== */
+#fullGameDock{position:fixed;left:3%;right:3%;bottom:58px;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:4px;background:rgba(3,16,26,.94);border:1px solid #225b75;border-radius:10px;box-shadow:0 4px 18px #0008}
+.fgd{height:34px;border:1px solid #286b8b;border-radius:7px;background:#0a2b3d;color:#d9f3ff;font-size:8px;font-weight:900}
+.fgd:active{transform:scale(.96)}
+#fullGamePanel{position:fixed;inset:7% 3% 8%;z-index:90;display:none;background:#061a28;border:2px solid #2b8bb8;border-radius:12px;box-shadow:0 12px 45px #000b;overflow:auto;padding:10px}
+.fgpHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.fgpHead b{font-size:15px;color:#ffd34d}
+.fgpClose{width:30px;height:28px;border:1px solid #50788b;border-radius:6px;background:#112e3e;color:#fff;font-size:17px}
+.fgpGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fgpCard{background:#092b3e;border:1px solid #205d78;border-radius:8px;padding:8px}
+.fgpCard h4{margin:0 0 5px;color:#ffd34d;font-size:10px}
+.fgpCard p{margin:2px 0;color:#b5cfdb;font-size:8px;line-height:1.4}
+.fgpBtn{height:27px;width:100%;margin-top:5px;border:1px solid #328bb4;border-radius:6px;background:#0d405a;color:#e7f8ff;font-size:8px;font-weight:900}
+.fgpWide{grid-column:1/-1}
+.fgpStat{display:flex;justify-content:space-between;border-bottom:1px solid #17445a;padding:3px 0;color:#bcd7e2;font-size:8px}
+@media(max-width:420px){#fullGameDock{bottom:56px}.fgd{font-size:7px;height:31px}.fgpGrid{gap:4px}.fgpCard{padding:6px}}
+</style>
+
+<div id="fullGameDock">
+  <button class="fgd" onclick="FG.open('hero')">👤 ГЕРОЙ</button>
+  <button class="fgd" onclick="FG.open('world')">🗺️ МИР</button>
+  <button class="fgd" onclick="FG.open('gear')">🎒 ИНВЕНТАРЬ</button>
+  <button class="fgd" onclick="FG.open('guild')">🏰 ГИЛЬДИЯ</button>
+  <button class="fgd" onclick="FG.open('more')">☰ ЕЩЁ</button>
+</div>
+<div id="fullGamePanel">
+  <div class="fgpHead"><b id="fgpTitle">Territory — Sdolars</b><button class="fgpClose" onclick="FG.close()">×</button></div>
+  <div id="fgpBody"></div>
+</div>
+
 <script>
-/* ===== s32 GLOBAL GAME SYSTEMS ===== */
+/* ===== FULL PLAYABLE GAME HUB ===== */
 (function(){
-  const A=()=>window.territoryServerAction;
-  const esc2=x=>String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-  const tr2=(ru,en)=>state.lang==='EN'?en:ru;
-  function refreshView(k){try{openP(k)}catch(e){}}
-  function globalMore(){const en=state.lang==='EN';return '<div class="card"><b>🌍 '+tr2('Мир Sdolars','Sdolars World')+'</b><p>'+tr2('Город разделён на районы. Здесь открываются арена, рынок, кузница, таверна и события.','The city is divided into districts: arena, market, forge, tavern and events.')+'</p><div class="grid2"><button onclick="s32World()">🗺️ '+tr2('Районы','Districts')+'</button><button onclick="s32Leaderboard()">🏆 '+tr2('Рейтинг','Leaderboard')+'</button><button onclick="openP('guild')">👥 '+tr2('Гильдия','Guild')+'</button><button onclick="openP('messages')">✉ '+tr2('Почта и чат','Mail & Chat')+'</button></div></div><div class="card"><b>🎯 '+tr2('Прогресс','Progress')+'</b><p>'+tr2('Победы','Wins')+': <b>'+state.wins+'</b> · '+tr2('Бои','Battles')+': <b>'+state.battles+'</b> · Rating: <b>'+((state.rating||1000))+'</b></p></div>'}
-  function world(){const en=state.lang==='EN';return '<div class="card"><b>🗺️ '+tr2('Районы Sdolars','Sdolars Districts')+'</b><p>🏰 '+tr2('Центральная площадь','Central Square')+'</p><button onclick="battle()">⚔️ '+tr2('Арена','Arena')+'</button><button onclick="openP(\'shop\')">🛒 '+tr2('Рынок','Market')+'</button><button onclick="openP(\'forge\')">⚒️ '+tr2('Кузница','Forge')+'</button><button onclick="openP(\'tavern\')">🍺 '+tr2('Таверна','Tavern')+'</button></div><div class="card"><b>🏘️ '+tr2('Открывающиеся районы','Unlockable districts')+'</b><p>🌲 '+tr2('Северный лес · доступен','North Forest · available')+'</p><p>⚓ '+tr2('Порт · уровень 8','Harbor · level 8')+'</p><p>🏭 '+tr2('Промзона · уровень 12','Industrial Zone · level 12')+'</p><p>🏛️ '+tr2('Старая крепость · уровень 18','Old Fortress · level 18')+'</p></div>'}
-  async function leaderboard(){let rows=[];try{const r=await fetch('/hub/leaderboard',{cache:'no-store'});const j=await r.json();rows=j.players||[]}catch(e){}const en=state.lang==='EN';let h='<div class="card"><b>🏆 '+tr2('Рейтинг бойцов','Warrior Leaderboard')+'</b>';if(!rows.length)h+='<p>'+tr2('Рейтинг появится после первых подключений игроков.','Leaderboard will appear after players connect.')+'</p>';rows.forEach((x,i)=>h+='<p><b>#'+(i+1)+' '+esc2(x.name)+'</b> · '+tr2('ур.','Lv.')+' '+x.level+' · '+x.wins+' '+tr2('побед','wins')+' · <b>'+x.rating+'</b></p>');return h+'</div><button onclick="openP(\'more\')">← '+tr2('Назад','Back')+'</button>'}
-  window.s32World=()=>{pt.textContent=tr2('Районы Sdolars','Sdolars Districts');pb.innerHTML=world();modal.classList.add('open');applyLanguage()};
-  window.s32Leaderboard=async()=>{pt.textContent=tr2('Рейтинг Sdolars','Sdolars Leaderboard');pb.innerHTML='<div class="card">⌛ '+tr2('Загрузка...','Loading...')+'</div>';modal.classList.add('open');pb.innerHTML=await leaderboard();applyLanguage()};
-  window.s32Daily=async()=>{if(await A()?.('daily.claim')){refreshView('bonus');toast(tr2('🎁 Ежедневная награда получена','🎁 Daily reward claimed'))}};
-  window.s32Event=async()=>{if(await A()?.('event.fight')){refreshView('events');toast(tr2('🏰 Событие: +80 🪙 +20 XP','🏰 Event: +80 🪙 +20 XP'))}};
-  window.s32Recruit=async(id)=>{if(await A()?.('tavern.recruit',{hero:id})){refreshView('tavern');toast(tr2('Герой нанят','Hero recruited'))}};
-  window.s32CreateGuild=async()=>{const n=prompt(tr2('Название гильдии:','Guild name:'))||'';if(n&&await A()?.('guild.create',{name:n})){refreshView('guild');toast(tr2('Гильдия создана','Guild created'))}};
-  window.s32JoinGuild=async()=>{if(await A()?.('guild.join')){refreshView('guild');toast(tr2('Ты вступил в гильдию','You joined a guild'))}};
-  window.s32LeaveGuild=async()=>{if(await A()?.('guild.leave')){refreshView('guild');toast(tr2('Ты покинул гильдию','You left the guild'))}};
-  window.s32Achievement=async(id)=>{if(await A()?.('achievement.claim',{id:id})){refreshView('ach');toast(tr2('🏆 Достижение получено','🏆 Achievement claimed'))}};
-  window.s32Sell=async(i)=>{if(await A()?.('market.sell',{index:i})){refreshView('inventory');toast(tr2('Предмет продан','Item sold'))}};
-  window.s32Equip=async(i)=>{if(await A()?.('item.equip',{index:i})){refreshView('inventory')}};
-  window.s32Drop=async(i)=>{if(await A()?.('item.drop',{index:i})){refreshView('inventory')}};
-  const s32Views={
-    more:['Ещё',globalMore],
-    guild:['Гильдия',()=>'<div class="card"><b>👥 '+tr2('Гильдия Sdolars','Sdolars Guild')+'</b><p>'+tr2('Название:','Name:')+' <b>'+esc2(state.guildName||tr2('Нет гильдии','No guild'))+'</b></p><p>'+tr2('Участники:','Members:')+' <b>'+((state.guildMembers||1))+'/20</b></p><p>🏆 Rating: <b>'+((state.rating||1000))+'</b></p></div><div class="grid2">'+(state.guildId?'<button onclick="s32LeaveGuild()">'+tr2('Выйти','Leave')+'</button>':'<button class="goldBtn" onclick="s32CreateGuild()">'+tr2('Создать','Create')+'</button><button class="goldBtn" onclick="s32JoinGuild()">'+tr2('Вступить','Join')+'</button>')+'</div>'],
-    tavern:['Таверна',()=>'<div class="card"><b>🍺 '+tr2('Таверна — наём героев','Tavern — recruit heroes')+'</b></div><div class="card"><b>Рагнар</b><p>Воин · 500 🪙</p><button class="goldBtn" onclick="s32Recruit(\'ragnar\')">'+tr2('Нанять','Recruit')+'</button></div><div class="card"><b>Астрид</b><p>Разведчица · 650 🪙</p><button class="goldBtn" onclick="s32Recruit(\'astrid\')">'+tr2('Нанять','Recruit')+'</button></div><div class="card"><b>Ульф</b><p>Берсерк · 900 🪙</p><button class="goldBtn" onclick="s32Recruit(\'ulf\')">'+tr2('Нанять','Recruit')+'</button></div>'],
-    events:['События',()=>'<div class="card"><b>🏰 '+tr2('Осада Sdolars','Siege of Sdolars')+'</b><p>'+tr2('Прогресс:','Progress:')+' <b>'+(state.eventProgress||0)+'/100</b></p><button class="goldBtn" onclick="s32Event()">'+tr2('Участвовать · 5 энергии','Join · 5 energy')+'</button></div><div class="card"><b>⚔️ '+tr2('Турнир арены','Arena Tournament')+'</b><button onclick="s32Leaderboard()">'+tr2('Открыть рейтинг','Open leaderboard')+'</button></div>'],
-    bonus:['Бонусы',()=>'<div class="card"><b>🎁 '+tr2('Ежедневная награда','Daily reward')+'</b><p>'+tr2('Серия:','Streak:')+' <b>'+(state.dailyStreak||0)+'</b></p><button class="goldBtn" onclick="s32Daily()">'+tr2('Забрать','Claim')+'</button></div>'],
-    ach:['Достижения',()=>'<div class="card"><b>🏆 '+tr2('Достижения','Achievements')+'</b><p>⚔️ '+tr2('Первая победа','First win')+' <button onclick="s32Achievement(\'first_win\')">'+tr2('Забрать','Claim')+'</button></p><p>🔥 '+tr2('10 побед','10 wins')+' <button onclick="s32Achievement(\'ten_wins\')">'+tr2('Забрать','Claim')+'</button></p><p>💰 '+tr2('Богач — 2000 монет','Rich — 2000 coins')+' <button onclick="s32Achievement(\'rich\')">'+tr2('Забрать','Claim')+'</button></p><p>🏆 '+tr2('Рейтинг 1500','Rating 1500')+' <button onclick="s32Achievement(\'rating1500\')">'+tr2('Забрать','Claim')+'</button></p></div>']
+  const LS='territory_full_hub_v1';
+  const fallback={
+    stamina:20,maxStamina:20,materials:0,arenaRating:1000,guild:'Sdolars',guildLevel:1,
+    guildTreasury:1200,heroes:[],daily:0,dailyClaimed:false,season:1,seasonPoints:0,
+    equipmentUpgrades:0,contracts:0
   };
-  const originalOpenP=window.openP;
-  window.openP=function(k){if(s32Views[k]){pt.textContent=s32Views[k][0];pb.innerHTML=s32Views[k][1]();modal.classList.add('open');if(typeof applyLanguage==='function')applyLanguage();if(k==='more')setTimeout(()=>{},0);return}return originalOpenP(k)};
-  const oldInv=window.renderInventory;
-  window.renderInventory=function(){const h=oldInv?oldInv():'<div class="card">'+tr2('Инвентарь пуст','Inventory empty')+'</div>';return h.replace(/<button class="danger" onclick="dropItem\((\d+)\)">/g,'<button onclick="s32Sell($1)">💰 '+tr2('Продать','Sell')+'</button> <button class="danger" onclick="s32Drop($1)">');};
-})();
-</script>
-<script>
-/* ===== s33 GLOBAL ADVENTURE / PROGRESSION ===== */
-(function(){
-  const A=function(){return window.territoryServerAction};
-  const esc=function(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')};
-  const tr=function(a,b){return state.lang==='EN'?b:a};
-  const districts=[
-    {id:'square',ru:'Центральная площадь',en:'Central Square',level:1,cost:0,icon:'🏰',desc:'Главный центр Sdolars'},
-    {id:'forest',ru:'Северный лес',en:'North Forest',level:3,cost:3,icon:'🌲',desc:'Разбойники и редкие ресурсы'},
-    {id:'harbor',ru:'Порт Sdolars',en:'Sdolars Harbor',level:8,cost:5,icon:'⚓',desc:'Контрабандисты и торговцы'},
-    {id:'industrial',ru:'Промзона',en:'Industrial Zone',level:12,cost:7,icon:'🏭',desc:'Опасные банды и усиленное снаряжение'},
-    {id:'fortress',ru:'Старая крепость',en:'Old Fortress',level:18,cost:10,icon:'🏛️',desc:'Элитные враги и лучшие награды'}
+  let hub=fallback;
+  try{hub=Object.assign({},fallback,JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){}
+  function save(){try{localStorage.setItem(LS,JSON.stringify(hub))}catch(e){}}
+  function S(){return window.state||{}}
+  function toast43(t){try{if(typeof toast==='function')toast(t)}catch(e){}}
+  function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+  const enemies=[
+    ['Бандит',110,14,35],['Наёмник',145,18,50],['Варяг',180,21,70],
+    ['Охотник',210,25,90],['Страж крепости',250,29,120],['Чемпион арены',300,34,160]
   ];
-  const quests=[
-    {id:'forest_patrol',district:'forest',ru:'Патруль Северного леса',en:'North Forest Patrol',goal:3,reward:180,xp:45},
-    {id:'harbor_run',district:'harbor',ru:'Контрабандисты порта',en:'Harbor Smugglers',goal:5,reward:320,xp:80},
-    {id:'industrial_raid',district:'industrial',ru:'Рейд на промзону',en:'Industrial Raid',goal:7,reward:520,xp:120},
-    {id:'fortress_siege',district:'fortress',ru:'Штурм старой крепости',en:'Old Fortress Assault',goal:10,reward:900,xp:220}
+  const items=[
+    ['🔪','Нож','Оружие','+6 урона',220],['🪓','Тяжёлый топор','Оружие','+14 урона',650],
+    ['🛡️','Стальная броня','Броня','+12 защиты',800],['🩹','Аптечка','Расходник','+45 HP',80]
   ];
-  function call(type,args){return A()?A()(type,args||{}):Promise.resolve(false)}
-  function panel(title,html){pt.textContent=title;pb.innerHTML=html;modal.classList.add('open');if(typeof applyLanguage==='function')applyLanguage()}
-  function card(h){return '<div class="card">'+h+'</div>'}
-  function districtView(){
-    const lvl=Number(state.level||1), cur=state.district||'square', en=state.lang==='EN';
-    let h=card('<b>🗺️ '+tr('Районы Sdolars','Sdolars Districts')+'</b><p>'+tr('Выбирай район, исследуй его и открывай новые цепочки заданий.','Choose a district, scout it and unlock new quest chains.')+'</p>');
-    districts.forEach(d=>{const locked=lvl<d.level, active=cur===d.id;h+=card('<div class="row"><b>'+d.icon+' '+(en?d.en:d.ru)+'</b><span class="tag">'+(locked?tr('Уровень '+d.level,'Level '+d.level):(active?tr('ТЕКУЩИЙ','CURRENT'):tr('ДОСТУПЕН','OPEN')))+'</span></div><p>'+tr(d.desc,d.desc)+'</p><button '+(locked?'disabled ':'')+'onclick="s33Travel(\''+d.id+'\')">'+(active?tr('На месте','Here'):tr('Отправиться','Travel'))+(d.cost?' · '+d.cost+' ⚡':'')+'</button> '+(active?'<button onclick="s33Scout()">🔎 '+tr('Исследовать','Scout')+' · 2 ⚡</button>':'')+'</div>')});
-    return h;
+  const heroes=[['⚔️','Рагнар','Урон 18','120'],['🏹','Астрид','Урон 15','95'],['🪓','Ивар','Урон 22','140']];
+
+  function card(title,body,button,label){
+    return '<div class="fgpCard"><h4>'+title+'</h4><p>'+body+'</p>'+(button?'<button class="fgpBtn" onclick="'+button+'">'+label+'</button>':'')+'</div>';
   }
-  function questView(){
-    const en=state.lang==='EN', aq=state.activeQuest, done=state.completedQuests||[];
-    let h=card('<b>📜 '+tr('Приключения Sdolars','Sdolars Adventures')+'</b><p>'+tr('Большие цепочки заданий дают монеты, опыт и открывают новые районы.','Long quest chains give coins, XP and unlock new districts.')+'</p>');
-    if(aq){const q=quests.find(x=>x.id===aq.id);if(q)h+=card('<b>⚔️ '+(en?q.en:q.ru)+'</b><p>'+tr('Прогресс','Progress')+': <b>'+Number(aq.progress||0)+'/'+q.goal+'</b></p><div class="fhp"><i style="width:'+Math.min(100,Number(aq.progress||0)/q.goal*100)+'%"></i></div><button onclick="s33QuestProgress()">⚔️ '+tr('Продвинуться · 1⚡','Advance · 1⚡')+'</button> '+(Number(aq.progress||0)>=q.goal?'<button class="goldBtn" onclick="s33QuestClaim()">🎁 '+tr('Забрать '+q.reward+' 🪙','Claim '+q.reward+' 🪙')+'</button>':'')+'</div>');
-    }else quests.forEach(q=>{const d=districts.find(x=>x.id===q.district),locked=Number(state.level||1)<d.level,finished=done.includes(q.id);h+=card('<b>📜 '+(en?q.en:q.ru)+'</b><p>📍 '+(en?d.en:d.ru)+' · 🎁 '+q.reward+' 🪙 · ⭐ '+q.xp+' XP</p><button '+((locked||finished)?'disabled ':'')+'onclick="s33QuestStart(\''+q.id+'\')">'+(finished?tr('Выполнено','Completed'):(locked?tr('Нужен уровень '+d.level,'Requires level '+d.level):tr('Начать','Start')))+'</button></div>')});
-    return h+card('<b>🔎 '+tr('Быстрый отчёт','Quick report')+'</b><p>'+tr('Уровень','Level')+': '+state.level+' · '+tr('Энергия','Energy')+': '+Math.floor(state.energy||0)+' ⚡ · '+tr('Победы','Wins')+': '+(state.wins||0)+'</p>');
-  }
-  function heroesView(){
-    const en=state.lang==='EN', hs=Array.isArray(state.heroes)?state.heroes:[], roster=[{id:'ragnar',ru:'Рагнар',en:'Ragnar',role:tr('Воин','Warrior'),cost:500,icon:'🪓',bonus:'+8 урон'},{id:'astrid',ru:'Астрид',en:'Astrid',role:tr('Разведчица','Scout'),cost:650,icon:'🏹',bonus:'+5 уклонение'},{id:'ulf',ru:'Ульф',en:'Ulf',role:tr('Берсерк','Berserker'),cost:900,icon:'⚔️',bonus:'+12 крит'}];
-    let h=card('<b>🍺 '+tr('Таверна — отряд','Tavern — Squad')+'</b><p>'+tr('Герои помогают в развитии персонажа. Улучшай нанятых героев.','Heroes support your progression. Train recruited heroes.')+'</p>');
-    roster.forEach(r=>{const x=hs.find(v=>v.id===r.id),name=en?r.en:r.ru;h+=card('<b>'+r.icon+' '+name+'</b><p>'+r.role+' · '+r.bonus+'</p>'+(x?'<p>'+tr('Уровень','Level')+' '+(x.level||1)+'</p><button onclick="s33TrainHero(\''+r.id+'\')">⬆️ '+tr('Тренировать · 250 🪙','Train · 250 🪙')+'</button>':'<button class="goldBtn" onclick="s33RecruitHero(\''+r.id+'\')">💰 '+tr('Нанять · '+r.cost+' 🪙','Recruit · '+r.cost+' 🪙')+'</button>')+'</div>')});
-    return h;
-  }
-  function progressView(){
-    const en=state.lang==='EN', wins=Number(state.wins||0), rating=Number(state.rating||1000), ach=Array.isArray(state.achievements)?state.achievements:[];
-    const rows=[['⚔️','first_win',1,wins,tr('Первая победа','First win'),100],['🔥','ten_wins',10,wins,tr('10 побед','10 wins'),500],['💰','rich',2000,Number(state.coins||0),tr('Богач — 2000 монет','Rich — 2000 coins'),1000],['🏆','rating1500',1500,rating,tr('Рейтинг 1500','Rating 1500'),800]];
-    let h=card('<b>🏆 '+tr('Достижения и прогресс','Achievements & Progress')+'</b>');rows.forEach(r=>{const got=ach.includes(r[1]),ok=r[3]>=r[2];h+='<div class="card"><b>'+r[0]+' '+r[4]+'</b><p>'+r[3]+'/'+r[2]+'</p><button '+((got||!ok)?'disabled ':'')+'onclick="s33ClaimAch(\''+r[1]+'\')">'+(got?tr('Получено','Claimed'):tr('Получить '+r[5]+' 🪙','Claim '+r[5]+' 🪙'))+'</button></div>'});return h;
-  }
-  window.s33World=function(){panel(tr('Мир Sdolars','Sdolars World'),'<div class="grid2"><button onclick="s33Districts()">🗺️ '+tr('Районы','Districts')+'</button><button onclick="s33Quests()">📜 '+tr('Приключения','Adventures')+'</button><button onclick="s33Heroes()">🍺 '+tr('Отряд','Squad')+'</button><button onclick="s33Progress()">🏆 '+tr('Достижения','Achievements')+'</button></div>'+card('<b>🌍 '+tr('Глобальная цель','Global Goal')+'</b><p>'+tr('Развивай героя, захватывай районы, собирай отряд и поднимай рейтинг Sdolars.','Develop your hero, conquer districts, build a squad and climb the Sdolars rating.')+'</p>') )};
-  window.s33Districts=function(){panel(tr('Районы Sdolars','Sdolars Districts'),districtView())};
-  window.s33Quests=function(){panel(tr('Приключения Sdolars','Sdolars Adventures'),questView())};
-  window.s33Heroes=function(){panel(tr('Отряд Sdolars','Sdolars Squad'),heroesView())};
-  window.s33Progress=function(){panel(tr('Прогресс Sdolars','Sdolars Progress'),progressView())};
-  window.s33Travel=async function(id){const r=await call('district.travel',{id:id});if(r){toast(tr('📍 Район изменён','📍 District changed'));s33Districts()}};
-  window.s33Scout=async function(){const r=await call('scout');if(r){toast(tr('🔎 Исследование завершено','🔎 Scouting complete'));s33Districts()}};
-  window.s33QuestStart=async function(id){const r=await call('quest.start',{id:id});if(r){toast(tr('📜 Задание начато','📜 Quest started'));s33Quests()}};
-  window.s33QuestProgress=async function(){const r=await call('quest.progress',{amount:1});if(r){toast(tr('⚔️ Прогресс задания +1','⚔️ Quest progress +1'));s33Quests()}};
-  window.s33QuestClaim=async function(){const r=await call('quest.claim');if(r){toast(tr('🎁 Награда получена','🎁 Reward claimed'));s33Quests()}};
-  window.s33RecruitHero=async function(id){const map={ragnar:'ragnar',astrid:'astrid',ulf:'ulf'};const r=await call('tavern.recruit',{hero:map[id]});if(r){state.heroes=state.heroes||[];if(!state.heroes.some(x=>x.id===id))state.heroes.push({id:id,level:1});save();toast(tr('🍺 Герой присоединился','🍺 Hero joined'));s33Heroes()}};
-  window.s33TrainHero=async function(id){const r=await call('hero.train',{id:id});if(r){toast(tr('⬆️ Герой усилен','⬆️ Hero trained'));s33Heroes()}};
-  window.s33ClaimAch=async function(id){const r=await call('achievement.claim',{id:id});if(r){toast(tr('🏆 Достижение получено','🏆 Achievement claimed'));s33Progress()}};
-  const oldMore=window.s32World;
-  window.s32World=function(){s33World()};
-  const moreOld=window.openP;
-  window.openP=function(k){if(k==='more'){panel(tr('Мир Sdolars','Sdolars World'),'<div class="grid2"><button onclick="s33Districts()">🗺️ '+tr('Районы','Districts')+'</button><button onclick="s33Quests()">📜 '+tr('Приключения','Adventures')+'</button><button onclick="s33Heroes()">🍺 '+tr('Отряд','Squad')+'</button><button onclick="s33Progress()">🏆 '+tr('Достижения','Achievements')+'</button><button onclick="s32Leaderboard()">🏅 '+tr('Рейтинг','Leaderboard')+'</button><button onclick="openP(\'messages\')">💬 '+tr('Чат','Chat')+'</button></div>');return}return moreOld(k)};
-  state.district=state.district||'square';state.completedQuests=state.completedQuests||[];state.heroes=state.heroes||[];state.activeQuest=state.activeQuest||null;
+
+  window.FG={
+    close(){document.getElementById('fullGamePanel').style.display='none'},
+    open(tab){
+      const p=document.getElementById('fullGamePanel'),b=document.getElementById('fgpBody');
+      if(!p||!b)return;
+      const st=S(), lang=st.lang==='EN';
+      let title='Territory — Sdolars';
+      let html='';
+      if(tab==='hero'){
+        title='👤 Герой';
+        const weapon=st.weapon||'Кулаки';
+        html='<div class="fgpGrid">'+
+          card('⚔️ Персонаж','Уровень: '+(st.level||1)+' · Опыт: '+(st.exp||0)+'/'+(st.maxExp||100)+'<br>Оружие: '+esc(weapon))+
+          card('📊 Характеристики','Сила: '+(st.strength||0)+' · Ловкость: '+(st.agility||0)+'<br>Свободных очков: '+(st.freePoints||0),
+            'FG.addStat()','РАЗВИТЬ СИЛУ')+
+          card('❤️ Выносливость','HP: '+(st.hp||0)+'/'+(st.maxHp||120)+'<br>Энергия: '+hub.stamina+'/'+hub.maxStamina,
+            'FG.rest()','ВОССТАНОВИТЬ')+
+          card('🏆 Прогресс','Победы: '+(st.wins||0)+' · Рейтинг: '+hub.arenaRating+'<br>Сезон: '+hub.season+' · очки: '+hub.seasonPoints)+'</div>';
+      } else if(tab==='world'){
+        title='🗺️ Мир Sdolars';
+        const wins=Number(st.wins||0);
+        const zones=[
+          ['⚓','Старый порт',0,'Контракты и первые бои'],
+          ['⚒️','Железный квартал',5,'Кузницы и тяжёлое оружие'],
+          ['🗡️','Чёрный рынок',10,'Редкие предметы и опасные враги'],
+          ['🏰','Крепость Севера',20,'Элитные противники и осада'],
+          ['👑','Трон Sdolars',35,'Финал первой кампании']
+        ];
+        html='<div class="fgpGrid">'+zones.map((z,i)=>{
+          const open=wins>=z[2], status=open?'ОТКРЫТО':'ЗАКРЫТО';
+          return card(z[0]+' '+z[1],z[3]+'<br>'+status+(open?'':' · нужно побед: '+z[2]),
+            open?'FG.goBattle()':null,open?'В БОЙ':'');
+        }).join('')+
+        card('📜 Контракты','Выполнено сегодня: '+hub.contracts+'/3 · награда за серию: 120 🪙 + 40 XP',
+          'FG.contract()','ВЫПОЛНИТЬ')+
+        card('🎯 Арена','Рейтинг: '+hub.arenaRating+'<br>Победа: +25 · поражение: −18',
+          'FG.arena()','ВЫЗВАТЬ СОПЕРНИКА')+
+        card('⚔️ Кампания','Следующий противник выбирается по прогрессу побед.',
+          'FG.goBattle()','НАЧАТЬ БОЙ')+'</div>';
+      } else if(tab==='gear'){
+        title='🎒 Инвентарь и снаряжение';
+        const inv=Array.isArray(st.inventory)?st.inventory:[];
+        html='<div class="fgpGrid">'+items.map(it=>card(it[0]+' '+it[1],it[2]+' · '+it[3]+'<br>Цена: '+it[4]+' 🪙',
+          'FG.buy('+it[4]+','+JSON.stringify(it[1])+')','КУПИТЬ')).join('')+
+          card('🎒 Твои предметы',(inv.length?inv.map(x=>esc(typeof x==='string'?x:(x.name||x.id||'Предмет'))).join(', '):'Инвентарь пуст.')+
+          '<br>Улучшений: '+hub.equipmentUpgrades,
+          'FG.upgrade()','УЛУЧШИТЬ')+
+          card('🔨 Кузница','Материалы: '+hub.materials+'<br>Улучшай оружие и броню за материалы.',
+            'FG.forge()','КУЗНИЦА')+'</div>';
+      } else if(tab==='guild'){
+        title='🏰 Гильдия Sdolars';
+        html='<div class="fgpGrid">'+
+          card('🏰 '+esc(hub.guild),'Уровень: '+hub.guildLevel+' · участников: '+(st.guildMembers||1)+'<br>Казна: '+hub.guildTreasury+' 🪙')+
+          card('⚔️ Вклад','Участвуй в боях и пополняй казну.',
+            'FG.contribute()','ВНЕСТИ 50 🪙')+
+          card('🛡️ Осада Sdolars','Общая цель: 10 побед гильдии.<br>Твой вклад сохраняется.',
+            'FG.siege()','УЧАСТВОВАТЬ')+
+          card('👥 Герои таверны','Доступно героев: '+heroes.length+'<br>Найм открывает помощников.',
+            'FG.recruit()','НАЙНЯТЬ ГЕРОЯ')+'</div>';
+      } else {
+        title='☰ Все системы';
+        html='<div class="fgpGrid">'+
+          card('🎁 Ежедневная награда','День входа: '+((st.loginStreak||1))+' · награда 150 🪙',
+            'FG.daily()','ЗАБРАТЬ')+
+          card('🏆 Достижения','Первый бой · Богач · Воин Sdolars<br>Победы: '+(st.wins||0))+
+          card('💬 Чат','Глобальный и клановый чат уже доступны в игре.',
+            'FG.chat()','ОТКРЫТЬ ЧАТ')+
+          card('🏅 Рейтинг','Арена: '+hub.arenaRating+'<br>Сезонные очки: '+hub.seasonPoints)+
+          card('⚙️ Настройки','Язык: '+(st.lang||'RU')+' · Звук: '+((st.settings&&st.settings.sound)?'ВКЛ':'ВЫКЛ'),
+            'FG.lang()','СМЕНИТЬ ЯЗЫК')+
+          card('📖 О Territory','Sdolars — город, где герой строит репутацию через бои, задания, экипировку и гильдии.')+
+          '</div>';
+      }
+      document.getElementById('fgpTitle').textContent=title;
+      b.innerHTML=html;p.style.display='block';
+    },
+    addStat(){if((S().freePoints||0)>0){S().strength=(S().strength||0)+1;S().freePoints--;if(typeof save==='function')save();toast43('💪 Сила увеличена')}else toast43('Нет свободных очков');this.open('hero')},
+    rest(){S().hp=S().maxHp||120;hub.stamina=hub.maxStamina;save();if(typeof save==='function')save();toast43('❤️ Герой восстановлен');this.open('hero')},
+    goBattle(){this.close();setTimeout(()=>{if(typeof openP==='function')openP('battle');else toast43('Открой раздел Бой')},60)},
+    contract(){hub.contracts=Math.min(3,hub.contracts+1);hub.seasonPoints+=10;hub.materials+=2;save();toast43('📜 Контракт +1');this.open('world')},
+    arena(){if(hub.stamina<=0){toast43('⚡ Нет энергии');return}hub.stamina--;hub.arenaRating+=25;hub.seasonPoints+=15;save();toast43('🏆 Арена: +25 рейтинга');this.open('world')},
+    buy(price,name){if((S().coins||0)<price){toast43('Недостаточно монет');return}S().coins-=price;S().inventory??=[];S().inventory.push({name:name,type:'Оборудование'});if(typeof save==='function')save();toast43('🛒 Куплено: '+name);this.open('gear')},
+    upgrade(){if(hub.materials<3){toast43('⛏️ Нужно 3 материала');return}hub.materials-=3;hub.equipmentUpgrades++;hub.seasonPoints+=5;save();toast43('🔨 Снаряжение улучшено');this.open('gear')},
+    forge(){hub.materials+=2;save();toast43('⛏️ Получено 2 материала');this.open('gear')},
+    contribute(){if((S().coins||0)<50){toast43('Нужно 50 монет');return}S().coins-=50;hub.guildTreasury+=50;hub.seasonPoints+=5;if(typeof save==='function')save();save();toast43('🏰 Вклад внесён');this.open('guild')},
+    siege(){hub.seasonPoints+=20;hub.guildTreasury+=20;save();toast43('⚔️ Вклад в осаду засчитан');this.open('guild')},
+    recruit(){const h=heroes[hub.heroes%heroes.length];hub.heroes++;hub.seasonPoints+=10;save();toast43('👤 Нанят '+h[1]);this.open('guild')},
+    daily(){if(hub.dailyClaimed){toast43('🎁 Награда уже получена');return}S().coins=(S().coins||0)+150;hub.dailyClaimed=true;hub.seasonPoints+=10;if(typeof save==='function')save();save();toast43('🎁 +150 монет');this.open('more')},
+    chat(){this.close();setTimeout(()=>{if(typeof openP==='function')openP('chat');else toast43('Чат находится в нижнем меню')},60)},
+    lang(){S().lang=S().lang==='EN'?'RU':'EN';if(typeof save==='function')save();toast43('🌐 Язык: '+S().lang);this.open('more')}
+  };
+  setInterval(()=>{if(hub.stamina<hub.maxStamina){hub.stamina++;save()}},60000);
 })();
 </script>
 </body></html>
@@ -826,7 +860,7 @@ export default {
   async fetch(request,env){
     const url=new URL(request.url);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'Content-Type,Authorization,X-Telegram-Init-Data,X-Guest-Id,X-Guest-Name'}});
-    if(url.pathname==='/api/health')return json({ok:true,service:'Territory Sdolars',version:'s45',serverTime:Date.now(),telegramAuth:!!env.TELEGRAM_BOT_TOKEN});
+    if(url.pathname==='/api/health')return json({ok:true,service:'Territory Sdolars',version:'s30',serverTime:Date.now(),telegramAuth:!!env.TELEGRAM_BOT_TOKEN});
     if(url.pathname==='/api/auth'&&request.method==='POST'){
       const auth=await authRequest(request,env); if(!auth)return json({ok:false,error:'telegram_auth_required'},401);
       const id=env.GAME_HUB.idFromName('main'); return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/auth',request.url),{method:'POST',headers:{'content-type':'application/json','x-player-id':auth.playerId,'x-player-name':auth.name,'x-telegram-id':auth.telegramId||''},body:JSON.stringify({seed:await request.json().catch(()=>null),auth})}));
@@ -846,17 +880,6 @@ export default {
       const h=new Headers(request.headers);h.set('x-player-id',auth.playerId);h.set('x-player-name',auth.name);h.set('x-telegram-id',auth.telegramId||'');
       return env.GAME_HUB.get(id).fetch(new Request(request.url,{method:'GET',headers:h}));
     }
-    if(url.pathname.startsWith('/api/player/')){
-      const auth=await authRequest(request,env);if(!auth)return json({ok:false,error:'telegram_auth_required'},401);
-      const target=cleanId(decodeURIComponent(url.pathname.slice('/api/player/'.length)));
-      if(target!==auth.playerId)return json({ok:false,error:'forbidden'},403);
-      const id=env.GAME_HUB.idFromName('main');
-      if(request.method==='GET')return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/me',request.url),{headers:{'x-player-id':auth.playerId,'x-player-name':auth.name}}));
-      if(request.method==='POST'){
-        const body=await request.json().catch(()=>({}));
-        return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/save',request.url),{method:'POST',headers:{'content-type':'application/json','x-player-id':auth.playerId,'x-player-name':auth.name},body:JSON.stringify(body)}));
-      }
-    }
     if(url.pathname==='/api/players'&&request.method==='GET'){
       const id=env.GAME_HUB.idFromName('main');return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/players',request.url),request));
     }
@@ -873,14 +896,12 @@ export class GameHub extends DurableObject {
   online(){return this.sockets().map(ws=>this.attachment(ws)).filter(x=>x?.playerId).map(x=>({playerId:x.playerId,name:x.name}))}
   broadcastOnline(){const list=this.online();for(const ws of this.sockets())this.send(ws,{type:'online',players:list,names:list.map(x=>x.name)})}
   socketByPlayer(pid){return this.sockets().find(ws=>this.attachment(ws)?.playerId===pid)||null}
-  getState(pid){const row=this.sql.exec('SELECT state_json FROM players WHERE player_id=?',pid).one();if(!row?.state_json)return null;let s;try{s=JSON.parse(row.state_json)}catch{return null}const now=Date.now(),last=Number(s.lastEnergyAt)||now;const gain=Math.floor((now-last)/300000);if(gain>0){s.energy=Math.min(200,(Number(s.energy)||0)+gain);s.lastEnergyAt=last+gain*300000}return s}
+  getState(pid){const row=this.sql.exec('SELECT state_json FROM players WHERE player_id=?',pid).one();return row?.state_json?JSON.parse(row.state_json):null}
   putState(pid,name,state){const now=Date.now();state.playerName=name;state._serverUpdatedAt=now;this.sql.exec('INSERT INTO players(player_id,name,state_json,updated_at) VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET name=excluded.name,state_json=excluded.state_json,updated_at=excluded.updated_at',pid,name,JSON.stringify(state),now);return state}
   async fetch(request){const url=new URL(request.url),pid=cleanId(request.headers.get('x-player-id')),name=safeName(request.headers.get('x-player-name')||'Игрок');
     if(url.pathname==='/hub/players')return json({ok:true,players:this.online()});
-    if(url.pathname==='/hub/leaderboard'){const rows=this.sql.exec('SELECT name,state_json FROM players ORDER BY updated_at DESC LIMIT 100').toArray().map(r=>{let x={};try{x=JSON.parse(r.state_json)}catch{}return {name:r.name,rating:Number(x.rating)||1000,wins:Number(x.wins)||0,level:Number(x.level)||1}}).sort((a,b)=>b.rating-a.rating||b.wins-a.wins).slice(0,20);return json({ok:true,players:rows})}
     if(url.pathname==='/hub/auth'&&request.method==='POST'){const body=await request.json().catch(()=>({}));let state=this.getState(pid);const firstLogin=!state;if(firstLogin){state=sanitizedSeed(body.seed?.state||body.seed,{name});state=this.putState(pid,name,state)}else{state.playerName=name;state=this.putState(pid,name,state)}return json({ok:true,player:state,playerId:pid,firstLogin});}
     if(url.pathname==='/hub/me'&&request.method==='GET'){const state=this.getState(pid);return json({ok:true,authenticated:!!pid,player:state||null,online:this.online()});}
-    if(url.pathname==='/hub/save'&&request.method==='POST'){const body=await request.json().catch(()=>({}));const incoming=body.state&&typeof body.state==='object'?body.state:null;if(!incoming)return json({ok:false,error:'invalid_state'},400);const current=this.getState(pid)||sanitizedSeed(incoming,{name});const merged={...current,...incoming};merged.playerName=name;const saved=this.putState(pid,name,merged);return json({ok:true,state:saved,player:saved});}
     if(url.pathname==='/hub/action'&&request.method==='POST')return this.action(pid,name,await request.json().catch(()=>({})));
     if(url.pathname==='/ws'){const pair=new WebSocketPair(),client=pair[0],server=pair[1];if(!pid)return new Response('Unauthorized',{status:401});this.ctx.acceptWebSocket(server);server.serializeAttachment({playerId:pid,name});this.putState(pid,name,this.getState(pid)||{...START,playerName:name,items:[],lang:'RU'});this.send(server,{type:'hello.ok',playerId:pid,name});this.broadcastOnline();return new Response(null,{status:101,webSocket:client})}
     return new Response('not found',{status:404});
@@ -893,23 +914,7 @@ export class GameHub extends DurableObject {
     if(type==='stat.add'){const k=a.stat;if(!['strength','agility'].includes(k)||s.freePoints<=0)return json({ok:false,error:'invalid_stat'},400);s[k]++;s.freePoints--;s=this.putState(pid,name,s);return json({ok:true,player:s})}
     if(type==='item.buy'){const catalog={knife:{name:'Нож',type:'Оружие',icon:'🔪',damage:6,price:220},heavyaxe:{name:'Тяжёлый топор',type:'Оружие',icon:'🪓',damage:18,price:700},steel:{name:'Стальная броня',type:'Броня',icon:'🛡️',defense:15,price:650},bandage:{name:'Аптечка',type:'Расходник',icon:'🩹',qty:1,price:80}};const c=catalog[a.item];if(!c||s.coins<c.price)return json({ok:false,error:'not_enough_or_unknown'},400);s.coins-=c.price;const old=(s.items||[]).find(x=>x.name===c.name);if(old&&c.qty)old.qty=(old.qty||0)+1;else s.items=[...(s.items||[]),{...c,id:c.name+'_'+Date.now(),equipped:false}];s=this.putState(pid,name,s);return json({ok:true,player:s})}
     if(type==='item.use'){const i=Number(a.index),it=(s.items||[])[i];if(!it||it.name!=='Аптечка')return json({ok:false,error:'invalid_item'},400);s.hp=Math.min(s.maxHp,s.hp+30);it.qty--;if(it.qty<=0)s.items.splice(i,1);s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='daily.claim'){const day=new Date().toISOString().slice(0,10);if(s.dailyLast===day)return json({ok:false,error:'already_claimed'},409);const y=new Date(Date.now()-86400000).toISOString().slice(0,10);s.dailyStreak=s.dailyLast===y?Math.min(365,(s.dailyStreak||0)+1):1;s.dailyLast=day;const reward=200+Math.min(1000,s.dailyStreak*50);s.coins+=reward;s.exp+=20+s.dailyStreak*5;s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s,reward})}
-    if(type==='event.fight'){if((s.energy||0)<5)return json({ok:false,error:'no_energy'},400);s.energy-=5;s.eventProgress=Math.min(100,(s.eventProgress||0)+1);s.coins+=80;s.exp+=20;s.wins++;s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s,reward:{coins:80,xp:20},progress:s.eventProgress})}
-    if(type==='tavern.recruit'){const roster={ragnar:{name:'Рагнар',cost:500,role:'Воин'},astrid:{name:'Астрид',cost:650,role:'Разведчица'},ulf:{name:'Ульф',cost:900,role:'Берсерк'}};const c=roster[String(a.hero||'')];if(!c||s.coins<c.cost)return json({ok:false,error:'not_enough_or_unknown'},400);s.recruited=s.recruited||[];if(s.recruited.includes(c.name))return json({ok:false,error:'already_recruited'},409);s.coins-=c.cost;s.recruited.push(c.name);s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='item.equip'){const i=Number(a.index),it=(s.items||[])[i];if(!it||it.type==='Расходник')return json({ok:false,error:'invalid_item'},400);s.items.forEach(x=>{if(x.type===it.type)x.equipped=false});it.equipped=true;s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='item.drop'){const i=Number(a.index),it=(s.items||[])[i];if(!it||it.equipped)return json({ok:false,error:'invalid_item'},400);if(it.qty>1)it.qty--;else s.items.splice(i,1);s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='market.sell'){const i=Number(a.index),it=(s.items||[])[i];if(!it||it.equipped)return json({ok:false,error:'invalid_item'},400);const value=Math.max(10,Math.round((it.price||((it.damage||0)*80+(it.defense||0)*50+50))*0.45));if(it.qty>1)it.qty--;else s.items.splice(i,1);s.coins+=value;s=this.putState(pid,name,s);return json({ok:true,player:s,value})}
-    if(type==='guild.create'){if(s.guildId)return json({ok:false,error:'already_in_guild'},409);const g='g_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);const gn=safeName(a.name||('Гильдия '+name)).slice(0,32);this.sql.exec('INSERT INTO guilds(guild_id,name,owner_id,created_at) VALUES(?,?,?,?)',g,gn,pid,Date.now());this.sql.exec('INSERT INTO guild_members(guild_id,player_id,role) VALUES(?,?,?)',g,pid,'owner');s.guildId=g;s.guildName=gn;s.guildMembers=1;s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='guild.join'){if(s.guildId)return json({ok:false,error:'already_in_guild'},409);const row=this.sql.exec('SELECT guild_id,name FROM guilds ORDER BY created_at DESC LIMIT 1').one();if(!row)return json({ok:false,error:'no_guild'},404);this.sql.exec('INSERT OR IGNORE INTO guild_members(guild_id,player_id,role) VALUES(?,?,?)',row.guild_id,pid,'member');s.guildId=row.guild_id;s.guildName=row.name;s.guildMembers=2;s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='guild.leave'){if(!s.guildId)return json({ok:false,error:'not_in_guild'},400);this.sql.exec('DELETE FROM guild_members WHERE guild_id=? AND player_id=?',s.guildId,pid);s.guildId='';s.guildName='';s.guildMembers=1;s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='achievement.claim'){const id=safeName(a.id||'');s.achievements=s.achievements||[];if(s.achievements.includes(id))return json({ok:false,error:'already_claimed'},409);const rewards={first_win:[100,20],ten_wins:[500,80],rich:[1000,100],rating1500:[800,120]};const r=rewards[id];if(!r)return json({ok:false,error:'unknown_achievement'},400);if(id==='first_win'&&(s.wins||0)<1)return json({ok:false,error:'locked'},400);if(id==='ten_wins'&&(s.wins||0)<10)return json({ok:false,error:'locked'},400);if(id==='rich'&&(s.coins||0)<2000)return json({ok:false,error:'locked'},400);if(id==='rating1500'&&(s.rating||1000)<1500)return json({ok:false,error:'locked'},400);s.achievements.push(id);s.coins+=r[0];s.exp+=r[1];s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='district.travel'){const d=DISTRICTS.find(x=>x.id===String(a.id||''));if(!d)return json({ok:false,error:'unknown_district'},400);if((s.level||1)<d.level)return json({ok:false,error:'level_locked',level:d.level},400);const cost=Number(d.cost)||0;if((s.energy||0)<cost)return json({ok:false,error:'no_energy'},400);s.energy-=cost;s.district=d.id;s.lastEnergyAt=Date.now();s=this.putState(pid,name,s);return json({ok:true,player:s,district:d})}
-    if(type==='quest.start'){const q=ADVENTURE_QUESTS.find(x=>x.id===String(a.id||''));if(!q)return json({ok:false,error:'unknown_quest'},400);if(s.activeQuest)return json({ok:false,error:'quest_active'},409);if((s.level||1)<(DISTRICTS.find(d=>d.id===q.district)?.level||1))return json({ok:false,error:'district_locked'},400);s.activeQuest={id:q.id,progress:0,startedAt:Date.now()};s=this.putState(pid,name,s);return json({ok:true,player:s,quest:q})}
-    if(type==='quest.progress'){const aq=s.activeQuest;if(!aq)return json({ok:false,error:'no_active_quest'},400);const q=ADVENTURE_QUESTS.find(x=>x.id===aq.id);if(!q)return json({ok:false,error:'unknown_quest'},400);const n=Math.max(1,Math.min(3,Number(a.amount)||1));if((s.energy||0)<n)return json({ok:false,error:'no_energy'},400);s.energy-=n;aq.progress=Math.min(q.goal,(aq.progress||0)+n);s.activeQuest=aq;s.lastEnergyAt=Date.now();s=this.putState(pid,name,s);return json({ok:true,player:s,quest:q})}
-    if(type==='quest.claim'){const aq=s.activeQuest;if(!aq)return json({ok:false,error:'no_active_quest'},400);const q=ADVENTURE_QUESTS.find(x=>x.id===aq.id);if(!q||Number(aq.progress||0)<q.goal)return json({ok:false,error:'quest_not_ready'},400);s.coins+=q.reward;s.exp+=q.xp;s.completedQuests=s.completedQuests||[];if(!s.completedQuests.includes(q.id))s.completedQuests.push(q.id);s.activeQuest=null;s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s,reward:{coins:q.reward,xp:q.xp}})}
-    if(type==='scout'){const d=DISTRICTS.find(x=>x.id===String(s.district||'square'))||DISTRICTS[0];const cost=2;if((s.energy||0)<cost)return json({ok:false,error:'no_energy'},400);s.energy-=cost;s.exp+=10;s.coins+=25+Math.floor((s.level||1)*5);s.lastEnergyAt=Date.now();s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s,district:d.id,reward:{coins:25+Math.floor((s.level||1)*5),xp:10}})}
-    if(type==='hero.train'){const id=safeName(a.id||'');s.heroes=s.heroes||[];const h=s.heroes.find(x=>x.id===id);if(!h||s.coins<250)return json({ok:false,error:'cannot_train'},400);s.coins-=250;h.level=Math.min(20,(h.level||1)+1);s=this.putState(pid,name,s);return json({ok:true,player:s})}
-    if(type==='forge.upgrade'){const w=(s.items||[]).find(x=>x.equipped&&x.type==='Оружие');const cost=250+((s.forgeLevel||0)*100);if(!w||s.coins<cost)return json({ok:false,error:'cannot_upgrade',cost},400);s.coins-=cost;w.damage=Math.min(100,(w.damage||0)+4);s.forgeLevel=(s.forgeLevel||0)+1;s=this.putState(pid,name,s);return json({ok:true,player:s,cost})}
+    if(type==='forge.upgrade'){const w=(s.items||[]).find(x=>x.equipped&&x.type==='Оружие');if(!w||s.coins<200)return json({ok:false,error:'cannot_upgrade'},400);s.coins-=200;w.damage=Math.min(100,(w.damage||0)+3);s=this.putState(pid,name,s);return json({ok:true,player:s})}
     return json({ok:false,error:'unknown_action'},400);
   }
   level(s){while(s.exp>=s.maxExp){s.exp-=s.maxExp;s.level++;s.maxExp=Math.round(s.maxExp*1.25);s.maxHp+=8;s.hp=s.maxHp;s.freePoints+=2}return s}
