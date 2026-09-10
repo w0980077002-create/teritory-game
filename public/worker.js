@@ -712,7 +712,7 @@ const ENEMIES=[
 
   async function boot(){
     const ok=await auth();
-    if(ok){if(typeof connectGameChat==='function')connectGameChat();setTimeout(serverMe,15000);setInterval(serverMe,45000)}
+    if(ok){if(typeof connectGameChat==='function')connectGameChat();setTimeout(serverMe,15000);setInterval(serverMe,45000)}else{window.territoryAuth={ok:false,local:true};}
   }
   setTimeout(boot,150);
 })();
@@ -933,7 +933,7 @@ export default {
   async fetch(request,env){
     const url=new URL(request.url);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'Content-Type,Authorization,X-Telegram-Init-Data,X-Guest-Id,X-Guest-Name'}});
-    if(url.pathname==='/api/health')return json({ok:true,service:'Territory Sdolars',version:'s36',serverTime:Date.now(),telegramAuth:!!env.TELEGRAM_BOT_TOKEN});
+    if(url.pathname==='/api/health')return json({ok:true,service:'Territory Sdolars',version:'s37',serverTime:Date.now(),telegramAuth:!!env.TELEGRAM_BOT_TOKEN});
     if(url.pathname==='/api/auth'&&request.method==='POST'){
       const auth=await authRequest(request,env); if(!auth)return json({ok:false,error:'telegram_auth_required'},401);
       const id=env.GAME_HUB.idFromName('main'); return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/auth',request.url),{method:'POST',headers:{'content-type':'application/json','x-player-id':auth.playerId,'x-player-name':auth.name,'x-telegram-id':auth.telegramId||''},body:JSON.stringify({seed:await request.json().catch(()=>null),auth})}));
