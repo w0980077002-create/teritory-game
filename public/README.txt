@@ -1,17 +1,3 @@
-Territory — Sdolars GAME s12
-
-Добавлено:
-- 10 смайликов в игровом чате.
-- Настоящий realtime-чат через WebSocket.
-- Общий чат и чат клана — отдельные комнаты.
-- Список онлайн игроков обновляется автоматически.
-- Статус LIVE/OFFLINE.
-- История сообщений хранится в памяти сервера.
-
-Запуск:
-1. Установить Node.js.
-2. В папке выполнить: npm install
-3. Запустить: npm start
-4. Открыть: http://localhost:3000
-
-Для Telegram Mini App сервер нужно разместить на HTTPS-хостинге. Тогда клиент автоматически использует WSS на том же домене.
+Territory — Sdolars GAME s11
+Language switching RU / EN implemented.
+Main page layout preserved.
