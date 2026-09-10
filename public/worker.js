@@ -363,7 +363,7 @@ const I18N={
  'Territory — Sdolars':'Territory — Sdolars','Sdolars':'Sdolars',
  'Глава 5 · Уровень ':'Chapter 5 · Level ', 'Текущее задание':'Current quest','Поговори с кузнецом ›':'Talk to the blacksmith ›','⌖ Кузница':'⌖ Forge','Ежедневный бонус':'Daily bonus','Бонусы':'Bonuses','События':'Events','VIP':'VIP','Кузница':'Forge','Улучшение снаряжения':'Equipment upgrade','Таверна':'Tavern','Найм героев':'Hero recruitment','Магазин':'Shop','Предметы и снаряжение':'Items and equipment','Бой':'Battle','Инвентарь':'Inventory','Экипировка':'Equipment','Задания':'Quests','Чат игры':'Game chat','Общий чат и чат клана':'Global chat and clan chat','Открыть ›':'Open ›','Город':'City','Герой':'Hero','Гильдия':'Guild','Ещё':'More',
  'Глава 5 · Уровень':'Chapter 5 · Level','Сила':'Strength','Ловкость':'Agility','Защита':'Defense','Опыт':'Experience','＋ Сила':'＋ Strength','＋ Ловкость':'＋ Agility','Предметы':'Items','Монеты:':'Coins:','Инвентарь пуст.':'Inventory is empty.','Снять':'Unequip','Экипировать':'Equip','Использовать':'Use','Выбросить':'Discard','Изменить':'Change','Оружие':'Weapon','Броня':'Armor','Пусто':'Empty','Урон':'Damage','Нет оружия':'No weapon','Текущий урон:':'Current damage:','Следующее улучшение:':'Next upgrade:','Стоимость:':'Cost:','Улучшить':'Upgrade','Купить':'Buy','Расходник':'Consumable','Количество':'Quantity',
- 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s33':'Version: s33',
+ 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s35':'Version: s33',
  'Чат':'Chat','Общий чат':'Global chat','Чат клана':'Clan chat','Общий':'Global','Клан':'Clan','Онлайн игроки':'Online players','Сейчас находятся в Sdolars':'Currently in Sdolars','Развернуть':'Expand','Свернуть':'Collapse','Написать сообщение...':'Write a message...','Отправить':'Send','Добро пожаловать в общий чат игры!':'Welcome to the global game chat!','Кто идёт на арену?':'Who is going to the arena?','Чат клана открыт. Добро пожаловать!':'Clan chat is open. Welcome!','Система Sdolars':'Sdolars System','Клан Sdolars':'Sdolars Clan',
  'Бой — Викингская арена':'Battle — Viking arena','⚔️ Викинг Sdolars':'⚔️ Viking of Sdolars','👹 Монстр':'👹 Monster','Ледяной тролль':'Frost troll','Атака — выбери 1 зону':'Attack — choose 1 zone','Защита — выбери 2 зоны':'Defense — choose 2 zones','Выбрано:':'Selected:','Сделать ход':'Make a move','История боя':'Battle log','Выберите атаку и две зоны защиты.':'Choose an attack and two defense zones.','АВТОБОЙ':'AUTO BATTLE','ОСТАНОВИТЬ АВТОБОЙ':'STOP AUTO BATTLE','Автобой сам выбирает атаку и 2 зоны защиты каждый ход.':'Auto battle chooses an attack and 2 defense zones each turn.','Автобой включён — ходы выполняются автоматически.':'Auto battle is on — turns are performed automatically.','Ход:':'Turn:','попадание':'hit','промах':'miss','КРИТ!':'CRIT!','блок':'blocked','не блок':'not blocked','заблокировано':'blocked','урон':'damage','Победа над Ледяной тролльом!':'Victory over the Frost troll!','Ледяной тролль победил.':'The Frost troll won.',
  'Голова':'Head','Грудь':'Chest','Живот':'Stomach','Пояс':'Waist','Ноги':'Legs',
@@ -812,7 +812,7 @@ const ENEMIES=[
 })();
 </script>
 <script>
-/* ===== s34 GLOBAL CHARACTER / CRAFT / DAILY MISSIONS / SEASON ===== */
+/* ===== s35 GLOBAL GAME SYSTEMS ===== */
 (function(){
   const A=()=>window.territoryServerAction;
   const tr=(ru,en)=>state.lang==='EN'?en:ru;
@@ -835,6 +835,7 @@ const ENEMIES=[
   window.s34Craft=async id=>{if(await A()?.('craft',{recipe:id})){toast(tr('⚒️ Предмет создан','⚒️ Item crafted'));s34CraftMenu()}};
   window.s34Guild=async amount=>{if(await A()?.('guild.contribute',{amount})){toast(tr('👥 Вклад внесён','👥 Contribution added'));s34GuildMenu()}};
   const oldMore=window.openP;
+  const previousOpenP=window.openP;
   window.openP=function(k){
     if(k==='more'){
       const base='<div class="grid2"><button onclick="s34Character()">🧔 '+tr('Персонаж','Character')+'</button><button onclick="s34Missions()">🎯 '+tr('Дневные задания','Daily Missions')+'</button><button onclick="s34CraftMenu()">⚒️ '+tr('Мастерская','Workshop')+'</button><button onclick="s34Season()">🏆 '+tr('Сезон','Season')+'</button><button onclick="s34GuildMenu()">👥 '+tr('Гильдия','Guild')+'</button><button onclick="s33World()">🌍 '+tr('Мир Sdolars','Sdolars World')+'</button></div>';
@@ -845,7 +846,63 @@ const ENEMIES=[
   // Keep the new systems visible from the existing More/Extra button.
 })();
 </script>
-</body></html>
+<script>
+/* ===== s35 GLOBAL GAME SYSTEMS ===== */
+(function(){
+  const A=()=>window.territoryServerAction;
+  const tr=(ru,en)=>state.lang==='EN'?en:ru;
+  const esc=x=>String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  const card=x=>'<div class="card">'+x+'</div>';
+  const pane=(title,html)=>{pt.textContent=title;pb.innerHTML=html;modal.classList.add('open');if(window.applyLanguage)applyLanguage()};
+  const call=(type,args)=>A()?A()(type,args||{}):Promise.resolve(false);
+  function combatStats(){
+    const w=(state.items||[]).find(x=>x.equipped&&x.type==='Оружие');
+    const a=(state.items||[]).find(x=>x.equipped&&x.type==='Броня');
+    return {damage:15+Math.floor((state.strength||0)*.7)+(w?.damage||0),defense:(a?.defense||0)+Math.floor((state.agility||0)*.25)};
+  }
+  function overview(){
+    const st=combatStats(), sr=state.season||{};
+    return card('<b>⚔️ '+tr('Боевой профиль','Combat Profile')+'</b><p>⚔️ '+tr('Урон','Damage')+': <b>'+st.damage+'</b> · 🛡️ '+tr('Защита','Defense')+': <b>'+st.defense+'</b></p><p>💪 '+tr('Сила','Strength')+': '+(state.strength||0)+' · 🏃 '+tr('Ловкость','Agility')+': '+(state.agility||0)+' · ❤️ HP: '+(state.hp||0)+'/'+(state.maxHp||0)+'</p>')+
+      card('<b>🏆 '+tr('Сезон','Season')+'</b><p>'+tr('Рейтинг','Rating')+': <b>'+((state.rating||1000))+'</b> · '+tr('Победы','Wins')+': <b>'+((sr.wins||state.wins||0))+'</b></p><button onclick="s35Leaderboard()">🏅 '+tr('Таблица игроков','Player table')+'</button><button onclick="s35SeasonClaim()">🎁 '+tr('Забрать награду сезона','Claim season reward')+'</button>')+
+      card('<b>📦 '+tr('Ресурсы','Resources')+'</b><p>⛓️ '+(state.materials?.iron||0)+' · 🪵 '+(state.materials?.wood||0)+' · 🧵 '+(state.materials?.leather||0)+' · 🌿 '+(state.materials?.herbs||0)+'</p><button onclick="s35Gather()">🔎 '+tr('Добыть ресурсы · 3 энергии','Gather resources · 3 energy')+'</button>')+
+      card('<b>❤️ '+tr('Восстановление','Recovery')+'</b><p>'+tr('Быстрое восстановление HP за монеты.','Quick HP recovery for coins.')+'</p><button onclick="s35Rest()">🩹 '+tr('Восстановить 50% HP · 75 🪙','Restore 50% HP · 75 🪙')+'</button>');
+  }
+  function equipment(){
+    const items=state.items||[];
+    let h=card('<b>🎒 '+tr('Экипировка и предметы','Equipment & Items')+'</b><p>'+tr('Экипированные предметы напрямую влияют на боевые характеристики.','Equipped items directly affect combat stats.')+'</p>');
+    if(!items.length)return h+card(tr('Инвентарь пуст.','Inventory is empty.'));
+    items.forEach((it,i)=>{h+=card('<b>'+esc(it.icon||'📦')+' '+esc(it.name)+'</b><p>'+tr('Тип','Type')+': '+esc(it.type)+' · '+(it.damage?'⚔️ '+it.damage+' ':'')+(it.defense?'🛡️ '+it.defense+' ':'')+(it.qty?'· '+tr('Количество','Qty')+': '+it.qty:'')+'</p><div class="grid2"><button onclick="s35Equip('+i+')">'+(it.equipped?tr('Снять','Unequip'):tr('Экипировать','Equip'))+'</button><button onclick="s35Sell('+i+')">💰 '+tr('Продать','Sell')+'</button></div>')});
+    return h;
+  }
+  function guild(){
+    return card('<b>👥 '+tr('Гильдия Sdolars','Sdolars Guild')+'</b><p>'+tr('Название','Name')+': <b>'+esc(state.guildName||tr('Нет гильдии','No guild'))+'</b></p><p>⭐ '+tr('Уровень','Level')+': '+(state.guildLevel||1)+' · 👤 '+((state.guildMembers||1))+'</p><p>💰 '+tr('Личный вклад','Personal contribution')+': '+(state.guildContribution||0)+'</p>')+
+      card('<b>🏦 '+tr('Развитие гильдии','Guild development')+'</b><p>'+tr('Вклад повышает уровень гильдии и откроет будущие бонусы.','Contribution raises guild level and unlocks future bonuses.')+'</p><div class="grid2"><button onclick="s35Guild(100)">💰 100</button><button onclick="s35Guild(500)">💰 500</button></div>');
+  }
+  function missions(){
+    const ms=state.dailyMissions?.items||[];let h=card('<b>🎯 '+tr('Цикл дня','Daily cycle')+'</b><p>'+tr('Выполняй действия, получай монеты и опыт, а затем усиливай героя.','Complete actions, earn coins and XP, then strengthen your hero.')+'</p>');
+    if(!ms.length)return h+card(tr('Задания загрузятся после синхронизации с сервером.','Missions will load after server sync.'));
+    const names={wins:['⚔️','Победы','Wins'],scout:['🔎','Исследования','Scouting'],forge:['⚒️','Кузница','Forge']};
+    ms.forEach(m=>{const n=names[m.id]||['🎯',m.id,m.id];h+=card('<b>'+n[0]+' '+tr(n[1],n[2])+'</b><p>'+m.progress+'/'+m.goal+' · 🎁 '+m.reward+' 🪙 · ⭐ '+m.xp+' XP</p><button '+((m.claimed||m.progress<m.goal)?'disabled ':'')+'onclick="s35Mission(\''+esc(m.id)+'\')">'+(m.claimed?tr('Получено','Claimed'):tr('Забрать','Claim'))+'</button>')});return h;
+  }
+  window.s35Character=()=>pane(tr('Глобальный профиль','Global Profile'),overview());
+  window.s35Inventory=()=>pane(tr('Инвентарь','Inventory'),equipment());
+  window.s35GuildMenu=()=>pane(tr('Гильдия','Guild'),guild());
+  window.s35Missions=()=>pane(tr('Ежедневные задания','Daily Missions'),missions());
+  window.s35Gather=async()=>{const r=await call('resource.gather');if(r){toast(tr('⛏️ Ресурсы добыты','⛏️ Resources gathered'));s35Character()}};
+  window.s35Rest=async()=>{const r=await call('rest');if(r){toast(tr('❤️ HP восстановлено','❤️ HP restored'));s35Character()}};
+  window.s35SeasonClaim=async()=>{const r=await call('season.claim');if(r){toast(tr('🏆 Сезонная награда получена','🏆 Season reward claimed'));s35Character()}};
+  window.s35Equip=async i=>{const r=await call('item.equip',{index:i});if(r)s35Inventory()};
+  window.s35Sell=async i=>{const r=await call('market.sell',{index:i});if(r){toast(tr('💰 Предмет продан','💰 Item sold'));s35Inventory()}};
+  window.s35Mission=async id=>{const r=await call('mission.claim',{id:id});if(r)s35Missions()};
+  window.s35Guild=async amount=>{const r=await call('guild.contribute',{amount:amount});if(r){toast(tr('👥 Вклад внесён','👥 Contribution added'));s35GuildMenu()}};
+  window.s35Leaderboard=async()=>{pt.textContent=tr('Рейтинг Sdolars','Sdolars Leaderboard');pb.innerHTML=card('⌛ '+tr('Загрузка...','Loading...'));modal.classList.add('open');try{const r=await fetch('/api/leaderboard');const j=await r.json();let h=card('<b>🏆 '+tr('Топ игроков','Top players')+'</b>');(j.players||[]).forEach((x,i)=>h+=card('<b>#'+(i+1)+' '+esc(x.name)+'</b><p>🏆 '+x.rating+' · ⚔️ '+x.wins+' · '+tr('Уровень','Level')+' '+x.level+'</p>'));pb.innerHTML=h||card(tr('Пока нет данных.','No data yet.'));applyLanguage()}catch(e){pb.innerHTML=card(tr('Рейтинг пока недоступен.','Leaderboard unavailable.'))}};
+  window.openP=function(k){
+    if(k==='more'){pane(tr('Sdolars — глобальное меню','Sdolars — Global Menu'),'<div class="grid2"><button onclick="s35Character()">🧔 '+tr('Профиль','Profile')+'</button><button onclick="s35Inventory()">🎒 '+tr('Инвентарь','Inventory')+'</button><button onclick="s35Missions()">🎯 '+tr('Дневные задания','Daily Missions')+'</button><button onclick="s34CraftMenu()">⚒️ '+tr('Мастерская','Workshop')+'</button><button onclick="s35Leaderboard()">🏆 '+tr('Рейтинг','Leaderboard')+'</button><button onclick="s35GuildMenu()">👥 '+tr('Гильдия','Guild')+'</button><button onclick="s33World()">🌍 '+tr('Мир Sdolars','Sdolars World')+'</button><button onclick="openP(\'messages\')">💬 '+tr('Чат','Chat')+'</button></div>');return}
+    if(k==='guild'){s35GuildMenu();return}
+    return previousOpenP(k);
+  };
+})();
+</script></body></html>
 
 state.maxHp??=120; state.strength??=12; state.agility??=9; state.wins??=0; state.eventProgress??=0; state.guildMembers??=1; state.recruited??=[]; state.settings??={sound:true,fx:true}; state.lang??='RU';
 `;
@@ -854,7 +911,7 @@ export default {
   async fetch(request,env){
     const url=new URL(request.url);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'Content-Type,Authorization,X-Telegram-Init-Data,X-Guest-Id,X-Guest-Name'}});
-    if(url.pathname==='/api/health')return json({ok:true,service:'Territory Sdolars',version:'s34',serverTime:Date.now(),telegramAuth:!!env.TELEGRAM_BOT_TOKEN});
+    if(url.pathname==='/api/health')return json({ok:true,service:'Territory Sdolars',version:'s35',serverTime:Date.now(),telegramAuth:!!env.TELEGRAM_BOT_TOKEN});
     if(url.pathname==='/api/auth'&&request.method==='POST'){
       const auth=await authRequest(request,env); if(!auth)return json({ok:false,error:'telegram_auth_required'},401);
       const id=env.GAME_HUB.idFromName('main'); return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/auth',request.url),{method:'POST',headers:{'content-type':'application/json','x-player-id':auth.playerId,'x-player-name':auth.name,'x-telegram-id':auth.telegramId||''},body:JSON.stringify({seed:await request.json().catch(()=>null),auth})}));
@@ -876,6 +933,9 @@ export default {
     }
     if(url.pathname==='/api/players'&&request.method==='GET'){
       const id=env.GAME_HUB.idFromName('main');return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/players',request.url),request));
+    }
+    if(url.pathname==='/api/leaderboard'&&request.method==='GET'){
+      const id=env.GAME_HUB.idFromName('main');return env.GAME_HUB.get(id).fetch(new Request(new URL('/hub/leaderboard',request.url),request));
     }
     if(url.pathname==='/' || url.pathname==='/index.html') return new Response(INDEX_HTML,{headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
     return new Response('Not found',{status:404});
@@ -962,6 +1022,21 @@ export class GameHub extends DurableObject {
     if(type==='scout'){const d=DISTRICTS.find(x=>x.id===String(s.district||'square'))||DISTRICTS[0];const cost=2;if((s.energy||0)<cost)return json({ok:false,error:'no_energy'},400);s.energy-=cost;s.exp+=10;s.coins+=25+Math.floor((s.level||1)*5);const sm=s.dailyMissions?.items?.find(x=>x.id==='scout');if(sm)sm.progress=Math.min(sm.goal,(sm.progress||0)+1);s.lastEnergyAt=Date.now();s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s,district:d.id,reward:{coins:25+Math.floor((s.level||1)*5),xp:10}})}
     if(type==='hero.train'){const id=safeName(a.id||'');s.heroes=s.heroes||[];const h=s.heroes.find(x=>x.id===id);if(!h||s.coins<250)return json({ok:false,error:'cannot_train'},400);s.coins-=250;h.level=Math.min(20,(h.level||1)+1);s=this.putState(pid,name,s);return json({ok:true,player:s})}
     if(type==='forge.upgrade'){const w=(s.items||[]).find(x=>x.equipped&&x.type==='Оружие');const cost=250+((s.forgeLevel||0)*100);if(!w||s.coins<cost)return json({ok:false,error:'cannot_upgrade',cost},400);s.coins-=cost;w.damage=Math.min(100,(w.damage||0)+4);s.forgeLevel=(s.forgeLevel||0)+1;const fm=s.dailyMissions?.items?.find(x=>x.id==='forge');if(fm)fm.progress=Math.min(fm.goal,(fm.progress||0)+1);s=this.putState(pid,name,s);return json({ok:true,player:s,cost})}
+    if(type==='resource.gather'){
+      const cost=3;if((s.energy||0)<cost)return json({ok:false,error:'no_energy'},400);
+      s.energy-=cost;s.materials=s.materials||{iron:0,wood:0,leather:0,herbs:0};
+      const keys=['iron','wood','leather','herbs'];const key=keys[Math.floor(Math.random()*keys.length)];const amount=2+Math.floor(Math.random()*4);s.materials[key]=(s.materials[key]||0)+amount;
+      s.exp+=15;const sm=s.dailyMissions?.items?.find(x=>x.id==='scout');if(sm)sm.progress=Math.min(sm.goal,(sm.progress||0)+1);s.lastEnergyAt=Date.now();s=this.level(s);s=this.putState(pid,name,s);
+      return json({ok:true,player:s,reward:{material:key,amount,xp:15}})
+    }
+    if(type==='rest'){
+      const cost=75;if((s.coins||0)<cost)return json({ok:false,error:'not_enough_coins'},400);
+      const heal=Math.max(1,Math.ceil((s.maxHp||120)*.5));s.coins-=cost;s.hp=Math.min(s.maxHp,(s.hp||1)+heal);s=this.putState(pid,name,s);return json({ok:true,player:s,heal})
+    }
+    if(type==='season.claim'){
+      const month=new Date().toISOString().slice(0,7);s.season=s.season||{};if(s.season.claimed===month)return json({ok:false,error:'already_claimed'},409);
+      const rating=Number(s.rating||1000);if(rating<1200)return json({ok:false,error:'rating_locked'},400);const reward=Math.min(2500,300+Math.floor(rating/10));s.coins+=reward;s.exp+=100;s.season.claimed=month;s=this.level(s);s=this.putState(pid,name,s);return json({ok:true,player:s,reward})
+    }
     return json({ok:false,error:'unknown_action'},400);
   }
   level(s){while(s.exp>=s.maxExp){s.exp-=s.maxExp;s.level++;s.maxExp=Math.round(s.maxExp*1.25);s.maxHp+=8;s.hp=s.maxHp;s.freePoints+=2}return s}
