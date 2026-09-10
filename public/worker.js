@@ -70,7 +70,7 @@ const ENEMIES=[
     const idx=Math.min(ENEMIES.length-1,Math.floor((state.wins||0)/3)); const e=ENEMIES[idx];
     const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const pname=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||state.playerName||'Игрок';
     const pimg=document.querySelector('.avatar img')?.src||'';
-    const safeBattleHp=(Number(state.hp)>0?Number(state.hp):Number(state.maxHp)); if(Number(state.hp)<=0){state.hp=state.maxHp; save(); toast('❤️ HP восстановлено перед боем')} const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(safeBattleHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
+    const battleMaxHp=Math.max(1,Number(state.maxHp)||120); state.maxHp=battleMaxHp; state.hp=battleMaxHp; save(); const b={hp:e.hp,maxHp:e.hp,playerHp:battleMaxHp,maxPlayerHp:battleMaxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
     pt.textContent='⚔️ Бой — арена Sdolars';
     pb.innerHTML=\`<div class="vikingBattle">
       <div class="fighters">
@@ -502,7 +502,7 @@ const ENEMIES=[
     const idx=Math.min(ENEMIES.length-1,Math.floor((state.wins||0)/3)); const e=ENEMIES[idx];
     const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const pname=((tg?.first_name||'')+' '+(tg?.last_name||'')).trim()||state.playerName||'Игрок';
     const pimg=document.querySelector('.avatar img')?.src||'';
-    const safeBattleHp=(Number(state.hp)>0?Number(state.hp):Number(state.maxHp)); if(Number(state.hp)<=0){state.hp=state.maxHp; save(); toast('❤️ HP восстановлено перед боем')} const b={hp:e.hp,maxHp:e.hp,playerHp:Math.min(safeBattleHp,state.maxHp),maxPlayerHp:state.maxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
+    const battleMaxHp=Math.max(1,Number(state.maxHp)||120); state.maxHp=battleMaxHp; state.hp=battleMaxHp; save(); const b={hp:e.hp,maxHp:e.hp,playerHp:battleMaxHp,maxPlayerHp:battleMaxHp,turn:1,attack:null,defs:[],locked:false,auto:false,autoTimer:null,enemy:e};
     pt.textContent='⚔️ Бой — арена Sdolars';
     pb.innerHTML=\`<div class="vikingBattle">
       <div class="fighters">
@@ -900,8 +900,8 @@ export class GameHub extends DurableObject {
   putState(pid,name,state){const now=Date.now();state.playerName=name;state._serverUpdatedAt=now;this.sql.exec('INSERT INTO players(player_id,name,state_json,updated_at) VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET name=excluded.name,state_json=excluded.state_json,updated_at=excluded.updated_at',pid,name,JSON.stringify(state),now);return state}
   async fetch(request){const url=new URL(request.url),pid=cleanId(request.headers.get('x-player-id')),name=safeName(request.headers.get('x-player-name')||'Игрок');
     if(url.pathname==='/hub/players')return json({ok:true,players:this.online()});
-    if(url.pathname==='/hub/auth'&&request.method==='POST'){const body=await request.json().catch(()=>({}));let state=this.getState(pid);const firstLogin=!state;if(firstLogin){state=sanitizedSeed(body.seed?.state||body.seed,{name});state=this.putState(pid,name,state)}else{state.playerName=name;state=this.putState(pid,name,state)}return json({ok:true,player:state,playerId:pid,firstLogin});}
-    if(url.pathname==='/hub/me'&&request.method==='GET'){const state=this.getState(pid);return json({ok:true,authenticated:!!pid,player:state||null,online:this.online()});}
+    if(url.pathname==='/hub/auth'&&request.method==='POST'){const body=await request.json().catch(()=>({}));let state=this.getState(pid);const firstLogin=!state;if(firstLogin){state=sanitizedSeed(body.seed?.state||body.seed,{name});state=this.putState(pid,name,state)}else{state.playerName=name;if(Number(state.hp)<=0)state.hp=state.maxHp;state=this.putState(pid,name,state)}return json({ok:true,player:state,playerId:pid,firstLogin});}
+    if(url.pathname==='/hub/me'&&request.method==='GET'){let state=this.getState(pid);if(state&&Number(state.hp)<=0){state.hp=state.maxHp;state=this.putState(pid,name,state)}return json({ok:true,authenticated:!!pid,player:state||null,online:this.online()});}
     if(url.pathname==='/hub/action'&&request.method==='POST')return this.action(pid,name,await request.json().catch(()=>({})));
     if(url.pathname==='/ws'){const pair=new WebSocketPair(),client=pair[0],server=pair[1];if(!pid)return new Response('Unauthorized',{status:401});this.ctx.acceptWebSocket(server);server.serializeAttachment({playerId:pid,name});this.putState(pid,name,this.getState(pid)||{...START,playerName:name,items:[],lang:'RU'});this.send(server,{type:'hello.ok',playerId:pid,name});this.broadcastOnline();return new Response(null,{status:101,webSocket:client})}
     return new Response('not found',{status:404});
