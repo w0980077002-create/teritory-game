@@ -1,1 +1,7 @@
-{"name":"territory-sdolars-chat","version":"1.0.0","private":true,"scripts":{"start":"node server.js"},"dependencies":{"ws":"^8.18.0"}}
+{
+  "name": "territory-sdolars-s25",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {"start":"node server.js"},
+  "dependencies": {"ws":"^8.18.0"}
+}

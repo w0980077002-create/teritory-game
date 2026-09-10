@@ -502,6 +502,41 @@ const ENEMIES=[
 })();
 
 </script>
+
+<script>
+/* ===== s25 SERVER SAVE SYNC ===== */
+(function(){
+  const SYNC_KEY='sdolars_server_player_id';
+  let syncBusy=false;
+  function telegramId(){try{return window.Telegram?.WebApp?.initDataUnsafe?.user?.id||null}catch(e){return null}}
+  function localId(){let id=localStorage.getItem(SYNC_KEY);if(!id){id='web_'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem(SYNC_KEY,id)}return id}
+  function playerId(){return String(telegramId()||localId())}
+  async function serverLoad(){
+    try{
+      const r=await fetch('/api/player/'+encodeURIComponent(playerId()),{cache:'no-store'}); if(!r.ok)return;
+      const j=await r.json();
+      if(j.state && typeof j.state==='object'){
+        const serverState={...j.state};
+        const localUpdated=Number(state._updatedAt||0), serverUpdated=Number(j.state._updatedAt||0); delete serverState._updatedAt;
+        if(serverUpdated>=localUpdated){ Object.assign(state,serverState); try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}; if(typeof updateHud==='function')updateHud(); if(typeof applyLanguage==='function')applyLanguage(); }
+        else await serverSave();
+      } else await serverSave();
+    }catch(e){ /* offline: localStorage remains active */ }
+  }
+  async function serverSave(){
+    if(syncBusy)return; syncBusy=true;
+    try{const copy=JSON.parse(JSON.stringify(state));copy._updatedAt=Date.now();state._updatedAt=copy._updatedAt;
+      await fetch('/api/player/'+encodeURIComponent(playerId()),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({state:copy}),keepalive:true});
+    }catch(e){} finally{syncBusy=false}
+  }
+  const oldSave=window.save;
+  window.save=function(){ try{oldSave();}catch(e){}; serverSave(); };
+  window.s25ServerSync={load:serverLoad,save:serverSave,playerId};
+  setTimeout(serverLoad,900);
+  setInterval(()=>{ if(document.visibilityState==='visible')serverSave(); },30000);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')serverSave()});
+})();
+</script>
 </body></html>
 
 state.maxHp??=120; state.strength??=12; state.agility??=9; state.wins??=0; state.eventProgress??=0; state.guildMembers??=1; state.recruited??=[]; state.settings??={sound:true,fx:true}; state.lang??='RU';
