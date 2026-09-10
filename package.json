@@ -1,14 +1,12 @@
 {
-  "name": "teritory-telegram-game",
+  "name": "territory-sdolars-server",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
-  "scripts": { "start": "node server.js" },
-  "engines": { "node": ">=20" },
-  "dependencies": {
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "grammy": "^1.35.0",
-    "pg": "^8.13.1"
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.33.1"
   }
 }
