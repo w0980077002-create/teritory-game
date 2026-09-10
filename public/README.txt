@@ -1,2 +1,5 @@
-Territory — Sdolars s42
-Complete core systems expansion. Base: s41.
+Territory — Sdolars s45 FIXED
+
+Основа: исходная игровая версия из видео 1000060793.mp4 (визуал и игровой поток сохранены).
+Исправлены: стартовый HP, восстановление после поражения, server sync /api/player, guest fallback, регенерация энергии, серверная нормализация состояния.
+Новые панели и новая верстка НЕ добавлялись.
