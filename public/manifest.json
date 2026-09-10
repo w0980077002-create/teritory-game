@@ -1,9 +1,0 @@
-{
-  "name":"Territoria",
-  "short_name":"Territoria",
-  "start_url":"/",
-  "display":"standalone",
-  "background_color":"#100d19",
-  "theme_color":"#171224",
-  "lang":"ru"
-}
