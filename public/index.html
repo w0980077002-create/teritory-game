@@ -236,6 +236,31 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 /* s15 — compact mobile battle */
 .vikingBattle{padding:6px;border-radius:12px}.fighters{gap:5px}.fighter{padding:4px;border-radius:10px}.fighter img,.fighter .vikingSvg{height:108px;object-fit:cover}.fighterName{font-size:11px;margin:3px 0 2px}.fighterRole{font-size:7px;margin-bottom:2px}.fhp{height:7px}.fhpText{font-size:8px}.vikingBattle>.card{padding:7px;margin:5px 0}.vikingBattle>.card p{margin:4px 0}.autoRow{margin:4px 0}.autoBtn{height:34px}.autoHint{font-size:8px;margin:1px 0 4px}.vikingBattle .zones{gap:3px}.vikingBattle .zones button{padding:7px 1px;font-size:10px}.vikingBattle .goldBtn{padding:9px 8px;font-size:12px}.vikingBattle #battleLog{font-size:10px;line-height:1.25}.panel{padding:10px}.panel h2{font-size:18px;margin:2px 0 7px}
 </style>
+
+<style id="s20-battle-button">
+/* s20: compact centered Battle button */
+.battleAction, .battle-btn, .fight-btn, .action:has([class*="battleArt"]), button[onclick*="battle()"] {
+  width: 148px !important;
+  min-width: 148px !important;
+  max-width: 148px !important;
+  height: 148px !important;
+  min-height: 148px !important;
+  max-height: 148px !important;
+  margin: 12px auto !important;
+  border-radius: 28px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px !important;
+  box-sizing: border-box !important;
+}
+button[onclick*="battle()"] .icon, .battleAction .icon, .battle-btn .icon, .fight-btn .icon, .action .battleArt {
+  font-size: 48px !important;
+  line-height: 1 !important;
+}
+</style>
+
 </head>
 <body>
 <div id="app">
