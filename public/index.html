@@ -5,110 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Territory — Sdolars</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#02080d;color:#eaf6fb;font-family:Arial,sans-serif}
-button{font:inherit}.game{width:min(520px,100%);min-height:100vh;margin:auto;background:#061520;position:relative;overflow:hidden}
-.top{height:62px;padding:7px 9px;background:#071c2a;border-bottom:1px solid #1d6588;display:flex;gap:8px;align-items:center;position:sticky;top:0;z-index:20}
-.portrait{width:45px;height:45px;border-radius:9px;border:1px solid #358eb6;background:#0c2b3e;display:grid;place-items:center;font-size:27px}
-.player{flex:1}.player b{font-size:14px}.player small{display:block;color:#91b5c5;margin-top:3px}
-.res{display:flex;gap:4px}.res span{font-size:9px;background:#0b2d40;border:1px solid #205e7b;border-radius:6px;padding:6px 5px}
-.city{height:205px;padding:12px 10px;display:flex;flex-direction:column;justify-content:flex-end;text-align:center;background:
-radial-gradient(circle at 50% 35%,#1c4657 0,#0b2737 38%,#06131f 78%);border-bottom:1px solid #174d67}
-.city .art{font-size:83px;line-height:1;filter:drop-shadow(0 12px 8px #000)}
-.city h1{font-size:22px;margin:3px 0;color:#ffd34e}.city p{font-size:10px;color:#88acbc;margin:0}
-.content{padding:9px 9px 72px}.mission{background:#241d09;border:1px solid #86671d;border-radius:8px;padding:8px;margin-bottom:8px}.mission b{color:#ffd34e;font-size:11px}.mission small{display:block;color:#bba96e;margin-top:4px}
-.bar{height:5px;background:#152f3e;border-radius:5px;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:#e5ae2e}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:7px}.card{background:#09273a;border:1px solid #1d6687;border-radius:8px;padding:9px}.card h3{font-size:12px;margin:0 0 4px}.card p{font-size:9px;color:#9cbac6;line-height:1.35;margin:3px 0}.wide{grid-column:1/-1}
-.btn{width:100%;height:30px;border:1px solid #287fa7;background:#0b3b55;color:#edfaff;border-radius:6px;font-size:9px;font-weight:900}.gold{background:linear-gradient(#f5ca4c,#a86f0e);border-color:#f3d268;color:#15202a}.red{background:#471522;border-color:#a74458}
-.nav{position:fixed;bottom:0;width:min(520px,100%);display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:5px;background:#04121beF;border-top:1px solid #185873;z-index:30}.nav button{height:41px;background:#082a3d;border:1px solid #175a78;color:#bdd8e2;border-radius:6px;font-size:8px;font-weight:900}.nav .on{color:#ffd34e;border-color:#2b9acb}
-.modal{position:fixed;inset:0;background:#000b;display:none;z-index:80;align-items:flex-end}.modal.show{display:flex}.sheet{width:min(520px,100%);max-height:94vh;overflow:auto;background:#061b2a;border:1px solid #2c88b2;border-bottom:0;border-radius:14px 14px 0 0;padding:10px}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.head b{font-size:17px;color:#ffd34e}.x{width:30px;height:28px;background:#102f40;color:#fff;border:1px solid #47788e;border-radius:6px}
-.list{display:grid;gap:6px}.row{display:flex;align-items:center;gap:8px;background:#092b3e;border:1px solid #1b5e7d;border-radius:7px;padding:8px}.row .grow{flex:1}.row b{font-size:11px}.row small{display:block;color:#9ab7c3;font-size:9px;margin-top:3px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.stat{background:#092b3e;border:1px solid #1c5f7d;border-radius:6px;text-align:center;padding:6px;font-size:8px;color:#9ebbc7}.stat b{display:block;color:#ffd34e;font-size:14px;margin-top:2px}
-.battle{align-items:stretch}.battle .sheet{height:100%;max-height:none;border-radius:0;display:flex;flex-direction:column}.fight{display:grid;grid-template-columns:1fr 1fr;gap:6px}.fighter{background:#081f30;border:2px solid #247da4;border-radius:9px;padding:6px;text-align:center}.fighter.enemy{border-color:#9d3c53}.face{font-size:57px;line-height:1}.fighter b{font-size:11px}.hp{height:7px;background:#321723;border-radius:5px;overflow:hidden;margin:4px 0}.hp i{display:block;height:100%;background:#e33d54}.pick{margin-top:6px;background:#09273a;border:1px solid #1b607e;border-radius:8px;padding:7px}.pick h3{font-size:10px;margin:0 0 5px;color:#ffd34e}.zones{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}.zone{height:34px;background:#0b3a53;border:1px solid #267b9f;color:#dff4fc;border-radius:5px;font-size:8px;font-weight:900}.zone.sel{background:#1e769b;border-color:#63c9ee}.battlelog{flex:1;min-height:55px;margin-top:6px;overflow:auto;background:#04131d;border:1px solid #17475e;border-radius:7px;padding:6px;font-size:9px;color:#b5ccd5}.turnmsg{padding:7px;margin-top:6px;background:#0b2c40;border-radius:7px;font-size:10px}
-.toast{position:fixed;left:50%;bottom:62px;transform:translateX(-50%);background:#071c29;border:1px solid #2e9dcc;border-radius:7px;padding:8px 12px;font-size:10px;font-weight:900;z-index:200;display:none}.toast.show{display:block}
-@media(max-width:380px){.city{height:185px}.city .art{font-size:70px}.zones .zone{font-size:7px}}
-</style>
-</head>
-<body><div class="game">
-<header class="top"><div class="portrait">🧔‍♂️</div><div class="player"><b id="pname">Игрок</b><small id="plvl">Уровень 1 · Sdolars</small></div><div class="res"><span>🪙 <i id="coins">0</i></span><span>⚡ <i id="energy">0</i></span></div></header>
-<section class="city"><div class="art">🧔‍♂️</div><h1>SDOLARS</h1><p>Город бойцов · Репутация решается на арене</p></section>
-<main class="content">
-<div class="mission"><b>📜 КОНТРАКТ</b><small id="mission">Победи 3 противников · 0/3</small><div class="bar"><i id="missionbar" style="width:0%"></i></div></div>
-<div class="cards">
-<div class="card"><h3>⚔️ Арена</h3><p>Тактический бой. Выбери атаку и две защиты.</p><button class="btn gold" onclick="G.battle()">В БОЙ</button></div>
-<div class="card"><h3>🗺️ Районы</h3><p>Продвигайся по Sdolars и открывай сильных врагов.</p><button class="btn" onclick="G.open('world')">РАЙОНЫ</button></div>
-<div class="card"><h3>🛒 Рынок</h3><p>Оружие, броня, аптечки.</p><button class="btn" onclick="G.open('shop')">МАГАЗИН</button></div>
-<div class="card"><h3>🔨 Кузница</h3><p>Материалы и улучшение экипировки.</p><button class="btn" onclick="G.open('forge')">КУЗНИЦА</button></div>
-<div class="card"><h3>👥 Гильдия</h3><p>Казна, вклад, осада.</p><button class="btn" onclick="G.open('guild')">ГИЛЬДИЯ</button></div>
-<div class="card"><h3>🏆 Рейтинг</h3><p>Твоя позиция на арене.</p><button class="btn" onclick="G.open('rating')">РЕЙТИНГ</button></div>
-<div class="card wide"><h3>⚡ Состояние героя</h3><p id="status">HP 120/120 · Энергия 20/20</p><button class="btn" onclick="G.open('hero')">ПРОФИЛЬ ГЕРОЯ</button></div>
-</div></main>
-<nav class="nav"><button class="on" onclick="G.home()">🏙️<br>ГОРОД</button><button onclick="G.open('hero')">👤<br>ГЕРОЙ</button><button onclick="G.open('inventory')">🎒<br>ИНВЕНТАРЬ</button><button onclick="G.open('quests')">📜<br>ЗАДАНИЯ</button><button onclick="G.open('more')">☰<br>ЕЩЁ</button></nav>
-</div>
-
-<div id="modal" class="modal"><div class="sheet"><div class="head"><b id="mtitle"></b><button class="x" onclick="G.close()">×</button></div><div id="mbody"></div></div></div>
-<div id="battle" class="modal battle"><div class="sheet"><div class="head"><b>⚔️ БОЙ — SDOLARS</b><button class="x" onclick="G.closeBattle()">×</button></div>
-<div class="fight"><div class="fighter"><div class="face">🧔‍♂️</div><b id="myname">Игрок</b><div class="hp"><i id="myhpbar"></i></div><small id="myhp"></small></div><div class="fighter enemy"><div class="face">👹</div><b id="enemyname">Бандит</b><div class="hp"><i id="enemyhpbar"></i></div><small id="enemyhp"></small></div></div>
-<div class="turnmsg" id="turnmsg">Твой ход</div>
-<div class="pick"><h3>АТАКА — выбери 1 зону</h3><div class="zones" id="attacks"></div></div>
-<div class="pick"><h3>ЗАЩИТА — выбери 2 зоны</h3><div class="zones" id="defs"></div></div>
-<div class="battlelog" id="blog"></div>
-<button class="btn gold" style="margin-top:6px;height:38px" onclick="G.move()">⚔️ СДЕЛАТЬ ХОД</button></div></div>
-<div id="toast" class="toast"></div>
-
-<script>
-const KEY="territory_sdolars_final_game";
-const Z=["Голова","Грудь","Живот","Пояс","Ноги"];
-const EN=[
-{name:"Бандит",hp:110,atk:14,def:6,reward:90,xp:35},
-{name:"Наёмник",hp:145,atk:17,def:8,reward:125,xp:50},
-{name:"Варяг",hp:180,atk:21,def:10,reward:170,xp:70},
-{name:"Охотник",hp:210,atk:24,def:12,reward:220,xp:90},
-{name:"Страж крепости",hp:250,atk:28,def:15,reward:300,xp:120},
-{name:"Чемпион арены",hp:300,atk:33,def:18,reward:420,xp:160}
-];
-const DEFAULT={name:"Игрок",hp:120,maxHp:120,coins:1000,level:1,xp:0,maxXp:100,strength:12,agility:9,defense:5,free:0,energy:20,maxEnergy:20,wins:0,losses:0,rating:1000,materials:10,guild:"Sdolars",guildTreasury:1200,contract:0,contractReward:false,inventory:[
-{id:"knife",name:"Нож",type:"Оружие",damage:6,price:220},{id:"armor",name:"Стальная броня",type:"Броня",defense:12,price:800},{id:"med",name:"Аптечка",type:"Расходник",heal:60,qty:2,price:80}],equipped:{weapon:"knife",armor:"armor"}};
-let P=loadP(),B=null;
-function loadP(){try{return Object.assign({},DEFAULT,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){return JSON.parse(JSON.stringify(DEFAULT))}}
-function save(){localStorage.setItem(KEY,JSON.stringify(P));render()}
-function toast(s){let x=document.getElementById("toast");x.textContent=s;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1400)}
-function stats(){let atk=P.strength,def=P.defense;for(const x of P.inventory){if(x.id===P.equipped.weapon)atk+=x.damage||0;if(x.id===P.equipped.armor)def+=x.defense||0}return{atk,def}}
-function level(){while(P.xp>=P.maxXp){P.xp-=P.maxXp;P.level++;P.maxXp=Math.round(P.maxXp*1.22);P.maxHp+=12;P.hp=P.maxHp;P.free+=3}}
-function render(){document.getElementById("pname").textContent=P.name;document.getElementById("plvl").textContent="Уровень "+P.level+" · Sdolars";document.getElementById("coins").textContent=P.coins;document.getElementById("energy").textContent=P.energy+"/"+P.maxEnergy;document.getElementById("status").textContent="HP "+P.hp+"/"+P.maxHp+" · Энергия "+P.energy+"/"+P.maxEnergy;document.getElementById("mission").textContent="Победи 3 противников · "+Math.min(3,P.contract)+"/3";document.getElementById("missionbar").style.width=(Math.min(3,P.contract)/3*100)+"%"}
-const G={
-home(){this.close()},
-close(){document.getElementById("modal").classList.remove("show")},
-open(tab){
-let h="",t="";
-if(tab==="hero"){t="👤 ГЕРОЙ";h='<div class="stats"><div class="stat">Сила<b>'+P.strength+'</b></div><div class="stat">Ловкость<b>'+P.agility+'</b></div><div class="stat">Защита<b>'+P.defense+'</b></div><div class="stat">Очки<b>'+P.free+'</b></div></div><div class="card" style="margin-top:7px"><p>HP '+P.hp+'/'+P.maxHp+' · XP '+P.xp+'/'+P.maxXp+'</p><p>Победы '+P.wins+' · Поражения '+P.losses+'</p><button class="btn" onclick="G.stat(\\'strength\\')">＋ СИЛА</button><button class="btn" style="margin-top:4px" onclick="G.stat(\\'agility\\')">＋ ЛОВКОСТЬ</button></div>'}
-else if(tab==="world"){t="🗺️ РАЙОНЫ SDOLARS";let w=P.wins,z=[["⚓","Старый порт",0],["⚒️","Железный квартал",5],["🗡️","Чёрный рынок",10],["🏰","Крепость Севера",20],["👑","Трон Sdolars",35]];h='<div class="list">'+z.map(x=>'<div class="row"><b>'+x[0]+'</b><div class="grow"><b>'+x[1]+'</b><small>'+(w>=x[2]?"Открыт":"Нужно побед: "+x[2])+'</small></div>'+(w>=x[2]?'<button class="btn" style="width:80px" onclick="G.battle()">ВОЙТИ</button>':'')+'</div>').join("")+'</div>'}
-else if(tab==="shop"){t="🛒 РЫНОК";let a=[["knife2","Боевой нож","Оружие","+10 урона",450],["axe","Тяжёлый топор","Оружие","+16 урона",850],["armor2","Усиленная броня","Броня","+18 защиты",1200],["med2","Аптечка","Расходник","+60 HP",100]];h='<div class="list">'+a.map(x=>'<div class="row"><div class="grow"><b>'+x[1]+'</b><small>'+x[2]+' · '+x[3]+'</small></div><button class="btn" style="width:80px" onclick="G.buy(\\''+x[0]+'\\',\\''+x[1]+'\\','+x[4]+')">'+x[4]+' 🪙</button></div>').join("")+'</div>'}
-else if(tab==="inventory"){t="🎒 ИНВЕНТАРЬ";h='<div class="list">'+((P.inventory||[]).map((x,i)=>'<div class="row"><div class="grow"><b>'+x.name+'</b><small>'+x.type+' · '+(x.damage?"+ "+x.damage+" урона":x.defense?"+ "+x.defense+" защиты":x.heal?"+ "+x.heal+" HP":"")+'</small></div>'+(x.type==="Расходник"?'<button class="btn" style="width:75px" onclick="G.use('+i+')">ИСПОЛЬЗ.</button>':'<button class="btn" style="width:75px" onclick="G.equip('+i+')">'+((P.equipped.weapon===x.id||P.equipped.armor===x.id)?"СНЯТЬ":"ЭКИП.")+'</button>')+'</div>').join("")||'<div class="card"><p>Инвентарь пуст.</p></div>')+'</div>'}
-else if(tab==="forge"){t="🔨 КУЗНИЦА";h='<div class="card"><h3>Улучшение экипировки</h3><p>Материалы: '+P.materials+'</p><p>Каждое улучшение даёт +2 к характеристике экипированного предмета.</p><button class="btn gold" onclick="G.forge()">УЛУЧШИТЬ · 3 МАТЕРИАЛА</button><button class="btn" style="margin-top:5px" onclick="G.gather()">⛏ ДОБЫТЬ 2 МАТЕРИАЛА</button></div>'}
-else if(tab==="guild"){t="🏰 ГИЛЬДИЯ SDOLARS";h='<div class="card"><h3>'+P.guild+'</h3><p>Казна: '+P.guildTreasury+' 🪙</p><p>Твой вклад: '+P.siege+'</p><button class="btn" onclick="G.contribute()">ВНЕСТИ 50 🪙</button><button class="btn" style="margin-top:5px" onclick="G.siege()">⚔️ УЧАСТВОВАТЬ В ОСАДЕ</button></div>'}
-else if(tab==="rating"){t="🏆 РЕЙТИНГ";h='<div class="stats"><div class="stat">Рейтинг<b>'+P.rating+'</b></div><div class="stat">Победы<b>'+P.wins+'</b></div><div class="stat">Уровень<b>'+P.level+'</b></div><div class="stat">Сезон<b>1</b></div></div><div class="card" style="margin-top:7px"><p>Победа в PvP: +25 · поражение: −18</p><button class="btn gold" onclick="G.pvp()">АРЕНА</button></div>'}
-else if(tab==="quests"){t="📜 ЗАДАНИЯ";h='<div class="card"><h3>Контракт Sdolars</h3><p>Победи 3 противников.</p><p>Прогресс: '+Math.min(3,P.contract)+'/3</p>'+(P.contract>=3&&!P.contractReward?'<button class="btn gold" onclick="G.questReward()">ЗАБРАТЬ 120 🪙 + 40 XP</button>':'<p>Контракт: '+(P.contractReward?"выполнен":"выполняй бои")+'</p>')+'</div><div class="card" style="margin-top:6px"><h3>🏆 Достижения</h3><p>Первый бой · Богач · Воин Sdolars</p></div>'}
-else if(tab==="more"){t="☰ ЕЩЁ";h='<div class="cards"><div class="card"><h3>🎁 Ежедневная награда</h3><p>150 🪙 за вход.</p><button class="btn gold" onclick="G.daily()">ЗАБРАТЬ</button></div><div class="card"><h3>💬 Чат</h3><p>Глобальный чат Sdolars.</p><button class="btn" onclick="toast(\\'Чат города готов\\')">ОТКРЫТЬ</button></div><div class="card wide"><h3>⚙️ Настройки</h3><p>Игра сохраняется автоматически на устройстве.</p></div></div>'}
-document.getElementById("mtitle").textContent=t;document.getElementById("mbody").innerHTML=h;document.getElementById("modal").classList.add("show")},
-stat(k){if(P.free<1){toast("Нет свободных очков");return}P[k]++;P.free--;save();this.open("hero")},
-buy(id,name,price){if(P.coins<price){toast("Недостаточно монет");return}P.coins-=price;let x={id,name,type:id.startsWith("med")?"Расходник":id.includes("armor")?"Броня":"Оружие",price};if(id==="knife2")x.damage=10;if(id==="axe")x.damage=16;if(id==="armor2")x.defense=18;if(id.startsWith("med")){x.heal=60;x.qty=1}P.inventory.push(x);save();toast("Куплено: "+name);this.open("shop")},
-equip(i){let x=P.inventory[i];if(!x)return;if(x.type==="Оружие")P.equipped.weapon=P.equipped.weapon===x.id?null:x.id;if(x.type==="Броня")P.equipped.armor=P.equipped.armor===x.id?null:x.id;save();this.open("inventory")},
-use(i){let x=P.inventory[i];if(!x||x.type!=="Расходник"||!x.qty){toast("Нет аптечки");return}P.hp=Math.min(P.maxHp,P.hp+x.heal);x.qty--;if(x.qty<=0)P.inventory.splice(i,1);save();toast("❤️ HP восстановлено");this.open("inventory")},
-forge(){if(P.materials<3){toast("Нужно 3 материала");return}P.materials-=3;let w=P.inventory.find(x=>x.id===P.equipped.weapon),a=P.inventory.find(x=>x.id===P.equipped.armor);if(w)w.damage=(w.damage||0)+2;if(a)a.defense=(a.defense||0)+2;save();toast("🔨 Экипировка улучшена");this.open("forge")},
-gather(){P.materials+=2;save();toast("⛏ +2 материала");this.open("forge")},
-contribute(){if(P.coins<50){toast("Нужно 50 монет");return}P.coins-=50;P.guildTreasury+=50;save();toast("🏰 Вклад внесён");this.open("guild")},
-siege(){P.siege=(P.siege||0)+1;P.guildTreasury+=20;save();toast("⚔️ Вклад в осаду засчитан");this.open("guild")},
-daily(){if(P.dailyClaimed){toast("Награда уже получена");return}P.dailyClaimed=true;P.coins+=150;save();toast("🎁 +150 монет");this.open("more")},
-questReward(){if(P.contract<3||P.contractReward)return;P.contractReward=true;P.coins+=120;P.xp+=40;level();save();toast("📜 Контракт выполнен");this.open("quests")},
-pvp(){this.battle(true)},
-battle(pvp=false){if(P.energy<=0){toast("⚡ Нет энергии");return}P.energy--;let e=EN[Math.min(EN.length-1,Math.floor(P.wins/4))];if(pvp)e={name:"Игрок-соперник",hp:Math.max(140,P.maxHp),atk:Math.max(18,stats().atk-2),def:Math.max(8,stats().def-2),reward:180,xp:80};B={enemy:{...e,maxHp:e.hp},attack:null,def:[],turn:1,pvp};document.getElementById("battle").classList.add("show");this.renderBattle();this.log("Выбери 1 зону атаки и 2 зоны защиты.")},
-renderBattle(){let b=B;document.getElementById("myname").textContent=P.name;document.getElementById("enemyname").textContent=b.enemy.name;document.getElementById("myhp").textContent=P.hp+"/"+P.maxHp+" HP";document.getElementById("enemyhp").textContent=b.enemy.hp+"/"+b.enemy.maxHp+" HP";document.getElementById("myhpbar").style.width=Math.max(0,P.hp/P.maxHp*100)+"%";document.getElementById("enemyhpbar").style.width=Math.max(0,b.enemy.hp/b.enemy.maxHp*100)+"%";document.getElementById("attacks").innerHTML=Z.map((z,i)=>'<button class="zone '+(b.attack===i?"sel":"")+'" onclick="G.attack('+i+')">'+z+'</button>').join("");document.getElementById("defs").innerHTML=Z.map((z,i)=>'<button class="zone '+(b.def||[]).includes(i)?"sel":"")+'" onclick="G.def('+i+')">'+z+'</button>').join("")},
-attack(i){B.attack=i;this.renderBattle()},
-def(i){let q=B.def.indexOf(i);if(q>=0)B.def.splice(q,1);else if(B.def.length<2)B.def.push(i);this.renderBattle()},
-log(s){let x=document.getElementById("blog");x.innerHTML+="<div>• "+s+"</div>";x.scrollTop=x.scrollHeight},
-move(){if(!B)return;if(B.attack===null||B.def.length!==2){toast("Выбери 1 атаку и 2 защиты");return}let st=stats(),ez=Math.floor(Math.random()*5),ed=[Math.floor(Math.random()*5)];while(ed.length<2){let q=Math.floor(Math.random()*5);if(!ed.includes(q))ed.push(q)}let crit=Math.random()<Math.min(.45,.05+P.strength*.012),dodge=Math.random()<Math.min(.35,.04+P.agility*.012),blocked=ed.includes(B.attack);let dmg=blocked?0:Math.max(1,st.atk-B.enemy.def+(crit?Math.floor(st.atk*.55):0));if(dodge)dmg=0;let taken=B.def.includes(ez)?0:Math.max(1,B.enemy.atk-st.def+(Math.random()<.12?7:0));if(Math.random()<.06)taken=0;B.enemy.hp=Math.max(0,B.enemy.hp-dmg);P.hp=Math.max(0,P.hp-taken);this.log("Ход "+B.turn+": ты "+dmg+" урона, получил "+taken+"."+((blocked)?" Блок атаки.":"")+((crit)?" КРИТ!":"")+((dodge)?" Враг увернулся.":""));if(B.enemy.hp<=0){P.wins++;P.coins+=B.enemy.reward;P.xp+=B.enemy.xp;P.materials+=2;P.contract=Math.min(3,P.contract+1);P.rating+=B.pvp?25:0;level();P.hp=P.maxHp;save();this.log("🏆 ПОБЕДА! +"+B.enemy.reward+" 🪙 +"+B.enemy.xp+" XP. HP восстановлено.");this.renderBattle();setTimeout(()=>this.closeBattle(),900);return}if(P.hp<=0){P.losses++;P.rating=Math.max(0,P.rating-(B.pvp?18:0));P.hp=P.maxHp;save();this.log("💀 ПОРАЖЕНИЕ. HP полностью восстановлено.");this.renderBattle();setTimeout(()=>this.closeBattle(),900);return}B.turn++;save();this.renderBattle()},
-closeBattle(){document.getElementById("battle").classList.remove("show");B=null;render()}
-};
-render();
-setInterval(()=>{if(P.energy<P.maxEnergy){P.energy++;save()}},60000);
-</script></body></html>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#061a26;color:#e8f3f7;font-family:Arial,sans-serif}
+body{display:flex;justify-content:center}
+.game{width:min(100%,760px);min-height:100vh;background:linear-gradient(#08283a,#061b27);padding-bottom:76px}
+.top{height:62px;padding:8px 12px;display:flex;align-items:center;border-bottom:1px solid #19739a;background:#071d29}
+.avatar{width:45px;height:45px;border:2px solid #258ab5;border-radius:12px;object-fit:cover;background:#0b3447}
+.player{flex:1;padding-left:10px}
+.player b{display:block;font-size:17px}
+.player span{font-size:13px;color:#91b0bc}
+.res{display:flex;gap:5px}
+.res span{padding:8px 10px;border:1px solid #216782;border-radius:9px;background:#092f42;font-size:13px}
+.hero{padding:18px 14px 12px;text-align:center;border-bottom:1px solid #176b8c;background:radial-gradient(circle at 50% 35%,#123c50,#061d2a 70%)}
+.hero img{width:150px;height:150px;object-fit:cover;border-radius:50%;border:3px solid #a97916}
+.hero h1{margin:7px 0 3px;color:#f0bd32;font-size:30px}
+.hero p{margin:0;color:#9ab6c1}
+.content{padding:10px}
+.contract{border:1px solid #8d711a;background:#201b
