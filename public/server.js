@@ -1,90 +1,32 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const WebSocket = require('ws');
-
-const PORT = process.env.PORT || 3000;
-const HOST = '0.0.0.0';
-const PUBLIC = path.join(__dirname);
-const rooms = { global: new Map(), clan: new Map() };
-const history = {
-  global: [
-    { name: 'Система Sdolars', text: 'Добро пожаловать в общий чат игры!', time: 'сейчас', system: true },
-    { name: 'Рагнар', text: 'Кто идёт на арену?', time: 'сейчас' }
-  ],
-  clan: [{ name: 'Клан Sdolars', text: 'Чат клана открыт. Добро пожаловать!', time: 'сейчас', system: true }]
-};
-
-function safeText(v, max = 180) {
-  return String(v ?? '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, max);
+const http=require('http');
+const fs=require('fs');
+const path=require('path');
+const WebSocket=require('ws');
+const PORT=process.env.PORT||3000;
+const root=__dirname;
+const history={global:[],clan:[]};
+const clients=new Map();
+function broadcastOnline(){
+  const names=[...clients.values()].map(c=>c.name).filter(Boolean);
+  const payload=JSON.stringify({type:'online',names:[...new Set(names)]});
+  for(const ws of clients.keys()) if(ws.readyState===1) ws.send(payload);
 }
-function roomName(v) { return v === 'clan' ? 'clan' : 'global'; }
-function broadcast(room, data) {
-  const raw = JSON.stringify(data);
-  for (const client of rooms[room].keys()) {
-    if (client.readyState === WebSocket.OPEN) client.send(raw);
-  }
-}
-function online(room) {
-  const names = [];
-  for (const client of rooms[room].keys()) if (client.playerName) names.push(client.playerName);
-  return [...new Set(names)].slice(0, 50);
-}
-function announceOnline(room) { broadcast(room, { type: 'online', names: online(room) }); }
-function move(client, room) {
-  room = roomName(room);
-  for (const r of ['global','clan']) rooms[r].delete(client);
-  rooms[room].set(client, true);
-  client.room = room;
-  client.send(JSON.stringify({ type: 'history', room, messages: history[room].slice(-60) }));
-  announceOnline('global');
-  announceOnline('clan');
-}
-
-const server = http.createServer((req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  let file = url.pathname === '/' ? '/index.html' : url.pathname;
-  file = path.normalize(file).replace(/^([.][.][\\/])+/, '');
-  const full = path.join(PUBLIC, file);
-  if (!full.startsWith(PUBLIC) || !fs.existsSync(full) || fs.statSync(full).isDirectory()) {
-    res.writeHead(404); return res.end('Not found');
-  }
-  const ext = path.extname(full).toLowerCase();
-  const types = { '.html':'text/html; charset=utf-8', '.js':'application/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.json':'application/json; charset=utf-8' };
-  res.writeHead(200, { 'Content-Type': types[ext] || 'application/octet-stream', 'Cache-Control': 'no-store' });
-  fs.createReadStream(full).pipe(res);
+function sendHistory(ws,room){ws.send(JSON.stringify({type:'history',room,messages:history[room]||[]}));}
+const server=http.createServer((req,res)=>{
+  let u=(req.url||'/').split('?')[0]; if(u==='/' )u='/index.html';
+  const file=path.join(root,decodeURIComponent(u));
+  if(!file.startsWith(root)||!fs.existsSync(file)||fs.statSync(file).isDirectory()){res.writeHead(404);return res.end('Not found')}
+  const ext=path.extname(file); const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'};
+  res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream','Cache-Control':'no-store'});fs.createReadStream(file).pipe(res);
 });
-
-const wss = new WebSocket.Server({ server, maxPayload: 4096 });
-wss.on('connection', client => {
-  client.playerName = 'Игрок';
-  client.room = 'global';
-  move(client, 'global');
-
-  client.on('message', raw => {
-    try {
-      const data = JSON.parse(raw.toString());
-      if (data.type === 'hello') {
-        client.playerName = safeText(data.name, 40) || 'Игрок';
-        move(client, roomName(data.room));
-        return;
-      }
-      if (data.type === 'room') { move(client, data.room); return; }
-      if (data.type === 'message') {
-        const room = roomName(data.room || client.room);
-        if (client.room !== room) return;
-        const text = safeText(data.message?.text, 180);
-        if (!text) return;
-        const msg = { name: client.playerName, text, time: new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' }), online: true };
-        history[room].push(msg);
-        if (history[room].length > 60) history[room].splice(0, history[room].length - 60);
-        broadcast(room, { type: 'message', room, message: msg });
-      }
-    } catch (_) {}
+const wss=new WebSocket.Server({server});
+wss.on('connection',ws=>{
+  const client={name:'Игрок',room:'global'};clients.set(ws,client);sendHistory(ws,'global');broadcastOnline();
+  ws.on('message',raw=>{let m;try{m=JSON.parse(raw.toString())}catch(e){return}
+    if(m.type==='hello'){client.name=String(m.name||'Игрок').slice(0,32);client.room=m.room==='clan'?'clan':'global';sendHistory(ws,client.room);broadcastOnline();return}
+    if(m.type==='room'){client.room=m.room==='clan'?'clan':'global';sendHistory(ws,client.room);return}
+    if(m.type==='message'){const room=m.room==='clan'?'clan':'global';const text=String(m.message?.text||'').trim().slice(0,180);if(!text)return;const msg={name:client.name,text,time:new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}),online:true};history[room].push(msg);if(history[room].length>100)history[room].shift();const payload=JSON.stringify({type:'message',room,message:msg});for(const [peer,c] of clients)if(c.room===room&&peer.readyState===1)peer.send(payload);}
   });
-  client.on('close', () => { const room = client.room; rooms.global.delete(client); rooms.clan.delete(client); announceOnline(room); announceOnline('global'); announceOnline('clan'); });
-  client.on('error', () => {});
+  ws.on('close',()=>{clients.delete(ws);broadcastOnline()});
 });
-
-setInterval(() => { for (const client of wss.clients) if (client.readyState === WebSocket.OPEN) client.ping(); }, 25000);
-server.listen(PORT, HOST, () => console.log(`Territory Sdolars server: http://${HOST}:${PORT}`));
+server.listen(PORT,()=>console.log(`Territory chat server: http://localhost:${PORT}`));
