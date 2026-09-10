@@ -237,36 +237,14 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .vikingBattle{padding:6px;border-radius:12px}.fighters{gap:5px}.fighter{padding:4px;border-radius:10px}.fighter img,.fighter .vikingSvg{height:108px;object-fit:cover}.fighterName{font-size:11px;margin:3px 0 2px}.fighterRole{font-size:7px;margin-bottom:2px}.fhp{height:7px}.fhpText{font-size:8px}.vikingBattle>.card{padding:7px;margin:5px 0}.vikingBattle>.card p{margin:4px 0}.autoRow{margin:4px 0}.autoBtn{height:34px}.autoHint{font-size:8px;margin:1px 0 4px}.vikingBattle .zones{gap:3px}.vikingBattle .zones button{padding:7px 1px;font-size:10px}.vikingBattle .goldBtn{padding:9px 8px;font-size:12px}.vikingBattle #battleLog{font-size:10px;line-height:1.25}.panel{padding:10px}.panel h2{font-size:18px;margin:2px 0 7px}
 </style>
 
-<style id="s21-battle-button">
-/* s21: compact centered Battle button — fixes the off-screen oversized button */
-.actions {
-  left: 50% !important;
-  right: auto !important;
-  width: 150px !important;
-  transform: translateX(-50%) !important;
-  bottom: 13% !important;
-  display: grid !important;
-  grid-template-columns: 1fr !important;
-  justify-items: center !important;
-}
-.actions .action {
-  width: 150px !important;
-  min-width: 150px !important;
-  max-width: 150px !important;
-  height: 150px !important;
-  min-height: 150px !important;
-  max-height: 150px !important;
-  margin: 0 !important;
-  border-radius: 50% !important;
-  padding: 8px !important;
-  box-sizing: border-box !important;
-}
-.actions .action .battleArt {
-  width: 68px !important;
-  height: 68px !important;
-  margin-bottom: 2px !important;
-}
-.actions .action span { font-size: 20px !important; }
+<style id="s22-battle-button">
+/* s22 — compact centered battle emblem, about half the previous size */
+.actions{left:50%!important;right:auto!important;width:86px!important;transform:translateX(-50%)!important;bottom:13%!important;display:grid!important;grid-template-columns:1fr!important;justify-items:center!important;z-index:6!important}
+.actions .action{width:86px!important;min-width:86px!important;max-width:86px!important;height:86px!important;min-height:86px!important;max-height:86px!important;margin:0!important;padding:4px!important;box-sizing:border-box!important;border-radius:50%!important;border:2px solid #29b9ff!important;box-shadow:0 0 0 3px rgba(8,31,49,.92),0 0 16px rgba(20,180,255,.42),0 5px 12px rgba(0,0,0,.55),inset 0 0 15px rgba(30,190,255,.25)!important}
+.actions .action:before{inset:5px!important;border-width:1.5px!important}
+.actions .action .battleArt{width:52px!important;height:52px!important;margin-bottom:0!important;filter:drop-shadow(0 2px 4px rgba(0,0,0,.75)) drop-shadow(0 0 6px rgba(255,170,40,.35))!important}
+.actions .action span{font-size:13px!important;line-height:13px!important;margin-top:-1px!important;text-shadow:0 2px 4px #000,0 0 7px rgba(255,210,70,.35)!important}
+@media(max-width:420px){.actions{width:80px!important}.actions .action{width:80px!important;min-width:80px!important;max-width:80px!important;height:80px!important;min-height:80px!important;max-height:80px!important}.actions .action .battleArt{width:48px!important;height:48px!important}.actions .action span{font-size:12px!important;line-height:12px!important}}
 </style>
 
 </head>
@@ -282,7 +260,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 <button class="daily" onclick="openP(&quot;bonus&quot;)"><span class="chest">🎁</span><b>Ежедневный бонус</b><time id="timer">23:45:00</time></button>
 <div class="left"><button class="smallBtn" onclick="openP(&quot;bonus&quot;)"><span class="icon">🎁</span>Бонусы<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;events&quot;)"><span class="icon">▦</span>События<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;vip&quot;)"><span class="icon">♛</span>VIP</button></div>
 <div class="right"><button class="location" onclick="openP(&quot;forge&quot;)"><span class="icon">⚒</span><div><strong>Кузница</strong><small>Улучшение снаряжения</small></div><div class="badge">!</div></button><button class="location" onclick="openP(&quot;tavern&quot;)"><span class="icon">🍺</span><div><strong>Таверна</strong><small>Найм героев</small></div><div class="badge">!</div></button><button class="location" onclick="openP(&quot;shop&quot;)"><span class="icon">🎒</span><div><strong>Магазин</strong><small>Предметы и снаряжение</small></div></button></div>
-<div class="actions"><button class="action" onclick="battle()"><svg class="battleArt" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="blade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#9bdcff"/><stop offset="1" stop-color="#318bd0"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe878"/><stop offset="1" stop-color="#d48a12"/></linearGradient></defs><path d="M13 8l7 3-6 6 26 26-5 5-26-26-6 6z" fill="url(#blade)" stroke="#173c5a" stroke-width="1.5"/><path d="M51 8l-7 3 6 6-26 26 5 5 26-26 6 6z" fill="url(#blade)" stroke="#173c5a" stroke-width="1.5"/><path d="M13 44l7 7-7 7-7-7zM51 44l-7 7 7 7 7-7z" fill="url(#gold)" stroke="#6b420b" stroke-width="1.5"/><path d="M27 26h10v12H27z" rx="2" fill="url(#gold)" stroke="#6b420b" stroke-width="1.5"/><path d="M29 28h6v8h-6z" fill="#0b2943"/></svg><span>Бой</span></button></div>
+<div class="actions"><button class="action" onclick="battle()"><svg class="battleArt" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="axeSteel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#b8d8e8"/><stop offset=".7" stop-color="#647c8d"/><stop offset="1" stop-color="#263844"/></linearGradient><linearGradient id="axeWood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9b5a27"/><stop offset=".5" stop-color="#5c2d16"/><stop offset="1" stop-color="#24140e"/></linearGradient><linearGradient id="axeGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe77a"/><stop offset=".5" stop-color="#d99a24"/><stop offset="1" stop-color="#6d3d0a"/></linearGradient></defs><g transform="rotate(-7 50 50)"><path d="M49 18L31 83" stroke="url(#axeWood)" stroke-width="7" stroke-linecap="round"/><path d="M24 24Q7 22 8 42Q9 58 27 54L38 47L31 39L20 43Q18 38 20 34Q22 31 32 34Z" fill="url(#axeSteel)" stroke="#172a35" stroke-width="2"/><path d="M22 28L31 30" stroke="#fff" stroke-width="2" opacity=".55"/></g><g transform="rotate(7 50 50)"><path d="M51 18L69 83" stroke="url(#axeWood)" stroke-width="7" stroke-linecap="round"/><path d="M76 24Q93 22 92 42Q91 58 73 54L62 47L69 39L80 43Q82 38 80 34Q78 31 68 34Z" fill="url(#axeSteel)" stroke="#172a35" stroke-width="2"/><path d="M78 28L69 30" stroke="#fff" stroke-width="2" opacity=".55"/></g><circle cx="50" cy="50" r="9" fill="url(#axeGold)" stroke="#6b3e0b" stroke-width="2"/><path d="M46 50h8M50 46v8" stroke="#fff2a3" stroke-width="1.5"/></svg><span>Бой</span></button></div>
 <button class="reward chatReward" onclick="openP(&quot;messages&quot;)"><span class="icon">💬</span><div class="rewardText"><b>Чат игры</b><small>Общий чат и чат клана</small></div><span class="chatGo">Открыть ›</span></button>
 </main>
 <nav class="bottom"><button class="active"><span>🏠</span>Город</button><button onclick="openP(&quot;hero&quot;)"><span>⚔</span>Герой</button><button onclick="openP(&quot;inventory&quot;)"><span>🎒</span>Инвентарь</button><button onclick="openP(&quot;quests&quot;)"><span>🛡</span>Задания</button><button onclick="openP(&quot;guild&quot;)"><span>👥</span>Гильдия</button><button onclick="openP(&quot;more&quot;)"><span>☰</span>Ещё</button></nav>
