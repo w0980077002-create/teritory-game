@@ -1123,3 +1123,445 @@ export class GameHub extends DurableObject {
   async webSocketClose(ws){const meta=this.attachment(ws);if(!meta?.playerId)return;for(const [id,m] of this.matches){if(m.a.playerId===meta.playerId||m.b.playerId===meta.playerId){const other=m.a.playerId===meta.playerId?m.b:m.a;this.send(this.socketByPlayer(other.playerId),{type:'pvp.end',reason:'opponent_offline'});this.matches.delete(id)}}this.broadcastOnline()}
   async webSocketError(ws){await this.webSocketClose(ws)}
 }
+
+
+/* ===== Territory s40: Full Game Layer ===== */
+(()=>{
+  const TG = {
+    version:"s40",
+    enemies:[
+      ["Бандит",120,12,80],["Наёмник",170,18,120],["Варяг",230,24,170],
+      ["Громила",310,31,230],["Страж Sdolars",420,39,320],["Вожак банды",560,48,500]
+    ],
+    items:[
+      {id:"knife",name:"Нож",type:"weapon",damage:8,cost:120,rarity:"common"},
+      {id:"axe",name:"Тяжёлый топор",type:"weapon",damage:18,cost:420,rarity:"rare"},
+      {id:"sword",name:"Стальной меч",type:"weapon",damage:28,cost:900,rarity:"epic"},
+      {id:"armor",name:"Стальная броня",type:"armor",defense:12,cost:650,rarity:"rare"},
+      {id:"helm",name:"Шлем стража",type:"armor",defense:7,cost:380,rarity:"common"},
+      {id:"medkit",name:"Аптечка",type:"consumable",heal:45,cost:90,rarity:"common"}
+    ],
+    districts:[
+      ["Порт",1,0],["Старый город",2,100],["Рынок",3,250],
+      ["Крепость",5,600],["Подземелья",8,1200]
+    ]
+  };
+
+  const getState=()=>window.state||window.gameState||null;
+  const saveState=()=>{try{ if(typeof save==="function") save(); }catch(e){}};
+
+  function ensure(){
+    const s=getState(); if(!s) return;
+    s.inventory ||= [];
+    s.resources ||= {iron:0,wood:0,leather:0,herbs:0};
+    s.fullGame ||= {wins:0,losses:0,kills:0,quests:0,crafts:0,explored:0,arena:0};
+    s.equipment ||= {weapon:null,armor:null,helm:null};
+    s.districts ||= TG.districts.map(x=>({name:x[0],level:x[1],cost:x[2],unlocked:x[1]<=((s.level||1))}));
+    s.season ||= {name:"Сезон Sdolars",points:0,league:"Bronze"};
+    saveState();
+  }
+
+  function addItem(id){
+    const s=getState(); const it=TG.items.find(x=>x.id===id); if(!s||!it) return false;
+    s.inventory.push({...it});
+    return true;
+  }
+  function totals(){
+    const s=getState(); if(!s) return {dmg:0,def:0};
+    let dmg=Number(s.bonusDamage||0), def=Number(s.defense||0);
+    for(const it of (s.inventory||[])){
+      if(s.equipment?.weapon===it.id) dmg+=Number(it.damage||0);
+      if(["armor","helm"].includes(it.type) && [s.equipment?.armor,s.equipment?.helm].includes(it.id)) def+=Number(it.defense||0);
+    }
+    return {dmg,def};
+  }
+
+  window.TerritoryFullGame={TG,ensure,addItem,totals};
+
+  // Visible "game status" card, intentionally compact for mobile.
+  function mount(){
+    ensure();
+    const host=document.querySelector("main")||document.body;
+    if(document.getElementById("tg-full-status")) return;
+    const box=document.createElement("section");
+    box.id="tg-full-status";
+    box.innerHTML=`
+      <div style="font-weight:900;font-size:14px;margin-bottom:6px">⚔️ Sdolars • Полная игра</div>
+      <div id="tg-fg-stats" style="font-size:12px;line-height:1.45"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:7px">
+        <button data-tg="district">🗺️ Районы</button>
+        <button data-tg="equipment">🎒 Экипировка</button>
+        <button data-tg="quests">📜 Квесты</button>
+      </div>`;
+    box.style.cssText="margin:8px;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:9px;background:rgba(10,15,22,.82);color:#fff";
+    box.querySelectorAll("button").forEach(b=>b.style.cssText="font-size:11px;padding:7px 3px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:#18202a;color:#fff");
+    host.prepend(box);
+
+    const render=()=>{
+      const s=getState(); if(!s) return;
+      const t=totals();
+      document.getElementById("tg-fg-stats").textContent=
+        `Уровень ${s.level||1} • Победы ${s.fullGame?.wins||0} • Поражения ${s.fullGame?.losses||0} • Урон ${t.dmg} • Защита ${t.def}`;
+    };
+    render(); setInterval(render,1000);
+    box.addEventListener("click",e=>{
+      const b=e.target.closest("[data-tg]"); if(!b) return;
+      const s=getState(); ensure();
+      if(b.dataset.tg==="district"){
+        const lines=(s.districts||[]).map(d=>`${d.unlocked?"✅":"🔒"} ${d.name} — ур.${d.level}`).join("\n");
+        alert("РАЙОНЫ SDOLARS\n\n"+lines);
+      }
+      if(b.dataset.tg==="equipment"){
+        const t=totals();
+        alert(`ЭКИПИРОВКА\n\nОружие: ${s.equipment?.weapon||"нет"}\nБроня: ${s.equipment?.armor||"нет"}\nШлем: ${s.equipment?.helm||"нет"}\n\nБонус урона: +${t.dmg}\nЗащита: +${t.def}`);
+      }
+      if(b.dataset.tg==="quests"){
+        alert(`АКТИВНОСТЬ\n\nПобеды: ${s.fullGame?.wins||0}\nУбийства: ${s.fullGame?.kills||0}\nКвесты: ${s.fullGame?.quests||0}\nИсследовано районов: ${s.fullGame?.explored||0}\nАрена: ${s.fullGame?.arena||0}`);
+      }
+    });
+  }
+
+  // Hook common victory/loss functions if present, preserving originals.
+  ["winBattle","battleWin","victory"].forEach(name=>{
+    if(typeof window[name]==="function" && !window[name].__tgWrapped){
+      const old=window[name];
+      const fn=function(...a){
+        const s=getState(); ensure();
+        if(s){s.fullGame.wins++;s.fullGame.kills++;s.season.points+=10;}
+        const r=old.apply(this,a); saveState(); return r;
+      };
+      fn.__tgWrapped=true; window[name]=fn;
+    }
+  });
+
+  // Daily/season maintenance.
+  setTimeout(mount,350);
+})();
+
+
+/* ===== Territory s41: Playable Content Expansion ===== */
+(()=>{
+  const TG41={
+    enemies:[
+      {name:"Бандит",hp:120,dmg:12,reward:80,xp:35},
+      {name:"Наёмник",hp:170,dmg:18,reward:120,xp:55},
+      {name:"Варяг",hp:230,dmg:24,reward:170,xp:80},
+      {name:"Громила",hp:310,dmg:31,reward:230,xp:110},
+      {name:"Страж Sdolars",hp:420,dmg:39,reward:320,xp:150},
+      {name:"Вожак банды",hp:560,dmg:48,reward:500,xp:220},
+      {name:"Капитан крепости",hp:760,dmg:57,reward:750,xp:320},
+      {name:"Босс Подземелий",hp:1100,dmg:72,reward:1200,xp:500}
+    ],
+    items:[
+      {id:"knife",name:"Нож",slot:"weapon",damage:8,cost:120},
+      {id:"axe",name:"Тяжёлый топор",slot:"weapon",damage:18,cost:420},
+      {id:"sword",name:"Стальной меч",slot:"weapon",damage:28,cost:900},
+      {id:"armor",name:"Стальная броня",slot:"armor",defense:12,cost:650},
+      {id:"helm",name:"Шлем стража",slot:"helm",defense:7,cost:380},
+      {id:"gloves",name:"Боевые перчатки",slot:"gloves",damage:5,defense:3,cost:300},
+      {id:"boots",name:"Сапоги разведчика",slot:"boots",defense:5,cost:340},
+      {id:"medkit",name:"Аптечка",slot:"consumable",heal:45,cost:90}
+    ],
+    zones:["Голова","Грудь","Живот","Пояс","Ноги"]
+  };
+
+  const S=()=>window.state||window.gameState;
+  function ensure(){
+    const s=S(); if(!s)return;
+    s.fullGame ||= {wins:0,losses:0,kills:0,quests:0,crafts:0,explored:0};
+    s.fullGame.stage ||= 0;
+    s.fullGame.energy ||= 20;
+    s.fullGame.maxEnergy ||= 20;
+    s.fullGame.lastEnergy ||= Date.now();
+    s.fullGame.enemyIndex ||= 0;
+    s.fullGame.battle ||= null;
+    s.fullGame.daily ||= {wins:0,explore:0,shop:0};
+    s.equipment ||= {weapon:null,armor:null,helm:null,gloves:null,boots:null};
+    s.inventory ||= [];
+    s.resources ||= {iron:0,wood:0,leather:0,herbs:0};
+    s.coins = Number(s.coins||0);
+    s.exp = Number(s.exp||0);
+    s.level = Number(s.level||1);
+    s.maxExp = Number(s.maxExp||100);
+    if(typeof save==="function") save();
+  }
+
+  function energy(){
+    const s=S(); if(!s)return;
+    const now=Date.now(), last=Number(s.fullGame.lastEnergy||now);
+    const gain=Math.floor((now-last)/60000);
+    if(gain>0){
+      s.fullGame.energy=Math.min(s.fullGame.maxEnergy,Number(s.fullGame.energy||0)+gain);
+      s.fullGame.lastEnergy=last+gain*60000;
+      if(typeof save==="function")save();
+    }
+  }
+  function gainXP(x){
+    const s=S(); if(!s)return;
+    s.exp+=x;
+    while(s.exp>=s.maxExp){
+      s.exp-=s.maxExp;s.level++;
+      s.maxExp=Math.floor(s.maxExp*1.18);
+      s.freePoints=Number(s.freePoints||0)+3;
+      s.hp=s.maxHp;
+    }
+  }
+  function totals(){
+    const s=S();let dmg=Number(s?.bonusDamage||0),def=Number(s?.defense||0);
+    for(const it of (s?.inventory||[])){
+      if(s.equipment?.[it.slot]===it.id){dmg+=Number(it.damage||0);def+=Number(it.defense||0);}
+    }
+    return {dmg,def};
+  }
+
+  function startBattle(){
+    const s=S(); ensure(); energy();
+    if(s.fullGame.energy<=0){alert("Нет энергии. Она восстанавливается по 1 ед./мин.");return;}
+    s.fullGame.energy--;
+    const e=TG41.enemies[Math.min(s.fullGame.enemyIndex,TG41.enemies.length-1)];
+    s.fullGame.battle={enemy:{...e,hp:e.hp},turn:"player",round:1};
+    if(typeof save==="function")save();
+    renderBattle();
+  }
+
+  function resolveTurn(atk,blocks){
+    const s=S(), b=s.fullGame.battle; if(!b)return;
+    const t=totals();
+    const enemyAtk=TG41.zones[Math.floor(Math.random()*5)];
+    const enemyBlocks=[...TG41.zones].sort(()=>Math.random()-.5).slice(0,2);
+    let playerDamage=Math.max(1,Math.floor(10+t.dmg/2+(s.strength||5)*.7));
+    if(blocks.includes(atk)) playerDamage=Math.floor(playerDamage*.35);
+    if(Math.random()<Math.min(.22,(s.strength||5)/100))playerDamage=Math.floor(playerDamage*1.8);
+    if(!enemyBlocks.includes(atk)) b.enemy.hp=Math.max(0,b.enemy.hp-playerDamage);
+    let enemyDamage=Math.max(1,Math.floor(b.enemy.dmg-t.def/2));
+    if(blocks.includes(enemyAtk)) enemyDamage=Math.floor(enemyDamage*.25);
+    if(Math.random()<Math.min(.18,(s.agility||5)/100))enemyDamage=0;
+    s.hp=Math.max(0,(s.hp??s.maxHp)-enemyDamage);
+
+    if(b.enemy.hp<=0){
+      s.fullGame.wins++;s.fullGame.kills++;s.fullGame.daily.wins++;
+      s.coins+=b.enemy.reward;gainXP(b.enemy.xp);
+      s.resources.iron++;s.resources.leather++;
+      if(typeof save==="function")save();
+      alert(`Победа!\n+${b.enemy.reward} монет\n+${b.enemy.xp} опыта\n+ресурсы`);
+      s.fullGame.enemyIndex=Math.min(s.fullGame.enemyIndex+1,TG41.enemies.length-1);
+      s.fullGame.battle=null;
+      if(typeof save==="function")save();
+      return;
+    }
+    if(s.hp<=0){
+      s.fullGame.losses++;s.hp=Math.max(1,Math.floor(s.maxHp*.35));
+      s.fullGame.battle=null;
+      if(typeof save==="function")save();
+      alert("Поражение. Здоровье восстановлено до 35%.");
+      return;
+    }
+    b.round++;b.turn="player";
+    if(typeof save==="function")save();
+    renderBattle();
+  }
+
+  function renderBattle(){
+    const s=S(),b=s?.fullGame?.battle;if(!b)return;
+    let old=document.getElementById("tg41-battle");
+    if(old)old.remove();
+    const box=document.createElement("div");
+    box.id="tg41-battle";
+    box.style.cssText="position:fixed;inset:8px;z-index:99999;background:#10151c;color:#fff;border:1px solid #3b4654;border-radius:14px;padding:12px;overflow:auto";
+    box.innerHTML=`<div style="font-size:18px;font-weight:900">⚔️ ${b.enemy.name}</div>
+      <div style="font-size:13px;margin:6px 0">Враг: ${b.enemy.hp}/${b.enemy.hp===0?0:TG41.enemies.find(e=>e.name===b.enemy.name)?.hp||b.enemy.hp} HP</div>
+      <div style="font-size:13px;margin-bottom:8px">Вы: ${s.hp}/${s.maxHp} HP • Раунд ${b.round}</div>
+      <div style="font-weight:800;margin:7px 0">Атака — выбери 1 зону</div>
+      <div id="tg41-atk" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px"></div>
+      <div style="font-weight:800;margin:9px 0 5px">Защита — выбери 2 зоны</div>
+      <div id="tg41-def" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px"></div>
+      <button id="tg41-go" style="width:100%;margin-top:12px;padding:11px;border-radius:10px;border:0;font-weight:900">⚔️ СДЕЛАТЬ ХОД</button>
+      <button id="tg41-close" style="width:100%;margin-top:6px;padding:8px;border-radius:10px">Выйти</button>`;
+    document.body.appendChild(box);
+    let atk=null,defs=[];
+    TG41.zones.forEach(z=>{
+      const a=document.createElement("button");a.textContent=z;a.style.cssText="font-size:10px;padding:8px 2px;border-radius:8px";
+      a.onclick=()=>{atk=z;[...document.querySelectorAll("#tg41-atk button")].forEach(x=>x.dataset.on="");a.dataset.on="1";};
+      box.querySelector("#tg41-atk").appendChild(a);
+      const d=document.createElement("button");d.textContent=z;d.style.cssText="font-size:10px;padding:8px 2px;border-radius:8px";
+      d.onclick=()=>{if(defs.includes(z))defs=defs.filter(x=>x!==z);else if(defs.length<2)defs.push(z);[...box.querySelectorAll("#tg41-def button")].forEach(x=>x.dataset.on="");defs.forEach(v=>[...box.querySelectorAll("#tg41-def button")].find(x=>x.textContent===v).dataset.on="1");};
+      box.querySelector("#tg41-def").appendChild(d);
+    });
+    box.querySelector("#tg41-go").onclick=()=>{if(!atk||defs.length!==2){alert("Выбери 1 атаку и 2 защиты.");return;}resolveTurn(atk,defs);};
+    box.querySelector("#tg41-close").onclick=()=>box.remove();
+    const style=document.createElement("style");style.textContent="#tg41-battle button[data-on='1']{outline:2px solid #d9a441;background:#293342;color:#fff}";box.appendChild(style);
+  }
+
+  window.Territory41={TG41,startBattle,resolveTurn,ensure,totals};
+  ensure();setInterval(energy,30000);
+
+  // Add one compact entry point without altering the existing city layout.
+  setTimeout(()=>{
+    if(document.getElementById("tg41-start"))return;
+    const b=document.createElement("button");
+    b.id="tg41-start";b.textContent="⚔️ Продолжить приключение";
+    b.style.cssText="position:fixed;left:50%;bottom:62px;transform:translateX(-50%);z-index:9998;padding:9px 13px;border-radius:10px;border:1px solid #596777;background:#171f29;color:#fff;font-weight:800;font-size:12px";
+    b.onclick=startBattle;document.body.appendChild(b);
+  },700);
+})();
+
+
+/* ===== Territory s42: Complete Core Systems ===== */
+(()=>{
+  const S=()=>window.state||window.gameState;
+  const saveNow=()=>{try{if(typeof save==="function")save();}catch(e){}};
+  const ensure=()=>{
+    const s=S(); if(!s)return;
+    s.fullGame ||= {};
+    Object.assign(s.fullGame,{
+      wins:Number(s.fullGame.wins||0),losses:Number(s.fullGame.losses||0),
+      kills:Number(s.fullGame.kills||0),crafts:Number(s.fullGame.crafts||0),
+      explored:Number(s.fullGame.explored||0),quests:Number(s.fullGame.quests||0),
+      arena:Number(s.fullGame.arena||0),energy:Number(s.fullGame.energy??20),
+      maxEnergy:Number(s.fullGame.maxEnergy||20),lastEnergy:Number(s.fullGame.lastEnergy||Date.now())
+    });
+    s.equipment ||= {weapon:null,armor:null,helm:null,gloves:null,boots:null};
+    s.inventory ||= [];
+    s.resources ||= {iron:0,wood:0,leather:0,herbs:0};
+    s.guild ||= {name:"",role:"",level:1,members:1,treasury:0,contribution:0};
+    s.ranking ||= {rating:1000,wins:0,losses:0,league:"Bronze"};
+    s.daily ||= {date:"",wins:0,explore:0,shop:0};
+    saveNow();
+  };
+  const recalc=()=>{
+    const s=S(); if(!s)return;
+    const eq=s.equipment||{}, inv=s.inventory||[];
+    let dmg=Number(s.bonusDamage||0), def=Number(s.defense||0);
+    for(const it of inv){
+      if(eq.weapon===it.id)dmg+=Number(it.damage||0);
+      if(eq.armor===it.id||eq.helm===it.id||eq.gloves===it.id||eq.boots===it.id){
+        def+=Number(it.defense||0); dmg+=Number(it.slot==="gloves"?it.damage||0:0);
+      }
+    }
+    s.combatStats={damage:dmg,defense:def};
+    return s.combatStats;
+  };
+  const toast=(m)=>{
+    if(typeof window.toast==="function")window.toast(m);else alert(m);
+  };
+
+  function dailyReset(){
+    const s=S(); if(!s)return;
+    const d=new Date().toISOString().slice(0,10);
+    if(s.daily.date!==d)s.daily={date:d,wins:0,explore:0,shop:0};
+  }
+  function energyTick(){
+    const s=S(); if(!s)return;
+    const now=Date.now(),last=Number(s.fullGame.lastEnergy||now);
+    const gain=Math.floor((now-last)/60000);
+    if(gain>0){
+      s.fullGame.energy=Math.min(s.fullGame.maxEnergy,Number(s.fullGame.energy)+gain);
+      s.fullGame.lastEnergy=last+gain*60000;saveNow();
+    }
+  }
+
+  const districts=[
+    ["Порт",1,0],["Старый город",2,100],["Рынок",3,250],
+    ["Крепость",5,600],["Подземелья",8,1200]
+  ];
+  const daily=[
+    ["Победитель Sdolars","Победи 3 раза","wins",3,250],
+    ["Исследователь","Исследуй 2 района","explore",2,180],
+    ["Торговец","Совершить 3 покупки","shop",3,150]
+  ];
+
+  function panel(title,html){
+    let old=document.getElementById("tg42-panel"); if(old)old.remove();
+    const p=document.createElement("div");p.id="tg42-panel";
+    p.style.cssText="position:fixed;inset:7px;z-index:100000;background:#0e141b;color:#fff;border:1px solid #3e4b5b;border-radius:14px;padding:12px;overflow:auto";
+    p.innerHTML=`<div style="font-size:18px;font-weight:900;margin-bottom:8px">${title}</div>${html}<button id="tg42-close" style="width:100%;margin-top:12px;padding:9px;border-radius:9px">Закрыть</button>`;
+    document.body.appendChild(p);p.querySelector("#tg42-close").onclick=()=>p.remove();return p;
+  }
+
+  function showHero(){
+    const s=S();recalc();
+    panel("👤 Персонаж",`
+      <div style="font-size:13px;line-height:1.7">
+      Уровень: <b>${s.level||1}</b><br>HP: <b>${s.hp||0}/${s.maxHp||0}</b><br>
+      Сила: <b>${s.strength||0}</b> • Ловкость: <b>${s.agility||0}</b><br>
+      Урон: <b>${s.combatStats.damage}</b> • Защита: <b>${s.combatStats.defense}</b><br>
+      Опыт: <b>${s.exp||0}/${s.maxExp||100}</b><br>
+      Монеты: <b>${s.coins||0}</b>
+      </div>
+      <div style="margin-top:9px;font-weight:800">Экипировка</div>
+      <div style="font-size:12px;line-height:1.6">⚔️ ${s.equipment.weapon||"нет"}<br>🛡️ ${s.equipment.armor||"нет"}<br>🪖 ${s.equipment.helm||"нет"}<br>🥊 ${s.equipment.gloves||"нет"}<br>🥾 ${s.equipment.boots||"нет"}</div>`);
+  }
+  function showDistricts(){
+    const s=S();
+    const html=districts.map(d=>{
+      const ok=(s.level||1)>=d[1];
+      return `<div style="padding:9px;margin:5px 0;border:1px solid #354150;border-radius:9px">
+      ${ok?"🟢":"🔒"} <b>${d[0]}</b> • уровень ${d[1]}
+      <button data-dist="${d[0]}" style="float:right;padding:5px 7px">${ok?"Исследовать":"Закрыто"}</button></div>`;
+    }).join("");
+    const p=panel("🗺️ Районы Sdolars",html);
+    p.querySelectorAll("[data-dist]").forEach(b=>b.onclick=()=>{
+      const d=districts.find(x=>x[0]===b.dataset.dist);
+      if((s.level||1)<d[1])return toast("Район пока закрыт");
+      s.fullGame.explored++;s.daily.explore++;
+      s.resources.wood++;s.resources.iron++;
+      if(d[0]==="Подземелья")s.resources.herbs++;
+      saveNow();toast(`Исследовано: ${d[0]}`);showDistricts();
+    });
+  }
+  function showQuests(){
+    const s=S();
+    const html=daily.map(q=>{
+      const n=Number(s.daily[q[2]]||0), done=n>=q[3];
+      return `<div style="padding:9px;margin:6px 0;border:1px solid #354150;border-radius:9px">
+      <b>${q[0]}</b><br><span style="font-size:12px">${q[1]} • ${n}/${q[3]} • +${q[4]} 🪙</span>
+      ${done?'<button data-q="'+q[2]+'" style="margin-top:5px;width:100%;padding:7px">Забрать</button>':""}</div>`;
+    }).join("");
+    const p=panel("📜 Ежедневные задания",html);
+    p.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{
+      const q=daily.find(x=>x[2]===b.dataset.q);s.coins+=q[4];s.fullGame.quests++;
+      s.daily[q[2]]=0;saveNow();toast("Награда получена");showQuests();
+    });
+  }
+  function showGuild(){
+    const s=S();
+    const name=s.guild.name||"Нет гильдии";
+    panel("🏰 Гильдия",`
+      <div style="font-size:13px;line-height:1.7">Гильдия: <b>${name}</b><br>
+      Уровень: <b>${s.guild.level}</b> • Участников: <b>${s.guild.members}</b><br>
+      Казна: <b>${s.guild.treasury}</b> 🪙<br>Ваш вклад: <b>${s.guild.contribution}</b></div>
+      <button id="tg42-guild" style="width:100%;margin-top:8px;padding:9px">${name==="Нет гильдии"?"Создать гильдию":"Внести 50 монет"}</button>`);
+    p=document.getElementById("tg42-panel");
+    p.querySelector("#tg42-guild").onclick=()=>{
+      if(!s.guild.name){s.guild={name:"Sdolars",role:"Глава",level:1,members:1,treasury:0,contribution:0};toast("Гильдия создана");}
+      else if(s.coins>=50){s.coins-=50;s.guild.treasury+=50;s.guild.contribution+=50;if(s.guild.treasury>=500){s.guild.level++;s.guild.treasury-=500;toast("Гильдия повысила уровень!");}}
+      else toast("Недостаточно монет");
+      saveNow();showGuild();
+    };
+  }
+  function showRanking(){
+    const s=S(); const r=s.ranking;
+    r.league=r.rating>=1600?"Diamond":r.rating>=1400?"Gold":r.rating>=1200?"Silver":"Bronze";
+    panel("🏆 Арена и рейтинг",`
+      <div style="font-size:14px;line-height:1.8">Рейтинг: <b>${r.rating}</b><br>
+      Лига: <b>${r.league}</b><br>Победы: <b>${r.wins}</b> • Поражения: <b>${r.losses}</b></div>
+      <div style="margin-top:8px;font-size:12px">Следующая цель: ${r.league==="Bronze"?"1200":r.league==="Silver"?"1400":r.league==="Gold"?"1600":"2000"} рейтинга</div>`);
+  }
+
+  function mount(){
+    ensure();dailyReset();energyTick();
+    if(document.getElementById("tg42-bar"))return;
+    const bar=document.createElement("div");bar.id="tg42-bar";
+    bar.style.cssText="position:fixed;right:7px;top:88px;z-index:9998;display:grid;grid-template-columns:repeat(2,1fr);gap:4px;width:120px";
+    [["hero","👤 Герой"],["dist","🗺️ Районы"],["quest","📜 Квесты"],["guild","🏰 Гильдия"],["rank","🏆 Рейтинг"]].forEach(([id,t])=>{
+      const b=document.createElement("button");b.textContent=t;b.style.cssText="font-size:10px;padding:6px 3px;border-radius:8px;border:1px solid #485463;background:#121a23;color:#fff";
+      b.onclick=()=>({hero:showHero,dist:showDistricts,quest:showQuests,guild:showGuild,rank:showRanking}[id]());
+      bar.appendChild(b);
+    });
+    document.body.appendChild(bar);
+  }
+
+  window.Territory42={ensure,showHero,showDistricts,showQuests,showGuild,showRanking,recalc};
+  setInterval(energyTick,30000);
+  setTimeout(mount,900);
+})();
