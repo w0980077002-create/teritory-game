@@ -5,10 +5,18 @@
   "compatibility_date": "2026-09-11",
   "durable_objects": {
     "bindings": [
-      { "name": "GAME_HUB", "class_name": "GameHub" }
+      {
+        "name": "GAME_HUB",
+        "class_name": "GameHub"
+      }
     ]
   },
   "migrations": [
-    { "tag": "v1", "new_sqlite_classes": ["GameHub"] }
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "GameHub"
+      ]
+    }
   ]
 }
