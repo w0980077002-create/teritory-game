@@ -1,6 +1,0 @@
-Territory Sdolars s48
-
-Base: previously verified s47 RECHECK package.
-Workflow corrected to explicitly deploy worker.js with wrangler.jsonc.
-GitHub main currently has the same corrected workflow.
-No game files were replaced or rewritten in this s48 package.
