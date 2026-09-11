@@ -1,14 +1,13 @@
-Territory — Sdolars
-s47 recovery/fix package
+Territory — Sdolars GAME V4
+EXTRA COMPACT MOBILE.
 
-Состав:
-- worker.js — сервер/Cloudflare Worker
-- index.html — сохранённая версия интерфейса s47
-- package.json — Wrangler
-- wrangler.jsonc — Cloudflare Worker config
-- .github/workflows/deploy.yml — исправленный GitHub Actions deploy
+В этой версии уменьшены именно КНОПКИ:
+- боковые: 44×44 px;
+- Кузница/Таверна/Магазин: высота 44 px;
+- Бой/Инвентарь/Экипировка/Задания: высота 48 px;
+- блок награды: 39 px;
+- нижняя навигация: 56 px;
+- иконки дополнительно уменьшены.
 
-Критическое исправление:
-command: deploy worker.js --config wrangler.jsonc
-
-Это устраняет ошибку Wrangler Missing entry-point.
+Цель: оставить как можно больше видимой сцены с викингом и не закрывать её интерфейсом.
+Все кнопки остаются рабочими.
