@@ -1,18 +1,12 @@
-# Territory — Sdolars — S88
+# Territory — Sdolars s75
 
-Base: confirmed working S83.
+S75 — цельная мобильная игровая сборка на базе текущей Territory.
 
-S88 changes:
-- Casino is removed completely from the game client.
-- "Ещё" no longer duplicates City systems.
-- "Ещё" contains only unique secondary systems: Сезон, Чат, Достижения, Настройки.
-- "Ещё" buttons have Territory dark/blue styling and do not use default browser-white buttons.
-- Core City buttons remain in the City screen.
-- Battle remains 4 zones: Голова / Грудь / Пояс / Ноги; attack 1, defense 2.
-- Worker embeds the exact same index.html.
+## Игровой цикл
+Город → герой → экипировка → районы → разведка/ресурсы → тактический бой → награды/XP → улучшение → гильдия → сезон → казино (только внутриигровые монеты) → чат.
 
-QA:
-- all inline scripts pass node --check;
-- worker.js passes node --check;
-- no casino references remain in index.html;
-- embedded Worker HTML equals project index.html.
+## Бой
+Ровно 4 зоны: Голова, Грудь, Пояс, Ноги. Игрок выбирает 1 зону атаки и 2 зоны защиты. Противник использует те же 4 зоны.
+
+## Сервер
+`worker.js` содержит ту же HTML-сборку и серверную логику, поэтому Worker не должен отдавать старую страницу.
