@@ -1,104 +1,147 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<script src="https://telegram.org"></script>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<meta name="territory-build" content="S89-VISUAL-FINAL-REDESIGN">
 <title>Territory — Sdolars</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;overflow:hidden;background:#020914;color:#fff;font-family:Arial,sans-serif}
-button{font:inherit;color:inherit;border:0;cursor:pointer}
-#app{height:100dvh;width:100%;max-width:832px;margin:auto;display:flex;flex-direction:column;background:#031426;overflow:hidden}
-.top{height:112px;flex:none;background:linear-gradient(#03182b,#031222);border-bottom:3px solid #0b8dd9;display:flex;padding:5px 8px;gap:5px}
-.heroHead{width:42%;display:flex;align-items:center;gap:5px;min-width:0}
-.avatar{width:64px;height:64px;border:2px solid #78d1ff;border-radius:12px;overflow:hidden;position:relative;flex:none}
-.avatar img{width:100%;height:100%;object-fit:cover;object-position:center}
-.lvl{position:absolute;left:-2px;bottom:-2px;background:#082744;border:2px solid #72ccff;border-radius:8px;padding:1px 6px;font-size:14px;font-weight:900}
-.title{font-size:17px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
-.chapter{font-size:12px;color:#76cbff;font-weight:900;margin-top:1px}
-.xp{height:10px;max-width:155px;border:1px solid #237bb5;border-radius:8px;margin-top:3px;overflow:hidden;background:#071c2d}
-.xp i{display:block;width:40%;height:100%;background:#10c8f1}
-.xpt{font-size:10px;margin-top:1px}
-.hud{flex:1;min-width:0}
-.resources{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
-.res{height:34px;background:#061c31;border:2px solid #1b72ad;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;white-space:nowrap}
-.res b{font-size:14px;margin-right:2px}.coin b{color:#ffd52d}.dia b{color:#4eeaff}.ene b{color:#ffd52d}
-.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:3px}
-.tool{height:34px;background:#082540;border:2px solid #1b71ad;border-radius:8px;position:relative;font-size:15px;display:grid;place-items:center}
-.world{position:relative;flex:1;min-height:0;background:#071b2b url('assets/home-screen.png') center/cover no-repeat;overflow:hidden}
-.world:after{content:"";position:absolute;inset:0;background:rgba(0,8,15,.15);pointer-events:none}
-.world>*{z-index:2}
-.quest,.daily,.left,.right,.actions{position:absolute}
-.quest{left:2%;top:2%;width:42%;height:74px;padding:6px 8px;text-align:left;border:2px solid #178bd8;border-radius:11px;background:rgba(6,29,52,0.85)}
-.quest small{color:#ffd42b;font-size:11px;font-weight:900}
-.quest strong{display:block;font-size:13px;margin-top:4px}.quest span{display:block;color:#a5cce7;font-size:9px;margin-top:4px}
-.daily{right:2%;top:3%;width:35%;height:72px;border:2px solid #ffd129;border-radius:11px;background:rgba(33,16,68,0.85);text-align:center;padding:5px}
-.daily b{display:block;color:#ffd42b;font-size:11px;margin-top:10px}.daily time{display:block;font-size:13px;font-weight:900;margin-top:5px}
-.left{left:2%;top:27%;display:flex;flex-direction:column;gap:5px}
-.smallBtn{width:50px;height:50px;border:1.5px solid #1688d5;border-radius:10px;background:rgba(8,43,72,0.8);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;font-weight:900}
-.right{right:2%;top:29%;width:41%;display:flex;flex-direction:column;gap:5px}
-.location{height:50px;border:1.5px solid #1688d5;border-radius:10px;background:rgba(8,43,72,0.8);display:flex;align-items:center;gap:5px;padding:3px 5px;text-align:left}
-.location strong{font-size:11px}.location small{display:block;color:#a5cce7;font-size:8px;margin-top:1px}
-.actions{left:2%;right:2%;bottom:4%;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.action{height:58px;border-radius:10px;border:2px solid #148fe4;background:linear-gradient(#0a4d89,#071e3d);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:11px}
-.bottom{height:62px;flex:none;background:#03182b;border-top:2px solid #124b71;display:grid;grid-template-columns:repeat(6,1fr)}
-.bottom button{background:#03192d;border:0;color:#a0c1da;font-size:8px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.bottom .active{color:#ffd52a!important}
-.modal{position:fixed;inset:0;background:#000b;z-index:30;display:none;align-items:flex-end}.modal.open{display:flex}
-.panel{width:100%;max-height:90dvh;overflow:auto;background:#061d34;border:2px solid #1888d5;border-radius:18px 18px 0 0;padding:14px}
-.close{float:right;background:#123653;border:1px solid #3183bd;border-radius:8px;padding:4px 8px}
-.card{background:#09213a;border:1px solid #246e9f;border-radius:11px;padding:10px;margin:6px 0}
-.goldBtn{width:100%;padding:10px;background:linear-gradient(#ffd652,#bd7200);border:2px solid #ffe17c;border-radius:9px;color:#180d00;font-weight:900}
-.zones{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.zones button{background:#0c2e4b;border:1px solid #3186bd;border-radius:7px;padding:12px 2px;font-size:11px;font-weight:900}
-.zones .sel{background:#147bb4;border-color:#ffd54a}
-.toast{position:fixed;z-index:50;left:50%;bottom:82px;transform:translateX(-50%);background:#07233c;border:2px solid #35b9ff;border-radius:9px;padding:8px 12px;font-weight:900;display:none}.toast.show{display:block}
-body.battle-open .bottom,body.battle-open .actions{display:none!important}
+:root{--bg-dark:rgba(13,17,23,.85);--bg-card:rgba(22,27,34,.75);--border-color:rgba(48,54,61,.8);--text-main:#f0f6fc;--text-muted:#8b949e;--accent-gold:#e3b341;--accent-blue:#1f6feb;--accent-green:#238636;--accent-purple:#8957e5;--accent-red:#da3633;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#0d1117;color:var(--text-main)}
+button,input{font:inherit}button{cursor:pointer}
+.game-container{position:relative;width:100%;height:100dvh;max-width:480px;margin:0 auto;background:url('assets/home-screen.png') center center/cover no-repeat;display:flex;flex-direction:column;gap:8px;overflow:hidden;padding:calc(10px + var(--safe-top)) 12px calc(10px + var(--safe-bottom))}
+.top-bar{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;background:var(--bg-dark);padding:10px 14px;border-radius:12px;border:1px solid var(--border-color);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);flex:none;z-index:5}
+.profile-section{display:flex;align-items:center;gap:10px;min-width:0}.avatar{width:44px;height:44px;background:radial-gradient(#e3b341,#8a6d25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #fff;box-shadow:0 0 8px rgba(227,179,65,.5);flex:none}.profile-info{min-width:0}.profile-info h3{font-size:14px;font-weight:700;color:var(--accent-gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.profile-info p{font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap}.stats-grid{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap;min-width:0}.stat-badge{background:rgba(0,0,0,.4);padding:4px 7px;border-radius:6px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:3px;border:1px solid rgba(255,255,255,.05);white-space:nowrap}.stat-badge span{display:inline-block;min-width:1ch}.sys-actions{display:flex;gap:6px;margin-top:6px;justify-content:flex-end}.btn-sys{background:var(--bg-dark);border:1px solid var(--border-color);color:var(--text-main);padding:5px 10px;border-radius:6px;font-size:11px;backdrop-filter:blur(8px)}
+.main-content{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:10px;overflow:hidden;margin:2px 0}.quest-box{background:linear-gradient(90deg,rgba(31,111,235,.4),rgba(0,0,0,0));border-left:4px solid var(--accent-blue);background-color:var(--bg-dark);padding:10px 12px;border-radius:0 12px 12px 0;backdrop-filter:blur(8px);flex:none}.quest-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)}.quest-text{font-size:13px;font-weight:600;margin-top:2px;color:#fff}
+.locations-grid{display:flex;flex-direction:column;gap:7px;max-height:36%;overflow:hidden}.location-card{background:rgba(6,29,52,.85);border:1.5px solid #1888d5;border-radius:12px;padding:10px 13px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .1s,background-color .2s;position:relative;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 0 12px rgba(31,111,235,.12)}.location-card:active{transform:scale(.98);background:rgba(6,29,52,.65)}.location-icon{font-size:22px;flex:none}.location-details{min-width:0}.location-details h4{font-size:14px;font-weight:600}.location-details p{font-size:11px;color:var(--text-muted);margin-top:1px}.badge-notify{position:absolute;top:-4px;right:-4px;background:var(--accent-red);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:10px;border:2px solid #0d1117;box-shadow:0 0 5px rgba(218,54,51,.6)}
+.quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.btn-quick{background:rgba(13,17,23,.78);border:1.5px solid rgba(48,54,61,.9);padding:8px;border-radius:10px;text-align:center;font-size:11px;font-weight:600;color:var(--text-main);backdrop-filter:blur(8px)}.btn-quick:active{border-color:var(--accent-gold)}
+.action-zone{background:var(--bg-dark);border:1px solid var(--border-color);border-radius:14px;padding:9px;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:7px;flex:none}.main-buttons{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:7px}.btn-main{padding:9px 5px;border-radius:10px;border:0;font-weight:700;font-size:12px;color:#fff;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 4px 12px rgba(0,0,0,.3)}.btn-main .ico{font-size:18px}.btn-battle{background:linear-gradient(135deg,#da3633,#8f1d1b)}.btn-inventory{background:linear-gradient(135deg,#bf7a1d,#80500f)}.btn-equipment{background:linear-gradient(135deg,#8957e5,#5a30a3)}.mini-chat{background:rgba(0,0,0,.4);border-radius:8px;padding:7px 10px;font-size:11px;border-left:3px solid var(--accent-gold);display:flex;justify-content:space-between;align-items:center;gap:8px}.mini-chat span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mini-chat button{background:transparent;color:var(--accent-gold);border:0;font-weight:800;flex:none}
+.bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);background:var(--bg-dark);border:1px solid var(--border-color);border-radius:14px;padding:5px 3px;backdrop-filter:blur(10px);flex:none;z-index:5}.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text-muted);font-size:9px;font-weight:500;text-decoration:none;cursor:pointer;padding:5px 0;border:0;background:transparent}.nav-item.active{color:var(--accent-gold)}.nav-item-icon{font-size:17px;line-height:17px}
+.modal{position:absolute;inset:0;z-index:30;display:none;background:rgba(2,7,13,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:calc(12px + var(--safe-top)) 12px calc(12px + var(--safe-bottom));overflow:auto}.modal.open{display:block}.modal-inner{max-width:460px;margin:0 auto;padding-bottom:20px}.modal-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;background:rgba(13,17,23,.96);padding:4px 0 10px}.modal-head h2{flex:1;font-size:20px}.close{background:#21262d;border:1px solid #484f58;color:#fff;border-radius:9px;padding:8px 12px;font-weight:800}.card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:11px;margin:7px 0;backdrop-filter:blur(7px)}.card b{display:block;margin-bottom:4px}.muted{color:var(--text-muted);font-size:12px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.list{display:grid;gap:7px}.item{display:flex;align-items:center;gap:9px}.grow{flex:1;min-width:0}.action{width:100%;padding:10px;border-radius:9px;background:#1f6feb;border:1px solid #58a6ff;color:#fff;font-weight:800}.action.gold{background:#6d4a08;border-color:#e3b341}.action.purple{background:#4e1490;border-color:#b56aff}.action.green{background:#08734f;border-color:#35e6a7}.action.red{background:#7d1825;border-color:#ff6376}.action.alt{background:#30363d;border-color:#8b949e}input{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:9px;color:#fff;padding:10px}.chatlog{height:48dvh;overflow:auto;background:#090d12;border:1px solid #30363d;border-radius:10px;padding:8px}.msg{padding:6px 0;border-bottom:1px solid #21262d;font-size:12px}.msg b{color:#58a6ff}.chatrow{display:flex;gap:6px;margin-top:7px}.chatrow .action{width:auto;padding-inline:14px}
+#battleModal{z-index:40}.enemy{background:rgba(63,20,28,.82);border:1px solid #9b4652;border-radius:12px;padding:11px}.hp{height:12px;background:#17070a;border-radius:9px;overflow:hidden;margin-top:7px}.hp i{display:block;height:100%;background:#e44358;transition:width .2s}.zone-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:7px}.zone{padding:12px 7px;border-radius:9px;background:#0d1f2d;border:1px solid #2d6d8f;color:#fff;font-weight:800}.zone.sel{border-color:#e3b341;background:#46390b;box-shadow:0 0 0 1px #e3b341 inset}.label{color:#8b949e;font-size:11px;font-weight:800;margin-top:11px;text-transform:uppercase}.round-log{font-size:12px;line-height:1.45;min-height:48px}.round-log strong{color:var(--accent-gold)}
+.toast{position:absolute;z-index:60;left:50%;bottom:calc(82px + var(--safe-bottom));transform:translateX(-50%);background:#161b22;border:1px solid #58a6ff;border-radius:10px;padding:9px 13px;display:none;max-width:90%;text-align:center;font-size:12px;box-shadow:0 8px 25px #0009}.toast.show{display:block}
+@media(max-height:700px){.game-container{padding-top:calc(6px + var(--safe-top));padding-bottom:calc(6px + var(--safe-bottom));gap:5px}.top-bar{padding:7px 10px}.avatar{width:38px;height:38px}.location-card{padding:7px 10px}.locations-grid{max-height:31%}.quest-box{padding:7px 10px}.action-zone{padding:7px}.btn-main{padding:7px}.bottom-nav{padding:3px}}
+@media(max-width:360px){.game-container{padding-left:8px;padding-right:8px}.top-bar{grid-template-columns:1fr;gap:6px}.stats-grid{justify-content:flex-start}.sys-actions{margin-top:2px}.locations-grid{max-height:33%}.location-card{padding:7px 9px}.location-icon{font-size:19px}.location-details h4{font-size:12px}.location-details p{font-size:10px}.btn-quick{font-size:10px;padding:7px}.btn-main{font-size:11px}}
 </style>
 </head>
 <body>
-<div id="app">
-<header class="top">
-<div class="heroHead"><div class="avatar"><img src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='50' height='50'><circle cx='25' cy='25' r='20' fill='%23178bd8'/></svg>"><div class="lvl" id="lvlBox">3</div></div><div><div class="title" id="pName">Игрок</div><div class="chapter" id="pDistrict">Центральная площадь</div><div class="xp"><i id="xpBar" style="width:40%"></i></div><div class="xpt" id="xpText">120/150 XP</div></div></div>
-<div class="hud"><div class="resources"><div class="res"><b>🪙</b><span id="resCoins">0</span></div><div class="res"><b>◆</b><span id="resGems">0</span></div><div class="res"><b>ϟ</b><span id="resEnergy">0</span></div></div>
-<div class="tools"><button class="tool" onclick="openP('messages')">💬</button><button class="tool" onclick="openP('achievements')">🏆</button><button class="tool" onclick="openP('settings')">⚙</button><button class="tool" onclick="toggleLang()">RU</button></div></div>
-</header>
-<main class="world">
-<button class="quest" onclick="openP('quests')"><small>Текущее задание</small><strong>Поговори с кузнецом ›</strong><span>⌖ Кузница</span></button>
-<div class="daily"><b>Бонус доступен</b><time id="timer">00:00:00</time></div>
-<div class="left"><button class="smallBtn" onclick="openP('bonus')">🎁<br>Бонус</button><button class="smallBtn" onclick="openP('events')">▦<br>Ивенты</button></div>
-<div class="right"><button class="location" onclick="openP('forge')">⚒️<div><strong>Кузница</strong><small>Улучшение оружия</small></div></button><button class="location" onclick="openP('shop')">🎒<div><strong>Магазин</strong><small>Снаряжение</small></div></button></div>
-<div class="actions"><button class="action" onclick="startBattle()">⚔️<br>Бой</button><button class="action" onclick="openP('inventory')">🎒<br>Инвентарь</button><button class="action" onclick="openP('map')">🗺️<br>Районы</button><button class="action" onclick="openP('guild')">👥<br>Гильдия</button></div>
-</main>
-<nav class="bottom"><button class="active" onclick="closeP()">🏠<br>Город</button><button onclick="openP('hero')">👤<br>Герой</button><button onclick="openP('inventory')">🎒<br>Инвентарь</button><button onclick="openP('quests')">📜<br>Задания</button><button onclick="openP('guild')">👥<br>Гильдия</button><button onclick="openP('more')">☰<br>Ещё</button></nav>
+<div class="game-container">
+  <header>
+    <div class="top-bar">
+      <div class="profile-section"><div class="avatar">🧔</div><div class="profile-info"><h3 id="player-name">S$$</h3><p id="player-level">Глава 5 • Уровень 9</p></div></div>
+      <div class="stats-grid">
+        <div class="stat-badge">🪙 <span id="resCoins">0</span></div>
+        <div class="stat-badge">💎 <span id="resGems">0</span></div>
+        <div class="stat-badge">⚡ <span id="resEnergy">0</span></div>
+      </div>
+    </div>
+    <div class="sys-actions"><button class="btn-sys" onclick="toggleLanguage()" id="langBtn">RU</button><button class="btn-sys" onclick="openModal('settings')">⚙️</button></div>
+  </header>
+
+  <main class="main-content">
+    <section class="quest-box" onclick="openModal('quest')"><div class="quest-title">Текущее задание</div><div class="quest-text" id="questText">Поговори с кузнецом ›</div></section>
+    <section class="quick-actions"><button class="btn-quick" onclick="claimBonus()">🎁 Бонусы</button><button class="btn-quick" onclick="openModal('events')">⚔️ События</button><button class="btn-quick" onclick="openModal('vip')">👑 VIP</button></section>
+    <section class="locations-grid">
+      <button class="location-card" onclick="openModal('forge')"><span class="location-icon">⚒️</span><span class="location-details"><h4>Кузница</h4><p>Улучшение снаряжения</p></span></button>
+      <button class="location-card" onclick="openModal('tavern')"><span class="location-icon">🍺</span><span class="location-details"><h4>Таверна</h4><p>Найм героев</p></span></button>
+      <button class="location-card" onclick="openModal('shop')"><span class="location-icon">🛒</span><span class="location-details"><h4>Магазин</h4><p>Предметы и снаряжение</p></span><span class="badge-notify" id="shopBadge">!</span></button>
+    </section>
+    <section class="action-zone">
+      <div class="main-buttons"><button class="btn-main btn-battle" onclick="startBattle()"><span class="ico">⚔️</span><span>Бой</span></button><button class="btn-main btn-inventory" onclick="openModal('inventory')"><span class="ico">🎒</span><span>Инвентарь</span></button><button class="btn-main btn-equipment" onclick="openModal('equipment')"><span class="ico">🛡️</span><span>Экипировка</span></button></div>
+      <div class="mini-chat"><span id="chatPreview">💬 Кто идёт на арену?</span><button onclick="openModal('chat')">Открыть ›</button></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active"><span class="nav-item-icon">🏰</span><span>Город</span></button><button class="nav-item" onclick="openModal('hero')"><span class="nav-item-icon">🧔</span><span>Герой</span></button><button class="nav-item" onclick="openModal('inventory')"><span class="nav-item-icon">🎒</span><span>Предметы</span></button><button class="nav-item" onclick="openModal('quest')"><span class="nav-item-icon">📜</span><span>Задания</span></button><button class="nav-item" onclick="openModal('more')"><span class="nav-item-icon">☰</span><span>Ещё</span></button>
+  </nav>
+
+  <section class="modal" id="modal"><div class="modal-inner"><div class="modal-head"><h2 id="modalTitle">Territory</h2><button class="close" onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></section>
+  <section class="modal" id="battleModal"><div class="modal-inner"><div class="modal-head"><h2>⚔️ Арена</h2><button class="close" onclick="closeBattle()">✕</button></div><div class="enemy"><b id="enemyName">Противник</b><div class="hp"><i id="enemyHp" style="width:100%"></i></div><div id="enemyHpText" class="muted" style="margin-top:5px">90 / 90</div></div><div class="label">Атака — выбери 1 зону</div><div id="attackZones" class="zone-grid"></div><div class="label">Защита — выбери ровно 2 разные зоны</div><div id="defenseZones" class="zone-grid"></div><div id="battleMsg" class="card round-log">Выбери атаку и две защиты.</div><button class="action" onclick="submitTurn()">Подтвердить ход</button></div></section>
+  <div class="toast" id="toast"></div>
 </div>
-<div class="modal" id="modal" onclick="if(event.target===this)closeP()"><section class="panel"><button class="close" onclick="closeP()">✕</button><h2 id="pt"></h2><div id="pb"></div></section></div><div class="toast" id="toast"></div>
 <script>
-const ZONES=['Голова','Грудь','Пояс','Ноги'];
-let state={};let currentBattle=null;let moveAttack=null;let moveDefs=[];let ws=null;
-function toast(m){const e=document.getElementById('toast');if(e){e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1500)}}
-async function callApi(p,b={}){
-  const init=window.Telegram?.WebApp?.initData||"";
-  try{
-    const r=await fetch('/api/'+p,{method:'POST',headers:{'Content-Type':'application/json','X-Telegram-Init-Data':init},body:JSON.stringify(b)});
-    const d=await r.json();if(d.ok){if(d.player){state=d.player;updateHud()}return d;}else{toast(d.error||'Ошибка');}
-  }catch{toast('Ошибка сети');}return null;
-}
+const zones=['Голова','Грудь','Пояс','Ноги'];
+const zoneEN=['Head','Chest','Waist','Legs'];
+let state={};let selectedAttack=null;let selectedDefs=new Set();let enemy=null;let ws=null;let battleBusy=false;
+const KEY='territory_s89_redesign';
+const $=id=>document.getElementById(id);
+function toast(text){const e=$('toast');e.textContent=text;e.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.remove('show'),2200)}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(_){}updateHud()}
 function updateHud(){
-  if(!state.playerName)return;
-  document.getElementById('pName').textContent=state.playerName;
-  document.getElementById('lvlBox').textContent=state.level;
-  document.getElementById('xpText').textContent=`${state.exp}/${state.maxExp} XP`;
-  document.getElementById('xpBar').style.width=(state.exp/state.maxExp*100)+'%';
-  document.getElementById('resCoins').textContent=state.coins;
-  document.getElementById('resGems').textContent=state.gems;
-  document.getElementById('resEnergy').textContent=Math.floor(state.energy);
-  const curD=state.district==='square'?'Центральная площадь':state.district==='forest'?'Северный лес':state.district==='harbor'?'Порт Sdolars':state.district==='industrial'?'Промзона':'Старая крепость';
-  document.getElementById('pDistrict').textContent=curD;
+  $('resCoins').textContent=Number(state.coins||0).toLocaleString('ru-RU');
+  $('resGems').textContent=Number(state.gems||0).toLocaleString('ru-RU');
+  $('resEnergy').textContent=Number(state.energy||0);
+  $('player-name').textContent=state.playerName||state.name||'S$$';
+  $('player-level').textContent=`Глава 5 • Уровень ${Number(state.level||1)}`;
+  $('questText').textContent=state.questDone?'Задание выполнено ✓':'Поговори с кузнецом ›';
 }
-async function startBattle(){
-  const d=await callApi('action',{type:'battle.start'});
-  if(d&&d.battle){currentBattle=d.battle;renderBattle(d.battle)}
+async function sendAction(type,extra={}){
+  try{
+    const body={type,...extra};
+    const r=await fetch('/api/action',{method:'POST',headers:{'Content-Type':'application/json','X-Guest-Id':getGuestId(),'X-Guest-Name':'S$$'},body:JSON.stringify(body)});
+    const d=await r.json().catch(()=>({ok:false,error:'bad_response'}));
+    if(d.player)state=d.player; else if(d.state)state=d.state; updateHud(); saveLocal();
+    if(!d.ok)toast(errorText(d.error));
+    return d;
+  }catch(e){toast('Нет соединения с сервером');return {ok:false,error:'network'}}
 }
-function renderBattle(b){
-  document.body.classList.add('battle-open');moveAttack=null;moveDefs=[];
+function getGuestId(){let id=localStorage.getItem('territory_guest_id');if(!id){id='guest_'+crypto.randomUUID();localStorage.setItem('territory_guest_id',id)}return id}
+function errorText(e){const map={no_energy:'Недостаточно энергии',already_claimed:'Уже получено',invalid_move:'Неверный ход',battle_in_progress:'Бой уже идёт',battle_not_active:'Бой не активен',unknown_district:'Район не найден',level_required:'Недостаточный уровень',not_enough_or_unknown:'Недостаточно монет',item_not_found:'Предмет не найден',item_not_usable:'Предмет нельзя использовать'};return map[e]||e||'Ошибка'}
+async function loadState(){
+  let local=null;try{local=JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){}
+  try{const r=await fetch('/api/state',{method:'POST',headers:{'Content-Type':'application/json','X-Guest-Id':getGuestId(),'X-Guest-Name':'S$$'},body:JSON.stringify({seed:local})});const d=await r.json();if(d.player)state=d.player;else if(d.state)state=d.state}catch(_){state=local||{coins:1779,gems:1330,energy:100,level:3,playerName:'S$$',hp:120,maxHp:120,strength:12,agility:9,freePoints:0,items:[]}}
+  updateHud();saveLocal();
+}
+function openModal(type){
+  const map={
+    quest:['Задания',`<div class="card"><b>📜 Поговори с кузнецом</b><span class="muted">Награда: 150 монет + 80 XP</span><button class="action gold" style="margin-top:8px" onclick="completeQuest()">${state.questDone?'Выполнено':'Завершить'}</button></div>`],
+    bonus:['Ежедневный бонус',`<div class="card"><b>🎁 Награда за вход</b><span class="muted">250 монет + 20 XP</span><button class="action gold" style="margin-top:8px" onclick="claimBonus()">Забрать</button></div>`],
+    events:['События',`<div class="card"><b>⚔️ Арена Sdolars</b><span class="muted">Тактический бой на 4 зоны.</span><button class="action red" style="margin-top:8px" onclick="closeModal();startBattle()">Войти в бой</button></div>`],
+    vip:['VIP Territory',`<div class="card"><b>👑 VIP</b><span class="muted">Бонусы и привилегии Sdolars.</span></div>`],
+    forge:['Кузница',`<div class="card"><b>⚒️ Улучшение оружия</b><span class="muted">Уровень кузницы: ${state.forgeLevel||0}</span><button class="action alt" style="margin-top:8px" onclick="toast('Модуль кузницы подключён к интерфейсу')">Открыть</button></div>`],
+    tavern:['Таверна',`<div class="card"><b>🍺 Найм героев</b><span class="muted">Здесь будут доступны герои и наёмники Sdolars.</span></div>`],
+    shop:['Магазин','<div id="shopList" class="list"></div>'],
+    inventory:['Инвентарь','<div id="inventoryList" class="list"></div>'],
+    equipment:['Экипировка','<div id="equipmentList"></div>'],
+    hero:['Герой','<div id="heroList"></div>'],
+    guild:['Гильдия',`<div class="card"><b>🛡️ Sdolars</b><span class="muted">Участники: ${state.guildMembers||1} · Рейтинг: ${state.rating||1000}</span></div>`],
+    chat:['Чат игры','<div id="chatLog" class="chatlog"></div><div class="chatrow"><input id="chatInput" maxlength="500" placeholder="Сообщение..."><button class="action" onclick="sendChat()">➤</button></div>'],
+    districts:['Районы','<div id="districtList" class="list"></div>'],
+    settings:['Настройки',`<div class="card"><b>Язык</b><div class="grid"><button class="action ${state.lang==='RU'?'gold':''}" onclick="setLanguage('RU')">RU</button><button class="action ${state.lang==='EN'?'gold':''}" onclick="setLanguage('EN')">EN</button></div></div><div class="card"><b>Состояние сервера</b><span class="muted">Durable Object · SQLite storage · Static Assets</span></div>`],
+    achievements:['Достижения',`<div class="card"><b>🏆 Первые шаги</b><span class="muted">Победи первого противника.</span></div>`],
+    season:['Сезон',`<div class="card"><b>🏅 Сезон Sdolars</b><span class="muted">Сезонные награды.</span></div>`],
+    more:['Ещё',`<div class="grid"><button class="action" onclick="openModal('districts')">🗺️ Районы</button><button class="action" onclick="openModal('guild')">🛡️ Гильдия</button><button class="action" onclick="openModal('achievements')">🏆 Достижения</button><button class="action" onclick="openModal('season')">🏅 Сезон</button></div>`]
+  };
+  const x=map[type]||map.more;$('modalTitle').textContent=x[0];$('modalBody').innerHTML=x[1];$('modal').classList.add('open');
+  if(type==='shop')renderShop();if(type==='inventory')renderInventory();if(type==='equipment')renderEquipment();if(type==='hero')renderHero();if(type==='districts')renderDistricts();if(type==='chat')connectChat();
+}
+function closeModal(){$('modal').classList.remove('open')}
+function renderShop(){const e=$('shopList');if(!e)return;const cat=state.catalog||{};const list=Array.isArray(cat)?cat:Object.entries(cat).map(([id,v])=>({id,...v}));e.innerHTML=list.map(i=>`<div class="card item"><div style="font-size:25px">${i.icon||'⚔️'}</div><div class="grow"><b>${i.name}</b><span class="muted">${i.price} монет</span></div><button class="action gold" style="width:auto" onclick="buyItem('${i.id}')">Купить</button></div>`).join('')||'<div class="card">Магазин пуст.</div>'}
+function renderInventory(){const e=$('inventoryList');if(!e)return;const items=state.items||[];e.innerHTML=items.map(i=>`<div class="card item"><div style="font-size:24px">${i.icon||'🎒'}</div><div class="grow"><b>${escapeHtml(i.name)}</b><span class="muted">${i.equipped?'Экипировано':'В инвентаре'}${i.qty>1?' · '+i.qty+' шт.':''}</span></div><button class="action" style="width:auto" onclick="itemToggle('${i.id}',${i.equipped?'false':'true'})">${i.equipped?'Снять':'Надеть'}</button></div>`).join('')||'<div class="card">Инвентарь пуст.</div>'}
+function renderEquipment(){const e=$('equipmentList');if(!e)return;const eq=(state.items||[]).filter(x=>x.equipped);const dmg=eq.reduce((n,x)=>n+Number(x.damage||0),0);const def=eq.reduce((n,x)=>n+Number(x.defense||0),0);e.innerHTML=`<div class="card"><b>⚔️ Оружие: ${escapeHtml(eq.find(x=>x.type==='Оружие')?.name||'Кулаки')}</b><span class="muted">Доп. урон: +${dmg}</span></div><div class="card"><b>🛡️ Защита: +${def}</b><span class="muted">Сила ${state.strength||0} · Ловкость ${state.agility||0}</span></div>`}
+function renderHero(){const e=$('heroList');if(!e)return;e.innerHTML=`<div class="card"><b>${escapeHtml(state.playerName||'S$$')}</b><span class="muted">Уровень ${state.level||1} · XP ${state.exp||0}/${state.maxExp||100}</span></div><div class="grid"><button class="action" onclick="addStat('strength')">💪 Сила +</button><button class="action" onclick="addStat('agility')">🏃 Ловкость +</button></div><div class="card"><span class="muted">Свободных очков: ${state.freePoints||0}</span></div>`}
+function renderDistricts(){const e=$('districtList');if(!e)return;const ds=state.districts||[{id:'square',name:'Центральная площадь',level:1,cost:0,unlocked:true,icon:'🏰'},{id:'forest',name:'Северный лес',level:3,cost:3,unlocked:(state.level||1)>=3,icon:'🌲'},{id:'harbor',name:'Порт Sdolars',level:8,cost:5,unlocked:(state.level||1)>=8,icon:'⚓'}];e.innerHTML=ds.map(d=>`<div class="card item"><div style="font-size:24px">${d.icon||'🗺️'}</div><div class="grow"><b>${escapeHtml(d.name)}</b><span class="muted">Ур. ${d.level} · ${d.cost} ⚡</span></div><button class="action" style="width:auto" onclick="travel('${d.id}')">${d.unlocked?'Войти':'Закрыто'}</button></div>`).join('')}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+async function buyItem(id){const d=await sendAction('item.buy',{item:id});if(d.ok){toast('Куплено');renderShop()}}
+async function itemToggle(id,equip){const d=await sendAction(equip?'item.equip':'item.unequip',{id});if(d.ok){renderInventory();renderEquipment();toast(equip?'Экипировано':'Снято')}}
+async function addStat(stat){const d=await sendAction('stat.add',{stat});if(d.ok)renderHero()}
+async function travel(id){const d=await sendAction('district.travel',{district:id});if(d.ok)toast('Переход выполнен');renderDistricts()}
+async function claimBonus(){const d=await sendAction('bonus.claim');if(d.ok){toast('Бонус получен');openModal('bonus')}}
+async function completeQuest(){const d=await sendAction('quest.complete');if(d.ok){toast('Задание выполнено');openModal('quest')}}
+async function setLanguage(lang){const d=await sendAction('lang.set',{lang});if(d.ok){state.lang=lang;toast(lang==='EN'?'English selected':'Русский выбран');openModal('settings')}}
+function toggleLanguage(){setLanguage(state.lang==='EN'?'RU':'EN')}
+function startBattle(){if(battleBusy)return;closeModal();$('battleModal').classList.add('open');selectedAttack=null;selectedDefs=new Set();battleBusy=true;$('battleMsg').textContent='Начинаем бой...';sendAction('battle.start').then(d=>{battleBusy=false;if(!d.ok){closeBattle();return}enemy=d.battle?.enemy||{name:'Противник',hp:90};enemy.hp=d.battle?.enemyHp??enemy.hp;enemy.maxHp=enemy.hp;renderBattle()})}
+function renderBattle(){if(!enemy)return;$('enemyName').textContent=enemy.name;$('enemyHpText').textContent=`${enemy.hp} / ${enemy.maxHp}`;$('enemyHp').style.width=Math.max(0,enemy.hp/enemy.maxHp*100)+'%';$('attackZones').innerHTML=zones.map((z,i)=>`<button class="zone ${selectedAttack===i?'sel':''}" onclick="pickAttack(${i})">${state.lang==='EN'?zoneEN[i]:z}</button>`).join('');$('defenseZones').innerHTML=zones.map((z,i)=>`<button class="zone ${selectedDefs.has(i)?'sel':''}" onclick="pickDefense(${i})">${state.lang==='EN'?zoneEN[i]:z}</button>`).join('')}
+function pickAttack(i){selectedAttack=i;renderBattle()}
+function pickDefense(i){if(selectedDefs.has(i))selectedDefs.delete(i);else if(selectedDefs.size<2)selectedDefs.add(i);renderBattle()}
+async function submitTurn(){if(selectedAttack===null)return toast('Выбери атаку');if(selectedDefs.size!==2)return toast('Нужно выбрать ровно 2 защиты');const defs=[...selectedDefs];const d=await sendAction('battle.turn',{attack:Number(selectedAttack),defs:defs.map(Number)});if(!d.ok)return;const r=d.round;if(!r){toast('Сервер не вернул результат раунда');return}enemy.hp=Number(r.enemyHp);$('battleMsg').innerHTML=`<strong>Раунд ${r.turn}</strong>: ${r.hit?'атака попала':'атака заблокирована'} · ${r.blocked?'защита сработала':'защита не сработала'}${r.dodge?' · уклонение':''}<br>Урон: ${r.playerDamage} / получено: ${r.enemyDamage}`;selectedAttack=null;selectedDefs=new Set();renderBattle();if(r.result==='win'){const reward=await sendAction('battle.reward');toast('Победа!');setTimeout(()=>closeBattle(),800)}else if(r.result==='loss'){await sendAction('battle.loss');toast('Поражение');setTimeout(()=>closeBattle(),800)}}
+function closeBattle(){$('battleModal').classList.remove('open');battleBusy=false}
+function connectChat(){const log=$('chatLog');if(!log)return;if(ws&&ws.readyState===1)return;const proto=location.protocol==='https:'?'wss':'ws';ws=new WebSocket(`${proto}://${location.host}/ws?guest=${encodeURIComponent(getGuestId())}`);ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='chat'||m.type==='system'){const row=document.createElement('div');row.className='msg';if(m.name){const b=document.createElement('b');b.textContent=m.name;row.appendChild(b);row.append(' '+(m.text||''))}else row.textContent=m.text||'';log.appendChild(row);log.scrollTop=log.scrollHeight;$('chatPreview').textContent='💬 '+(m.text||'Новое сообщение')}}catch(_){} };ws.onclose=()=>{ws=null}}
+function sendChat(){const i=$('chatInput');if(!i||!i.value.trim())return;if(!ws||ws.readyState!==1){toast('Чат подключается');connectChat();return}ws.send(JSON.stringify({type:'chat',name:state.playerName||'Игрок',text:i.value.trim()}));i.value=''}
+loadState();
+</script>
+</body>
+</html>

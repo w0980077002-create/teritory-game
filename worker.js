@@ -158,6 +158,7 @@ function sanitize(seed, auth) {
     losses: Math.max(0, Number(s.losses) || 0),
     battles: Math.max(0, Number(s.battles) || 0),
     items,
+    catalog: Object.entries(CATALOG).map(([id, item]) => ({ id, ...item })),
     lang: s.lang === "EN" ? "EN" : "RU",
     district: DISTRICTS.some((d) => d.id === s.district) ? s.district : "square",
     questDone: !!s.questDone,
