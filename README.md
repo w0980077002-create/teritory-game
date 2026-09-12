@@ -1,14 +1,11 @@
-# Territory s30
-Основа: s29.
+# Territory s31
 
-Обновления Арены:
-- компактное окно боя поверх игрового фона;
-- сцена с воином и противником;
-- компактные зоны атаки и защиты;
-- отображение HP воина и противника;
-- реальный ответный урон противника;
-- анимации атаки;
-- экран победы/поражения;
-- сохранение HP/энергии/награды в localStorage.
+Based on Territory s30.
 
-Источник: локальная игровая версия. Cloudflare/Worker не добавлялся.
+Arena UI refinement:
+- smaller battle sheet and tighter spacing;
+- scene remains visible behind the modal;
+- compact fighter stage and zone controls;
+- compact action/log/reward controls;
+- existing battle mechanics preserved;
+- no Cloudflare dependency added.
