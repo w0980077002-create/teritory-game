@@ -1,15 +1,22 @@
-# Territory S90 — Cloudflare FIX
+# Territory — S90 GitHub Pages
 
-Загружать содержимое этого архива непосредственно в корень GitHub-репозитория.
+Это **полностью статическая версия Territory**, предназначенная для запуска напрямую с GitHub Pages.
 
-В корне должны быть:
-- index.html
-- worker.js
-- wrangler.jsonc
-- package.json
-- assets/
+Структура:
+- `index.html`
+- `assets/home-screen.png`
+- `assets/home-screen-full.png`
 
-Исправлено:
-- Worker `/api/health` теперь показывает `s90-final`.
-- Для HTML/JS/CSS/JSON добавлены `no-store/no-cache`, чтобы старый интерфейс не удерживался кэшем Cloudflare/браузера.
-- Статический frontend остаётся S90.
+Что изменено:
+- убраны обращения к `/api/state` и `/api/action`;
+- убран WebSocket `/ws`;
+- состояние игрока, магазин, инвентарь, экипировка, задания, бонус, районы и тактический бой работают локально через `localStorage`;
+- тактический бой сохранён: 1 зона атаки + 2 разные зоны защиты;
+- Cloudflare Worker больше не требуется для запуска этой версии;
+- версия помечена `S90-GITHUB-PAGES`.
+
+## Запуск
+
+Включить GitHub Pages для репозитория и выбрать ветку `main`, папку `/ (root)`.
+
+Важно: Telegram WebApp должен использовать URL GitHub Pages, а не старый Cloudflare URL.
