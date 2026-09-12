@@ -5,7 +5,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Territory — Sdolars</title>
-<meta name="territory-build" content="s79-functional-4zones">
+<meta name="territory-build" content="s80-functional-4zones">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;background:#020914;color:#fff;font-family:Arial,sans-serif}
@@ -56,7 +56,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .bottom{height:62px;flex:none;background:#03182b;border-top:2px solid #124b71;display:grid;grid-template-columns:repeat(6,1fr)}
 .bottom button{background:#03192d;border-right:1px solid #173f5a;color:#a0c1da;font-size:8px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 .bottom button span:first-child{font-size:17px;line-height:17px}
-.bottom .active{color:#ffd52a;box-shadow:inset 0 -4px #ffd12b}
+.bottom .active{color:#ffd52a;box-shadow:none;border-bottom:0}
 .modal{position:fixed;inset:0;background:#000b;z-index:30;display:none;align-items:flex-end}.modal.open{display:flex}
 .panel{width:min(700px,100%);max-height:90dvh;overflow:auto;background:#061d34;border:2px solid #1888d5;border-bottom:0;border-radius:18px 18px 0 0;padding:14px}
 .panel h2{color:#ffd42a;margin:0 0 9px}.close{float:right;background:#123653;border:1px solid #3183bd;border-radius:8px;padding:4px 8px}
@@ -489,7 +489,7 @@ button:disabled{pointer-events:none}
 <div class="hud"><div class="resources"><div class="res coin"><b>●</b>1779 ＋</div><div class="res dia"><b>◆</b>1330 ＋</div><div class="res ene"><b>ϟ</b>191.38 ＋</div></div>
 <div class="tools"><button class="tool" onclick="openP(&quot;messages&quot;)">✉<div class="badge">2</div></button><button class="tool" onclick="openP(&quot;ach&quot;)">🏆</button><button class="tool" onclick="openP(&quot;settings&quot;)">⚙</button><button class="tool" onclick="toggleLang()">🇬🇧</button></div></div>
 </header>
-<main class="world"><span style="position:absolute;right:8px;bottom:8px;font-size:9px;color:#78a9c3;opacity:.65;pointer-events:none">S78</span>
+<main class="world"><span style="position:absolute;right:8px;bottom:8px;font-size:9px;color:#78a9c3;opacity:.65;pointer-events:none">S80</span>
 <button class="quest" onclick="openP(&quot;quests&quot;)"><small>Текущее задание</small><strong>Поговори с кузнецом　›</strong><span>⌖ Кузница</span></button>
 <button class="daily" onclick="openP(&quot;bonus&quot;)"><span class="chest">🎁</span><b>Ежедневный бонус</b><time id="timer">23:45:00</time></button>
 <div class="left"><button class="smallBtn" onclick="openP(&quot;bonus&quot;)"><span class="icon">🎁</span>Бонусы<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;events&quot;)"><span class="icon">▦</span>События<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;vip&quot;)"><span class="icon">♛</span>VIP</button></div>
@@ -539,7 +539,7 @@ const I18N={
  'Territory — Sdolars':'Territory — Sdolars','Sdolars':'Sdolars',
  'Глава 5 · Уровень ':'Chapter 5 · Level ', 'Текущее задание':'Current quest','Поговори с кузнецом ›':'Talk to the blacksmith ›','⌖ Кузница':'⌖ Forge','Ежедневный бонус':'Daily bonus','Бонусы':'Bonuses','События':'Events','VIP':'VIP','Кузница':'Forge','Улучшение снаряжения':'Equipment upgrade','Таверна':'Tavern','Найм героев':'Hero recruitment','Магазин':'Shop','Предметы и снаряжение':'Items and equipment','Бой':'Battle','Инвентарь':'Inventory','Экипировка':'Equipment','Задания':'Quests','Чат игры':'Game chat','Общий чат и чат клана':'Global chat and clan chat','Открыть ›':'Open ›','Город':'City','Герой':'Hero','Гильдия':'Guild','Ещё':'More',
  'Глава 5 · Уровень':'Chapter 5 · Level','Сила':'Strength','Ловкость':'Agility','Защита':'Defense','Опыт':'Experience','＋ Сила':'＋ Strength','＋ Ловкость':'＋ Agility','Предметы':'Items','Монеты:':'Coins:','Инвентарь пуст.':'Inventory is empty.','Снять':'Unequip','Экипировать':'Equip','Использовать':'Use','Выбросить':'Discard','Изменить':'Change','Оружие':'Weapon','Броня':'Armor','Пусто':'Empty','Урон':'Damage','Нет оружия':'No weapon','Текущий урон:':'Current damage:','Следующее улучшение:':'Next upgrade:','Стоимость:':'Cost:','Улучшить':'Upgrade','Купить':'Buy','Расходник':'Consumable','Количество':'Quantity',
- 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s79':'Version: s79',
+ 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s80':'Version: s79',
  'Чат':'Chat','Общий чат':'Global chat','Чат клана':'Clan chat','Общий':'Global','Клан':'Clan','Онлайн игроки':'Online players','Сейчас находятся в Sdolars':'Currently in Sdolars','Развернуть':'Expand','Свернуть':'Collapse','Написать сообщение...':'Write a message...','Отправить':'Send','Добро пожаловать в общий чат игры!':'Welcome to the global game chat!','Кто идёт на арену?':'Who is going to the arena?','Чат клана открыт. Добро пожаловать!':'Clan chat is open. Welcome!','Система Sdolars':'Sdolars System','Клан Sdolars':'Sdolars Clan',
  'Бой — Викингская арена':'Battle — Viking arena','⚔️ Викинг Sdolars':'⚔️ Viking of Sdolars','👹 Монстр':'👹 Monster','Ледяной тролль':'Frost troll','Атака — выбери 1 зону':'Attack — choose 1 zone','Защита — выбери 2 зоны':'Defense — choose 2 zones','Выбрано:':'Selected:','История боя':'Battle log','Выберите атаку и две зоны защиты.':'Choose an attack and two defense zones.','попадание':'hit','промах':'miss','КРИТ!':'CRIT!','блок':'blocked','не блок':'not blocked','заблокировано':'blocked','урон':'damage','Победа над Ледяной тролльом!':'Victory over the Frost troll!','Ледяной тролль победил.':'The Frost troll won.',
  'Голова':'Head','Грудь':'Chest','Пояс':'Waist','Ноги':'Legs',
@@ -594,7 +594,7 @@ const views={
  ach:['Достижения',()=>'<div class="card"><b>🏆 Первый бой</b><p>Победи первого противника.</p><p>Прогресс: <b>'+(state.wins>0?'1':'0')+' / 1</b></p></div><div class="card"><b>💰 Богач</b><p>Накопи 2000 монет.</p><p>Прогресс: <b>'+Math.min(state.coins,2000)+' / 2000</b></p></div><div class="card"><b>⚔️ Воин Sdolars</b><p>Победи 10 противников.</p><p>Прогресс: <b>'+state.wins+' / 10</b></p></div>'],
  settings:['Настройки',()=>'<div class="card"><b>⚙️ Настройки игры</b><p>🔊 Звуки <button onclick="toggleSetting(&quot;sound&quot;)">'+(state.settings.sound?'ВКЛ':'ВЫКЛ')+'</button></p><p>📳 Эффекты <button onclick="toggleSetting(&quot;fx&quot;)">'+(state.settings.fx?'ВКЛ':'ВЫКЛ')+'</button></p><p>🌐 Язык <button onclick="toggleLang()">'+state.lang+'</button></p><p>📱 Telegram ID <b>'+(window.Telegram?.WebApp?.initDataUnsafe?.user?.id||'гостевой режим')+'</b></p></div>'],
  guild:['Гильдия',renderGuildS75],
- more:['Ещё',()=>'<div class="grid2"><button class="goldBtn" onclick="openP(&quot;messages&quot;)">✉ Сообщения</button><button class="goldBtn" onclick="openP(&quot;ach&quot;)">🏆 Достижения</button><button class="goldBtn" onclick="openP(&quot;settings&quot;)">⚙ Настройки</button><button class="goldBtn" onclick="openP(&quot;guild&quot;)">👥 Гильдия</button></div><div class="card"><b>ℹ️ О Territory</b><p>Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.</p><p>Версия: s78</p></div>']
+ more:['Ещё',()=>'<div class="grid2"><button class="goldBtn" onclick="openP(&quot;messages&quot;)">✉ Сообщения</button><button class="goldBtn" onclick="openP(&quot;ach&quot;)">🏆 Достижения</button><button class="goldBtn" onclick="openP(&quot;settings&quot;)">⚙ Настройки</button><button class="goldBtn" onclick="openP(&quot;guild&quot;)">👥 Гильдия</button></div><div class="card"><b>ℹ️ О Territory</b><p>Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.</p><p>Версия: s80</p></div>']
 };
 applyTelegramPlayer();
 function totalDamage(){return 15+(state.items.find(x=>x.equipped&&x.type==='Оружие')?.damage||0)}
@@ -714,28 +714,33 @@ views.events=['События',()=>'<div class="card"><b>🏰 Осада Sdolars
 views.vip=['VIP',()=>'<div class="card"><b>👑 VIP Sdolars</b><p>Статус: <b>'+(state.vip||'Нет')+'</b></p><p>7 дней · +25 к максимальной энергии.</p><p>Стоимость: <b>500 ◆</b></p><button class="goldBtn" onclick="vipS75()">Активировать VIP</button></div>'];
 save();updateHud();
 
-// S79: reliable mobile navigation bindings
+// S80: reliable mobile navigation and battle tap handling
 (function(){
   function bindCoreButtons(){
-    document.querySelectorAll('.actions .action').forEach(function(btn, i){
-      btn.type='button';
-      btn.addEventListener('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        if(i===0){ window.battle(); }
-        else if(i===1){ openP('inventory'); }
-        else if(i===2){ openP('equipment'); }
-        else if(i===3){ openP('quests'); }
-      }, true);
-    });
-    document.querySelectorAll('.nav-item').forEach(function(btn, i){
-      btn.addEventListener('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
+    document.addEventListener('click', function(e){
+      var el=e.target.closest ? e.target.closest('.action, .bottom button') : null;
+      if(!el) return;
+      if(el.classList.contains('action')){
+        var actions=Array.prototype.indexOf.call(document.querySelectorAll('.actions .action'),el);
+        if(actions===0){
+          e.preventDefault(); e.stopPropagation();
+          if(typeof window.battle==='function') window.battle();
+          return;
+        }
+        if(actions===1){ e.preventDefault(); e.stopPropagation(); if(typeof openP==='function') openP('inventory'); return; }
+        if(actions===2){ e.preventDefault(); e.stopPropagation(); if(typeof openP==='function') openP('equipment'); return; }
+        if(actions===3){ e.preventDefault(); e.stopPropagation(); if(typeof openP==='function') openP('quests'); return; }
+      }
+      if(el.closest('.bottom')){
+        var buttons=Array.prototype.slice.call(document.querySelectorAll('.bottom button'));
+        var i=buttons.indexOf(el);
         var keys=['city','hero','inventory','quests','guild','more'];
-        if(keys[i]) openP(keys[i]);
-      }, true);
-    });
+        if(i>=0 && keys[i]){
+          e.preventDefault(); e.stopPropagation();
+          if(typeof openP==='function') openP(keys[i]);
+        }
+      }
+    }, true);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindCoreButtons);
   else bindCoreButtons();
