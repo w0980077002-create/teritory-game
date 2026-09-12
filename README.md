@@ -1,11 +1,4 @@
-# Territory — Sdolars s56
+# Territory — Sdolars s58
 
-Эталонная сборка на базе утверждённого городского экрана.
-
-- Исходный фон города и исходная компоновка кнопок сохранены.
-- Чат global/clan и WebSocket сохранены.
-- Cloudflare Worker + Durable Object сохранены.
-- Тактический бой: 1 зона атаки + 2 зоны защиты.
-- Авторитетный PVE-ход через `/api/action`.
-
-Визуальный фон и базовую городскую разметку без отдельного согласования не менять.
+The main city screen is preserved from the approved s47 build. Do not change the city background, character scale, or main layout without explicit approval.
+The Worker keeps the server/Durable Object layer from the later build.
