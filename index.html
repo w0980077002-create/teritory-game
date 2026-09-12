@@ -36,6 +36,19 @@ footer button{background:#071d2d;color:#91acbb;font-size:11px;font-weight:900} f
 @keyframes hit{50%{transform:scale(1.15);filter:brightness(2)}}
 .shake{animation:hit .3s}
 @media(max-width:430px){header{height:104px;flex-basis:104px}.avatar{width:62px;height:62px;font-size:38px}.quest{width:205px}.quick button{width:108px}.nav button{height:59px;font-size:11px}}
+
+#three{position:absolute;inset:0;overflow:hidden;background:#071522}
+#world{position:absolute;inset:-3%;background-position:center center;background-size:cover;background-repeat:no-repeat;will-change:transform;filter:saturate(1.04) contrast(1.04)}
+.world-haze{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,13,23,.15),transparent 28%,rgba(3,12,18,.08) 65%,rgba(2,10,16,.62) 100%);pointer-events:none}
+.location{position:absolute;z-index:4;padding:9px 14px;border:2px solid #c8943a;border-radius:12px;background:linear-gradient(180deg,#172a35eF,#07151eeF);box-shadow:0 5px 15px #0009;color:#fff;font-size:15px;pointer-events:auto;cursor:pointer;text-shadow:0 2px 2px #000;transition:.15s}
+.location:active{transform:scale(.95)}
+.castle{left:55%;top:27%}.tavern{left:7%;top:58%}.market{left:35%;top:66%}.arena{right:8%;top:48%}.district{right:7%;top:39%}.casino{right:8%;top:67%}
+.world-npc{position:absolute;z-index:4;left:49%;bottom:31%;font-size:42px;filter:drop-shadow(0 4px 4px #000);pointer-events:auto;cursor:pointer;animation:npc 2.8s ease-in-out infinite}
+@keyframes npc{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+body{padding-bottom:env(safe-area-inset-bottom)}
+#app{min-height:100dvh}
+footer{padding-bottom:env(safe-area-inset-bottom)}
 </style>
 </head>
 <body>
@@ -51,7 +64,14 @@ footer button{background:#071d2d;color:#91acbb;font-size:11px;font-weight:900} f
 </header>
 <main id="scene">
   <div id="three"></div>
-  <div class="overlay">
+  <div class="overlay"><div class="location castle" onclick="toast('Замок Sdolars')">🏰 <b>Замок</b></div>
+    <div class="location tavern" onclick="toast('Таверна: поиск героев')">🍺 <b>Таверна</b></div>
+    <div class="location market" onclick="openModal('market')">⚖️ <b>Рынок</b></div>
+    <div class="location arena" onclick="startBattle()">⚔️ <b>Арена</b></div>
+    <div class="location district" onclick="toast('Районы Sdolars')">🗺️ <b>Районы</b></div>
+    <div class="location casino" onclick="openModal('casino')">🎲 <b>Казино</b></div>
+    <div class="world-npc" onclick="toast('Стражник: Добро пожаловать в Sdolars!')">🛡️</div>
+
     <div class="card quest"><strong id="questTitle">Патруль Sdolars</strong><div id="questText">Победи 3 противников</div><small>Награда: 180 🟡 + 45 XP</small></div>
     <div class="quick"><button onclick="startBattle()">⚔️ Арена</button><button onclick="openModal('districts')">🏙️ Районы</button></div>
     <div class="chat"><div>💬 <span data-i18n="chat">Городской чат</span><small> 12 онлайн</small></div><button onclick="toast('Чат готовится к подключению')">Открыть</button></div>
@@ -119,91 +139,20 @@ function gainXp(n){state.exp+=n;while(state.exp>=state.maxExp){state.exp-=state.
 function updateEnemy(){const e=document.getElementById('ehp');if(e)e.style.width=Math.max(0,enemy.hp/enemy.maxHp*100)+'%'}
 renderHud();setInterval(()=>{if(state.energy<200){state.energy=Math.min(200,state.energy+.25);save()}},60000);
 
-// Territory s10 — cinematic self-contained city scene, GitHub only.
+// Territory s11 — interactive Sdolars environment.
+// The image is an environment asset only; UI and gameplay remain real HTML/JS.
 const host=document.getElementById('three');
-host.innerHTML='<canvas id="cityCanvas"></canvas>';
-const canvas=document.getElementById('cityCanvas'),ctx=canvas.getContext('2d');
-let cw=1,ch=1,st=0;
-function resizeScene(){const r=host.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);cw=Math.max(1,r.width);ch=Math.max(1,r.height);canvas.width=cw*d;canvas.height=ch*d;canvas.style.width=cw+'px';canvas.style.height=ch+'px';ctx.setTransform(d,0,0,d,0,0)}
-function poly(p,f,s,l=1){ctx.beginPath();ctx.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)ctx.lineTo(p[i][0],p[i][1]);ctx.closePath();if(f){ctx.fillStyle=f;ctx.fill()}if(s){ctx.strokeStyle=s;ctx.lineWidth=l;ctx.stroke()}}
-function circle(x,y,r,f){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=f;ctx.fill()}
-function rr(x,y,w,h,r,f,s,l=1){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(f){ctx.fillStyle=f;ctx.fill()}if(s){ctx.strokeStyle=s;ctx.lineWidth=l;ctx.stroke()}}
-function tower(x,base,w,h){ctx.fillStyle='#263d49';ctx.fillRect(x,base-h,w,h);ctx.fillStyle='#385765';ctx.fillRect(x+w*.12,base-h-28,w*.76,28);poly([[x-5,base-h-28],[x+w/2,base-h-70],[x+w+5,base-h-28]],'#516b76');for(let y=base-h+18;y<base-12;y+=19){ctx.fillStyle='#d9b84d';ctx.fillRect(x+w*.27,y,6,8);ctx.fillRect(x+w*.66,y,6,8)}}
-function pine(x,y,s){ctx.fillStyle='#102f2d';ctx.fillRect(x-3*s,y,6*s,35*s);poly([[x,y-42*s],[x-30*s,y+8*s],[x+30*s,y+8*s]],'#104238');poly([[x,y-23*s],[x-36*s,y+28*s],[x+36*s,y+28*s]],'#155044')}
-function lamp(x,y){ctx.fillStyle='#533522';ctx.fillRect(x-3,y,6,34);circle(x,y,5,'#fff0a0');const g=ctx.createRadialGradient(x,y,0,x,y,28);g.addColorStop(0,'#ffd36a');g.addColorStop(.25,'#ff8a2e');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,28,0,Math.PI*2);ctx.fill()}
-function hero(x,y){
- ctx.save();ctx.translate(x,y+Math.sin(st*2)*2);
- // shadow
- ctx.fillStyle='#02070a99';ctx.beginPath();ctx.ellipse(0,118,70,18,0,0,Math.PI*2);ctx.fill();
- // boots/legs
- rr(-31,66,25,53,5,'#10191f','#5c7078',2);rr(6,66,25,53,5,'#10191f','#5c7078',2);
- // cloak
- poly([[-55,80],[-44,15],[-25,-5],[25,-5],[44,15],[55,80],[31,105],[-31,105]],'#182b35','#8398a0',2);
- // fur mantle
- circle(-34,13,23,'#4b4039');circle(34,13,23,'#4b4039');circle(-19,23,18,'#5d4d43');circle(19,23,18,'#5d4d43');
- // torso armor
- rr(-30,31,60,51,9,'#30444d','#a4b1b5',2);rr(-18,45,36,8,3,'#b98d43');
- // neck
- ctx.fillStyle='#9d6a45';ctx.fillRect(-10,-10,20,18);
- // head
- circle(0,-31,29,'#a97049');
- // long hair
- ctx.fillStyle='#3e2922';ctx.beginPath();ctx.arc(0,-39,32,Math.PI,Math.PI*2);ctx.fill();ctx.fillRect(-31,-43,10,37);ctx.fillRect(21,-43,10,37);
- // beard
- poly([[-23,-20],[-17,2],[0,18],[17,2],[23,-20],[14,-2],[0,9],[-14,-2]],'#533529');
- // eyes, brows, scar
- ctx.strokeStyle='#3a241e';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-18,-39);ctx.lineTo(-4,-41);ctx.moveTo(4,-41);ctx.lineTo(18,-39);ctx.stroke();
- circle(-10,-31,3,'#10161a');circle(10,-31,3,'#10161a');ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(14,-44);ctx.lineTo(8,-22);ctx.stroke();
- // axe
- ctx.strokeStyle='#9caeb5';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(38,86);ctx.lineTo(78,-20);ctx.stroke();poly([[74,-20],[104,-35],[91,5]],'#9cabb1','#516771',2);
- ctx.restore();
+host.innerHTML='<div id="world"></div><div class="world-haze"></div>';
+const world=document.getElementById('world');
+world.style.backgroundImage="url('assets/sdolars_city.jpg')";
+let worldT=0;
+function animateWorld(){
+  worldT+=0.016;
+  const sx=Math.sin(worldT*0.55)*0.7, sy=Math.sin(worldT*0.8)*0.35;
+  world.style.transform=`scale(1.045) translate(${sx}px,${sy}px)`;
+  requestAnimationFrame(animateWorld);
 }
-function drawScene(){
- const w=cw,h=ch;ctx.clearRect(0,0,w,h);
- // cinematic sky
- const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#0b3558');sky.addColorStop(.28,'#3d7591');sky.addColorStop(.53,'#91b7bf');sky.addColorStop(1,'#091722');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
- // moonlight
- const mg=ctx.createRadialGradient(w*.75,h*.17,5,w*.75,h*.17,90);mg.addColorStop(0,'#e7f3e8');mg.addColorStop(1,'transparent');ctx.fillStyle=mg;ctx.fillRect(0,0,w,h);
- circle(w*.75,h*.17,18,'#e8f1df');
- // moving clouds
- for(let i=0;i<7;i++){let x=((i*155+st*8)%(w+180))-90,y=28+(i%3)*45;ctx.globalAlpha=.13;circle(x,y,29,'#fff');circle(x+28,y+2,21,'#fff');circle(x-25,y+6,18,'#fff')}ctx.globalAlpha=1;
- // mountains with snowy ridge
- poly([[0,h*.38],[w*.12,h*.13],[w*.22,h*.38],[w*.38,h*.16],[w*.50,h*.39],[w*.66,h*.11],[w*.79,h*.37],[w*.92,h*.16],[w,h*.38]],'#203f50');
- poly([[0,h*.30],[w*.12,h*.13],[w*.22,h*.31],[w*.38,h*.16],[w*.50,h*.31],[w*.66,h*.11],[w*.79,h*.30],[w*.92,h*.16],[w,h*.31]],'#d7e5e7');
- // distant skyline
- const base=h*.57;
- for(let i=0;i<18;i++){let x=i*w/18,bh=35+(i%6)*13;ctx.fillStyle=i%2?'#162d3b':'#1d3744';ctx.fillRect(x,base-bh,34,bh);for(let yy=base-bh+10;yy<base-7;yy+=15){ctx.fillStyle=(i+Math.floor(yy))%3?'#c9b04c':'#7195a0';ctx.fillRect(x+7,yy,5,6)}}
- // Sdolars citadel
- const cx=w*.51,by=h*.65;
- tower(cx-112,by,54,150);tower(cx+58,by,54,150);
- ctx.fillStyle='#2b4652';ctx.fillRect(cx-64,by-120,128,120);
- poly([[cx-72,by-120],[cx,by-178],[cx+72,by-120]],'#4b6671');
- // battlements
- ctx.fillStyle='#4d6975';for(let i=-3;i<=3;i++)ctx.fillRect(cx+i*20-6,by-132,12,14);
- ctx.fillStyle='#d3a932';ctx.fillRect(cx-10,by-65,20,65);
- ctx.fillStyle='#8a2832';ctx.fillRect(cx-3,by-179,6,31);
- // flags move
- ctx.strokeStyle='#9baeb5';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx-3,by-179);ctx.lineTo(cx-3,by-228);ctx.stroke();poly([[cx-3,by-226],[cx+28+Math.sin(st*2)*5,by-216],[cx-3,by-207]],'#9a2936');
- // main avenue
- poly([[w*.36,h],[w*.46,by],[w*.56,by],[w*.78,h]],'#122934','#58727c',2);
- // road stones
- ctx.fillStyle='#536d76';for(let i=0;i<8;i++){let yy=by+20+i*32, half=10+i*9;ctx.fillRect(w*.51-half,yy,half*2,2)}
- // market buildings foreground
- for(let i=0;i<5;i++){let x=18+i*w*.18,y=by+55+(i%2)*18;rr(x,y,74,35,5,'#132d38','#4e6973',2);ctx.fillStyle=i%2?'#7e3831':'#94713a';ctx.fillRect(x+8,y+9,58,13)}
- // greenery
- pine(w*.08,by+15,.65);pine(w*.92,by+18,.65);pine(w*.22,by+30,.42);pine(w*.82,by+28,.42);
- lamp(w*.27,by+52);lamp(w*.76,by+50);
- // foreground bridge rail
- ctx.strokeStyle='#607b84';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(0,h*.83);ctx.lineTo(w*.33,h*.75);ctx.moveTo(w,h*.83);ctx.lineTo(w*.67,h*.75);ctx.stroke();
- // hero in front, not a cartoon emoji
- hero(w*.5,h*.71);
- // atmospheric particles
- for(let i=0;i<28;i++){let px=(i*113+st*11)%(w+10)-5,py=(i*47+Math.sin(st+i)*12)%(h*.75);circle(px,py,1.3,'#dcecef');}
- // vignette
- const vg=ctx.createRadialGradient(w/2,h*.52,w*.2,w/2,h*.52,w*.72);vg.addColorStop(.62,'transparent');vg.addColorStop(1,'#000b');ctx.fillStyle=vg;ctx.fillRect(0,0,w,h);
-}
-addEventListener('resize',resizeScene);resizeScene();
-function animateScene(){st+=.016;drawScene();requestAnimationFrame(animateScene)}animateScene();
+animateWorld();
 </script>
 </body>
 </html>
