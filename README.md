@@ -1,24 +1,9 @@
-# Territory — Sdolars s75
+# Territory — Sdolars s84
 
-Global gameplay build based directly on the approved s60 working base.
+Integrated gameplay build based directly on the verified s83 working base.
 
-- 4 attack zones and 4 defense zones; no belly zone
-- 2 defense selections
-- automatic strike after selection
-- 15-second timeout = loss
-- compact battle history and auto-battle checkbox
-- character progression and persistent stats
-- districts with level gates, enemies, rewards and win counters
-- inventory/equipment
-- progressive forge upgrades
-- quests and rewards
-- casino excluded
-- approved city screen preserved
+Included: 4-zone tactical PvE, character progression, inventory/equipment, market, forge, districts, resources, adventure quests, daily missions, achievements, tavern heroes and training, guild treasury/raid, season rating/leaderboard, live PvP lobby, global/clan chat, RU/EN, Telegram Web App, virtual in-game casino, server state synchronization, and an interactive Three.js Sdolars city with fallback.
 
+Combat rule: exactly 1 attack zone + exactly 2 defense zones from Head / Chest / Waist / Legs.
 
-## s76 — gameplay loop update
-- Battle now costs 3 energy.
-- Victory/loss persists battle statistics and HP.
-- Victory advances active adventure quest and daily win mission.
-- Victory grants level progression and free attribute points when XP threshold is reached.
-- Version markers updated to s76.
+QA: Node syntax checks passed for client JS and Worker; Worker embeds the exact s84 index; duplicate battleRound id removed; four-zone rule checked on both sides; inventory handlers use real indices.
