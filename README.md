@@ -1,19 +1,21 @@
-# Territory — Sdolars · S89 VISUAL FINAL
+# Territory — Sdolars · S90 FINAL
 
-Финальная мобильная сборка для Cloudflare Workers + Durable Objects + SQLite + Static Assets.
+Готовая мобильная сборка Territory для текущего Cloudflare Workers backend.
 
-## Структура
-- `index.html` — мобильный фронтенд S89 VISUAL
-- `worker.js` — GameHub, Durable Object, игровая логика и 4-зонный бой
-- `wrangler.jsonc` — конфигурация Workers/Assets/DO SQLite
-- `package.json` — Wrangler scripts
-- `assets/home-screen.png` — world backdrop для мобильной сцены
-- `assets/home-screen-full.png` — исходный полный арт S89
+## Состав
 
-## Деплой
-```bash
-npm install
-npm run deploy
-```
+- index.html — финальный мобильный интерфейс
+- worker.js — текущий серверный GameHub и игровая логика
+- wrangler.jsonc — Cloudflare Workers, Durable Objects и Static Assets
+- package.json — команды Wrangler
+- assets/home-screen.png — фон игровой сцены
+- assets/home-screen-full.png — полный исходный арт
 
-Static Assets настроены на корень проекта: `directory: "."`.
+## Установка
+
+1. Скопируйте содержимое этой папки в репозиторий.
+2. Сохраните worker.js, wrangler.jsonc, package.json и папку assets.
+3. Установите зависимости командой `npm install`.
+4. Опубликуйте проект командой `npm run deploy`.
+
+Фронтенд использует POST /api/state и POST /api/action. Боевой интерфейс работает с четырьмя зонами сервера: атака — одна зона, защита — две разные зоны. После завершения раунда используются серверные действия battle.reward и battle.loss.
