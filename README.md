@@ -1,9 +1,17 @@
-# Territory — Sdolars s84
+# Territory S85 — Sdolars
 
-Integrated gameplay build based directly on the verified s83 working base.
+Стабильная сборка на базе рабочей S83/S84, без замены игры новой оболочкой.
 
-Included: 4-zone tactical PvE, character progression, inventory/equipment, market, forge, districts, resources, adventure quests, daily missions, achievements, tavern heroes and training, guild treasury/raid, season rating/leaderboard, live PvP lobby, global/clan chat, RU/EN, Telegram Web App, virtual in-game casino, server state synchronization, and an interactive Three.js Sdolars city with fallback.
+## Исправлено в S85
+- Исправлен критический сбой кнопки «Бой»: использовалась несуществующая `s75SpendEnergy`.
+- Исправлены оставшиеся вызовы `s75Mission`/`s75Level`, которые могли падать после победы.
+- Worker и `index.html` синхронизированы: Worker отдаёт ровно тот же HTML, что находится в архиве.
+- Зафиксированы 4 зоны боя: Голова, Грудь, Пояс, Ноги. Атака — 1 зона, защита — 2.
+- Убран возможный цветной/жёлтый край внизу приложения: корневой фон и нижняя панель принудительно тёмные, без нижней границы.
+- Сохранены существующие системы Sdolars и локальная совместимость прогресса.
 
-Combat rule: exactly 1 attack zone + exactly 2 defense zones from Head / Chest / Waist / Legs.
-
-QA: Node syntax checks passed for client JS and Worker; Worker embeds the exact s84 index; duplicate battleRound id removed; four-zone rule checked on both sides; inventory handlers use real indices.
+## Проверка
+- `node --check worker.js` — OK
+- клиентский inline JavaScript — OK
+- количество боевых зон — 4
+- встроенный HTML Worker совпадает с `index.html` — OK
