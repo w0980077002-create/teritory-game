@@ -1,19 +1,26 @@
-# Territory — Sdolars / s4 GitHub Only
+# Territory — Sdolars / s6 GitHub Only
 
-Это версия только для GitHub/static hosting.
+Это чистая версия игры для размещения через GitHub.
 
-## В корне
+## В репозитории
 - `index.html` — единственный файл игры.
 
-## Важно
-- Cloudflare не используется.
-- `worker.js` удалён.
-- `wrangler.jsonc` удалён.
-- `package.json` удалён.
-- В игре нет зависимости от Cloudflare Worker.
-- Telegram Web App подключается напрямую к клиенту.
-- Сохранение текущего прототипа выполняется через localStorage.
+## Принцип
+GitHub хранит и отдаёт `index.html`. Никаких Cloudflare Worker, Wrangler, Durable Objects или `worker.js` здесь нет.
 
-Загружайте `index.html` в корень репозитория GitHub.
+## В игре
+- мобильный интерфейс Territory;
+- 3D-сцена;
+- тактический бой: 1 зона атаки + 2 зоны защиты;
+- прокачка;
+- инвентарь и экипировка;
+- рынок;
+- районы;
+- квесты;
+- казино;
+- гильдия;
+- RU/EN;
+- сохранение localStorage;
+- Telegram Web App API.
 
-Если используется GitHub Pages, источник должен быть настроен на ветку `main` и папку `/ (root)`.
+Загружать `index.html` нужно прямо в корень ветки `main`.
