@@ -1,12 +1,18 @@
-# Territory — Sdolars s75
+# Territory — Sdolars — S78
 
-S75 — цельная мобильная игровая сборка на базе текущей Territory.
+S78 is a functional cleanup of the existing Territory build, not a replacement game.
 
-## Игровой цикл
-Город → герой → экипировка → районы → разведка/ресурсы → тактический бой → награды/XP → улучшение → гильдия → сезон → казино (только внутриигровые монеты) → чат.
+Verified:
+- 4 combat zones only: Голова / Грудь / Пояс / Ноги.
+- Attack = 1 zone.
+- Defense = 2 zones.
+- Old 5-zone battle UI is absent from the active source.
+- Mobile world content scrolls instead of being clipped.
+- Existing city buttons remain functional.
+- Guild view uses the functional guild system.
+- Worker embeds the exact same index.html.
+- Worker health version = s78.
+- index.html and worker.js pass Node syntax checks.
 
-## Бой
-Ровно 4 зоны: Голова, Грудь, Пояс, Ноги. Игрок выбирает 1 зону атаки и 2 зоны защиты. Противник использует те же 4 зоны.
-
-## Сервер
-`worker.js` содержит ту же HTML-сборку и серверную логику, поэтому Worker не должен отдавать старую страницу.
+Deployment marker:
+The city screen contains a small S78 marker. If Telegram still shows 5 combat zones, Telegram is loading an older deployment/endpoint rather than this Worker build.
