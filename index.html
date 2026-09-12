@@ -135,22 +135,23 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 
 <style>
 /* S6 — Viking battle + auto battle */
-.vikingBattle{background:linear-gradient(180deg,#061a2d,#04101e);border:1px solid #1d6f9e;border-radius:14px;padding:8px;margin-bottom:7px}
-.fighters{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:stretch}
-.fighter{position:relative;background:radial-gradient(circle at 50% 20%,#183d5b,#071b2f 70%);border:2px solid #268ed0;border-radius:12px;padding:6px;text-align:center;overflow:hidden}
+.vikingBattle{background:linear-gradient(180deg,#071d30,#030d18);border:1px solid #1d6f9e;border-radius:12px;padding:6px;margin-bottom:6px;max-width:100%;overflow:hidden}
+.fighters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:end;position:relative;padding:4px 2px 0;background:radial-gradient(ellipse at 50% 100%,#15364a 0%,#081b2c 55%,#04111d 100%);border-radius:10px}
+.fighters:after{content:"⚔";position:absolute;left:50%;bottom:52px;transform:translateX(-50%);font-size:16px;color:#d6e7ef;opacity:.8;pointer-events:none}
+.fighter{position:relative;min-width:0;background:linear-gradient(180deg,rgba(24,61,91,.55),rgba(7,27,47,.88));border:1px solid #268ed0;border-radius:9px;padding:4px;text-align:center;overflow:hidden}
 .fighter.enemy{border-color:#b53a4b}
-.fighter img,.fighter .vikingSvg{width:100%;height:145px;object-fit:cover;border-radius:9px;background:#081522;display:block}
-.fighterName{font-size:12px;font-weight:900;margin:4px 0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fighterRole{font-size:8px;color:#9bc5df;margin-bottom:4px}
-.fhp{height:8px;background:#32141b;border-radius:8px;overflow:hidden;border:1px solid #5c2a34}.fhp i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#16d66b,#8af05d);transition:width .25s}
+.fighter img,.fighter .vikingSvg{width:100%;height:150px;object-fit:contain;object-position:center bottom;border-radius:7px;background:linear-gradient(180deg,#0a1c2b,#06121d);display:block}
+.fighterName{font-size:11px;font-weight:900;margin:3px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fighterRole{font-size:7px;color:#9bc5df;margin-bottom:3px}
+.fhp{height:7px;background:#32141b;border-radius:7px;overflow:hidden;border:1px solid #5c2a34}.fhp i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#16d66b,#8af05d);transition:width .25s}
 .enemy .fhp i{background:linear-gradient(90deg,#ff405d,#ff9a45)}
-.fhpText{font-size:9px;margin-top:2px;color:#dcecf8}
+.fhpText{font-size:8px;margin-top:2px;color:#dcecf8}
 .vikingAction{animation:vikingHit .35s ease}
 .vikingAttack{animation:vikingAttack .42s ease}
-@keyframes vikingAttack{0%{transform:translateX(0)}45%{transform:translateX(18px) scale(1.03)}100%{transform:translateX(0)}}
-@keyframes vikingHit{0%{transform:translateX(0)}25%{transform:translateX(-7px) rotate(-1deg)}55%{transform:translateX(7px) rotate(1deg)}100%{transform:translateX(0)}}
-.autoRow{display:flex;gap:5px;align-items:center;margin:6px 0}.autoBtn{flex:1;height:38px;border:2px solid #23b9ff;border-radius:9px;background:#082f4e;font-weight:900;font-size:11px}.autoBtn.on{background:linear-gradient(#18b86a,#075e39);border-color:#5dffb1}.autoHint{font-size:8px;color:#9dbfd7;text-align:center;margin:2px 0 5px}
-@media(max-width:500px){.fighter img,.fighter .vikingSvg{height:125px}.fighterName{font-size:10px}.fighterRole{font-size:7px}.vikingBattle{padding:6px}.autoBtn{height:34px;font-size:10px}}
+@keyframes vikingAttack{0%{transform:translateX(0)}45%{transform:translateX(10px) scale(1.02)}100%{transform:translateX(0)}}
+@keyframes vikingHit{0%{transform:translateX(0)}25%{transform:translateX(-5px) rotate(-1deg)}55%{transform:translateX(5px) rotate(1deg)}100%{transform:translateX(0)}}
+.autoRow{display:flex;gap:5px;align-items:center;margin:5px 0}.autoBtn{flex:1;height:34px;border:1px solid #23b9ff;border-radius:8px;background:#082f4e;font-weight:900;font-size:10px}.autoBtn.on{background:linear-gradient(#18b86a,#075e39);border-color:#5dffb1}.autoHint{font-size:8px;color:#9dbfd7;text-align:center;margin:2px 0 4px}
+@media(max-width:500px){.fighter img,.fighter .vikingSvg{height:122px}.fighterName{font-size:10px}.fighterRole{font-size:7px}.vikingBattle{padding:5px}.fighters{gap:4px}.autoBtn{height:32px;font-size:9px}}
 </style>
 
 <style>
