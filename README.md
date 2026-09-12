@@ -1,24 +1,12 @@
 # Territory — Sdolars s75
 
-Global gameplay build based directly on the approved s60 working base.
+S75 — цельная мобильная игровая сборка на базе текущей Territory.
 
-- 4 attack zones and 4 defense zones; no belly zone
-- 2 defense selections
-- automatic strike after selection
-- 15-second timeout = loss
-- compact battle history and auto-battle checkbox
-- character progression and persistent stats
-- districts with level gates, enemies, rewards and win counters
-- inventory/equipment
-- progressive forge upgrades
-- quests and rewards
-- casino excluded
-- approved city screen preserved
+## Игровой цикл
+Город → герой → экипировка → районы → разведка/ресурсы → тактический бой → награды/XP → улучшение → гильдия → сезон → казино (только внутриигровые монеты) → чат.
 
+## Бой
+Ровно 4 зоны: Голова, Грудь, Пояс, Ноги. Игрок выбирает 1 зону атаки и 2 зоны защиты. Противник использует те же 4 зоны.
 
-## s76 — gameplay loop update
-- Battle now costs 3 energy.
-- Victory/loss persists battle statistics and HP.
-- Victory advances active adventure quest and daily win mission.
-- Victory grants level progression and free attribute points when XP threshold is reached.
-- Version markers updated to s76.
+## Сервер
+`worker.js` содержит ту же HTML-сборку и серверную логику, поэтому Worker не должен отдавать старую страницу.
