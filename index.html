@@ -378,59 +378,6 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .autoCheck input{width:14px!important;height:14px!important;margin:0!important}
 .battleHistory #battleLog{max-height:90px!important;overflow-y:auto!important;font-size:10px!important;line-height:1.2!important}
 </style>
-
-<style>
-/* S71 — compact battle: no giant empty panel, four zones in attack AND defense */
-.panel:has(.vikingBattle){
-  height:auto!important;
-  max-height:92dvh!important;
-  overflow:hidden!important;
-  padding:6px!important;
-}
-.panel:has(.vikingBattle) .vikingBattle{
-  height:auto!important;
-  display:block!important;
-  overflow:hidden!important;
-  padding:4px!important;
-}
-.panel:has(.vikingBattle) .fighters{
-  height:auto!important;
-  min-height:0!important;
-  flex:none!important;
-  padding:2px!important;
-}
-.panel:has(.vikingBattle) .fighter img,
-.panel:has(.vikingBattle) .fighter .vikingSvg{
-  height:96px!important;
-}
-.panel:has(.vikingBattle) .autoCheck{
-  margin:4px 0!important;
-}
-.panel:has(.vikingBattle) .card{
-  height:auto!important;
-  min-height:0!important;
-  flex:none!important;
-  padding:5px!important;
-  margin:3px 0!important;
-}
-.panel:has(.vikingBattle) .zones{
-  grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  gap:4px!important;
-}
-.panel:has(.vikingBattle) .zones button{
-  width:auto!important;
-  height:34px!important;
-  font-size:9px!important;
-}
-.panel:has(.vikingBattle) .card:last-child{
-  min-height:0!important;
-}
-.panel:has(.vikingBattle) #battleLog{
-  height:72px!important;
-  max-height:72px!important;
-  overflow-y:auto!important;
-}
-</style>
 </head>
 <body>
 <div id="app">
@@ -471,8 +418,8 @@ function applyTelegramPlayer(){
   }catch(e){}
 }
 const modal=document.getElementById('modal'),pt=document.getElementById('pt'),pb=document.getElementById('pb');
-const ZONES=['Голова','Грудь','Пояс','Ноги'];
-const ATTACK_ZONES=[0,1,2,3];
+const ZONES=['Голова','Грудь','Живот','Пояс','Ноги'];
+const ATTACK_ZONES=[0,1,3,4];
 const KEY='sdolars_s1_save';
 let state={coins:1779,level:3,exp:120,items:[
  {id:'axe',name:'Боевой топор',type:'Оружие',icon:'🪓',damage:12,price:450,equipped:true},
@@ -483,13 +430,14 @@ let state={coins:1779,level:3,exp:120,items:[
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s)state=s}catch(e){}
 state.maxHp??=120;state.strength??=12;state.agility??=9;state.wins??=0;state.eventProgress??=0;state.guildMembers??=1;state.recruited??=[];state.settings??={sound:true,fx:true};state.lang??='RU';state.questDone??=false;state.bonusClaimed??=false;state.chat??={tab:'global',collapsed:false,global:[{name:'Система Sdolars',text:'Добро пожаловать в общий чат игры!',time:'сейчас',system:true},{name:'Рагнар',text:'Кто идёт на арену?',time:'сейчас'}],clan:[{name:'Клан Sdolars',text:'Чат клана открыт. Добро пожаловать!',time:'сейчас',system:true}]};
 state.onlinePlayers??=['Рагнар','Астрид','Ивар','Фрейя','Бьёрн','Олаф','Торстейн'];
+state.maxEnergy??=100;state.energy??=100;state.freePoints??=0;state.districtWins??={};state.currentDistrict??=1;state.itemsCapacity??=24;state.questProgress??={upgrade:0};state.questClaimed??={};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));if(typeof updateHud==='function')updateHud()}catch(e){}}
 function toast(s){const t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400)}
 const I18N={
  'Territory — Sdolars':'Territory — Sdolars','Sdolars':'Sdolars',
  'Глава 5 · Уровень ':'Chapter 5 · Level ', 'Текущее задание':'Current quest','Поговори с кузнецом ›':'Talk to the blacksmith ›','⌖ Кузница':'⌖ Forge','Ежедневный бонус':'Daily bonus','Бонусы':'Bonuses','События':'Events','VIP':'VIP','Кузница':'Forge','Улучшение снаряжения':'Equipment upgrade','Таверна':'Tavern','Найм героев':'Hero recruitment','Магазин':'Shop','Предметы и снаряжение':'Items and equipment','Бой':'Battle','Инвентарь':'Inventory','Экипировка':'Equipment','Задания':'Quests','Чат игры':'Game chat','Общий чат и чат клана':'Global chat and clan chat','Открыть ›':'Open ›','Город':'City','Герой':'Hero','Гильдия':'Guild','Ещё':'More',
  'Глава 5 · Уровень':'Chapter 5 · Level','Сила':'Strength','Ловкость':'Agility','Защита':'Defense','Опыт':'Experience','＋ Сила':'＋ Strength','＋ Ловкость':'＋ Agility','Предметы':'Items','Монеты:':'Coins:','Инвентарь пуст.':'Inventory is empty.','Снять':'Unequip','Экипировать':'Equip','Использовать':'Use','Выбросить':'Discard','Изменить':'Change','Оружие':'Weapon','Броня':'Armor','Пусто':'Empty','Урон':'Damage','Нет оружия':'No weapon','Текущий урон:':'Current damage:','Следующее улучшение:':'Next upgrade:','Стоимость:':'Cost:','Улучшить':'Upgrade','Купить':'Buy','Расходник':'Consumable','Количество':'Quantity',
- 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s12':'Version: s10',
+ 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s74':'Version: s10',
  'Чат':'Chat','Общий чат':'Global chat','Чат клана':'Clan chat','Общий':'Global','Клан':'Clan','Онлайн игроки':'Online players','Сейчас находятся в Sdolars':'Currently in Sdolars','Развернуть':'Expand','Свернуть':'Collapse','Написать сообщение...':'Write a message...','Отправить':'Send','Добро пожаловать в общий чат игры!':'Welcome to the global game chat!','Кто идёт на арену?':'Who is going to the arena?','Чат клана открыт. Добро пожаловать!':'Clan chat is open. Welcome!','Система Sdolars':'Sdolars System','Клан Sdolars':'Sdolars Clan',
  'Бой — Викингская арена':'Battle — Viking arena','⚔️ Викинг Sdolars':'⚔️ Viking of Sdolars','👹 Монстр':'👹 Monster','Ледяной тролль':'Frost troll','Атака — выбери 1 зону':'Attack — choose 1 zone','Защита — выбери 2 зоны':'Defense — choose 2 zones','Выбрано:':'Selected:','История боя':'Battle log','Выберите атаку и две зоны защиты.':'Choose an attack and two defense zones.','попадание':'hit','промах':'miss','КРИТ!':'CRIT!','блок':'blocked','не блок':'not blocked','заблокировано':'blocked','урон':'damage','Победа над Ледяной тролльом!':'Victory over the Frost troll!','Ледяной тролль победил.':'The Frost troll won.',
  'Голова':'Head','Грудь':'Chest','Живот':'Stomach','Пояс':'Waist','Ноги':'Legs',
@@ -530,31 +478,21 @@ function bindChatControls(){const input=document.getElementById('chatInput');con
 function setChatTab(tab){state.chat.tab=tab==='clan'?'clan':'global';state.chat.collapsed=false;save();openP('messages')}
 function toggleChatCollapse(){state.chat.collapsed=!state.chat.collapsed;save();openP('messages')}
 function sendChat(){const input=document.getElementById('chatInput');if(input){const ev=new Event('submit');ev.preventDefault?.();const text=input.value.trim();if(text){if(sendServerMessage(text)){input.value='';return}const tab=state.chat.tab==='clan'?'clan':'global';state.chat[tab]??=[];state.chat[tab].push({name:currentChatName(),text,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),online:false});save();input.value='';openP('messages')}}}
-/* S73 FINAL GAMEPLAY EXPANSION — intentionally inserted before views, not inside another script tag */
-const S73_DISTRICTS=[
- {id:1,name:'Старый порт',need:1,enemy:'Бандит порта',hp:90,reward:180,xp:30},
- {id:2,name:'Железный квартал',need:3,enemy:'Наёмник',hp:120,reward:300,xp:50},
- {id:3,name:'Северные ворота',need:5,enemy:'Щитоносец',hp:150,reward:450,xp:70},
- {id:4,name:'Крепость Севера',need:7,enemy:'Ярл',hp:190,reward:700,xp:100}
+const districts=[
+ {id:1,name:'Старый порт',min:1,enemy:'Бандит порта',hp:90,reward:180,xp:30},
+ {id:2,name:'Железный квартал',min:3,enemy:'Наёмник',hp:115,reward:280,xp:45},
+ {id:3,name:'Северные ворота',min:5,enemy:'Щитоносец',hp:145,reward:420,xp:65},
+ {id:4,name:'Крепость Севера',min:7,enemy:'Ярл-викинг',hp:180,reward:650,xp:90}
 ];
-state.districtWins??={}; state.currentDistrict??=1; state.itemsCapacity??=24; state.maxEnergy??=100;
-function s73Hero(){return card('👤 Персонаж Sdolars','<p>Уровень <b>'+state.level+'</b> · Опыт <b>'+state.exp+'/'+state.maxExp+'</b></p><div class="statgrid"><div class="statbox">⚔️ Сила<b>'+state.strength+'</b></div><div class="statbox">🏃 Ловкость<b>'+state.agility+'</b></div><div class="statbox">❤️ HP<b>'+state.maxHp+'</b></div><div class="statbox">⚡ Энергия<b>'+Math.floor(state.energy||0)+'/'+state.maxEnergy+'</b></div></div><p>🛡️ Защита <b>'+totalDef()+'</b> · ⚔️ Урон <b>'+totalDamage()+'</b></p><p>Свободных очков: <b>'+state.freePoints+'</b></p><button onclick="addStat(\'strength\')">＋ Сила</button> <button onclick="addStat(\'agility\')">＋ Ловкость</button>')}
-function s73Districts(){return '<div class="card"><b>🗺️ Районы Sdolars</b><p>Проходи районы по порядку. Победы и награды сохраняются.</p></div>'+S73_DISTRICTS.map(d=>{let open=state.level>=d.need,w=state.districtWins[d.id]||0;return '<div class="card" style="opacity:'+(open?1:.48)+'"><b>'+d.name+'</b><p>👹 '+d.enemy+' · HP '+d.hp+' · Награда '+d.reward+' 🪙 + '+d.xp+' XP</p><p>Побед в районе: <b>'+w+'</b></p>'+(open?'<button class="goldBtn" onclick="s73StartDistrict('+d.id+')">Войти в район</button>':'<button disabled>Открывается с '+d.need+' уровня</button>')+'</div>'}).join('')}
-function s73StartDistrict(id){let d=S73_DISTRICTS.find(x=>x.id===id);if(!d||state.level<d.need)return toast('Район пока закрыт');state.currentDistrict=id;state.currentEnemy=d;save();battle()}
-function s73Inventory(){let n=state.items.reduce((a,x)=>a+(x.qty||1),0);return '<div class="card"><b>🎒 Инвентарь</b><p>Мест: <b>'+n+'/'+state.itemsCapacity+'</b> · Монеты: <b>'+state.coins+' 🪙</b></p></div>'+renderInventory()}
-function s73Quests(){let w=state.wins||0,u=state.questProgress?.upgrade||0;return '<div class="card"><b>📜 Доска заданий</b><p>Задания дают дополнительный прогресс и награды.</p></div><div class="card"><b>⚔️ Новичок арены</b><p>Победи 1 противника: <b>'+Math.min(w,1)+'/1</b></p><p>🎁 150 🪙 + 50 XP</p><button class="goldBtn" onclick="s73Claim(\'q1\')">Забрать</button></div><div class="card"><b>🔥 Опытный боец</b><p>Победи 5 противников: <b>'+Math.min(w,5)+'/5</b></p><p>🎁 350 🪙 + 100 XP</p><button class="goldBtn" onclick="s73Claim(\'q5\')">Забрать</button></div><div class="card"><b>⚒️ Кузнец</b><p>Улучши оружие 2 раза: <b>'+Math.min(u,2)+'/2</b></p><p>🎁 300 🪙 + 80 XP</p><button class="goldBtn" onclick="s73Claim(\'qf\')">Забрать</button></div>'}
-function s73Claim(id){state.questClaimed??={};if(state.questClaimed[id])return toast('Уже получено');let ok=false,r=[0,0];if(id==='q1'){ok=(state.wins||0)>=1;r=[150,50]}if(id==='q5'){ok=(state.wins||0)>=5;r=[350,100]}if(id==='qf'){ok=(state.questProgress?.upgrade||0)>=2;r=[300,80]}if(!ok)return toast('Задание ещё не выполнено');state.questClaimed[id]=1;state.coins+=r[0];state.exp+=r[1];while(state.exp>=state.maxExp){state.exp-=state.maxExp;state.level++;state.maxExp=Math.round(state.maxExp*1.2+20);state.freePoints+=3;state.maxHp+=8;state.maxEnergy+=5;state.energy=state.maxEnergy}save();openP('quests');toast('🎁 Награда получена')}
-function s73Forge(){let w=state.items.find(x=>x.equipped&&x.type==='Оружие');if(!w)return '<div class="card"><b>⚒️ Кузница</b><p>Экипируй оружие, чтобы улучшать его.</p><button onclick="openP(\'inventory\')">Открыть инвентарь</button></div>';let lv=w.upgradeLevel||0,cost=200+lv*150;return '<div class="card"><b>⚒️ Кузница Sdolars</b><p>'+w.icon+' '+w.name+' · Урон <b>'+w.damage+'</b> · Улучшений '+lv+'</p><p>Следующий уровень: <b>+3 урона</b> за <b>'+cost+' 🪙</b></p><button class="goldBtn" onclick="s73Upgrade()">Улучшить</button></div>'}
-function s73Upgrade(){let w=state.items.find(x=>x.equipped&&x.type==='Оружие');if(!w)return toast('Нет оружия');let lv=w.upgradeLevel||0,cost=200+lv*150;if(state.coins<cost)return toast('Не хватает монет');state.coins-=cost;w.damage+=3;w.upgradeLevel=lv+1;state.questProgress??={};state.questProgress.upgrade=(state.questProgress.upgrade||0)+1;save();openP('forge');toast('⚒️ Оружие улучшено')}
-function s73More(){return '<div class="grid2"><button class="goldBtn" onclick="openP(\'districts\')">🗺️ Районы</button><button class="goldBtn" onclick="openP(\'hero\')">👤 Персонаж</button><button class="goldBtn" onclick="openP(\'inventory\')">🎒 Инвентарь</button><button class="goldBtn" onclick="openP(\'equipment\')">🛡️ Экипировка</button><button class="goldBtn" onclick="openP(\'quests\')">📜 Задания</button><button class="goldBtn" onclick="openP(\'forge\')">⚒️ Кузница</button><button class="goldBtn" onclick="openP(\'messages\')">💬 Чат</button><button class="goldBtn" onclick="openP(\'ach\')">🏆 Достижения</button></div><div class="card"><b>Territory · Sdolars</b><p>Главный цикл: район → бой → награда → прокачка → снаряжение.</p><p>Версия: s73</p></div>'}
+function renderDistricts(){return '<div class="card"><b>🗺️ Районы Sdolars</b><p>Продвигайся по городу, открывай новые районы и более сильных противников.</p></div>'+districts.map(d=>{const open=state.level>=d.min,w=state.districtWins[d.id]||0;return '<div class="card" style="opacity:'+(open?1:.55)+'"><b>📍 '+d.name+'</b><p>'+d.enemy+' · '+d.hp+' HP · награда '+d.reward+' 🪙 · '+d.xp+' XP</p><p>Побед в районе: <b>'+w+'</b></p>'+ (open?'<button class="goldBtn" onclick="startDistrict('+d.id+')">Войти в район</button>':'<button disabled>Открывается с '+d.min+' уровня</button>')+'</div>'}).join('')}
+function startDistrict(id){const d=districts.find(x=>x.id===id);if(!d||state.level<d.min){toast('Район пока закрыт');return}state.currentDistrict=id;state.currentEnemy=d;save();battle()}
 const views={
- hero:['Герой',()=>{const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const name=(tg?.first_name||'Игрок')+' '+(tg?.last_name||''); return card('👤 '+name.trim(),'<p>Глава 5 · Уровень <b>'+state.level+'</b></p><div class="statgrid"><div class="statbox">⚔️ Сила<b>'+state.strength+'</b></div><div class="statbox">🏃 Ловкость<b>'+state.agility+'</b></div><div class="statbox">❤️ HP<b>'+state.maxHp+'</b></div><div class="statbox">🛡️ Защита<b>'+totalDef()+'</b></div></div><div class="card"><b>Опыт</b><p>'+state.exp+' / '+state.maxExp+' XP</p><div style="height:7px;background:#12304a;border-radius:8px;overflow:hidden"><i style="display:block;width:'+Math.min(100,state.exp/state.maxExp*100)+'%;height:100%;background:#1da7ff"></i></div></div><button onclick="addStat(&quot;strength&quot;)">＋ Сила</button> <button onclick="addStat(&quot;agility&quot;)">＋ Ловкость</button>') }],
- inventory:['Инвентарь',s73Inventory], equipment:['Экипировка',renderEquipment],
- quests:['Задания',s73Quests],
- forge:['Кузница',s73Forge],
+ hero:['Герой',()=>{const tg=window.Telegram?.WebApp?.initDataUnsafe?.user; const name=(tg?.first_name||'Игрок')+' '+(tg?.last_name||''); return card('👤 '+name.trim(),'<p>Глава 5 · Уровень <b>'+state.level+'</b> · Энергия <b>'+Math.floor(state.energy)+'/'+state.maxEnergy+'</b></p><div class="statgrid"><div class="statbox">⚔️ Сила<b>'+state.strength+'</b></div><div class="statbox">🏃 Ловкость<b>'+state.agility+'</b></div><div class="statbox">❤️ HP<b>'+state.maxHp+'</b></div><div class="statbox">🛡️ Защита<b>'+totalDef()+'</b></div></div><div class="card"><b>Опыт</b><p>'+state.exp+' / '+state.maxExp+' XP</p><div style="height:7px;background:#12304a;border-radius:8px;overflow:hidden"><i style="display:block;width:'+Math.min(100,state.exp/state.maxExp*100)+'%;height:100%;background:#1da7ff"></i></div></div><button onclick="addStat(&quot;strength&quot;)">＋ Сила</button> <button onclick="addStat(&quot;agility&quot;)">＋ Ловкость</button>') }],
+ inventory:['Инвентарь',renderInventory], districts:['Районы Sdolars',renderDistricts], equipment:['Экипировка',renderEquipment],
+ quests:['Задания',()=>'<div class="card"><b>📜 Поговори с кузнецом</b><p>Посети кузницу Sdolars и улучши оружие.</p><p>Награда: <b>150 🪙 + 80 XP</b></p><button class="goldBtn" onclick="completeQuest()">Выполнить</button></div><div class="card"><b>⚔️ Испытание арены</b><p>Победи монстра.</p><p>Награда: <b>200 🪙 + 100 XP</b></p><button class="goldBtn" onclick="battle()">Начать бой</button></div>'],
+ forge:['Кузница',renderForge],
  tavern:['Таверна',()=>'<div class="card"><b>🍺 Найм героев</b><p>Выбери героя для своей команды.</p></div><div class="card"><b>Рагнар</b><p>Воин · 120 HP · Урон 16 · Защита 8</p><button class="goldBtn" onclick="recruit(&quot;Рагнар&quot;,500)">Нанять · 500 🪙</button></div><div class="card"><b>Астрид</b><p>Разведчица · 90 HP · Урон 20 · Ловкость 14</p><button class="goldBtn" onclick="recruit(&quot;Астрид&quot;,650)">Нанять · 650 🪙</button></div>'],
  shop:['Магазин',renderShop],
- districts:['Районы Sdolars',s73Districts],
  bonus:['Бонусы',()=>'<div class="card"><b>🎁 Ежедневный сундук</b><p>Награда за вход в Sdolars.</p><p>Сегодня: <b>250 🪙 + 20 XP</b></p><button class="goldBtn" onclick="claimBonus()">Забрать награду</button></div><div class="card"><b>🔥 Серия входов</b><p>День 1 из 7 · следующий бонус увеличится.</p></div>'],
  events:['События',()=>'<div class="card"><b>🏰 Осада Sdolars</b><p>Победи 10 врагов. Прогресс: <b>'+state.eventProgress+'/10</b></p><button class="goldBtn" onclick="eventFight()">Участвовать</button></div><div class="card"><b>⚔️ Турнир арены</b><p>Сразись с другими бойцами.</p><button onclick="toast(&quot;Турнир скоро начнётся&quot;)">Подробнее</button></div>'],
  vip:['VIP',()=>'<div class="card"><b>👑 VIP Sdolars</b><p>Статус: <b>'+state.vip+'</b></p><p>VIP даёт дополнительные награды, скидки и ускоренное восстановление.</p><button class="goldBtn" onclick="toast(&quot;VIP-магазин будет открыт после подключения сервера&quot;)">Открыть VIP</button></div>'],
@@ -562,12 +500,12 @@ const views={
  ach:['Достижения',()=>'<div class="card"><b>🏆 Первый бой</b><p>Победи первого противника.</p><p>Прогресс: <b>'+(state.wins>0?'1':'0')+' / 1</b></p></div><div class="card"><b>💰 Богач</b><p>Накопи 2000 монет.</p><p>Прогресс: <b>'+Math.min(state.coins,2000)+' / 2000</b></p></div><div class="card"><b>⚔️ Воин Sdolars</b><p>Победи 10 противников.</p><p>Прогресс: <b>'+state.wins+' / 10</b></p></div>'],
  settings:['Настройки',()=>'<div class="card"><b>⚙️ Настройки игры</b><p>🔊 Звуки <button onclick="toggleSetting(&quot;sound&quot;)">'+(state.settings.sound?'ВКЛ':'ВЫКЛ')+'</button></p><p>📳 Эффекты <button onclick="toggleSetting(&quot;fx&quot;)">'+(state.settings.fx?'ВКЛ':'ВЫКЛ')+'</button></p><p>🌐 Язык <button onclick="toggleLang()">'+state.lang+'</button></p><p>📱 Telegram ID <b>'+(window.Telegram?.WebApp?.initDataUnsafe?.user?.id||'гостевой режим')+'</b></p></div>'],
  guild:['Гильдия',()=>'<div class="card"><b>🛡️ Гильдия Sdolars</b><p>Уровень: <b>1</b></p><p>Участники: <b>'+state.guildMembers+' / 20</b></p><p>Казна: <b>2 450 🪙</b></p></div><div class="grid2"><button class="goldBtn" onclick="guildAction(&quot;Найти гильдию&quot;)">Найти гильдию</button><button class="goldBtn" onclick="guildAction(&quot;Приглашения&quot;)">Приглашения</button></div>'],
- more:['Ещё',s73More]
+ more:['Ещё',()=>'<div class="grid2"><button class="goldBtn" onclick="openP(&quot;districts&quot;)">🗺️ Районы</button><button class="goldBtn" onclick="openP(&quot;messages&quot;)">✉ Сообщения</button><button class="goldBtn" onclick="openP(&quot;ach&quot;)">🏆 Достижения</button><button class="goldBtn" onclick="openP(&quot;settings&quot;)">⚙ Настройки</button><button class="goldBtn" onclick="openP(&quot;guild&quot;)">👥 Гильдия</button></div><div class="card"><b>ℹ️ О Territory</b><p>Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.</p><p>Версия: s74</p></div>']
 };
 applyTelegramPlayer();
 function totalDamage(){return 15+(state.items.find(x=>x.equipped&&x.type==='Оружие')?.damage||0)}
 function totalDef(){return 5+(state.items.find(x=>x.equipped&&x.type==='Броня')?.defense||0)}
-function renderInventory(){let h='<div class="card"><b>🎒 Предметы</b><p>Монеты: <strong>'+state.coins+' 🪙</strong></p></div>';if(!state.items.length)h+='<div class="card">Инвентарь пуст.</div>';state.items.forEach((it,i)=>{h+='<div class="card"><b>'+it.icon+' '+it.name+'</b><p>'+it.type+(it.damage?' · Урон +'+it.damage:'')+(it.defense?' · Защита +'+it.defense:'')+(it.qty?' · Кол-во '+it.qty:'')+'</p>'+(it.type!=='Расходник'?'<button onclick="toggleEquip(&quot;+i+&quot;)">'+(it.equipped?'Снять':'Экипировать')+'</button>':'<button onclick="useItem(&quot;+i+&quot;)">Использовать</button>')+' <button class="danger" onclick="dropItem(&quot;+i+&quot;)">Выбросить</button></div>'});return h}
+function renderInventory(){let h='<div class="card"><b>🎒 Предметы</b><p>Монеты: <strong>'+state.coins+' 🪙</strong></p></div>';if(!state.items.length)h+='<div class="card">Инвентарь пуст.</div>';state.items.forEach((it,i)=>{h+='<div class="card"><b>'+it.icon+' '+it.name+'</b><p>'+it.type+(it.damage?' · Урон +'+it.damage:'')+(it.defense?' · Защита +'+it.defense:'')+(it.qty?' · Кол-во '+it.qty:'')+'</p>'+(it.type!=='Расходник'?'<button onclick="toggleEquip('+i+')">'+(it.equipped?'Снять':'Экипировать')+'</button>':'<button onclick="useItem('+i+')">Использовать</button>')+' <button class="danger" onclick="dropItem('+i+')">Выбросить</button></div>'});return h}
 function renderEquipment(){const w=state.items.find(x=>x.equipped&&x.type==='Оружие'),a=state.items.find(x=>x.equipped&&x.type==='Броня');return '<div class="card"><b>⚔️ Оружие</b><p>'+(w?w.icon+' '+w.name+' · Урон +'+w.damage:'Пусто')+'</p><button onclick="openP(&quot;inventory&quot;)">Изменить</button></div><div class="card"><b>🛡️ Броня</b><p>'+(a?a.icon+' '+a.name+' · Защита +'+a.defense:'Пусто')+'</p><button onclick="openP(&quot;inventory&quot;)">Изменить</button></div><div class="statgrid"><div class="statbox">⚔️ Урон<b>'+totalDamage()+'</b></div><div class="statbox">🛡️ Защита<b>'+totalDef()+'</b></div></div>'}
 function renderForge(){const w=state.items.find(x=>x.equipped&&x.type==='Оружие');return card('⚒️ Улучшение снаряжения','<p>'+(w?w.icon+' '+w.name:'Нет оружия')+'</p><p>Текущий урон: <b>'+(w?w.damage:0)+'</b></p><p>Следующее улучшение: <b>+3 урона</b></p><p>Стоимость: <b>200 🪙</b></p><button class="goldBtn" onclick="upgradeWeapon()">Улучшить</button>')}
 function renderShop(){return '<div class="card"><b>🔪 Нож</b><p>Урон +6 · 220 🪙</p><button class="goldBtn" onclick="buyItem(&quot;knife&quot;)">Купить</button></div><div class="card"><b>🪓 Тяжёлый топор</b><p>Урон +18 · 700 🪙</p><button class="goldBtn" onclick="buyItem(&quot;heavyaxe&quot;)">Купить</button></div><div class="card"><b>🛡️ Стальная броня</b><p>Защита +15 · 650 🪙</p><button class="goldBtn" onclick="buyItem(&quot;steel&quot;)">Купить</button></div><div class="card"><b>🩹 Аптечка</b><p>Восстанавливает 30 HP · 80 🪙</p><button class="goldBtn" onclick="buyItem(&quot;bandage&quot;)">Купить</button></div>'}
@@ -598,7 +536,7 @@ function battle(){
     </div>
     <label class="autoCheck"><input id="autoBattle" type="checkbox" onchange="toggleAutoBattle()"> <span>Автобой</span></label>
     <div class="card"><b>Атака — выбери 1 зону <span id="battleTimer" class="battleTimer">15</span></b><div class="zones attackZones" id="attacks">${ATTACK_ZONES.map(i=>'<button onclick="pickAttack('+i+',this)">'+ZONES[i]+'</button>').join('')}</div></div>
-    <div class="card"><b>Защита — выбери 2 зоны</b><div class="zones" id="defs">${ZONES.map((x,i)=>'<button onclick="pickDef('+i+',this)">'+x+'</button>').join('')}</div><p>Выбрано: <b id="dc">0/2</b></p></div>
+    <div class="card"><b>Защита — выбери 2 зоны</b><div class="zones" id="defs">${ATTACK_ZONES.map((x,i)=>'<button onclick="pickDef('+i+',this)">'+x+'</button>').join('')}</div><p>Выбрано: <b id="dc">0/2</b></p></div>
     <div class="card battleHistory"><b>Последние удары</b><div id="battleLog">Выберите атаку и две зоны защиты.</div></div>
   </div>`;
   modal.classList.add('open');window._battle=b;startBattleTimer();
@@ -607,10 +545,10 @@ function stopBattleTimer(){const b=window._battle;if(b?.timer){clearInterval(b.t
 function startBattleTimer(){stopBattleTimer();const b=window._battle,el=document.getElementById('battleTimer');if(!b||!el)return;b.deadline=Date.now()+15000;const tick=()=>{const left=Math.max(0,b.deadline-Date.now()),sec=Math.ceil(left/1000);el.textContent=String(sec);el.classList.toggle('danger',sec<=5);if(left<=0){stopBattleTimer();b.locked=true;el.textContent='0';const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⏱️ Время вышло — поражение.</div>'+log.innerHTML;}};tick();b.timer=setInterval(tick,200)}
 function toggleAutoBattle(){const b=window._battle;if(!b)return;b.auto=!!document.getElementById('autoBattle')?.checked;if(b.auto)autoBattleStep();else stopAutoBattle()}
 function stopAutoBattle(){const b=window._battle;if(!b)return;b.auto=false;if(b.autoTimer){clearTimeout(b.autoTimer);b.autoTimer=null}}
-function autoBattleStep(){const b=window._battle;if(!b||!b.auto||b.locked)return;b.attack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)];b.defs=[];while(b.defs.length<2){const z=Math.floor(Math.random()*4);if(!b.defs.includes(z))b.defs.push(z)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===ATTACK_ZONES.indexOf(b.attack)));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(true),450)}
+function autoBattleStep(){const b=window._battle;if(!b||!b.auto||b.locked)return;b.attack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)];b.defs=[];while(b.defs.length<2){const z=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)];if(!b.defs.includes(z))b.defs.push(z)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===ATTACK_ZONES.indexOf(b.attack)));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(true),450)}
 function pickAttack(i,el){const b=window._battle;if(!b||b.locked)return;document.querySelectorAll('#attacks button').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');b.attack=i;startBattleTimer()}
 function pickDef(i,el){const b=window._battle;if(!b||b.locked)return;const d=b.defs;if(d.includes(i)){b.defs=b.defs.filter(x=>x!==i);el.classList.remove('sel')}else if(d.length<2){d.push(i);el.classList.add('sel')}document.getElementById('dc').textContent=b.defs.length+'/2';if(b.attack!==null&&b.defs.length===2)strikeTurn(false)}
-function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked)return;if(b.attack===null||b.defs.length!==2){if(b.auto)autoBattleStep();else toast('Выбери атаку и 2 зоны защиты');return}b.locked=true;const enemyAttack=Math.floor(Math.random()*4),blocked=b.defs.includes(enemyAttack),base=totalDamage(),crit=Math.random()<Math.min(.35,.08+state.strength*.01),hit=b.attack!==enemyAttack,playerDamage=hit?base+(crit?Math.round(base*.5):0):0,enemyDamage=blocked?0:Math.max(4,10+Math.floor(Math.random()*7));b.hp=Math.max(0,b.hp-playerDamage);b.playerHp=Math.max(0,b.playerHp-(blocked?0:enemyDamage));
+function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked)return;if(b.attack===null||b.defs.length!==2){if(b.auto)autoBattleStep();else toast('Выбери атаку и 2 зоны защиты');return}b.locked=true;const enemyAttack=Math.floor(Math.random()*5),blocked=b.defs.includes(enemyAttack),base=totalDamage(),crit=Math.random()<Math.min(.35,.08+state.strength*.01),hit=b.attack!==enemyAttack,playerDamage=hit?base+(crit?Math.round(base*.5):0):0,enemyDamage=blocked?0:Math.max(4,10+Math.floor(Math.random()*7));b.hp=Math.max(0,b.hp-playerDamage);b.playerHp=Math.max(0,b.playerHp-(blocked?0:enemyDamage));
 const pf=document.getElementById('playerFighter'),ef=document.getElementById('enemyFighter');if(pf)pf.classList.remove('vikingAttack','vikingAction');if(ef)ef.classList.remove('vikingAttack','vikingAction');void document.body.offsetWidth;if(pf)pf.classList.add('vikingAttack');if(ef)ef.classList.add(playerDamage?'vikingAction':'vikingAttack');
 const eHp=document.getElementById('enemyHp'),pHp=document.getElementById('playerHp');if(eHp)eHp.textContent=b.hp+'/100 HP';if(pHp)pHp.textContent=b.playerHp+'/'+state.maxHp+' HP';const eb=document.getElementById('enemyBar'),pbar=document.getElementById('playerBar');if(eb)eb.style.width=b.hp+'%';if(pbar)pbar.style.width=Math.max(0,b.playerHp/state.maxHp*100)+'%';const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⚔️ Твоя атака: <b>'+ZONES[b.attack]+'</b> — '+(hit?'попадание':'промах')+(crit?' · <b>КРИТ!</b>':'')+' · Урон: <b>'+playerDamage+'</b></div><div>🛡️ Защита: '+ZONES[b.defs[0]]+', '+ZONES[b.defs[1]]+' — '+(blocked?'блок':'не блок')+'</div><div>🪓 Ледяной тролль атаковал: <b>'+ZONES[enemyAttack]+'</b> — '+(blocked?'заблокировано':'урон '+(blocked?0:enemyDamage))+'</div>';
 if(b.hp<=0){stopAutoBattle();state.coins+=200;state.exp+=40;state.wins++;save();if(log)log.innerHTML='<b>🏆 Победа над Ледяной тролльом! +200 🪙 +40 XP</b><br>'+log.innerHTML;setTimeout(closeP,1000);return}if(b.playerHp<=0){stopAutoBattle();if(log)log.innerHTML='<b>💀 Ледяной тролль победил.</b><br>'+log.innerHTML;setTimeout(closeP,1000);return}b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));startBattleTimer();const dc=document.getElementById('dc');if(dc)dc.textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},fromAuto?350:250)}
