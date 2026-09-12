@@ -214,10 +214,6 @@ html,body{background:#01070d}
 </header>
 <main class="world">
 <div class="sceneFx" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-<div class="sceneTitle"><b>SDOLARS</b><span>ГОРОД · ЖИВОЙ МИР</span></div>
-<div class="worldHero" aria-hidden="true"><div class="heroAura"></div><div class="heroBody"><div class="heroCape"></div><div class="heroHead"><div class="heroFace"></div></div><div class="heroTorso"></div><div class="heroArm a1"></div><div class="heroArm a2"></div><div class="heroLeg l1"></div><div class="heroLeg l2"></div><div class="heroWeapon"></div></div><div class="heroNameplate">SDOLARS <small>LVL <span class="lvlScene">5</span></small></div></div>
-<div class="worldRival" aria-hidden="true"><div class="rivalAura"></div><div class="rivalBody"><div class="rivalHead"></div><div class="rivalTorso"></div><div class="rivalArm r1"></div><div class="rivalArm r2"></div><div class="rivalLeg rl1"></div><div class="rivalLeg rl2"></div></div><div class="rivalNameplate">ХРАНИТЕЛЬ</div></div>
-<div class="sceneFloor" aria-hidden="true"></div>
 
 <button class="quest" onclick="openP(&quot;quests&quot;)"><small>Текущее задание</small><strong>Поговори с кузнецом　›</strong><span>⌖ Кузница</span></button>
 <button class="daily" onclick="openP(&quot;bonus&quot;)"><span class="chest">🎁</span><b>Ежедневный бонус</b><time id="timer">23:45:00</time></button>
@@ -379,7 +375,7 @@ if(b.hp<=0){stopAutoBattle();state.coins+=200;state.exp+=40;state.wins++;save();
 
 let sec=23*3600+45*60;setInterval(()=>{sec=Math.max(0,sec-1);let h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec%3600/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0'),v=h+':'+m+':'+s;const timer=document.getElementById('timer'),rt=document.getElementById('rt');if(timer)timer.textContent=v;if(rt)rt.textContent=v},1000);
 save();
-function updateHud(){document.querySelectorAll(".res")[0].innerHTML="<b>●</b>"+state.coins+" ＋";document.querySelector(".chapter").textContent=(state.lang==='EN'?"Chapter 5 · Level ":"Глава 5 · Уровень ")+state.level;document.querySelector(".xpt").textContent=state.exp+"/"+state.maxExp}
+function updateHud(){if(!(Number(state.maxExp)>0))state.maxExp=(Number(state.level)===3?300:100);document.querySelectorAll(".res")[0].innerHTML="<b>●</b>"+state.coins+" ＋";document.querySelector(".chapter").textContent=(state.lang==='EN'?"Chapter 5 · Level ":"Глава 5 · Уровень ")+state.level;document.querySelector(".xpt").textContent=state.exp+"/"+state.maxExp}
 updateHud();
 applyLanguage();
 </script>
@@ -699,7 +695,7 @@ let state={coins:1779,level:3,exp:120,items:[
  {id:'bandage',name:'Аптечка',type:'Расходник',icon:'🩹',qty:2,price:80,equipped:false}
 ]};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s)state=s}catch(e){}
-state.maxHp??=120;state.maxExp??=100;state.freePoints??=0;state.vip??='Нет';state.playerName??='Игрок';state.strength??=12;state.agility??=9;state.wins??=0;state.eventProgress??=0;state.guildMembers??=1;state.recruited??=[];state.settings??={sound:true,fx:true};state.lang??='RU';state.questDone??=false;state.bonusClaimed??=false;state.chat??={tab:'global',collapsed:false,global:[{name:'Система Sdolars',text:'Добро пожаловать в общий чат игры!',time:'сейчас',system:true},{name:'Рагнар',text:'Кто идёт на арену?',time:'сейчас'}],clan:[{name:'Клан Sdolars',text:'Чат клана открыт. Добро пожаловать!',time:'сейчас',system:true}]};
+state.maxHp??=120;if(!(Number(state.maxExp)>0))state.maxExp=(Number(state.level)===3?300:100);state.freePoints??=0;state.vip??='Нет';state.playerName??='Игрок';state.strength??=12;state.agility??=9;state.wins??=0;state.eventProgress??=0;state.guildMembers??=1;state.recruited??=[];state.settings??={sound:true,fx:true};state.lang??='RU';state.questDone??=false;state.bonusClaimed??=false;state.chat??={tab:'global',collapsed:false,global:[{name:'Система Sdolars',text:'Добро пожаловать в общий чат игры!',time:'сейчас',system:true},{name:'Рагнар',text:'Кто идёт на арену?',time:'сейчас'}],clan:[{name:'Клан Sdolars',text:'Чат клана открыт. Добро пожаловать!',time:'сейчас',system:true}]};
 state.onlinePlayers??=['Рагнар','Астрид','Ивар','Фрейя','Бьёрн','Олаф','Торстейн'];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));if(typeof updateHud==='function')updateHud()}catch(e){}}
 function toast(s){const t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400)}
@@ -833,7 +829,7 @@ function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked||b.ended)re
 function checkLevelUp(){state.maxExp??=100;while(state.exp>=state.maxExp){state.exp-=state.maxExp;state.level++;state.freePoints=(state.freePoints||0)+2;state.maxHp+=10;toast('⬆️ Новый уровень! +2 очка характеристик');}save()}
 let sec=23*3600+45*60;setInterval(()=>{sec=Math.max(0,sec-1);let h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec%3600/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0'),v=h+':'+m+':'+s;const timer=document.getElementById('timer'),rt=document.getElementById('rt');if(timer)timer.textContent=v;if(rt)rt.textContent=v},1000);
 save();
-function updateHud(){document.querySelectorAll(".res")[0].innerHTML="<b>●</b>"+state.coins+" ＋";document.querySelector(".chapter").textContent=(state.lang==='EN'?"Chapter 5 · Level ":"Глава 5 · Уровень ")+state.level;document.querySelector(".xpt").textContent=state.exp+"/"+state.maxExp}
+function updateHud(){if(!(Number(state.maxExp)>0))state.maxExp=(Number(state.level)===3?300:100);document.querySelectorAll(".res")[0].innerHTML="<b>●</b>"+state.coins+" ＋";document.querySelector(".chapter").textContent=(state.lang==='EN'?"Chapter 5 · Level ":"Глава 5 · Уровень ")+state.level;document.querySelector(".xpt").textContent=state.exp+"/"+state.maxExp}
 updateHud();
 applyLanguage();
 
