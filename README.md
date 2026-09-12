@@ -1,3 +1,11 @@
-# Territory — s24
+# Territory — s25
 
-Compact UI revision: sharp full-screen background, very small transparent right-side location buttons, patrol widget reduced to roughly one-third size, one small centered Arena button, single bottom navigation. No Cloudflare/Wrangler/Worker references.
+Обновлён верхний HUD:
+- профиль и аватар компактнее;
+- имя и уровень не занимают половину экрана;
+- XP-полоса тонкая;
+- ресурсы компактными ячейками;
+- фон игры не закрывается большим верхним блоком;
+- остальной интерфейс Territory сохранён.
+
+Cloudflare / Wrangler / Worker в игре отсутствуют.
