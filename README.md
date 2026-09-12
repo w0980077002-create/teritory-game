@@ -1,13 +1,7 @@
-# Territory S86
+# Territory — Sdolars — S87
 
-S86 is based directly on the verified S83 working build.
+S87 is based directly on S83. The broken VIP string is repaired, and the later fragile battle override is replaced with a guarded implementation.
 
-Focused repair:
-- battle modal is full-screen and scroll-safe on mobile;
-- bottom city navigation is hidden while a modal is open, so it cannot cover the battle controls;
-- battle layout is compact and fits the four-zone tactical controls;
-- yellow active-tab strip is disabled;
-- four zones only: Голова / Грудь / Пояс / Ноги; attack 1, defense 2;
-- Worker embeds the exact same index.html; version s86.
+Battle: exactly 4 zones; attack 1; defense 2. Bottom navigation is hidden during battle and restored after close. Active yellow underline is disabled. Worker embeds exact index.html.
 
-No replacement game or unrelated redesign.
+Validation: every inline script and worker.js pass node --check; embedded HTML equals index.html.

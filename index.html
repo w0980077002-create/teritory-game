@@ -5,7 +5,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Territory — Sdolars</title>
-<meta name="territory-build" content="s86-functional-complete">
+<meta name="territory-build" content="s87-functional-stable">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;background:#020914;color:#fff;font-family:Arial,sans-serif}
@@ -171,6 +171,17 @@ button{user-select:none;-webkit-user-select:none}
 .battleChoice .zones button{min-width:0!important}
 .battleSubmit{touch-action:manipulation}
 .s83-error{padding:16px;border:2px solid #e54b6d;border-radius:14px;background:#24101a}
+
+/* S87 stable mobile layer */
+nav.bottom button.active,nav.bottom button.active:before,nav.bottom button.active:after{background:#03192d!important;border:0!important;border-bottom:0!important;box-shadow:none!important;outline:0!important}
+nav.bottom{border-bottom:0!important;box-shadow:none!important}
+body.battle-open .bottom,body.battle-open .actions{display:none!important}
+body.battle-open .modal{align-items:flex-start!important}
+body.battle-open .panel{width:100%!important;max-width:none!important;height:100dvh!important;max-height:100dvh!important;border-radius:0!important;border-bottom:2px solid #1888d5!important;overflow:auto!important;padding:10px 10px calc(12px + env(safe-area-inset-bottom))!important}
+body.battle-open .panel h2{font-size:25px!important;margin:0 54px 7px 2px!important}
+body.battle-open .vikingBattle{overflow:visible!important}
+body.battle-open .battleChoice .zones{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
+body.battle-open .battleChoice .zones button{min-width:0!important;height:48px!important;font-size:11px!important}
 </style>
 
 <style>
@@ -493,36 +504,6 @@ button:disabled{pointer-events:none}
 .s77danger{border-color:#a33b4b!important}.s77success{border-color:#3b9c75!important}.s77gold{border-color:#9c7a25!important}
 .s77roulette{font-size:38px;text-align:center;padding:12px;letter-spacing:5px}.s77muted{color:#8ba8bb}.s77center{text-align:center}.s77list{display:grid;gap:7px}.s77list button{width:100%}
 @media(max-width:420px){.s77grid{grid-template-columns:1fr}.s77tile{padding:10px}}
-
-/* S86 FINAL BATTLE LAYOUT — full-screen, scroll-safe mobile */
-body:has(#modal.open) .bottom{display:none!important}
-body:has(#modal.open) .actions{display:none!important}
-.modal{z-index:99999!important;align-items:flex-start!important;padding:0!important;background:rgba(0,0,0,.82)!important}
-.modal.open{display:flex!important}
-.panel:has(.vikingBattle){width:100%!important;max-width:none!important;height:100dvh!important;max-height:100dvh!important;box-sizing:border-box!important;overflow-y:auto!important;overflow-x:hidden!important;border:2px solid #168bd8!important;border-radius:0!important;padding:10px 10px calc(14px + env(safe-area-inset-bottom))!important;background:linear-gradient(180deg,#061b30,#04111f)!important}
-.panel:has(.vikingBattle) h2{font-size:25px!important;height:40px!important;line-height:40px!important;margin:0 52px 6px 2px!important;white-space:nowrap!important;overflow:hidden!important}
-.panel:has(.vikingBattle) .close{position:absolute!important;right:12px!important;top:10px!important;width:54px!important;height:48px!important;padding:0!important;font-size:30px!important;border-radius:12px!important;z-index:4!important}
-.panel:has(.vikingBattle) .vikingBattle{height:auto!important;min-height:0!important;display:block!important;overflow:visible!important;padding:0!important;margin:0!important}
-.panel:has(.vikingBattle) .battleTop{display:grid!important;grid-template-columns:1fr 62px 1fr!important;gap:6px!important;padding:7px!important;margin:0 0 7px!important}
-.panel:has(.vikingBattle) .battleTop .side b{font-size:12px!important}.panel:has(.vikingBattle) .battleTop .side small{font-size:9px!important}
-.panel:has(.vikingBattle) .battleTop .turn{min-width:56px!important;width:56px!important;height:56px!important;font-size:10px!important}
-.panel:has(.vikingBattle) .battleRoundBar{font-size:13px!important;padding:8px!important;margin:0 0 7px!important;border-radius:9px!important}
-.panel:has(.vikingBattle) .fighters{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important;height:auto!important;min-height:0!important;padding:0!important;margin:0 0 7px!important}
-.panel:has(.vikingBattle) .fighter{padding:5px!important;border-radius:10px!important}
-.panel:has(.vikingBattle) .fighter img,.panel:has(.vikingBattle) .fighter .vikingSvg{width:100%!important;height:112px!important;object-fit:cover!important;border-radius:7px!important}
-.panel:has(.vikingBattle) .fighterName{font-size:12px!important;margin:3px 0 1px!important}.panel:has(.vikingBattle) .fighterRole{font-size:8px!important;margin:0 0 3px!important}
-.panel:has(.vikingBattle) .fhp{height:7px!important}.panel:has(.vikingBattle) .fhpText{font-size:9px!important;margin:2px 0 0!important}
-.panel:has(.vikingBattle) .battleRule4{font-size:12px!important;padding:8px!important;margin:0 0 7px!important}
-.panel:has(.vikingBattle) .battleChoice{padding:8px!important;margin:6px 0!important;border-radius:10px!important}
-.panel:has(.vikingBattle) .battleChoice>b{font-size:15px!important;margin-bottom:6px!important}
-.panel:has(.vikingBattle) .battleChoice .zones{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important;margin:0!important}
-.panel:has(.vikingBattle) .battleChoice .zones button{height:48px!important;min-height:48px!important;width:auto!important;padding:3px!important;font-size:11px!important;border-radius:8px!important}
-.panel:has(.vikingBattle) .battleChoice .zoneIcon{font-size:15px!important;margin-bottom:1px!important}
-.panel:has(.vikingBattle) .battleStatus{font-size:11px!important;min-height:22px!important;margin:5px 2px!important}
-.panel:has(.vikingBattle) .battleSubmit{height:52px!important;min-height:52px!important;margin:4px 0 5px!important;font-size:17px!important;border-radius:11px!important}
-.panel:has(.vikingBattle) .autoCheck{display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;font-size:11px!important;margin:4px 0!important}
-.panel:has(.vikingBattle) .battleHistory{max-height:90px!important;margin:6px 0 0!important;padding:7px!important;overflow:hidden!important}.panel:has(.vikingBattle) #battleLog{height:60px!important;max-height:60px!important;font-size:9px!important;overflow-y:auto!important}
-@media(max-width:390px){.panel:has(.vikingBattle){padding:7px 7px calc(10px + env(safe-area-inset-bottom))!important}.panel:has(.vikingBattle) .fighter img{height:94px!important}.panel:has(.vikingBattle) .battleChoice .zones button{height:44px!important;min-height:44px!important;font-size:10px!important}.panel:has(.vikingBattle) .battleTop{grid-template-columns:1fr 54px 1fr!important}.panel:has(.vikingBattle) .battleTop .turn{width:50px!important;min-width:50px!important;height:50px!important}}
 </style>
 </head>
 <body>
@@ -532,7 +513,7 @@ body:has(#modal.open) .actions{display:none!important}
 <div class="hud"><div class="resources"><div class="res coin"><b>●</b>1779 ＋</div><div class="res dia"><b>◆</b>1330 ＋</div><div class="res ene"><b>ϟ</b>191.38 ＋</div></div>
 <div class="tools"><button class="tool" onclick="openP(&quot;messages&quot;)">✉<div class="badge">2</div></button><button class="tool" onclick="openP(&quot;ach&quot;)">🏆</button><button class="tool" onclick="openP(&quot;settings&quot;)">⚙</button><button class="tool" onclick="toggleLang()">🇬🇧</button></div></div>
 </header>
-<main class="world"><span style="position:absolute;right:8px;bottom:8px;font-size:9px;color:#78a9c3;opacity:.65;pointer-events:none">S86</span>
+<main class="world"><span style="position:absolute;right:8px;bottom:8px;font-size:9px;color:#78a9c3;opacity:.65;pointer-events:none">S87</span>
 <button class="quest" onclick="__territoryOpenPanel('quests')"><small>Текущее задание</small><strong>Поговори с кузнецом　›</strong><span>⌖ Кузница</span></button>
 <button class="daily" onclick="openP(&quot;bonus&quot;)"><span class="chest">🎁</span><b>Ежедневный бонус</b><time id="timer">23:45:00</time></button>
 <div class="left"><button class="smallBtn" onclick="openP(&quot;bonus&quot;)"><span class="icon">🎁</span>Бонусы<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;events&quot;)"><span class="icon">▦</span>События<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;vip&quot;)"><span class="icon">♛</span>VIP</button></div>
@@ -609,7 +590,7 @@ const I18N={
  'Territory — Sdolars':'Territory — Sdolars','Sdolars':'Sdolars',
  'Глава 5 · Уровень ':'Chapter 5 · Level ', 'Текущее задание':'Current quest','Поговори с кузнецом ›':'Talk to the blacksmith ›','⌖ Кузница':'⌖ Forge','Ежедневный бонус':'Daily bonus','Бонусы':'Bonuses','События':'Events','VIP':'VIP','Кузница':'Forge','Улучшение снаряжения':'Equipment upgrade','Таверна':'Tavern','Найм героев':'Hero recruitment','Магазин':'Shop','Предметы и снаряжение':'Items and equipment','Бой':'Battle','Инвентарь':'Inventory','Экипировка':'Equipment','Задания':'Quests','Чат игры':'Game chat','Общий чат и чат клана':'Global chat and clan chat','Открыть ›':'Open ›','Город':'City','Герой':'Hero','Гильдия':'Guild','Ещё':'More',
  'Глава 5 · Уровень':'Chapter 5 · Level','Сила':'Strength','Ловкость':'Agility','Защита':'Defense','Опыт':'Experience','＋ Сила':'＋ Strength','＋ Ловкость':'＋ Agility','Предметы':'Items','Монеты:':'Coins:','Инвентарь пуст.':'Inventory is empty.','Снять':'Unequip','Экипировать':'Equip','Использовать':'Use','Выбросить':'Discard','Изменить':'Change','Оружие':'Weapon','Броня':'Armor','Пусто':'Empty','Урон':'Damage','Нет оружия':'No weapon','Текущий урон:':'Current damage:','Следующее улучшение:':'Next upgrade:','Стоимость:':'Cost:','Улучшить':'Upgrade','Купить':'Buy','Расходник':'Consumable','Количество':'Quantity',
- 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s83':'Version: s83',
+ 'Нож':'Knife','Тяжёлый топор':'Heavy axe','Стальная броня':'Steel armor','Аптечка':'Medkit','Ежедневный сундук':'Daily chest','Награда за вход в Sdolars.':'Login reward for Sdolars.','Сегодня:':'Today:','Забрать награду':'Claim reward','Серия входов':'Login streak','День 1 из 7 · следующий бонус увеличится.':'Day 1 of 7 · the next bonus will increase.','Осада Sdolars':'Siege of Sdolars','Победи 10 врагов.':'Defeat 10 enemies.','Прогресс:':'Progress:','Участвовать':'Participate','Турнир арены':'Arena tournament','Сразись с другими бойцами.':'Fight other warriors.','Подробнее':'Details','Турнир скоро начнётся':'The tournament will start soon','VIP Sdolars':'VIP Sdolars','Статус:':'Status:','VIP даёт дополнительные награды, скидки и ускоренное восстановление.':'VIP grants extra rewards, discounts and faster recovery.','Открыть VIP':'Open VIP','Первый бой':'First battle','Победи первого противника.':'Defeat your first opponent.','Богач':'Rich','Накопи 2000 монет.':'Collect 2000 coins.','Воин Sdolars':'Warrior of Sdolars','Победи 10 противников.':'Defeat 10 opponents.','Настройки':'Settings','Настройки игры':'Game settings','Звуки':'Sound','Эффекты':'Effects','Язык':'Language','ВКЛ':'ON','ВЫКЛ':'OFF','гостевой режим':'guest mode','Гильдия Sdolars':'Sdolars Guild','Уровень:':'Level:','Участники:':'Members:','Казна:':'Treasury:','Найти гильдию':'Find a guild','Приглашения':'Invitations','Сообщения':'Messages','Достижения':'Achievements','О Territory':'About Territory','Sdolars — твой город. Развивай героя, собирай снаряжение и сражайся.':'Sdolars — your city. Develop your hero, collect equipment and fight.','Версия: s83':'Version: s79',
  'Чат':'Chat','Общий чат':'Global chat','Чат клана':'Clan chat','Общий':'Global','Клан':'Clan','Онлайн игроки':'Online players','Сейчас находятся в Sdolars':'Currently in Sdolars','Развернуть':'Expand','Свернуть':'Collapse','Написать сообщение...':'Write a message...','Отправить':'Send','Добро пожаловать в общий чат игры!':'Welcome to the global game chat!','Кто идёт на арену?':'Who is going to the arena?','Чат клана открыт. Добро пожаловать!':'Clan chat is open. Welcome!','Система Sdolars':'Sdolars System','Клан Sdolars':'Sdolars Clan',
  'Бой — Викингская арена':'Battle — Viking arena','⚔️ Викинг Sdolars':'⚔️ Viking of Sdolars','👹 Монстр':'👹 Monster','Ледяной тролль':'Frost troll','Атака — выбери 1 зону':'Attack — choose 1 zone','Защита — выбери 2 зоны':'Defense — choose 2 zones','Выбрано:':'Selected:','История боя':'Battle log','Выберите атаку и две зоны защиты.':'Choose an attack and two defense zones.','попадание':'hit','промах':'miss','КРИТ!':'CRIT!','блок':'blocked','не блок':'not blocked','заблокировано':'blocked','урон':'damage','Победа над Ледяной тролльом!':'Victory over the Frost troll!','Ледяной тролль победил.':'The Frost troll won.',
  'Голова':'Head','Грудь':'Chest','Пояс':'Waist','Ноги':'Legs',
@@ -658,8 +639,8 @@ const views={
  tavern:['Таверна',()=>'<div class="card"><b>🍺 Найм героев</b><p>Выбери героя для своей команды.</p></div><div class="card"><b>Рагнар</b><p>Воин · 120 HP · Урон 16 · Защита 8</p><button class="goldBtn" onclick="recruit(&quot;Рагнар&quot;,500)">Нанять · 500 🪙</button></div><div class="card"><b>Астрид</b><p>Разведчица · 90 HP · Урон 20 · Ловкость 14</p><button class="goldBtn" onclick="recruit(&quot;Астрид&quot;,650)">Нанять · 650 🪙</button></div>'],
  shop:['Магазин',renderShop],
  bonus:['Бонусы',()=>'<div class="card"><b>🎁 Ежедневный сундук</b><p>Награда за вход в Sdolars.</p><p>Сегодня: <b>250 🪙 + 20 XP</b></p><button class="goldBtn" onclick="claimBonus()">Забрать награду</button></div><div class="card"><b>🔥 Серия входов</b><p>День 1 из 7 · следующий бонус увеличится.</p></div>'],
- events:['События',()=>'<div class="card"><b>🏰 Осада Sdolars</b><p>Прогресс: <b>'+Math.min(10,state.eventProgress||0)+'/10</b></p><p>5⚡ · +100 🪙 +30 XP.</p><button class="goldBtn" onclick="eventS75()">Участвовать</button></div><div class="card"><b>⚔️ Турнир арены</b><p>8⚡ · шанс победы 62% · победа даёт +35 рейтинга.</p><button class="goldBtn" onclick="tournamentS75()">Войти в турнир</button></div>'],
- vip:['VIP',()=>'<div class="card"><b>👑 VIP Sdolars</b><p>Статус: <b>'+(state.vipUntil&&state.vipUntil>Date.now()?'VIP активен':'Нет')+'</b></p><p>+25 максимум энергии · 7 дней.</p><p>Стоимость: <b>500 ◆</b></p><button class="goldBtn" onclick="vipS75()">Активировать / продлить</button></div>'],
+ events:['События',()=>'<div class="card"><b>🏰 Осада Sdolars</b><p>Победи 10 врагов. Прогресс: <b>'+state.eventProgress+'/10</b></p><button class="goldBtn" onclick="eventFight()">Участвовать</button></div><div class="card"><b>⚔️ Турнир арены</b><p>Сразись с другими бойцами.</p><button onclick="toast(&quot;Турнир скоро начнётся&quot;)">Подробнее</button></div>'],
+ vip:['VIP',()=>'<div class="card"><b>👑 VIP Sdolars</b><p>Статус: <b>'+state.vip+'</b></p><p>VIP даёт дополнительные награды, скидки и ускоренное восстановление.</p><button class="goldBtn" onclick="toast(&quot;VIP-магазин будет открыт после подключения сервера&quot;)">Открыть VIP</button></div>'],
  messages:['Чат',renderChat],
  ach:['Достижения',()=>'<div class="card"><b>🏆 Первый бой</b><p>Победи первого противника.</p><p>Прогресс: <b>'+(state.wins>0?'1':'0')+' / 1</b></p></div><div class="card"><b>💰 Богач</b><p>Накопи 2000 монет.</p><p>Прогресс: <b>'+Math.min(state.coins,2000)+' / 2000</b></p></div><div class="card"><b>⚔️ Воин Sdolars</b><p>Победи 10 противников.</p><p>Прогресс: <b>'+state.wins+' / 10</b></p></div>'],
  settings:['Настройки',()=>'<div class="card"><b>⚙️ Настройки игры</b><p>🔊 Звуки <button onclick="toggleSetting(&quot;sound&quot;)">'+(state.settings.sound?'ВКЛ':'ВЫКЛ')+'</button></p><p>📳 Эффекты <button onclick="toggleSetting(&quot;fx&quot;)">'+(state.settings.fx?'ВКЛ':'ВЫКЛ')+'</button></p><p>🌐 Язык <button onclick="toggleLang()">'+state.lang+'</button></p><p>📱 Telegram ID <b>'+(window.Telegram?.WebApp?.initDataUnsafe?.user?.id||'гостевой режим')+'</b></p></div>'],
@@ -741,10 +722,10 @@ function pickAttack(i,el){const b=window._battle;if(!b||b.locked)return;document
 function pickDef(i,el){const b=window._battle;if(!b||b.locked)return;const d=b.defs;if(d.includes(i)){b.defs=b.defs.filter(x=>x!==i);el.classList.remove('sel')}else if(d.length<2){d.push(i);el.classList.add('sel')}document.getElementById('dc').textContent=b.defs.length+'/2';if(b.attack!==null&&b.defs.length===2)strikeTurn(false)}
 function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked)return;if(b.attack===null||b.defs.length!==2){if(b.auto)autoBattleStep();else toast('Выбери атаку и 2 зоны защиты');return}b.locked=true;const enemyAttack=Math.floor(Math.random()*4),blocked=b.defs.includes(enemyAttack),base=totalDamage(),crit=Math.random()<Math.min(.35,.08+state.strength*.01),hit=b.attack!==enemyAttack,playerDamage=hit?base+(crit?Math.round(base*.5):0):0,enemyDamage=blocked?0:Math.max(4,10+Math.floor(Math.random()*7));b.hp=Math.max(0,b.hp-playerDamage);b.playerHp=Math.max(0,b.playerHp-(blocked?0:enemyDamage));
 const pf=document.getElementById('playerFighter'),ef=document.getElementById('enemyFighter');if(pf)pf.classList.remove('vikingAttack','vikingAction');if(ef)ef.classList.remove('vikingAttack','vikingAction');void document.body.offsetWidth;if(pf)pf.classList.add('vikingAttack');if(ef)ef.classList.add(playerDamage?'vikingAction':'vikingAttack');
-const rr=document.getElementById('battleRound');if(rr)rr.textContent=b.turn+1;const eHp=document.getElementById('enemyHp'),pHp=document.getElementById('playerHp');if(eHp)eHp.textContent=b.hp+'/100 HP';if(pHp)pHp.textContent=b.playerHp+'/'+state.maxHp+' HP';const eb=document.getElementById('enemyBar'),pbar=document.getElementById('playerBar');if(eb)eb.style.width=b.hp+'%';if(pbar)pbar.style.width=Math.max(0,b.playerHp/state.maxHp*100)+'%';const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⚔️ Твоя атака: <b>'+ZONES[b.attack]+'</b> — '+(hit?'попадание':'промах')+(crit?' · <b>КРИТ!</b>':'')+' · Урон: <b>'+playerDamage+'</b></div><div>🛡️ Защита: '+ZONES[b.defs[0]]+', '+ZONES[b.defs[1]]+' — '+(blocked?'блок':'не блок')+'</div><div>🪓 Ледяной тролль атаковал: <b>'+ZONES[enemyAttack]+'</b> — '+(blocked?'заблокировано':'урон '+(blocked?0:enemyDamage))+'</div>';
+const eHp=document.getElementById('enemyHp'),pHp=document.getElementById('playerHp');if(eHp)eHp.textContent=b.hp+'/100 HP';if(pHp)pHp.textContent=b.playerHp+'/'+state.maxHp+' HP';const eb=document.getElementById('enemyBar'),pbar=document.getElementById('playerBar');if(eb)eb.style.width=b.hp+'%';if(pbar)pbar.style.width=Math.max(0,b.playerHp/state.maxHp*100)+'%';const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⚔️ Твоя атака: <b>'+ZONES[b.attack]+'</b> — '+(hit?'попадание':'промах')+(crit?' · <b>КРИТ!</b>':'')+' · Урон: <b>'+playerDamage+'</b></div><div>🛡️ Защита: '+ZONES[b.defs[0]]+', '+ZONES[b.defs[1]]+' — '+(blocked?'блок':'не блок')+'</div><div>🪓 Ледяной тролль атаковал: <b>'+ZONES[enemyAttack]+'</b> — '+(blocked?'заблокировано':'урон '+(blocked?0:enemyDamage))+'</div>';
 if(b.hp<=0){stopAutoBattle();state.coins+=200;state.exp+=40;state.wins++;save();if(log)log.innerHTML='<b>🏆 Победа над Ледяной тролльом! +200 🪙 +40 XP</b><br>'+log.innerHTML;setTimeout(closeP,1000);return}if(b.playerHp<=0){stopAutoBattle();if(log)log.innerHTML='<b>💀 Ледяной тролль победил.</b><br>'+log.innerHTML;setTimeout(closeP,1000);return}b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));startBattleTimer();const dc=document.getElementById('dc');if(dc)dc.textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},fromAuto?350:250)}
 
-let sec=Math.max(0,Math.floor((Date.UTC(new Date().getUTCFullYear(),new Date().getUTCMonth(),new Date().getUTCDate()+1)-Date.now())/1000));setInterval(()=>{sec=Math.max(0,Math.floor((Date.UTC(new Date().getUTCFullYear(),new Date().getUTCMonth(),new Date().getUTCDate()+1)-Date.now())/1000));let h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec%3600/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0'),v=h+':'+m+':'+s;const timer=document.getElementById('timer'),rt=document.getElementById('rt');if(timer)timer.textContent=v;if(rt)rt.textContent=v},1000);
+let sec=23*3600+45*60;setInterval(()=>{sec=Math.max(0,sec-1);let h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec%3600/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0'),v=h+':'+m+':'+s;const timer=document.getElementById('timer'),rt=document.getElementById('rt');if(timer)timer.textContent=v;if(rt)rt.textContent=v},1000);
 save();
 function updateHud(){document.querySelectorAll(".res")[0].innerHTML="<b>●</b>"+state.coins+" ＋";document.querySelector(".chapter").textContent=(state.lang==='EN'?"Chapter 5 · Level ":"Глава 5 · Уровень ")+state.level;document.querySelector(".xpt").textContent=state.exp+"/"+state.maxExp}
 updateHud();
@@ -794,7 +775,38 @@ views.more=['Ещё',()=>'<div class="s77grid"><button onclick="openP(\'district
 useItem=function(i){const it=state.items[i];if(!it||it.name!=='Аптечка'&&it.name!=='Большая аптечка'){toast('Предмет нельзя использовать');return}const heal=Math.min(30,state.maxHp-state.hp);if(heal<=0){toast('❤️ HP уже полное');return}it.qty--;state.hp+=heal;if(it.qty<=0)state.items.splice(i,1);save();openP('inventory');toast('❤️ +'+heal+' HP')};
 upgradeWeapon=function(){const w=state.items.find(x=>x.equipped&&x.type==='Оружие');const cost=250+((state.forgeLevel||0)*100);if(!w){toast('Нет оружия');return}if(state.coins<cost){toast('Не хватает монет');return}state.coins-=cost;w.damage=Math.min(100,(w.damage||0)+4);state.forgeLevel=(state.forgeLevel||0)+1;s77Mission('craft');save();openP('forge');toast('⚒️ Оружие улучшено на +4')};
 // Final four-zone tactical PvE battle. One attack + two defense zones.
-battle=function(){stopAutoBattle();if(!s75SpendEnergy(5))return;if(state.hp<=0)state.hp=Math.ceil(state.maxHp*.5);const d=S75_DISTRICTS.find(x=>x.id===state.district)||S75_DISTRICTS[0];const tier=Math.max(0,Math.floor((state.level-1)/4));const enemyNames=['Уличный боец','Лесной охотник','Портовый головорез','Бронебоец','Страж крепости'];const enemy={name:enemyNames[Math.min(enemyNames.length-1,tier+(d.level>=12?1:0))],hp:100+state.level*12,damage:8+state.level*1.5,def:3+Math.floor(state.level/2),reward:90+state.level*25,xp:25+state.level*8};const b={hp:enemy.hp,maxHp:enemy.hp,playerHp:state.hp,locked:false,attack:null,defs:[],auto:false,autoTimer:null,turn:1,log:[]};const img=document.querySelector('.avatar img')?.src||TELEGRAM_VIKING_FALLBACK;const enemySvg='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1b2631"/><stop offset="1" stop-color="#080d13"/></linearGradient></defs><rect width="640" height="480" fill="url(#g)"/><ellipse cx="320" cy="450" rx="210" ry="28" fill="#02070b"/><path d="M165 440Q185 245 320 215Q455 245 475 440" fill="#172a38" stroke="#5b7380" stroke-width="12"/><path d="M195 210Q178 95 320 58Q462 95 445 210L420 300Q320 345 220 300Z" fill="#52636a" stroke="#202c32" stroke-width="12"/><path d="M175 112Q92 70 76 18Q155 32 230 77M465 112Q548 70 564 18Q485 32 410 77" fill="#b9b29a" stroke="#625d4d" stroke-width="12"/><path d="M214 174L272 164M368 164L426 174" stroke="#111820" stroke-width="16" stroke-linecap="round"/><circle cx="252" cy="185" r="11" fill="#ffd94d"/><circle cx="388" cy="185" r="11" fill="#ffd94d"/><path d="M292 210L320 226L348 210" fill="none" stroke="#29383d" stroke-width="10"/><path d="M270 270Q320 300 370 270" fill="none" stroke="#141d22" stroke-width="16" stroke-linecap="round"/><path d="M250 322L195 405M390 322L445 405" stroke="#7f9097" stroke-width="18" stroke-linecap="round"/></svg>`);pt.textContent='Бой — '+d.name;pb.innerHTML=`<div class="vikingBattle"><div class="battleTop"><div class="side"><b>⚔️ Ты</b><small>Викинг Sdolars</small></div><div class="turn">РАУНД<br><span id="battleRound">1</span></div><div class="side"><b>👹 ${chatEsc(enemy.name)}</b><small>Противник</small></div></div><div class="battleRoundBar">ХОД <b id="battleRound">1</b> · ВЫБЕРИ АТАКУ И 2 ЗАЩИТЫ</div><div class="fighters"><div class="fighter" id="playerFighter"><img src="${img}"><div class="fighterName">${chatEsc(currentChatName())}</div><div class="fighterRole">Уровень ${state.level} · ⚡ −5 энергии</div><div class="fhp"><i id="playerBar" style="width:${Math.max(0,state.hp/state.maxHp*100)}%"></i></div><div class="fhpText" id="playerHp">${state.hp}/${state.maxHp} HP</div></div><div class="fighter enemy" id="enemyFighter"><img src="${enemySvg}"><div class="fighterName">${chatEsc(enemy.name)}</div><div class="fighterRole">Сила ${Math.round(enemy.damage)} · 🛡 ${enemy.def}</div><div class="fhp"><i id="enemyBar" style="width:100%"></i></div><div class="fhpText" id="enemyHp">${enemy.hp}/${enemy.hp} HP</div></div></div><div class="battleRule4">⚔️ 4 ЗОНЫ · АТАКА: 1 · ЗАЩИТА: 2</div><div class="battleChoice"><b>⚔️ Атака</b><div class="zones attackZones" id="attacks">${ZONES.map((x,i)=>'<button onclick="pickAttack('+i+',this)"><span class="zoneIcon">'+['◉','◆','◇','▼'][i]+'</span>'+x+'</button>').join('')}</div></div><div class="battleChoice"><b>🛡️ Защита <span id="dc">0/2</span></b><div class="zones" id="defs">${ZONES.map((x,i)=>'<button onclick="pickDef('+i+',this)"><span class="zoneIcon">'+['◉','◆','◇','▼'][i]+'</span>'+x+'</button>').join('')}</div></div><div class="battleStatus" id="battleStatus">Выбери 1 зону атаки и 2 зоны защиты.</div><button class="battleSubmit" id="battleSubmit" onclick="strikeTurn(false)">⚔️ НАНЕСТИ УДАР</button><label class="autoCheck"><input id="autoBattle" type="checkbox" onchange="toggleAutoBattle()"> Автобой</label><div class="card battleHistory"><b>Журнал боя</b><div id="battleLog">Раунд 1 · противник готов.</div></div></div>`;modal.classList.add('open');window._battle=b;b.enemy=enemy;b.district=d.id;startBattleTimer()};
+battle=function(){
+  try{
+    if(typeof stopAutoBattle==='function')stopAutoBattle();
+    if(!state.season||typeof state.season!=='object')state.season={rating:Number(state.rating)||1000,bestRating:Number(state.rating)||1000,wins:Number(state.wins)||0};
+    if(!Array.isArray(state.items))state.items=[];
+    const maxHp=Math.max(1,Number(state.maxHp)||120);state.maxHp=maxHp;
+    state.hp=Math.max(1,Math.min(maxHp,Number(state.hp)||maxHp));
+    const energy=Number(state.energy)||0;
+    if(energy<5){toast('⚡ Не хватает энергии');return}
+    state.energy=energy-5;state.lastEnergyAt=Date.now();
+    const districts=(typeof S75_DISTRICTS!=='undefined'&&Array.isArray(S75_DISTRICTS))?S75_DISTRICTS:[];
+    const d=districts.find(x=>x.id===state.district)||districts[0]||{id:'square',name:'Центральная площадь',level:1};
+    const level=Math.max(1,Number(state.level)||1),tier=Math.min(4,Math.floor((level-1)/4));
+    const enemyNames=['Уличный боец','Лесной охотник','Портовый головорез','Бронебоец','Страж крепости'];
+    const enemy={name:enemyNames[Math.min(4,tier+(Number(d.level)>=12?1:0))],hp:100+level*12,damage:8+level*1.5,def:3+Math.floor(level/2),reward:90+level*25,xp:25+level*8};
+    const b={hp:enemy.hp,maxHp:enemy.hp,playerHp:state.hp,locked:false,attack:null,defs:[],auto:false,autoTimer:null,turn:1,log:[],enemy,district:d.id};
+    const img=document.querySelector('.avatar img')?.src||TELEGRAM_VIKING_FALLBACK;
+    const enemySvg='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300"><rect width="320" height="300" rx="18" fill="#071522"/><path d="M70 70Q74 20 125 24Q160 5 195 24Q246 20 250 70l-14 91q-14 48-76 54-62-6-76-54z" fill="#52636a" stroke="#202c32" stroke-width="7"/><path d="M70 70Q45 45 57 5q8 35 49 31M250 70Q275 45 263 5q-8 35-49 31" fill="#ded6b9" stroke="#625d4d" stroke-width="6"/><circle cx="121" cy="101" r="10" fill="#ffd84d"/><circle cx="199" cy="101" r="10" fill="#ffd84d"/><path d="M137 166q-12 35 9 24M183 166q12 35-9 24" fill="#eee5c7" stroke="#8e866c" stroke-width="5"/></svg>');
+    pt.textContent='Бой — '+String(d.name||'Центральная площадь');
+    pb.innerHTML=`<div class="vikingBattle"><div class="battleTop"><div class="side"><b>⚔️ Ты</b><small>Викинг Sdolars</small></div><div class="turn">РАУНД<br><span id="battleRound">1</span></div><div class="side"><b>👹 ${chatEsc(enemy.name)}</b><small>Противник</small></div></div><div class="fighters"><div class="fighter" id="playerFighter"><img src="${img}"><div class="fighterName">${chatEsc(currentChatName())}</div><div class="fighterRole">Уровень ${level} · ⚡ −5 энергии</div><div class="fhp"><i id="playerBar" style="width:${Math.max(0,state.hp/state.maxHp*100)}%"></i></div><div class="fhpText" id="playerHp">${state.hp}/${state.maxHp} HP</div></div><div class="fighter enemy" id="enemyFighter"><img src="${enemySvg}"><div class="fighterName">${chatEsc(enemy.name)}</div><div class="fighterRole">Сила ${Math.round(enemy.damage)} · 🛡 ${enemy.def}</div><div class="fhp"><i id="enemyBar" style="width:100%"></i></div><div class="fhpText" id="enemyHp">${enemy.hp}/${enemy.hp} HP</div></div></div><div class="battleRule4">⚔️ 4 ЗОНЫ · АТАКА: 1 · ЗАЩИТА: 2</div><div class="battleChoice"><b>⚔️ Атака</b><div class="zones attackZones" id="attacks">${ZONES.map((x,i)=>'<button type="button" onclick="pickAttack('+i+',this)"><span class="zoneIcon">'+['◉','◆','◇','▼'][i]+'</span>'+x+'</button>').join('')}</div></div><div class="battleChoice"><b>🛡️ Защита <span id="dc">0/2</span></b><div class="zones" id="defs">${ZONES.map((x,i)=>'<button type="button" onclick="pickDef('+i+',this)"><span class="zoneIcon">'+['◉','◆','◇','▼'][i]+'</span>'+x+'</button>').join('')}</div></div><div class="battleStatus" id="battleStatus">Выбери 1 зону атаки и 2 зоны защиты.</div><button type="button" class="battleSubmit" id="battleSubmit" onclick="strikeTurn(false)">⚔️ НАНЕСТИ УДАР</button><label class="autoCheck"><input id="autoBattle" type="checkbox" onchange="toggleAutoBattle()"> Автобой</label><div class="card battleHistory"><b>Журнал боя</b><div id="battleLog">Раунд 1 · противник готов.</div></div></div>`;
+    modal.classList.add('open');document.body.classList.add('battle-open');
+    const nav=document.querySelector('.bottom');if(nav)nav.style.display='none';
+    const actions=document.querySelector('.actions');if(actions)actions.style.display='none';
+    window._battle=b;startBattleTimer();updateHud();save();
+  }catch(e){
+    console.error('S87 battle open failed',e);
+    pt.textContent='Бой';
+    pb.innerHTML='<div class="s83-error"><b>Ошибка открытия боя</b><p>Бой не запустился. Энергия не списана.</p><button type="button" onclick="closeP()">Закрыть</button></div>';
+    modal.classList.add('open');
+  }
+}
+
 strikeTurn=function(fromAuto){const b=window._battle;if(!b||b.locked)return;if(b.attack===null||b.defs.length!==2){if(b.auto)autoBattleStep();else{const st=document.getElementById('battleStatus');if(st)st.textContent='Нужно выбрать 1 атаку и ровно 2 защиты.';toast('Выбери атаку и 2 зоны защиты')}return}b.locked=true;stopBattleTimer();const enemyAttack=Math.floor(Math.random()*4),enemyDefs=[];while(enemyDefs.length<2){const z=Math.floor(Math.random()*4);if(!enemyDefs.includes(z))enemyDefs.push(z)}const w=state.items.find(x=>x.equipped&&x.type==='Оружие'),a=state.items.find(x=>x.equipped&&x.type==='Броня');const base=15+(w?.damage||0)+Math.floor((state.strength||0)*.7),def=(a?.defense||0)+Math.floor((state.agility||0)*.35);const hit=!enemyDefs.includes(b.attack),crit=hit&&Math.random()<Math.min(.45,.06+(state.strength||0)*.012),dodge=Math.random()<Math.min(.35,.03+(state.agility||0)*.012),playerDamage=hit?Math.max(1,Math.round(base*(crit?1.5:1))):0,blocked=b.defs.includes(enemyAttack),enemyDamage=blocked||dodge?0:Math.max(1,Math.round(b.enemy.damage+Math.random()*5-def*.35));b.hp=Math.max(0,b.hp-playerDamage);b.playerHp=Math.max(0,b.playerHp-enemyDamage);const attackName=ZONES[b.attack],enemyAttackName=ZONES[enemyAttack];let line='Раунд '+b.turn+': ⚔️ '+attackName+' — '+(hit?'попадание':'промах')+' '+playerDamage+' урона'+(crit?' · КРИТ!':'')+' · 🛡️ '+b.defs.map(x=>ZONES[x]).join(', ')+' · 👹 '+enemyAttackName+' — '+(blocked?'БЛОК':(dodge?'УКЛОНЕНИЕ':'−'+enemyDamage+' HP'));b.log.unshift(line);b.log=b.log.slice(0,7);const log=document.getElementById('battleLog');if(log)log.innerHTML=b.log.map(x=>'<div>'+x+'</div>').join('');const eb=document.getElementById('enemyBar'),pb2=document.getElementById('playerBar'),eh=document.getElementById('enemyHp'),ph=document.getElementById('playerHp'),rr=document.getElementById('battleRound'),st=document.getElementById('battleStatus'),btn=document.getElementById('battleSubmit');if(eb)eb.style.width=(b.hp/b.maxHp*100)+'%';if(pb2)pb2.style.width=(b.playerHp/state.maxHp*100)+'%';if(eh)eh.textContent=b.hp+'/'+b.maxHp+' HP';if(ph)ph.textContent=b.playerHp+'/'+state.maxHp+' HP';b.turn++;if(rr)rr.textContent=b.turn;if(b.hp<=0){state.hp=state.maxHp;state.coins+=b.enemy.reward;state.exp+=b.enemy.xp;state.wins++;state.battles=(state.battles||0)+1;state.rating=Math.min(5000,(state.rating||1000)+25);state.season.rating=state.rating;state.season.bestRating=Math.max(state.season.bestRating||0,state.rating);state.season.wins=(state.season.wins||0)+1;s75Mission('wins');s75Level();state.battleHistory.unshift({enemy:b.enemy.name,result:'win',damage:b.maxHp,at:new Date().toLocaleTimeString()});state.battleHistory=state.battleHistory.slice(0,10);save();stopAutoBattle();if(st)st.textContent='🏆 Победа! +'+b.enemy.reward+' 🪙 · +'+b.enemy.xp+' XP';if(btn)btn.disabled=true;if(log)log.innerHTML='<b>🏆 ПОБЕДА!</b><br>'+log.innerHTML;setTimeout(closeP,1500);return}if(b.playerHp<=0){state.hp=Math.max(1,Math.round(state.maxHp*.35));state.losses=(state.losses||0)+1;state.battles=(state.battles||0)+1;state.rating=Math.max(0,(state.rating||1000)-18);save();stopAutoBattle();if(st)st.textContent='💀 Поражение. HP восстановлен до 35%.';if(btn)btn.disabled=true;if(log)log.innerHTML='<b>💀 ПОРАЖЕНИЕ</b><br>'+log.innerHTML;setTimeout(closeP,1500);return}b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));document.getElementById('dc').textContent='0/2';if(st)st.textContent='Ход завершён. Выбери новую атаку и 2 защиты.';setTimeout(()=>{b.locked=false;startBattleTimer();if(b.auto)autoBattleStep()},fromAuto?260:380)};
 // Make the old auto-battle helper use exactly four zones.
 autoBattleStep=function(){const b=window._battle;if(!b||!b.auto||b.locked)return;b.attack=Math.floor(Math.random()*4);b.defs=[];while(b.defs.length<2){const z=Math.floor(Math.random()*4);if(!b.defs.includes(z))b.defs.push(z)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===b.attack));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));const dc=document.getElementById('dc');if(dc)dc.textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(true),450)};
@@ -894,6 +906,9 @@ save();updateHud();
   closeP=function(){
     try{stopBattleTimer();stopAutoBattle()}catch(e){}
     modal.classList.remove('open');
+    document.body.classList.remove('battle-open');
+    const nav=document.querySelector('.bottom');if(nav)nav.style.display='';
+    const actions=document.querySelector('.actions');if(actions)actions.style.display='';
     document.querySelectorAll('.bottom button').forEach((b,i)=>b.classList.toggle('active',i===0));
   };
 
@@ -980,55 +995,6 @@ save();updateHud();
   save();
 })();
 
-
-/* ===== S83 FINAL QA PASS ===== */
-(function(){
-  // Persist a schema marker without destroying existing progress.
-  state.schemaVersion=83;
-  state.playerName=state.playerName||currentChatName();
-  state.gems=Number.isFinite(Number(state.gems))?Number(state.gems):1330;
-  state.energy=Math.max(0,Math.min(Number(state.maxEnergy)||100,Number(state.energy)||0));
-  state.hp=Math.max(1,Math.min(Number(state.maxHp)||120,Number(state.hp)||1));
-  state.items=(Array.isArray(state.items)?state.items:[]).filter(Boolean);
-  state.materials=state.materials||{iron:2,wood:2,leather:2,herbs:2};
-  ['iron','wood','leather','herbs'].forEach(k=>state.materials[k]=Math.max(0,Math.floor(Number(state.materials[k])||0)));
-
-  // Make all navigation calls safe even when a renderer throws.
-  const _open=openP;
-  openP=function(k){
-    try{_open(k)}catch(e){
-      console.error('openP',k,e);
-      modal.classList.add('open');pt.textContent='Раздел';
-      pb.innerHTML='<div class="s83-error"><b>Раздел временно не открылся.</b><p>Игра продолжает работать.</p><button type="button" onclick="closeP()">Закрыть</button></div>';
-    }
-  };
-
-  // Functional guild war, no dead button.
-  window.guildWarS83=guildWarS83;
-
-  // Strong input guard for battle zones: exactly 4 and no duplicate defense zones.
-  pickAttack=function(i,el){
-    const b=window._battle;if(!b||b.locked||![0,1,2,3].includes(Number(i)))return;
-    b.attack=Number(i);
-    document.querySelectorAll('#attacks button').forEach(x=>x.classList.remove('sel'));
-    if(el)el.classList.add('sel');
-    const st=document.getElementById('battleStatus');if(st)st.textContent='Атака выбрана: '+ZONES[b.attack]+'. Теперь выбери 2 зоны защиты.';
-    startBattleTimer();
-  };
-  pickDef=function(i,el){
-    const b=window._battle;if(!b||b.locked||![0,1,2,3].includes(Number(i)))return;
-    i=Number(i);
-    if(b.defs.includes(i))b.defs=b.defs.filter(x=>x!==i);
-    else if(b.defs.length<2)b.defs.push(i);
-    document.querySelectorAll('#defs button').forEach((x,n)=>x.classList.toggle('sel',b.defs.includes(n)));
-    const dc=document.getElementById('dc');if(dc)dc.textContent=b.defs.length+'/2';
-    const st=document.getElementById('battleStatus');if(st)st.textContent=b.defs.length===2?'Защита готова — ход выполняется.':'Выбрано '+b.defs.length+'/2 зон защиты.';
-    if(b.attack!==null&&b.defs.length===2)strikeTurn(false);
-  };
-
-  // Keep HUD correct after every state mutation.
-  save();updateHud();
-})();
 </script>
 </body></html>
 
