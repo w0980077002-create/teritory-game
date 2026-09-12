@@ -1,65 +1,574 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#061321"><title>Territory — Sdolars</title>
+<meta name="theme-color" content="#061321">
+<title>Territory — Sdolars</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#02070d;color:#fff;font-family:Arial,system-ui,sans-serif}button{font:inherit;cursor:pointer}
-#app{position:relative;width:100%;height:100dvh;overflow:hidden;background:#061321}
-#scene{position:absolute;inset:0;background:#061321 center/cover no-repeat url("./assets/home-screen.png?v=s89final")}
-#hit{position:absolute;inset:0;z-index:4}.hot{position:absolute;background:transparent;border:0;padding:0}
-.hot:active{background:#ffd43b12}
-.q{left:0;top:9%;width:48%;height:10%}.bonus{right:0;top:9%;width:42%;height:10%}.left1{left:0;top:20%;width:17%;height:7%}.left2{left:0;top:27%;width:17%;height:7%}.left3{left:0;top:34%;width:17%;height:7%}.forge{right:0;top:37%;width:41%;height:7%}.tavern{right:0;top:44%;width:41%;height:7%}.shop{right:0;top:51%;width:41%;height:7%}.battle{left:1%;bottom:15%;width:24%;height:9%}.inv{left:25%;bottom:15%;width:25%;height:9%}.gear{left:50%;bottom:15%;width:25%;height:9%}.quests{right:0;bottom:15%;width:25%;height:9%}.chat{left:0;right:0;bottom:8%;height:7%}.nav1{left:0;bottom:0;width:16.7%;height:8%}.nav2{left:16.7%;bottom:0;width:16.7%;height:8%}.nav3{left:33.4%;bottom:0;width:16.7%;height:8%}.nav4{left:50.1%;bottom:0;width:16.7%;height:8%}.nav5{left:66.8%;bottom:0;width:16.6%;height:8%}.nav6{right:0;bottom:0;width:16.6%;height:8%}
-.overlay{display:none;position:absolute;inset:0;z-index:10;background:#02070df2;backdrop-filter:blur(7px);padding:12px;overflow:auto}.overlay.open{display:block}.box{max-width:720px;margin:auto}.head{display:flex;gap:8px;align-items:center;position:sticky;top:0;background:#061321f5;padding-bottom:9px;z-index:2}.head h2{flex:1;margin:0}.close{background:#102c40;border:1px solid #43b8e9;color:white;border-radius:9px;padding:9px 12px}.card{background:linear-gradient(145deg,#0b293c,#07131e);border:1px solid #3d8daf;border-radius:12px;padding:11px;margin:8px 0}.muted{color:#9fc0d2;font-size:13px}.btn{display:block;width:100%;padding:11px;border-radius:10px;background:#0877aa;border:1px solid #43caff;color:#fff;font-weight:900;margin-top:8px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.zone{padding:14px 8px;background:#0b2335;color:#fff;border:1px solid #347d9e;border-radius:10px;font-weight:900}.zone.sel{border-color:#ffd43b;background:#4a3a09}.enemy{background:#241118;border:1px solid #a54b59;border-radius:12px;padding:12px}.hp{height:11px;background:#12070a;border-radius:8px;overflow:hidden}.hp i{display:block;height:100%;background:#ef4558}.label{margin:12px 0 6px;color:#8edcff;font-size:12px;font-weight:900}.log{height:50dvh;overflow:auto;background:#030c14;border:1px solid #22566f;border-radius:10px;padding:8px}.msg{padding:7px 0;border-bottom:1px solid #123044}.msg b{color:#7bd4ff}.row{display:flex;gap:7px;margin-top:7px}.row input{flex:1}.input{background:#06131e;border:1px solid #2c6d8a;border-radius:9px;color:white;padding:11px}.toast{position:fixed;z-index:50;left:50%;bottom:20px;transform:translateX(-50%);background:#071c2c;border:1px solid #43b8e9;border-radius:10px;padding:10px 14px;display:none}
-</style></head><body><div id="app"><div id="scene"></div>
-<div id="hit">
-<button class="hot q" onclick="openPanel('quest')"></button><button class="hot bonus" onclick="claim('daily.claim')"></button>
-<button class="hot left1" onclick="openPanel('bonus')"></button><button class="hot left2" onclick="openPanel('events')"></button><button class="hot left3" onclick="openPanel('vip')"></button>
-<button class="hot forge" onclick="openPanel('forge')"></button><button class="hot tavern" onclick="openPanel('tavern')"></button><button class="hot shop" onclick="openPanel('shop')"></button>
-<button class="hot battle" onclick="startBattle()"></button><button class="hot inv" onclick="openPanel('inventory')"></button><button class="hot gear" onclick="openPanel('hero')"></button><button class="hot quests" onclick="openPanel('quest')"></button><button class="hot chat" onclick="openPanel('chat')"></button>
-<button class="hot nav1" onclick="closePanel()"></button><button class="hot nav2" onclick="openPanel('hero')"></button><button class="hot nav3" onclick="openPanel('inventory')"></button><button class="hot nav4" onclick="openPanel('quest')"></button><button class="hot nav5" onclick="openPanel('guild')"></button><button class="hot nav6" onclick="openPanel('more')"></button>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#02070d;color:#fff;font-family:Arial,system-ui,sans-serif}
+body{overscroll-behavior:none}
+button,input{font:inherit}
+button{cursor:pointer}
+#app{position:relative;width:100%;height:100dvh;max-width:900px;margin:auto;overflow:hidden;background:#061321}
+#scene{position:absolute;inset:0;overflow:hidden;background:
+radial-gradient(circle at 50% 26%,#79c9ff 0,#347eb5 24%,#123b5a 49%,#071827 75%,#02070d 100%)}
+.sky{position:absolute;inset:0;background:
+linear-gradient(180deg,#102f4b00 0 48%,#06132188 72%,#02070ddd 100%),
+radial-gradient(ellipse at 50% 42%,#cbeaff 0 2%,#6bb1dd 13%,#2d719c 30%,transparent 52%)}
+.mountains{position:absolute;left:-15%;right:-15%;top:24%;height:43%;background:
+linear-gradient(135deg,transparent 34%,#d8efff 34.3%,#6da3bf 39%,transparent 39.4%),
+linear-gradient(45deg,transparent 32%,#d8efff 32.4%,#5687a1 39%,transparent 39.4%),
+linear-gradient(160deg,transparent 38%,#e4f5ff 38.3%,#4e7e98 45%,transparent 45.3%),
+linear-gradient(20deg,transparent 35%,#d2ebf9 35.3%,#477790 43%,transparent 43.3%);
+filter:drop-shadow(0 8px 14px #0008)}
+.castle{position:absolute;left:22%;right:14%;top:30%;height:34%;filter:drop-shadow(0 10px 18px #000a)}
+.castle .body{position:absolute;left:18%;right:18%;bottom:5%;height:57%;background:linear-gradient(90deg,#263c4b,#71818a 48%,#273a46);clip-path:polygon(8% 18%,92% 18%,100% 100%,0 100%)}
+.tower{position:absolute;bottom:5%;width:16%;height:83%;background:linear-gradient(90deg,#263944,#81919a,#263944);clip-path:polygon(10% 13%,90% 13%,100% 100%,0 100%)}
+.t1{left:0}.t2{left:28%;height:100%}.t3{right:0;height:88%}
+.tower:before{content:"";position:absolute;left:0;right:0;top:-18%;height:22%;background:#172631;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.flag{position:absolute;left:50%;top:-5%;width:3px;height:30%;background:#c9a54b}.flag:after{content:"";position:absolute;top:0;left:3px;border-style:solid;border-width:10px 0 10px 25px;border-color:transparent transparent transparent #b62d3d}
+.water{position:absolute;left:0;right:0;bottom:11%;height:28%;background:
+linear-gradient(180deg,#143f58,#0b3046 20%,#061d2d 70%,#04131f);
+box-shadow:inset 0 18px 40px #73c5df33}
+.dock{position:absolute;left:0;right:0;bottom:12%;height:10%;background:repeating-linear-gradient(90deg,#503a28 0 18px,#7b5a38 19px 24px);transform:skewY(-2deg);opacity:.9}
+.ship{position:absolute;bottom:19%;width:22%;height:9%;background:#211811;clip-path:polygon(0 35%,10% 72%,90% 72%,100% 35%,78% 100%,20% 100%);filter:drop-shadow(0 6px 5px #000)}
+.ship:before{content:"";position:absolute;left:47%;top:-95%;height:100%;width:3px;background:#4d3825}.ship:after{content:"";position:absolute;left:49%;top:-90%;border-style:solid;border-width:4px 0 45px 55px;border-color:transparent transparent transparent #e9e2c9}
+.ship1{left:5%}.ship2{right:7%;bottom:25%;transform:scale(.8)}
+.hero{position:absolute;left:-5%;bottom:10%;width:58%;height:53%;filter:drop-shadow(0 12px 20px #000c)}
+.hero .head{position:absolute;left:36%;top:2%;width:25%;height:25%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d9a477,#7c472e 75%);border:6px solid #342218}
+.hero .beard{position:absolute;left:33%;top:17%;width:31%;height:24%;background:#4b2b1c;border-radius:20% 20% 50% 50%;transform:rotate(8deg)}
+.hero .torso{position:absolute;left:21%;top:28%;width:56%;height:64%;border-radius:28% 30% 8% 8%;background:linear-gradient(90deg,#1c2021,#725437 45%,#24282a);border:7px solid #30261c}
+.hero .fur{position:absolute;left:8%;top:28%;width:78%;height:62%;background:radial-gradient(circle,#8e8068 0 10%,#463b30 30%,transparent 31%),#332c25;border-radius:35%;opacity:.9}
+.hero .axe{position:absolute;left:43%;bottom:-1%;width:10%;height:48%;background:#55351d;transform:rotate(25deg);border-radius:8px;z-index:3}
+.hero .axe:after{content:"";position:absolute;top:-6%;left:-90%;width:190%;height:16%;background:#b8c2c5;clip-path:polygon(0 0,100% 0,78% 100%,20% 100%)}
+.header{position:absolute;z-index:3;top:0;left:0;right:0;height:15%;padding:12px 12px 7px;display:flex;gap:8px;align-items:flex-start;background:linear-gradient(#03101fe8,#03101f99,#03101f00)}
+.avatar{width:58px;height:58px;border-radius:50%;border:3px solid #31aee8;background:radial-gradient(circle at 50% 35%,#e0a87e,#603a28 50%,#171b20 52%);display:grid;place-items:center;font-size:28px;box-shadow:0 0 12px #009ff755}
+.profile{min-width:130px;flex:1}.name{font-size:20px;font-weight:900}.sub{font-size:13px;color:#80d8ff;font-weight:800;margin-top:2px}.xp{height:10px;background:#03131f;border:1px solid #267da5;border-radius:10px;overflow:hidden;margin-top:6px}.xp i{display:block;height:100%;width:62%;background:#1cc9ff}.xptext{font-size:12px;margin-top:3px}
+.resources{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;max-width:55%}.res{background:#071b2bdf;border:2px solid #267ba8;border-radius:11px;padding:8px 10px;font-weight:900;white-space:nowrap}.res b{color:#ffd43b}.res.g b{color:#60e6ff}.res.e b{color:#ffd34d}
+.quick{position:absolute;right:12px;top:8.3%;z-index:4;display:flex;gap:5px}.quick button{width:58px;height:45px;border-radius:10px;background:#061c2cdf;border:2px solid #267ba8;color:#fff;font-size:21px}
+.task{position:absolute;z-index:3;left:12px;top:16%;width:43%;background:#061c2ce8;border:2px solid #2e8cb9;border-radius:14px;padding:10px;box-shadow:0 7px 18px #0006}.task small{color:#ffd43b;font-weight:900}.task b{display:block;font-size:16px;margin-top:5px}.task span{font-size:12px;color:#9ec4d8}.bonus{position:absolute;z-index:3;right:12px;top:17%;width:38%;background:#2b1450ee;border:3px solid #ffd43b;border-radius:14px;padding:11px;text-align:center}.bonus b{color:#ffd43b}.bonus strong{display:block;font-size:20px;margin-top:4px}
+.side{position:absolute;z-index:4;left:12px;top:36%;display:grid;gap:7px}.side button{width:84px;padding:9px 5px;border-radius:11px;background:#071f32ed;border:2px solid #1f9ed6;color:#fff;font-weight:900;position:relative}.side button em{position:absolute;right:-7px;top:-7px;background:#ff3f62;border-radius:50%;width:26px;height:26px;display:grid;place-items:center;font-style:normal}
+.right{position:absolute;z-index:4;right:12px;top:37%;display:grid;gap:7px;width:39%}.right button{padding:11px;text-align:left;background:#08283eea;border:2px solid #2b99cc;border-radius:13px;color:#fff}.right b{display:block;font-size:16px}.right span{font-size:12px;color:#a5c6d7}
+.actions{position:absolute;z-index:4;left:12px;right:12px;bottom:16%;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.actions button{min-height:62px;border-radius:13px;color:#fff;font-weight:900;border:2px solid}.battleBtn{background:#851523e8;border-color:#ff4b62}.invBtn{background:#8a5609e8;border-color:#ffc12d}.gearBtn{background:#51139be8;border-color:#a85cff}.questBtn{background:#087b59e8;border-color:#2be9a8}
+.chatbar{position:absolute;z-index:4;left:12px;right:12px;bottom:9%;height:6.5%;display:flex;align-items:center;justify-content:space-between;background:#031523ed;border-top:1px solid #1e526e;border-bottom:1px solid #1e526e;padding:5px 10px}.chatbar b{color:#ffd43b}.chatbar span{display:block;font-size:11px;color:#9ab7c6}.chatbar button{background:transparent;color:#ffd43b;font-weight:900}
+.nav{position:absolute;z-index:5;left:0;right:0;bottom:0;height:8.5%;display:grid;grid-template-columns:repeat(6,1fr);background:#041827f5;border-top:2px solid #1e5774}.nav button{background:transparent;border-right:1px solid #1a4961;color:#9dbacc;font-weight:900;font-size:12px}.nav button.active{color:#ffd43b;background:#071f31}.nav i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
+.overlay{display:none;position:absolute;z-index:20;inset:0;background:#02070df4;backdrop-filter:blur(8px);padding:12px;overflow:auto}.overlay.open{display:block}.panel{max-width:720px;margin:auto;padding-bottom:25px}.panelHead{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;background:#061321f5;padding-bottom:10px}.panelHead h2{margin:0;flex:1}.close{background:#102c40;color:#fff;border:1px solid #46b9e9;border-radius:9px;padding:9px 12px}.card{background:linear-gradient(145deg,#0a283b,#06131e);border:1px solid #347f9f;border-radius:12px;padding:11px;margin:8px 0}.muted{color:#9fc1d2;font-size:13px}.btn{width:100%;padding:11px;border-radius:9px;background:#0878ab;border:1px solid #45caff;color:#fff;font-weight:900;margin-top:7px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.item{display:flex;align-items:center;gap:9px}.grow{flex:1}.zone{padding:14px 8px;border-radius:10px;background:#092238;color:#fff;border:1px solid #317d9e;font-weight:900}.zone.sel{background:#4c3a08;border-color:#ffd43b;box-shadow:0 0 0 1px #ffd43b inset}.enemy{background:#261018;border:1px solid #a34b58;border-radius:12px;padding:11px}.hp{height:11px;background:#13070a;border-radius:8px;overflow:hidden;margin-top:6px}.hp i{display:block;height:100%;background:#ee4056}.label{font-size:12px;font-weight:900;color:#91dcff;margin:12px 0 6px}.log{height:52dvh;overflow:auto;background:#030d15;border:1px solid #255c76;border-radius:10px;padding:8px}.msg{padding:7px 0;border-bottom:1px solid #123044}.msg b{color:#7dd5ff}.row{display:flex;gap:7px;margin-top:7px}.row input{flex:1}.input{width:100%;background:#06131e;border:1px solid #2a6b89;border-radius:9px;color:#fff;padding:11px}.toast{position:fixed;z-index:50;left:50%;bottom:20px;transform:translateX(-50%);background:#071c2c;border:1px solid #43b8e9;border-radius:10px;padding:10px 14px;display:none;max-width:90%;text-align:center}
+@media(max-width:390px){.res{padding:7px 7px;font-size:12px}.resources{max-width:58%}.avatar{width:52px;height:52px}.side button{width:72px}.right{width:42%}.actions button{font-size:11px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="scene">
+    <div class="sky"></div><div class="mountains"></div>
+    <div class="castle"><div class="body"></div><div class="tower t1"></div><div class="tower t2"></div><div class="tower t3"></div><div class="flag"></div></div>
+    <div class="water"></div><div class="dock"></div><div class="ship ship1"></div><div class="ship ship2"></div>
+    <div class="hero"><div class="fur"></div><div class="torso"></div><div class="head"></div><div class="beard"></div><div class="axe"></div></div>
+  </div>
+
+  <header class="header">
+    <div class="avatar">⚔️</div>
+    <div class="profile">
+      <div class="name" id="playerName">S$$</div>
+      <div class="sub" id="levelText">Глава 5 · Уровень 9</div>
+      <div class="xp"><i id="xpBar"></i></div>
+      <div class="xptext" id="xpText">0/0</div>
+    </div>
+    <div class="resources">
+      <div class="res"><b>●</b> <span id="coins">0</span> +</div>
+      <div class="res g"><b>◆</b> <span id="gems">0</span> +</div>
+      <div class="res e"><b>⚡</b> <span id="energy">0</span> +</div>
+    </div>
+  </header>
+
+  <div class="quick">
+    <button onclick="openPanel('chat')">✉️</button>
+    <button onclick="openPanel('achievements')">🏆</button>
+    <button onclick="openPanel('settings')">⚙️</button>
+  </div>
+
+  <div class="task" onclick="openPanel('quest')">
+    <small>Текущее задание</small>
+    <b>Поговори с кузнецом ›</b>
+    <span>⚒ Кузница</span>
+  </div>
+
+  <div class="bonus" onclick="claim('daily.claim')">
+    <b>🎁 Ежедневный бонус</b>
+    <strong>ЗАБРАТЬ</strong>
+  </div>
+
+  <div class="side">
+    <button onclick="openPanel('bonus')">🎁<br>Бонусы<em>!</em></button>
+    <button onclick="openPanel('events')">📜<br>События<em>!</em></button>
+    <button onclick="openPanel('vip')">👑<br>VIP</button>
+  </div>
+
+  <div class="right">
+    <button onclick="openPanel('forge')"><b>⚒ Кузница</b><span>Улучшение снаряжения</span></button>
+    <button onclick="openPanel('tavern')"><b>🍺 Таверна</b><span>Найм героев</span></button>
+    <button onclick="openPanel('shop')"><b>🛍 Магазин</b><span>Предметы и снаряжение</span></button>
+  </div>
+
+  <div class="actions">
+    <button class="battleBtn" onclick="startBattle()">⚔️<br>Бой</button>
+    <button class="invBtn" onclick="openPanel('inventory')">🎒<br>Инвентарь</button>
+    <button class="gearBtn" onclick="openPanel('hero')">🛡️<br>Экипировка</button>
+    <button class="questBtn" onclick="openPanel('missions')">📜<br>Задания</button>
+  </div>
+
+  <div class="chatbar" onclick="openPanel('chat')">
+    <div>💬 <b>Чат игры</b><span>Общий чат и чат клана</span></div>
+    <button>Открыть ›</button>
+  </div>
+
+  <nav class="nav">
+    <button class="active" onclick="closePanel()"><i>🏠</i>Город</button>
+    <button onclick="openPanel('districts')"><i>⚔️</i>Районы</button>
+    <button onclick="openPanel('hero')"><i>🧔</i>Герой</button>
+    <button onclick="openPanel('inventory')"><i>🎒</i>Инвентарь</button>
+    <button onclick="openPanel('guild')"><i>👥</i>Гильдия</button>
+    <button onclick="openPanel('more')"><i>☰</i>Ещё</button>
+  </nav>
+
+  <section id="panel" class="overlay">
+    <div class="panel">
+      <div class="panelHead"><h2 id="panelTitle">Territory</h2><button class="close" onclick="closePanel()">✕</button></div>
+      <div id="panelBody"></div>
+    </div>
+  </section>
+
+  <section id="battle" class="overlay">
+    <div class="panel">
+      <div class="panelHead"><h2>Тактический бой</h2><button class="close" onclick="closeBattle()">✕</button></div>
+      <div id="enemyBox" class="enemy"></div>
+      <div class="label">АТАКА — ВЫБЕРИ 1 ЗОНУ</div>
+      <div id="attackZones" class="grid"></div>
+      <div class="label">ЗАЩИТА — ВЫБЕРИ РОВНО 2 РАЗНЫЕ ЗОНЫ</div>
+      <div id="defenseZones" class="grid"></div>
+      <div id="roundResult" class="card">Выбери атаку и две защиты.</div>
+      <button class="btn" onclick="submitTurn()">Подтвердить ход</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast"></div>
 </div>
-<section id="panel" class="overlay"><div class="box"><div class="head"><h2 id="pt">Territory</h2><button class="close" onclick="closePanel()">✕</button></div><div id="pb"></div></div></section>
-<section id="battle" class="overlay"><div class="box"><button class="close" onclick="closeBattle()">← Назад</button><div id="enemy" class="enemy" style="margin-top:8px"></div><div class="label">АТАКА — 1 ЗОНА</div><div id="att" class="grid"></div><div class="label">ЗАЩИТА — РОВНО 2 РАЗНЫЕ ЗОНЫ</div><div id="defs" class="grid"></div><div id="round" class="card">Выбери атаку и две защиты.</div><button class="btn" onclick="turn()">Подтвердить ход</button></div></section>
-<div id="toast" class="toast"></div></div>
+
 <script>
-const zones=['Голова','Грудь','Пояс','Ноги'];let state=null,battle=null,attack=null,defenses=new Set(),ws=null;
-function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>e.style.display='none',2200)}
-async function callApi(action,data={}){try{const r=await fetch('/api/action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:action,...data})});const d=await r.json();if(d.state)state=d.state;if(!d.ok)toast(d.error||'Ошибка');return d}catch(e){toast('Нет соединения');return{ok:false}}}
-async function load(){try{const r=await fetch('/api/state',{method:'POST'});const d=await r.json();state=d.state||d.player}catch(e){}}
-function closePanel(){document.getElementById('panel').classList.remove('open')}
-function openPanel(type){const p=document.getElementById('panel'),t=document.getElementById('pt'),b=document.getElementById('pb');p.classList.add('open');
- const views={
- quest:['Задания',`<div class="card"><b>Поговори с кузнецом</b><div class="muted">Награда: 150 монет + 80 XP</div><button class="btn" onclick="claim('quest.complete')">Выполнить</button></div>`],
- bonus:['Бонусы',`<div class="card"><b>🎁 Ежедневная награда</b><div class="muted">250 монет + 10 энергии + 20 XP</div><button class="btn" onclick="claim('daily.claim')">Забрать</button></div>`],
- events:['События',`<div class="card"><b>⚔️ Событие Sdolars</b><div class="muted">Стоимость: 3 энергии</div><button class="btn" onclick="claim('event.fight')">Участвовать</button></div>`],
- vip:['VIP',`<div class="card"><b>👑 VIP Territory</b><div class="muted">Раздел зарезервирован под серверные привилегии.</div></div>`],
- forge:['Кузница',`<div class="card"><b>🔨 Крафт оружия</b><div class="muted">Нужно: 2 железа, 2 дерева, 1 кожи.</div><button class="btn" onclick="claim('craft')">Ковать</button></div><div class="card"><b>Уровень кузницы: ${state?.forgeLevel||0}</b></div>`],
- tavern:['Таверна',`<div class="card"><b>🍺 Нанять героя</b><div class="muted">Стоимость: 300 монет</div><button class="btn" onclick="claim('tavern.recruit')">Нанять</button></div>`],
- shop:['Магазин',`<div id="shop"></div>`],
- inventory:['Инвентарь',`<div id="items"></div>`],
- hero:['Персонаж',`<div class="card"><b>${state?.playerName||'Игрок'}</b><div class="muted">Уровень ${state?.level||1} · XP ${state?.exp||0}/${state?.maxExp||100}</div><div class="muted">HP ${state?.hp||0}/${state?.maxHp||0} · Сила ${state?.strength||0} · Ловкость ${state?.agility||0}</div><div class="muted">Свободные очки: ${state?.freePoints||0}</div><div class="grid"><button class="btn" onclick="stat('strength')">Сила +</button><button class="btn" onclick="stat('agility')">Ловкость +</button></div></div>`],
- guild:['Гильдия',`<div class="card"><b>${state?.guildName||'Sdolars'}</b><div class="muted">Участники: ${state?.guildMembers||1} · Вклад: ${state?.guildContrib||0} · Рейтинг: ${state?.rating||1000}</div><button class="btn" onclick="guild()">Внести 100 монет</button></div>`],
- chat:['Чат игры',`<div id="chatlog" class="log"></div><div class="row"><input id="chatinput" class="input" maxlength="500" placeholder="Сообщение"><button class="btn" style="width:auto" onclick="sendChat()">➤</button></div>`],
- more:['Ещё',`<div class="grid"><button class="btn" onclick="claim('resource.gather')">🌲 Ресурсы</button><button class="btn" onclick="claim('rest')">❤️ Отдых</button><button class="btn" onclick="claim('achievement.claim')">🏆 Достижение</button><button class="btn" onclick="claim('season.claim')">🏅 Сезон</button></div><div class="card"><b>Материалы</b><div class="muted">Железо ${state?.materials?.iron||0} · Дерево ${state?.materials?.wood||0} · Кожа ${state?.materials?.leather||0} · Травы ${state?.materials?.herbs||0}</div></div>`]
- };
- const v=views[type]||views.more;t.textContent=v[0];b.innerHTML=v[1];
- if(type==='shop')renderShop();if(type==='inventory')renderItems();if(type==='chat')connectChat();
+const zones = ["Голова", "Грудь", "Пояс", "Ноги"];
+let state = null;
+let battle = null;
+let selectedAttack = null;
+let selectedDefs = new Set();
+let socket = null;
+
+function toast(message) {
+  const element = document.getElementById("toast");
+  element.textContent = message;
+  element.style.display = "block";
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => {
+    element.style.display = "none";
+  }, 2200);
 }
-function renderShop(){const e=document.getElementById('shop');if(!e)return;e.innerHTML=[['knife','🔪','Нож',220],['heavyaxe','🪓','Тяжёлый топор',700],['steel','🛡️','Стальная броня',650],['bandage','🩹','Аптечка',80]].map(x=>`<div class="card"><b>${x[1]} ${x[2]}</b><div class="muted">${x[3]} монет</div><button class="btn" onclick="buy('${x[0]}')">Купить</button></div>`).join('')}
-function renderItems(){const e=document.getElementById('items');if(!e)return;e.innerHTML=(state?.items||[]).map(i=>`<div class="card"><b>${i.icon} ${i.name}</b><div class="muted">${i.type} · ${i.equipped?'Экипировано':'В инвентаре'} · x${i.qty}</div><button class="btn" onclick="item('${i.id}','${i.equipped?'unequip':'equip'}')">${i.equipped?'Снять':'Надеть'}</button>${i.type==='Расходник'?`<button class="btn" onclick="item('${i.id}','use')">Использовать</button>`:''}</div>`).join('')||'<div class="card">Инвентарь пуст.</div>'}
-async function claim(a,d={}){const x=await callApi(a,d);if(x.ok){toast('Готово');if(document.getElementById('panel').classList.contains('open'))openPanel(document.getElementById('pt').textContent==='Магазин'?'shop':'more')}}
-async function buy(id){const x=await callApi('item.buy',{item:id});if(x.ok){toast('Куплено');renderShop()}}
-async function item(id,a){const x=await callApi('item.'+a,{id});if(x.ok){renderItems();toast('Готово')}}
-async function stat(s){const x=await callApi('stat.add',{stat:s});if(x.ok)openPanel('hero')}
-async function guild(){const x=await callApi('guild.contribute',{amount:100});if(x.ok)openPanel('guild')}
-function startBattle(){closePanel();document.getElementById('battle').classList.add('open');attack=null;defenses=new Set();callApi('battle.start').then(x=>{if(!x.ok){closeBattle();return}battle=x.battle;renderBattle()})}
-function renderBattle(){const e=document.getElementById('enemy'),a=document.getElementById('att'),d=document.getElementById('defs');e.innerHTML=`<b>${battle.enemy.name}</b><div class="hp"><i style="width:${battle.enemyHp/battle.enemy.hp*100}%"></i></div><div>${battle.enemyHp} / ${battle.enemy.hp}</div>`;
-a.innerHTML=zones.map((z,i)=>`<button class="zone ${attack===i?'sel':''}" onclick="pickA(${i})">${z}</button>`).join('');
-d.innerHTML=zones.map((z,i)=>`<button class="zone ${defenses.has(i)?'sel':''}" onclick="pickD(${i})">${z}</button>`).join('')}
-function pickA(i){attack=i;renderBattle()}function pickD(i){if(defenses.has(i))defenses.delete(i);else if(defenses.size<2)defenses.add(i);renderBattle()}
-async function turn(){if(attack===null)return toast('Выбери атаку');if(defenses.size!==2)return toast('Нужно выбрать 2 разные защиты');const x=await callApi('battle.turn',{attack,defs:[...defenses]});if(!x.ok)return;const r=x.round;document.getElementById('round').innerHTML=`Атака: ${zones[r.attack]} · Защита: ${r.defs.map(i=>zones[i]).join(', ')}<br>Враг атаковал: ${zones[r.enemyAttack]} · ${r.blocked?'БЛОК':''}${r.dodge?' УКЛОНЕНИЕ':''}<br>Урон: ${r.playerDamage} · Ответный урон: ${r.enemyDamage}`;
-if(x.result==='win'){const q=await callApi('battle.reward');toast(q.ok?'Победа!':'Ошибка награды');setTimeout(closeBattle,700)}else if(x.result==='loss'){await callApi('battle.loss');toast('Поражение');setTimeout(closeBattle,700)}else{battle.enemyHp=r.enemyHp;renderBattle()}attack=null;defenses=new Set()}
-function closeBattle(){document.getElementById('battle').classList.remove('open')}
-function connectChat(){if(ws&&ws.readyState===1)return;const proto=location.protocol==='https:'?'wss':'ws';ws=new WebSocket(`${proto}://${location.host}/ws`);ws.onmessage=e=>{try{const m=JSON.parse(e.data),log=document.getElementById('chatlog');if(!log)return;const row=document.createElement('div');row.className='msg';const b=document.createElement('b');b.textContent=m.name||'Игрок';row.append(b,document.createTextNode(' '+(m.text||'')));log.appendChild(row);log.scrollTop=log.scrollHeight}catch{}}}
-function sendChat(){const i=document.getElementById('chatinput');if(!i||!i.value.trim()||!ws||ws.readyState!==1)return toast('Чат подключается');ws.send(JSON.stringify({type:'chat',name:state?.playerName||'Игрок',text:i.value.trim()}));i.value=''}
-load();
-</script></body></html>
+
+async function callApi(route, data = {}) {
+  try {
+    const response = await fetch("/api/" + route, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (result.state) {
+      state = result.state;
+      renderHud();
+    }
+
+    if (!result.ok) {
+      toast(errorText(result.error));
+    }
+
+    return result;
+  } catch (error) {
+    toast("Нет соединения с сервером");
+    return { ok: false, error: "network_error" };
+  }
+}
+
+function errorText(error) {
+  const map = {
+    no_energy: "Недостаточно энергии",
+    not_enough_coins: "Недостаточно монет",
+    not_enough_materials: "Не хватает материалов",
+    level_required: "Нужен более высокий уровень",
+    already_claimed: "Уже получено",
+    invalid_move: "Неверный ход",
+    no_active_battle: "Нет активного боя",
+    battle_active: "Бой уже идёт",
+    full_hp: "Здоровье уже полное",
+    mission_locked: "Миссия ещё не выполнена",
+    achievement_locked: "Достижение ещё не открыто",
+    season_locked: "Сезонная награда пока недоступна",
+    quest_not_complete: "Задание ещё не выполнено"
+  };
+  return map[error] || error || "Ошибка";
+}
+
+async function loadState() {
+  const result = await callApi("state");
+  if (result.ok) renderHud();
+}
+
+function renderHud() {
+  if (!state) return;
+
+  document.getElementById("playerName").textContent = state.playerName || "Игрок";
+  document.getElementById("levelText").textContent = "Глава 5 · Уровень " + (state.level || 1);
+  document.getElementById("coins").textContent = state.coins ?? 0;
+  document.getElementById("gems").textContent = state.gems ?? 0;
+  document.getElementById("energy").textContent = state.energy ?? 0;
+  document.getElementById("xpText").textContent = `${state.exp || 0}/${state.maxExp || 100}`;
+
+  const percent = Math.max(0, Math.min(100, ((state.exp || 0) / Math.max(1, state.maxExp || 100)) * 100));
+  document.getElementById("xpBar").style.width = percent + "%";
+}
+
+function closePanel() {
+  document.getElementById("panel").classList.remove("open");
+}
+
+function openPanel(type) {
+  const panel = document.getElementById("panel");
+  const title = document.getElementById("panelTitle");
+  const body = document.getElementById("panelBody");
+
+  const views = {
+    hero: [
+      "Персонаж",
+      `<div class="card"><b>${esc(state?.playerName || "Игрок")}</b><div class="muted">Уровень ${state?.level || 1} · XP ${state?.exp || 0}/${state?.maxExp || 100}</div><div class="muted">HP ${state?.hp || 0}/${state?.maxHp || 0} · Сила ${state?.strength || 0} · Ловкость ${state?.agility || 0}</div><div class="muted">Свободные очки: ${state?.freePoints || 0}</div><div class="grid"><button class="btn" onclick="addStat('strength')">Сила +</button><button class="btn" onclick="addStat('agility')">Ловкость +</button></div></div>`
+    ],
+    inventory: ["Инвентарь", `<div id="items"></div>`],
+    shop: ["Магазин", `<div id="shop"></div>`],
+    forge: ["Кузница", `<div class="card"><b>⚒ Крафт оружия</b><div class="muted">2 железа + 2 дерева + 1 кожа.</div><button class="btn" onclick="claim('craft')">Ковать</button></div><div class="card"><b>Уровень кузницы: ${state?.forgeLevel || 0}</b></div>`],
+    tavern: ["Таверна", `<div class="card"><b>🍺 Нанять героя</b><div class="muted">Стоимость: 300 монет</div><button class="btn" onclick="claim('tavern.recruit')">Нанять</button></div>`],
+    bonus: ["Бонусы", `<div class="card"><b>🎁 Ежедневный бонус</b><div class="muted">250 монет + 10 энергии + 20 XP</div><button class="btn" onclick="claim('bonus.claim')">Забрать</button></div>`],
+    events: ["События", `<div class="card"><b>⚔️ Событие Sdolars</b><div class="muted">Стоимость: 3 энергии</div><button class="btn" onclick="claim('event.fight')">Участвовать</button></div>`],
+    vip: ["VIP", `<div class="card"><b>👑 VIP Territory</b><div class="muted">Раздел готов для серверных привилегий.</div></div>`],
+    guild: ["Гильдия", `<div class="card"><b>${esc(state?.guildName || "Sdolars")}</b><div class="muted">Участники: ${state?.guildMembers || 1} · Вклад: ${state?.guildContrib || 0} · Рейтинг: ${state?.rating || 1000}</div><button class="btn" onclick="guildContribute()">Внести 100 монет</button></div>`],
+    missions: ["Миссии", `<div class="card"><b>🏆 Большая миссия</b><div class="muted">Победи 3 противников.</div><button class="btn" onclick="claim('mission.claim')">Получить награду</button></div>`],
+    quest: ["Задания", `<div class="card"><b>Поговори с кузнецом</b><div class="muted">Нажми, чтобы начать, затем выполни действие в кузнице.</div><button class="btn" onclick="questStart('forge')">Начать</button><button class="btn" onclick="questProgress('forge')">Отметить выполнение</button><button class="btn" onclick="questClaim('forge')">Забрать награду</button></div><div class="card"><b>Разведка района</b><div class="muted">Проведи разведку за 2 энергии.</div><button class="btn" onclick="questStart('scout')">Начать</button><button class="btn" onclick="scout()">Разведать</button><button class="btn" onclick="questClaim('scout')">Забрать награду</button></div>`],
+    districts: ["Районы", `<div id="districts"></div>`],
+    achievements: ["Достижения", `<div class="card"><b>🏆 Первая победа</b><div class="muted">Победи хотя бы одного противника.</div><button class="btn" onclick="claim('achievement.claim')">Получить</button></div>`],
+    settings: ["Настройки", `<div class="card"><b>Язык</b><div class="grid"><button class="btn" onclick="toast('Русский активен')">RU</button><button class="btn" onclick="toast('English UI — следующий этап')">EN</button></div></div>`],
+    chat: ["Чат", `<div id="chatlog" class="log"></div><div class="row"><input id="chatinput" class="input" maxlength="500" placeholder="Сообщение"><button class="btn" style="width:auto" onclick="sendChat()">➤</button></div>`],
+    more: ["Ещё", `<div class="grid"><button class="btn" onclick="claim('resource.gather')">🌲 Ресурсы</button><button class="btn" onclick="claim('rest')">❤️ Отдых</button><button class="btn" onclick="claim('season.claim')">🏅 Сезон</button><button class="btn" onclick="openPanel('districts')">🗺️ Районы</button></div><div class="card"><b>Материалы</b><div class="muted">Железо ${state?.materials?.iron || 0} · Дерево ${state?.materials?.wood || 0} · Кожа ${state?.materials?.leather || 0} · Травы ${state?.materials?.herbs || 0}</div></div>`]
+  };
+
+  const view = views[type] || views.more;
+  title.textContent = view[0];
+  body.innerHTML = view[1];
+  panel.classList.add("open");
+
+  if (type === "inventory") renderItems();
+  if (type === "shop") renderShop();
+  if (type === "districts") renderDistricts();
+  if (type === "chat") connectChat();
+}
+
+function renderItems() {
+  const element = document.getElementById("items");
+  if (!element) return;
+
+  const items = state?.items || [];
+  element.innerHTML = items.length
+    ? items.map((item) => `
+      <div class="card item">
+        <div style="font-size:26px">${esc(item.icon)}</div>
+        <div class="grow"><b>${esc(item.name)}</b><div class="muted">${esc(item.type)} · ${item.equipped ? "Экипировано" : "В инвентаре"} · x${item.qty}</div></div>
+        <button class="btn" style="width:auto" onclick="itemAction('${escAttr(item.id)}','${item.equipped ? "unequip" : "equip"}')">${item.equipped ? "Снять" : "Надеть"}</button>
+      </div>`).join("")
+    : `<div class="card">Инвентарь пуст.</div>`;
+}
+
+function renderShop() {
+  const element = document.getElementById("shop");
+  if (!element) return;
+
+  const catalog = [
+    ["knife", "🔪", "Нож", 220],
+    ["heavyaxe", "🪓", "Тяжёлый топор", 700],
+    ["steel", "🛡️", "Стальная броня", 650],
+    ["bandage", "🩹", "Аптечка", 80]
+  ];
+
+  element.innerHTML = catalog.map((item) => `
+    <div class="card">
+      <b>${item[1]} ${item[2]}</b>
+      <div class="muted">${item[3]} монет</div>
+      <button class="btn" onclick="buyItem('${item[0]}')">Купить</button>
+    </div>`).join("");
+}
+
+function renderDistricts() {
+  const element = document.getElementById("districts");
+  if (!element) return;
+
+  element.innerHTML = (state?.districts || []).map((district) => `
+    <div class="card item">
+      <div style="font-size:25px">${district.icon}</div>
+      <div class="grow"><b>${esc(district.name)}</b><div class="muted">Ур. ${district.level} · ${district.cost} ⚡</div></div>
+      <button class="btn" style="width:auto" onclick="travel('${escAttr(district.id)}')">${district.unlocked ? "Войти" : "Закрыто"}</button>
+    </div>`).join("");
+}
+
+async function claim(action) {
+  const result = await callApi("action", { type: action });
+  if (result.ok) toast("Готово");
+}
+
+async function addStat(stat) {
+  const result = await callApi("action", { type: "stat.add", stat });
+  if (result.ok) openPanel("hero");
+}
+
+async function buyItem(item) {
+  const result = await callApi("action", { type: "item.buy", item });
+  if (result.ok) {
+    toast("Куплено");
+    renderShop();
+  }
+}
+
+async function itemAction(id, action) {
+  const result = await callApi("action", { type: "item." + action, id });
+  if (result.ok) {
+    toast("Готово");
+    renderItems();
+  }
+}
+
+async function travel(district) {
+  const result = await callApi("action", { type: "district.travel", district });
+  if (result.ok) {
+    toast("Переход выполнен");
+    renderDistricts();
+  }
+}
+
+async function guildContribute() {
+  const result = await callApi("action", { type: "guild.contribute", amount: 100 });
+  if (result.ok) openPanel("guild");
+}
+
+async function questStart(quest) {
+  const result = await callApi("action", { type: "quest.start", quest });
+  if (result.ok) toast("Задание начато");
+}
+
+async function questProgress(quest) {
+  const result = await callApi("action", { type: "quest.progress", quest });
+  if (result.ok) toast("Прогресс сохранён");
+}
+
+async function questClaim(quest) {
+  const result = await callApi("action", { type: "quest.claim", quest });
+  if (result.ok) {
+    toast("Награда получена");
+    openPanel("quest");
+  }
+}
+
+async function scout() {
+  const result = await callApi("action", { type: "scout" });
+  if (result.ok) toast(`Разведка: +${result.reward?.coins || 0} монет`);
+}
+
+function startBattle() {
+  closePanel();
+  document.getElementById("battle").classList.add("open");
+  selectedAttack = null;
+  selectedDefs = new Set();
+
+  callApi("action", { type: "battle.start" }).then((result) => {
+    if (!result.ok) {
+      closeBattle();
+      return;
+    }
+
+    battle = result.battle;
+    renderBattle();
+  });
+}
+
+function renderBattle() {
+  if (!battle) return;
+
+  const enemy = document.getElementById("enemyBox");
+  enemy.innerHTML = `
+    <b>${esc(battle.enemy.name)}</b>
+    <div class="hp"><i style="width:${Math.max(0, battle.enemyHp / battle.enemy.hp * 100)}%"></i></div>
+    <div>${battle.enemyHp} / ${battle.enemy.hp} HP</div>`;
+
+  document.getElementById("attackZones").innerHTML = zones.map((zone, index) => `
+    <button class="zone ${selectedAttack === index ? "sel" : ""}" onclick="selectAttack(${index})">${zone}</button>
+  `).join("");
+
+  document.getElementById("defenseZones").innerHTML = zones.map((zone, index) => `
+    <button class="zone ${selectedDefs.has(index) ? "sel" : ""}" onclick="toggleDefense(${index})">${zone}</button>
+  `).join("");
+}
+
+function selectAttack(index) {
+  selectedAttack = index;
+  renderBattle();
+}
+
+function toggleDefense(index) {
+  if (selectedDefs.has(index)) {
+    selectedDefs.delete(index);
+  } else if (selectedDefs.size < 2) {
+    selectedDefs.add(index);
+  }
+  renderBattle();
+}
+
+async function submitTurn() {
+  if (selectedAttack === null) {
+    toast("Выбери зону атаки");
+    return;
+  }
+
+  if (selectedDefs.size !== 2) {
+    toast("Нужно выбрать ровно 2 разные защиты");
+    return;
+  }
+
+  // Exactly one numeric attack and exactly two unique numeric defense zones.
+  const attack = Number(selectedAttack);
+  const defs = [...selectedDefs].map(Number);
+
+  const result = await callApi("action", {
+    type: "battle.turn",
+    attack,
+    defs
+  });
+
+  if (!result.ok || !result.round) return;
+
+  const round = result.round;
+
+  document.getElementById("roundResult").innerHTML = `
+    <b>Раунд ${round.turn}</b><br>
+    Атака: ${zones[round.attack]}<br>
+    Защита: ${round.defs.map((index) => zones[index]).join(", ")}<br>
+    Враг атаковал: ${zones[round.enemyAttack]}<br>
+    ${round.hit ? "Попадание" : "Атака заблокирована"} ·
+    ${round.crit ? "КРИТ!" : ""}<br>
+    ${round.blocked ? "Блок" : ""} ${round.dodge ? "Уклонение" : ""}<br>
+    Урон игрока: ${round.playerDamage} · Урон врага: ${round.enemyDamage}
+  `;
+
+  selectedAttack = null;
+  selectedDefs = new Set();
+
+  if (result.result === "win") {
+    const reward = await callApi("action", { type: "battle.reward" });
+    toast(reward.ok ? "Победа!" : "Ошибка награды");
+    setTimeout(closeBattle, 800);
+    return;
+  }
+
+  if (result.result === "loss") {
+    await callApi("action", { type: "battle.loss" });
+    toast("Поражение");
+    setTimeout(closeBattle, 800);
+    return;
+  }
+
+  battle.enemyHp = round.enemyHp;
+  renderBattle();
+}
+
+function closeBattle() {
+  document.getElementById("battle").classList.remove("open");
+  battle = null;
+}
+
+function connectChat() {
+  if (socket && socket.readyState === WebSocket.OPEN) return;
+
+  const protocol = location.protocol === "https:" ? "wss" : "ws";
+  socket = new WebSocket(`${protocol}://${location.host}/ws`);
+
+  socket.onmessage = (event) => {
+    try {
+      const message = JSON.parse(event.data);
+      const log = document.getElementById("chatlog");
+      if (!log) return;
+
+      const row = document.createElement("div");
+      row.className = "msg";
+
+      const name = document.createElement("b");
+      name.textContent = message.name || "Игрок";
+
+      row.appendChild(name);
+      row.appendChild(document.createTextNode(" " + (message.text || "")));
+      log.appendChild(row);
+      log.scrollTop = log.scrollHeight;
+    } catch {
+      // Ignore malformed chat packets.
+    }
+  };
+
+  socket.onclose = () => {
+    socket = null;
+  };
+}
+
+function sendChat() {
+  const input = document.getElementById("chatinput");
+
+  if (!input || !input.value.trim()) return;
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    toast("Чат подключается");
+    return;
+  }
+
+  socket.send(JSON.stringify({
+    type: "chat",
+    name: state?.playerName || "Игрок",
+    text: input.value.trim()
+  }));
+
+  input.value = "";
+}
+
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[char]));
+}
+
+function escAttr(value) {
+  return String(value ?? "").replace(/[^a-zA-Z0-9_:@.-]/g, "");
+}
+
+window.addEventListener("visibilitychange", () => {
+  if (!document.hidden && state) {
+    loadState();
+  }
+});
+
+loadState();
+</script>
+</body>
+</html>
