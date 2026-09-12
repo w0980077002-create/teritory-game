@@ -371,11 +371,33 @@ views.craft=['Мастерская',()=>card('⚒️ Создание предм
 views.market=['Рынок',()=>{let h=card('💰 Продажа снаряжения','<p>Продажа даёт часть стоимости предмета.</p>');state.items.forEach((it,i)=>{if(!it.equipped)h+='<div class="card"><b>'+it.icon+' '+it.name+'</b><p>'+it.type+' · Количество '+(it.qty||1)+'</p><button class="sellBtn" onclick="sellItem('+i+')">Продать</button></div>'});return h}];
 views.season=['Сезон',()=>card('🏆 Сезон Sdolars','<p>Рейтинг: <b>'+state.rating+'</b></p><p>Лучший: <b>'+((state.season&&state.season.bestRating)||state.rating)+'</b> · Побед: <b>'+((state.season&&state.season.wins)||0)+'</b></p><button class="goldBtn" onclick="claimSeason()">Забрать сезонную награду</button>')];
 views.leaderboard=['Рейтинг',()=>'<div class="card"><b>🏆 Таблица Sdolars</b><p>Рейтинг и победы игроков.</p><div id="leaderboardBox">Загрузка...</div></div>'];
+views.casino=['Казино',()=>card('🎰 Казино Sdolars','<p>Только внутриигровые монеты. Реальные деньги не используются.</p><p>Баланс: <b>'+state.coins+' 🪙</b></p><button class="goldBtn" onclick="casinoSpin()">Крутить за 50 🪙</button>')];
 views.guild=['Гильдия',()=>{if(state.guildId)return card('🛡️ '+(state.guildName||'Гильдия Sdolars'),'<p>Уровень: <b>'+state.guildLevel+'</b> · Участники: <b>'+state.guildMembers+'</b></p><p>Вклад: <b>'+state.guildContribution+' 🪙</b></p><div class="grid2"><button onclick="guildContribute(100)">Внести 100 🪙</button><button onclick="leaveGuild()">Покинуть</button></div>');return card('🛡️ Гильдия Sdolars','<p>Создай свою гильдию или присоединись к последней созданной.</p><div class="grid2"><button class="goldBtn" onclick="createGuild()">Создать</button><button class="goldBtn" onclick="joinGuild()">Вступить</button></div>')}];
 views.heroes=['Герои',()=>{const hs=state.heroes||[];return card('⚔️ Команда',hs.length?hs.map(h=>'<div class="card"><b>'+h.name+'</b><p>Уровень '+h.level+' · '+h.role+'</p><button onclick="trainHero(\''+h.id+'\')">Тренировать · 250 🪙</button></div>').join(''):'<p>Героев пока нет. Найми их в таверне.</p>')}];
 views.more=['Ещё',()=>'<div class="featureGrid"><button class="featureBtn" onclick="openP(\'daily\')">🎁<br>Бонус</button><button class="featureBtn" onclick="openP(\'missions\')">📋<br>Миссии</button><button class="featureBtn" onclick="openP(\'craft\')">⚒️<br>Мастерская</button><button class="featureBtn" onclick="openP(\'market\')">💰<br>Рынок</button><button class="featureBtn" onclick="openP(\'season\')">🏆<br>Сезон</button><button class="featureBtn" onclick="openP(\'leaderboard\');loadLeaderboard()">🥇<br>Рейтинг</button><button class="featureBtn" onclick="openP(\'heroes\')">⚔️<br>Герои</button><button class="featureBtn" onclick="openP(\'guild\')">🛡️<br>Гильдия</button><button class="featureBtn" onclick="openP(\'districts\')">🗺️<br>Районы</button><button class="featureBtn" onclick="openP(\'messages\')">✉️<br>Чат</button><button class="featureBtn" onclick="openP(\'settings\')">⚙️<br>Настройки</button></div><div class="card"><b>ℹ️ Territory — Sdolars</b><p>Рабочая база сохранена. Новые системы подключаются поверх неё.</p><p>Версия: T1</p><p class="muted">GitHub-совместимый режим: API + локальный резерв.</p></div>'];
 
- if((state.coins||0) — рейтинг '+x.rating+' · побед '+x.wins+' · ур. '+x.level+'</p>').join('')||'Пока нет игроков.'}catch(e){box.textContent='Рейтинг доступен при подключении сервера.'}}
+function casinoSpin(){
+ if((state.coins||0)<50){toast('Не хватает монет');return}
+ state.coins-=50;
+ const roll=Math.random();
+ const mult=roll<.08?10:roll<.22?4:roll<.48?2:0;
+ if(mult){const win=50*mult;state.coins+=win;toast('🎰 Выигрыш +'+win+' 🪙')}
+ else toast('🎰 Не повезло');
+ save();openP('casino');
+}
+
+async function claimDaily(){const d=await serverAction('daily.claim');if(d?.ok){toast('🎁 +'+d.reward+' 🪙');openP('daily');return}if(d===null){const day=new Date().toISOString().slice(0,10);if(state.dailyLast===day){toast('Награда уже получена');return}state.dailyLast=day;state.dailyStreak=(state.dailyStreak||0)+1;const r=200+Math.min(1000,state.dailyStreak*50);state.coins+=r;state.exp+=20+state.dailyStreak*5;progress();save();toast('🎁 +'+r+' 🪙');openP('daily')}}
+async function claimMission(id){const d=await serverAction('mission.claim',{id});if(d?.ok){toast('🎁 Миссия выполнена');openP('missions');return}toast(d?.error||'Миссия ещё не готова')}
+async function craftItem(recipe){const d=await serverAction('craft',{recipe});if(d?.ok){toast('⚒️ Предмет создан');openP('craft');openP('inventory');return}if(d===null){toast('Мастерская доступна после подключения сервера')}}
+async function gatherResources(){const d=await serverAction('resource.gather');if(d?.ok){toast('⛏️ +'+d.reward.amount+' ресурса');openP('craft');return}toast(d?.error||'Недостаточно энергии')}
+async function sellItem(i){const d=await serverAction('market.sell',{index:i});if(d?.ok){toast('💰 +'+d.value+' 🪙');openP('market');return}if(d===null){const it=state.items[i];if(!it||it.equipped){toast('Нельзя продать');return}const value=Math.max(10,Math.round((it.price||50)*.45));if(it.qty>1)it.qty--;else state.items.splice(i,1);state.coins+=value;save();toast('💰 +'+value+' 🪙');openP('market')}}
+async function createGuild(){const name=prompt('Название гильдии','Гильдия Sdolars');if(!name)return;const d=await serverAction('guild.create',{name});if(d?.ok){toast('🛡️ Гильдия создана');openP('guild');return}toast(d?.error||'Не удалось создать гильдию')}
+async function joinGuild(){const d=await serverAction('guild.join');if(d?.ok){toast('🛡️ Ты вступил в гильдию');openP('guild');return}toast(d?.error||'Гильдия не найдена')}
+async function leaveGuild(){const d=await serverAction('guild.leave');if(d?.ok){toast('Гильдия покинута');openP('guild');return}toast(d?.error||'Ты не в гильдии')}
+async function guildContribute(amount){const d=await serverAction('guild.contribute',{amount});if(d?.ok){toast('🪙 Вклад внесён');openP('guild');return}toast(d?.error||'Не удалось внести вклад')}
+async function trainHero(id){const d=await serverAction('hero.train',{id});if(d?.ok){toast('⚔️ Герой усилен');openP('heroes');return}toast(d?.error||'Недостаточно монет')}
+async function claimSeason(){const d=await serverAction('season.claim');if(d?.ok){toast('🏆 Сезонная награда получена');openP('season');return}toast(d?.error||'Награда пока недоступна')}
+async function loadLeaderboard(){const box=document.getElementById('leaderboardBox');if(!box)return;try{const r=await fetch('/api/leaderboard');if(!r.ok)throw 0;const d=await r.json();box.innerHTML=(d.players||[]).map((x,i)=>'<p><b>'+(i+1)+'. '+chatEsc(x.name)+'</b> — рейтинг '+x.rating+' · побед '+x.wins+' · ур. '+x.level+'</p>').join('')||'Пока нет игроков.'}catch(e){box.textContent='Рейтинг доступен при подключении сервера.'}}
 const _oldStrike=strikeTurn;
 strikeTurn=async function(fromAuto){
  const b=window._battle;
