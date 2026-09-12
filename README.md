@@ -1,19 +1,24 @@
-# Territory — Sdolars — S81
+# Territory — Sdolars s75
 
-S81 fixes the two issues visible in the S80 phone screenshot at source level.
+Global gameplay build based directly on the approved s60 working base.
 
-1. Bottom yellow active-tab stripe:
-   - forced off with border/background/box-shadow/outline overrides.
+- 4 attack zones and 4 defense zones; no belly zone
+- 2 defense selections
+- automatic strike after selection
+- 15-second timeout = loss
+- compact battle history and auto-battle checkbox
+- character progression and persistent stats
+- districts with level gates, enemies, rewards and win counters
+- inventory/equipment
+- progressive forge upgrades
+- quests and rewards
+- casino excluded
+- approved city screen preserved
 
-2. Main Battle button and navigation:
-   - the previous delegated selector was removed;
-   - direct inline handlers now call an EARLY mobile bridge defined before the main application script;
-   - the bridge calls the real `battle()` / `openP()` functions at tap time and retries once if the app script has not finished initializing;
-   - battle errors are caught instead of silently leaving the user on the city screen.
 
-Other invariants:
-- 4 battle zones only: Голова / Грудь / Пояс / Ноги.
-- Attack 1, defense 2.
-- Worker embeds exact index.html.
-- Worker version s81.
-- Node syntax checks pass.
+## s76 — gameplay loop update
+- Battle now costs 3 energy.
+- Victory/loss persists battle statistics and HP.
+- Victory advances active adventure quest and daily win mission.
+- Victory grants level progression and free attribute points when XP threshold is reached.
+- Version markers updated to s76.
