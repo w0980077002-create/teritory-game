@@ -497,7 +497,7 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/health") {
-      return json({ ok: true, build: "s89-visual-final", zones: 4, energyRegenMs: 300000 });
+      return json({ ok: true, build: "s90-final", zones: 4, energyRegenMs: 300000 });
     }
 
     if (url.pathname.startsWith("/api/")) {
@@ -516,7 +516,21 @@ export default {
       return env.GAME_HUB.get(id).fetch(request);
     }
 
-    if (env.ASSETS) return env.ASSETS.fetch(request);
-    return new Response("Territory Sdolars", { status: 404 });
+    if (env.ASSETS) {
+      const assetResponse = await env.ASSETS.fetch(request);
+      const headers = new Headers(assetResponse.headers);
+      const path = url.pathname.toLowerCase();
+      if (path === "/" || path.endsWith(".html") || path.endsWith(".js") || path.endsWith(".css") || path.endsWith(".json")) {
+        headers.set("cache-control", "no-store, no-cache, must-revalidate, max-age=0");
+        headers.set("pragma", "no-cache");
+        headers.set("expires", "0");
+      }
+      return new Response(assetResponse.body, {
+        status: assetResponse.status,
+        statusText: assetResponse.statusText,
+        headers
+      });
+    }
+    return new Response("Territory Sdolars S90", { status: 404, headers: { "cache-control": "no-store" } });
   }
 };
