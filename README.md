@@ -1,21 +1,19 @@
-# Territory — Sdolars · S90 FINAL
+# Territory — Sdolars · S90 GitHub/Cloudflare READY
 
-Готовая мобильная сборка Territory для текущего Cloudflare Workers backend.
+Эта папка предназначена для загрузки **содержимого целиком в корень GitHub-репозитория** `teritory-game`.
 
-## Состав
+Структура корня:
+- index.html
+- worker.js
+- wrangler.jsonc
+- package.json
+- assets/home-screen.png
+- assets/home-screen-full.png
 
-- index.html — финальный мобильный интерфейс
-- worker.js — текущий серверный GameHub и игровая логика
-- wrangler.jsonc — Cloudflare Workers, Durable Objects и Static Assets
-- package.json — команды Wrangler
-- assets/home-screen.png — фон игровой сцены
-- assets/home-screen-full.png — полный исходный арт
+Важно: **не загружать саму папку `Territory-S90-GITHUB-READY` внутрь репозитория**. На GitHub должны быть видны `index.html`, `worker.js`, `wrangler.jsonc`, `package.json` и `assets` непосредственно в корне.
 
-## Установка
+Cloudflare Workers конфиг использует `main: worker.js` и Static Assets `directory: .`.
 
-1. Скопируйте содержимое этой папки в репозиторий.
-2. Сохраните worker.js, wrangler.jsonc, package.json и папку assets.
-3. Установите зависимости командой `npm install`.
-4. Опубликуйте проект командой `npm run deploy`.
-
-Фронтенд использует POST /api/state и POST /api/action. Боевой интерфейс работает с четырьмя зонами сервера: атака — одна зона, защита — две разные зоны. После завершения раунда используются серверные действия battle.reward и battle.loss.
+Для ручного деплоя:
+`npm install`
+`npm run deploy`
