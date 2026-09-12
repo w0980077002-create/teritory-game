@@ -174,7 +174,7 @@ function combatTurn(){
  const hit=Math.random()<Math.min(.95,.68+state.agility*.007);
  let dmg=0;
  if(hit&&!blockedByEnemy){
-   dmg=9+state.strength+state.weaponBonus+(crit?Math.ceil((9+state.strength)*.55):0);
+   const baseDamage=9+state.strength+state.weaponBonus+(crit?Math.ceil((9+state.strength)*.55):0); const recruitMultiplier=1+state.recruited.length*0.05; dmg=Math.max(1,Math.floor(baseDamage*recruitMultiplier));
    combat.enemy.hp=Math.max(0,combat.enemy.hp-dmg);
    combat.log.push((crit?'КРИТ! ':'')+'Попадание в '+ZONES[combat.attack]+': -'+dmg+' HP.');
  }else if(blockedByEnemy)combat.log.push('Противник закрыл твою зону атаки.');
@@ -250,20 +250,86 @@ function openPanel(type){
 function closePanel(){document.getElementById('modal').classList.remove('show')}
 function showSimple(t,x){document.getElementById('sheet').innerHTML=`<button class="close" onclick="closePanel()">✕</button><h2>${t}</h2><div class="card">${x}</div>`;document.getElementById('modal').classList.add('show')}
 
-function forgePanel(){const cost=80+state.forgeLevel*60;return `<button class="close" onclick="closePanel()">✕</button><h2>⚒️ Кузница</h2><div class="card"><h3>Улучшение экипировки</h3><p>Уровень: ${state.forgeLevel}</p><p>Сила ${state.strength} · Ловкость ${state.agility}</p><p>Цена: <b>${cost} ◆</b></p><button onclick="upgradeForge()">Улучшить: +2/+2</button></div>`}
-function upgradeForge(){const c=80+state.forgeLevel*60;if(state.sdo<c){toast('Недостаточно Sdolars.');return}state.sdo-=c;state.forgeLevel++;state.strength+=2;state.agility+=2;state.quest.forge=true;save();updateUI();toast('Кузница улучшена: +2 сила, +2 ловкость');openPanel('forge')}
+function forgePanel(){
+  const level=state.forgeLevel||0, gold=Math.floor(200*Math.pow(1.5,level)), sdo=Math.floor(50*Math.pow(1.5,level));
+  return `<button class="close" onclick="closePanel()">✕</button><h2>⚒️ Кузница</h2>
+  <div class="card"><h3>Улучшение снаряжения</h3>
+  <p>Уровень: <b>${level}</b></p><p>Сила: <b>${state.strength}</b> · Ловкость: <b>${state.agility}</b></p>
+  <p>Цена: <b>🟡 ${gold}</b> + <b>◆ ${sdo}</b></p>
+  <button onclick="upgradeForge('strength')">⚔️ Сила +2</button>
+  <button onclick="upgradeForge('agility')">🏃 Ловкость +2</button></div>`;
+}
+function upgradeForge(stat){
+  const level=state.forgeLevel||0, gold=Math.floor(200*Math.pow(1.5,level)), sdo=Math.floor(50*Math.pow(1.5,level));
+  if(state.coins<gold||state.sdo<sdo){toast('Недостаточно ресурсов для улучшения.');return}
+  state.coins-=gold; state.sdo-=sdo; state.forgeLevel=level+1;
+  if(stat==='agility') state.agility+=2; else state.strength+=2;
+  state.quest.forge=true; save(); updateUI();
+  toast('Снаряжение улучшено до уровня '+state.forgeLevel+'!');
+  openPanel('forge');
+}
 
-const HERO_NAMES=['Рагнар','Ивар','Сигрид','Эйрик','Астрид','Хальвар','Фрейя','Гуннар','Лагерта','Торстен'];
-function tavernPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>🍺 Таверна</h2><div class="card"><h3>Найм героя — 120 ◆</h3><p>Героев: ${state.recruited.length}</p><button onclick="recruitHero()">Нанять</button></div><div class="card" style="margin-top:9px">${state.recruited.length?state.recruited.map(x=>`<div class="statline">⚔️ ${x}<b>Нанят</b></div>`).join(''):'Героев пока нет.'}</div>`}
-function recruitHero(){if(state.sdo<120){toast('Недостаточно Sdolars.');return}state.sdo-=120;const a=HERO_NAMES.filter(x=>!state.recruited.includes(x));const n=(a.length?a:HERO_NAMES)[Math.floor(Math.random()*(a.length?a:HERO_NAMES).length)];state.recruited.push(n);state.quest.recruit=true;save();updateUI();toast('Вы наняли героя '+n);openPanel('tavern')}
 
-const SHOP=[{name:'Стальной меч',cost:180,str:5,agi:0},{name:'Кожаная броня',cost:150,str:0,agi:4},{name:'Боевой шлем',cost:120,str:2,agi:2},{name:'Тяжёлый топор',cost:260,str:8,agi:-1}];
-function shopPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>🎒 Магазин</h2><div class="grid">${SHOP.map((x,i)=>`<div class="card"><h3>${x.name}</h3><p>Сила +${x.str} · Ловкость ${x.agi>=0?'+':''}${x.agi}</p><p>${x.cost} ◆</p><button onclick="buyItem(${i})">Купить</button></div>`).join('')}</div>`}
-function buyItem(i){const x=SHOP[i];if(state.sdo<x.cost){toast('Недостаточно Sdolars.');return}state.sdo-=x.cost;state.strength+=x.str;state.agility+=x.agi;state.weapon=x.name;state.weaponBonus+=Math.max(0,x.str);state.inventory.push(x.name);state.equipment.push(x.name);state.quest.shop=true;save();updateUI();toast('Куплено: '+x.name);openPanel('shop')}
+const RECRUITS=[
+{name:'Рагнар',class:'Вор'},{name:'Ивар',class:'Лучник'},{name:'Сигрид',class:'Маг'},{name:'Эйрик',class:'Лучник'},
+{name:'Астрид',class:'Маг'},{name:'Хальвар',class:'Вор'},{name:'Фрейя',class:'Маг'},{name:'Гуннар',class:'Лучник'},
+{name:'Лагерта',class:'Вор'},{name:'Торстен',class:'Лучник'},{name:'Элин',class:'Маг'},{name:'Бьорн',class:'Вор'}
+];
+function tavernPanel(){
+  return `<button class="close" onclick="closePanel()">✕</button><h2>🍺 Таверна</h2>
+  <div class="card"><h3>Найм рекрута — 500 🟡</h3><p>Наёмников: <b>${state.recruited.length}</b></p>
+  <p>Каждый наёмник: <b>+5% к урону</b>.</p><button onclick="recruitHero()">Нанять случайного рекрута</button></div>
+  <div class="card" style="margin-top:9px">${state.recruited.length?state.recruited.map(x=>{const h=typeof x==='string'?{name:x,class:'Рекрут'}:x;return `<div class="statline">🧑 ${h.name} · ${h.class}<b>+5%</b></div>`}).join(''):'Рекрутов пока нет.'}</div>`;
+}
+function recruitHero(){
+  const cost=500;
+  if(state.coins<cost){toast('Недостаточно 🟡 для найма.');return}
+  state.coins-=cost;
+  const r=RECRUITS[Math.floor(Math.random()*RECRUITS.length)];
+  state.recruited.push({name:r.name,class:r.class});
+  state.quest.recruit=true; save(); updateUI();
+  toast('Вы наняли героя '+r.name+' ('+r.class+')'); openPanel('tavern');
+}
+
+const SHOP=[
+{name:'Стальной меч',cost:180,str:5,agi:0,type:'equipment'},
+{name:'Кожаная броня',cost:150,str:0,agi:4,type:'equipment'},
+{name:'Боевой шлем',cost:120,str:2,agi:2,type:'equipment'},
+{name:'Зелье Энергии',cost:100,energy:10,type:'energy'},
+{name:'Зелье Здоровья',cost:100,hp:30,type:'health'}
+];
+function shopPanel(){
+  return `<button class="close" onclick="closePanel()">✕</button><h2>🎒 Магазин</h2><div class="grid">${SHOP.map((x,i)=>{
+    const effect=x.type==='energy'?'+10 ϟ энергии':x.type==='health'?'+30 HP в бою':'Сила +'+(x.str||0)+' · Ловкость '+((x.agi||0)>=0?'+':'')+(x.agi||0);
+    return `<div class="card"><h3>${x.name}</h3><p>${effect}</p><p>Цена: <b>🟡 ${x.cost}</b></p><button onclick="buyItem(${i})">Купить</button></div>`;
+  }).join('')}</div>`;
+}
+function buyItem(i){
+  const x=SHOP[i]; if(state.coins<x.cost){toast('Недостаточно 🟡.');return}
+  state.coins-=x.cost;
+  if(x.type==='energy'){
+    state.energy=Math.min(state.maxEnergy,state.energy+x.energy); state.inventory.push(x.name);
+    toast('Зелье Энергии: +'+x.energy+' ϟ');
+  }else if(x.type==='health'){
+    state.inventory.push(x.name);
+    if(combat&&!combat.finished){combat.playerHp=Math.min(combat.playerMaxHp,combat.playerHp+x.hp);combat.log.push('Зелье Здоровья: +'+x.hp+' HP.')}
+    toast('Зелье Здоровья: +'+x.hp+' HP');
+  }else{
+    state.strength+=x.str; state.agility+=x.agi; state.weapon=x.name; state.weaponBonus+=Math.max(0,x.str);
+    state.inventory.push(x.name); state.equipment.push(x.name); state.quest.shop=true; toast('Куплено: '+x.name);
+  }
+  save();updateUI();openPanel('shop');
+}
 
 function inventoryPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>🎒 Инвентарь</h2><div class="card"><p>Оружие: <b>${state.weapon}</b></p>${state.inventory.length?state.inventory.map(x=>`<div class="statline">🎒 ${x}</div>`).join(''):'Инвентарь пуст.'}</div>`}
 function equipmentPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>🛡️ Экипировка</h2><div class="card"><div class="statline">⚔️ Сила <b>${state.strength}</b></div><div class="statline">🏃 Ловкость <b>${state.agility}</b></div><div class="statline">🔨 Кузница <b>${state.forgeLevel}</b></div><div class="statline">⚔️ Оружие <b>${state.weapon}</b></div></div>`}
-function heroesPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>⚔️ Герои</h2><div class="card">${state.recruited.length?state.recruited.map(x=>`<div class="statline">🧔 ${x}<b>Нанят</b></div>`).join(''):'Героев нет.'}</div>`}
+function heroesPanel(){
+  return `<button class="close" onclick="closePanel()">✕</button><h2>⚔️ Герои</h2><div class="card">
+  <div class="statline">Наёмников <b>${state.recruited.length}</b></div>
+  <div class="statline">Бонус к урону <b>+${state.recruited.length*5}%</b></div>
+  ${state.recruited.length?state.recruited.map(x=>{const h=typeof x==='string'?{name:x,class:'Рекрут'}:x;return `<div class="statline">🧑 ${h.name} · ${h.class}<b>+5%</b></div>`}).join(''):'Героев нет.'}
+  </div>`;
+}
 function questsPanel(){const q=state.quest;return `<button class="close" onclick="closePanel()">✕</button><h2>📜 Задания</h2><div class="card"><div class="statline">⚔️ Победа <b>${q.firstBattle?'✓':'○'}</b></div><div class="statline">⚒ Кузница <b>${q.forge?'✓':'○'}</b></div><div class="statline">🍺 Герой <b>${q.recruit?'✓':'○'}</b></div><div class="statline">🎒 Магазин <b>${q.shop?'✓':'○'}</b></div></div>`}
 
 setInterval(()=>{updateUI()},1000);
