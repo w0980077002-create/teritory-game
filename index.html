@@ -355,6 +355,37 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 }
 </style>
 
+<style>
+/* S67 — four compact attack zones */
+.vikingBattle .attackZones{
+  grid-template-columns:repeat(4,1fr)!important;
+  max-width:470px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+.vikingBattle .attackZones button{
+  min-width:0!important;
+  padding:0 4px!important;
+}
+</style>
+
+<style>
+/* S67 — compact 15-second battle timer */
+.battleTimer{
+  float:right;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  height:22px;
+  padding:0 6px;
+  border-radius:11px;
+  font-size:12px;
+  font-weight:800;
+  background:rgba(255,255,255,.12);
+}
+.battleTimer.danger{background:rgba(220,50,50,.8)}
+</style>
 </head>
 <body>
 <div id="app">
@@ -396,6 +427,7 @@ function applyTelegramPlayer(){
 }
 const modal=document.getElementById('modal'),pt=document.getElementById('pt'),pb=document.getElementById('pb');
 const ZONES=['Голова','Грудь','Живот','Пояс','Ноги'];
+const ATTACK_ZONES=[0,1,2,4];
 const KEY='sdolars_s1_save';
 let state={coins:1779,level:3,exp:120,items:[
  {id:'axe',name:'Боевой топор',type:'Оружие',icon:'🪓',damage:12,price:450,equipped:true},
@@ -489,7 +521,39 @@ function toggleLang(){state.lang=state.lang==='RU'?'EN':'RU';save();applyLanguag
 function guildAction(x){toast('👥 '+x+' открыто')}
 function completeQuest(){if(state.questDone){toast('Задание уже выполнено');return}state.questDone=true;state.coins+=150;state.exp+=80;save();openP('quests');toast('📜 +150 🪙 +80 XP')}
 function claimBonus(){if(state.bonusClaimed){toast('Награда уже получена');return}state.bonusClaimed=true;state.coins+=250;state.exp+=20;save();openP('bonus');toast('🎁 +250 🪙 +20 XP')}
+
+let battleTimerId=null;
+let battleDeadline=0;
+function stopBattleTimer(){
+  if(battleTimerId){clearInterval(battleTimerId);battleTimerId=null;}
+}
+function startBattleTimer(){
+  stopBattleTimer();
+  const el=document.getElementById('battleTimer');
+  if(!el)return;
+  battleDeadline=Date.now()+15000;
+  const tick=()=>{
+    const left=Math.max(0, battleDeadline-Date.now());
+    const sec=Math.ceil(left/1000);
+    el.textContent=String(sec);
+    el.classList.toggle('danger',sec<=5);
+    if(left<=0){
+      stopBattleTimer();
+      el.textContent='0';
+      // Timeout = immediate loss for the player.
+      try{
+        const log=document.getElementById('battleLog');
+        if(log) log.innerHTML='<div>⏱️ Время вышло — вы проиграли.</div>'+log.innerHTML;
+      }catch(e){}
+      try{ if(typeof battleEnd==='function') battleEnd(false,'Время вышло'); }catch(e){}
+    }
+  };
+  tick();
+  battleTimerId=setInterval(tick,200);
+}
+
 function battle(){
+startBattleTimer();
   stopAutoBattle();
   const playerName=(window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name||'Игрок')+' '+(window.Telegram?.WebApp?.initDataUnsafe?.user?.last_name||'');
   const playerImg=document.querySelector('.avatar img')?.src||'';
@@ -503,7 +567,7 @@ function battle(){
     </div>
     <div class="autoRow"><button class="autoBtn" id="autoBtn" onclick="toggleAutoBattle()">▶ АВТОБОЙ</button></div>
     <div class="autoHint" id="autoHint">Автобой сам выбирает атаку и 2 зоны защиты каждый ход.</div>
-    <div class="card"><b>Ход: <span id="turnNo">1</span> · Атака — выбери 1 зону</b><div class="zones" id="attacks">${ZONES.map((x,i)=>'<button onclick="pickAttack('+i+',this)">'+x+'</button>').join('')}</div></div>
+    <div class="card"><b>Атака — выбери 1 зону <span id="battleTimer" class="battleTimer">15</span></b><div class="zones attackZones" id="attacks">${ATTACK_ZONES.map(i=>'<button onclick="pickAttack('+i+',this)">'+ZONES[i]+'</button>').join('')}</div></div>
     <div class="card"><b>Защита — выбери 2 зоны</b><div class="zones" id="defs">${ZONES.map((x,i)=>'<button onclick="pickDef('+i+',this)">'+x+'</button>').join('')}</div><p>Выбрано: <b id="dc">0/2</b></p></div>
     <button class="goldBtn" onclick="strikeTurn()">⚔️ Сделать ход</button>
     <div class="card"><b>История боя</b><div id="battleLog">Выберите атаку и две зоны защиты.</div></div>
@@ -512,9 +576,10 @@ function battle(){
 }
 function toggleAutoBattle(){const b=window._battle;if(!b)return;if(b.auto){stopAutoBattle();return}b.auto=true;const btn=document.getElementById('autoBtn'),hint=document.getElementById('autoHint');if(btn){btn.classList.add('on');btn.textContent='■ ОСТАНОВИТЬ АВТОБОЙ'}if(hint)hint.textContent='Автобой включён — ходы выполняются автоматически.';autoBattleStep();}
 function stopAutoBattle(){const b=window._battle;if(b)b.auto=false;if(b?.autoTimer)clearTimeout(b.autoTimer);if(b?.autoTimer)b.autoTimer=null;const btn=document.getElementById('autoBtn');if(btn){btn.classList.remove('on');btn.textContent='▶ АВТОБОЙ'}const hint=document.getElementById('autoHint');if(hint)hint.textContent='Автобой сам выбирает атаку и 2 зоны защиты каждый ход.'}
-function autoBattleStep(){const b=window._battle;if(!b||!b.auto||b.locked)return;if(b.hp<=0||b.playerHp<=0){stopAutoBattle();return}b.attack=Math.floor(Math.random()*5);b.defs=[];while(b.defs.length<2){const z=Math.floor(Math.random()*5);if(!b.defs.includes(z))b.defs.push(z)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===b.attack));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(true),450)}
+function autoBattleStep(){const b=window._battle;if(!b||!b.auto||b.locked)return;if(b.hp<=0||b.playerHp<=0){stopAutoBattle();return}b.attack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)];b.defs=[];while(b.defs.length<2){const z=Math.floor(Math.random()*5);if(!b.defs.includes(z))b.defs.push(z)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===b.attack));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(true),450)}
 
-function pickAttack(i,b){document.querySelectorAll('#attacks button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');window._battle.attack=i}
+function pickAttack(i,b){
+startBattleTimer();document.querySelectorAll('#attacks button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');window._battle.attack=i}
 function pickDef(i,b){const d=window._battle.defs;if(d.includes(i)){window._battle.defs=d.filter(x=>x!==i);b.classList.remove('sel')}else if(d.length<2){d.push(i);b.classList.add('sel')}document.getElementById('dc').textContent=d.length+'/2'}
 function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked)return;if(b.attack===null||b.defs.length!==2){if(b.auto)autoBattleStep();else toast('Выбери атаку и 2 зоны защиты');return}b.locked=true;const enemyAttack=Math.floor(Math.random()*5),blocked=b.defs.includes(enemyAttack),base=totalDamage(),crit=Math.random()<Math.min(.35,.08+state.strength*.01),hit=b.attack!==enemyAttack,playerDamage=hit?base+(crit?Math.round(base*.5):0):0,enemyDamage=blocked?0:Math.max(4,10+Math.floor(Math.random()*7));b.hp=Math.max(0,b.hp-playerDamage);b.playerHp=Math.max(0,b.playerHp-(blocked?0:enemyDamage));
 const pf=document.getElementById('playerFighter'),ef=document.getElementById('enemyFighter');if(pf)pf.classList.remove('vikingAttack','vikingAction');if(ef)ef.classList.remove('vikingAttack','vikingAction');void document.body.offsetWidth;if(pf)pf.classList.add('vikingAttack');if(ef)ef.classList.add(playerDamage?'vikingAction':'vikingAttack');
