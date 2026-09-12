@@ -1,18 +1,18 @@
-# Territory — Sdolars / S88 FIXED
+# Territory — Sdolars S89 VISUAL
+Новая мобильная визуальная сборка на основе S88 FIXED.
 
-Release replacement files for GitHub.
+Главное изменение:
+- домашний экран собран как полноэкранная вертикальная сцена без растягивания отдельных элементов;
+- визуальная композиция повторяет утверждённый референс: Viking + замок + горы + порт + золотые панели;
+- функциональные прозрачные зоны поверх сцены открывают реальные игровые разделы;
+- сохранён backend S88 FIXED: Durable Object, SQLite, регенерация энергии, проверка travel и честный бой 4 зон.
 
-Files:
+Файлы:
 - worker.js
 - index.html
+- assets/home-screen.png
 - wrangler.jsonc
 
-Critical fixes:
-- server-side energy regeneration runs at the beginning of every GameHub.action()
-- district.travel rejects insufficient energy with `no_energy`
-- tactical battle uses exactly 4 zones
-- attack = 1 numeric zone
-- defs = exactly 2 different numeric zones
-- client sends `defs: [0, 2]`-style payload
-- `/ws` WebSocket chat route
-- Static Assets binding configured in wrangler.jsonc
+Перед публикацией:
+npm install
+npx wrangler deploy
