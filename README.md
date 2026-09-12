@@ -1,17 +1,13 @@
-# Territory S85 — Sdolars
+# Territory S86
 
-Стабильная сборка на базе рабочей S83/S84, без замены игры новой оболочкой.
+S86 is based directly on the verified S83 working build.
 
-## Исправлено в S85
-- Исправлен критический сбой кнопки «Бой»: использовалась несуществующая `s75SpendEnergy`.
-- Исправлены оставшиеся вызовы `s75Mission`/`s75Level`, которые могли падать после победы.
-- Worker и `index.html` синхронизированы: Worker отдаёт ровно тот же HTML, что находится в архиве.
-- Зафиксированы 4 зоны боя: Голова, Грудь, Пояс, Ноги. Атака — 1 зона, защита — 2.
-- Убран возможный цветной/жёлтый край внизу приложения: корневой фон и нижняя панель принудительно тёмные, без нижней границы.
-- Сохранены существующие системы Sdolars и локальная совместимость прогресса.
+Focused repair:
+- battle modal is full-screen and scroll-safe on mobile;
+- bottom city navigation is hidden while a modal is open, so it cannot cover the battle controls;
+- battle layout is compact and fits the four-zone tactical controls;
+- yellow active-tab strip is disabled;
+- four zones only: Голова / Грудь / Пояс / Ноги; attack 1, defense 2;
+- Worker embeds the exact same index.html; version s86.
 
-## Проверка
-- `node --check worker.js` — OK
-- клиентский inline JavaScript — OK
-- количество боевых зон — 4
-- встроенный HTML Worker совпадает с `index.html` — OK
+No replacement game or unrelated redesign.
