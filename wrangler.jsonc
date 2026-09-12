@@ -3,27 +3,17 @@
   "name": "territory-sdolars",
   "main": "worker.js",
   "compatibility_date": "2026-09-10",
+  "vars": { "ALLOW_GUESTS": "true" },
   "assets": {
     "directory": ".",
     "binding": "ASSETS"
   },
   "durable_objects": {
     "bindings": [
-      {
-        "name": "GAME_HUB",
-        "class_name": "GameHub"
-      }
+      { "name": "GAME_HUB", "class_name": "GameHub" }
     ]
   },
   "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": [
-        "GameHub"
-      ]
-    }
-  ],
-  "vars": {
-    "ALLOW_GUESTS": "true"
-  }
+    { "tag": "v1", "new_sqlite_classes": ["GameHub"] }
+  ]
 }
