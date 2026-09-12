@@ -1,11 +1,3 @@
-# Territory s31
-
-Based on Territory s30.
-
-Arena UI refinement:
-- smaller battle sheet and tighter spacing;
-- scene remains visible behind the modal;
-- compact fighter stage and zone controls;
-- compact action/log/reward controls;
-- existing battle mechanics preserved;
-- no Cloudflare dependency added.
+Territory S32 — развитие арены на базе S31.
+Добавлено: полноценные раунды, тактика противника, блоки, промахи, уклонения, критические удары, урон, HP, восстановление после поражения, награды и прокачка.
+Сборка автономная: фон уже встроен в index.html.

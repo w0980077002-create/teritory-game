@@ -11,7 +11,7 @@
 #arena{position:absolute;z-index:9;left:50%;bottom:154px;transform:translateX(-50%);width:88px;height:48px;border:2px solid #37b8ef;border-radius:18px;background:rgba(3,27,43,.30);display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:900;text-shadow:0 2px 3px #000}#arena span{font-size:19px}
 #chat{position:absolute;z-index:8;left:16px;right:16px;bottom:82px;height:46px;border:1px solid rgba(48,160,205,.72);background:rgba(3,20,32,.46);display:flex;align-items:center;justify-content:space-between;padding:5px 9px;font-size:13px}.chatText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chatText small{color:#9fb9c8}.chatBtn{background:rgba(255,255,255,.88);color:#22313b;padding:6px 10px;flex:none}
 #bottom{position:absolute;z-index:9;left:0;right:0;bottom:0;height:82px;background:rgba(3,20,32,.76);border-top:2px solid rgba(18,91,121,.8);display:grid;grid-template-columns:repeat(6,1fr);padding:4px 5px 5px;gap:2px}.bottomBtn{background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#a9becb;text-shadow:0 2px 3px #000}.bottomBtn span{font-size:23px;margin-bottom:2px}.bottomBtn:first-child{color:#ffd83d}
-#toast{position:absolute;z-index:30;left:50%;bottom:205px;transform:translateX(-50%) translateY(15px);opacity:0;pointer-events:none;background:rgba(2,17,28,.92);border:1px solid #36b8ed;border-radius:10px;padding:9px 14px;font-weight:800;transition:.2s}#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.modal{position:absolute;z-index:50;inset:0;background:rgba(0,0,0,.48);display:none;align-items:center;justify-content:center;padding:12px}.modal.show{display:flex;align-items:flex-start;padding-top:9vh}.sheet{width:min(100%,520px);max-height:70%;overflow:auto;background:rgba(5,25,39,.88);backdrop-filter:blur(2px);border:2px solid #1596d4;border-radius:16px;padding:10px;box-shadow:0 10px 35px rgba(0,0,0,.45)} .sheet h2{margin:0 0 7px;color:#ffd83d}.close{float:right;background:#16415b;border-radius:9px;padding:7px 11px}.item{border:1px solid #176da3;border-radius:11px;padding:10px;margin:7px 0;background:#092b42} .battleStage{position:relative;min-height:88px;margin:2px 0 6px;border:1px solid #176da3;border-radius:13px;background:linear-gradient(rgba(3,20,31,.18),rgba(3,20,31,.58));overflow:hidden;display:flex;align-items:flex-end;justify-content:space-around;padding:5px 14px}.battleStage:after{content:"";position:absolute;left:8%;right:8%;bottom:12px;height:2px;background:rgba(42,165,214,.45)}.fighterSprite{position:relative;z-index:2;text-align:center;font-size:35px;line-height:1;filter:drop-shadow(0 4px 3px rgba(0,0,0,.55));transition:.22s} .fighterSprite small{display:block;font-size:9px;font-weight:900;margin-top:3px}.fighterSprite.hit{animation:hit .28s}.fighterSprite.attack{animation:attack .32s}.fighterSprite.defend{animation:defend .25s}@keyframes hit{50%{transform:translateX(-8px) rotate(-5deg);filter:drop-shadow(0 0 9px #e45757)}}@keyframes attack{50%{transform:translateX(10px) scale(1.08)}}@keyframes defend{50%{transform:scale(.94)}}.battleTop{display:flex;gap:7px;align-items:center;margin:4px 0 7px}.fighter{flex:1;border:1px solid #247fa9;border-radius:10px;padding:5px 6px;background:rgba(2,19,31,.48)}.fighter b{display:block;font-size:11px}.hpbar{height:7px;border:1px solid #277fa8;border-radius:8px;overflow:hidden;margin-top:6px;background:#06131e}.hpbar i{display:block;height:100%;background:#22c5e9;width:100%;transition:width .25s}.enemy .hpbar i{background:#e45757}.battleHint{text-align:center;color:#a9c5d2;font-size:10px;margin:4px 0}.zoneTitle{font-weight:900;margin:6px 0 4px;color:#ffd83d;font-size:12px}.zones{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.zone{min-height:30px;padding:3px 2px;border:1px solid #2aa5d6;border-radius:9px;background:rgba(5,37,57,.72);font-size:9px;font-weight:900}.zone.selected{background:rgba(26,151,205,.72);box-shadow:0 0 0 2px rgba(255,216,61,.7) inset}.defzones{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.defzone{min-height:29px;padding:3px 1px;border:1px solid #2a6f91;border-radius:9px;background:rgba(5,27,42,.78);font-size:9px;font-weight:900}.defzone.selected{background:rgba(178,132,31,.62);border-color:#ffd83d}.battleAction{width:100%;margin-top:8px;height:36px;border:2px solid #37b8ef;border-radius:10px;background:rgba(12,75,105,.72);font-weight:900;font-size:11px}.battleAction:disabled{opacity:.45}.battleLog{min-height:36px;border:1px solid #176da3;border-radius:10px;padding:6px 7px;font-size:10px;color:#d7e6ed;margin-top:6px}.battleReward{text-align:center;padding:8px;border:1px solid #c99a2e;border-radius:11px;background:rgba(83,61,12,.35);margin-top:8px}.battleAgain{width:100%;height:38px;margin-top:6px;border:1px solid #ffd83d;border-radius:11px;background:rgba(95,71,14,.65);font-weight:900}@media(max-width:360px){#places{width:102px;top:275px}#quest{width:140px}.bottomBtn{font-size:9px}.bottomBtn span{font-size:21px}.zones,.defzones{gap:3px}.zone{font-size:9px}}</style>
+#toast{position:absolute;z-index:30;left:50%;bottom:205px;transform:translateX(-50%) translateY(15px);opacity:0;pointer-events:none;background:rgba(2,17,28,.92);border:1px solid #36b8ed;border-radius:10px;padding:9px 14px;font-weight:800;transition:.2s}#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.modal{position:absolute;z-index:50;inset:0;background:rgba(0,0,0,.48);display:none;align-items:center;justify-content:center;padding:12px}.modal.show{display:flex;align-items:flex-start;padding-top:9vh}.sheet{width:min(100%,520px);max-height:70%;overflow:auto;background:rgba(5,25,39,.88);backdrop-filter:blur(2px);border:2px solid #1596d4;border-radius:16px;padding:10px;box-shadow:0 10px 35px rgba(0,0,0,.45)} .sheet h2{margin:0 0 7px;color:#ffd83d}.close{float:right;background:#16415b;border-radius:9px;padding:7px 11px}.item{border:1px solid #176da3;border-radius:11px;padding:10px;margin:7px 0;background:#092b42} .battleStage{position:relative;min-height:88px;margin:2px 0 6px;border:1px solid #176da3;border-radius:13px;background:linear-gradient(rgba(3,20,31,.18),rgba(3,20,31,.58));overflow:hidden;display:flex;align-items:flex-end;justify-content:space-around;padding:5px 14px}.battleStage:after{content:"";position:absolute;left:8%;right:8%;bottom:12px;height:2px;background:rgba(42,165,214,.45)}.fighterSprite{position:relative;z-index:2;text-align:center;font-size:35px;line-height:1;filter:drop-shadow(0 4px 3px rgba(0,0,0,.55));transition:.22s} .fighterSprite small{display:block;font-size:9px;font-weight:900;margin-top:3px}.fighterSprite.hit{animation:hit .28s}.fighterSprite.attack{animation:attack .32s}.fighterSprite.defend{animation:defend .25s}@keyframes hit{50%{transform:translateX(-8px) rotate(-5deg);filter:drop-shadow(0 0 9px #e45757)}}@keyframes attack{50%{transform:translateX(10px) scale(1.08)}}@keyframes defend{50%{transform:scale(.94)}}.battleTop{display:flex;gap:7px;align-items:center;margin:4px 0 7px}.fighter{flex:1;border:1px solid #247fa9;border-radius:10px;padding:5px 6px;background:rgba(2,19,31,.48)}.fighter b{display:block;font-size:11px}.hpbar{height:7px;border:1px solid #277fa8;border-radius:8px;overflow:hidden;margin-top:6px;background:#06131e}.hpbar i{display:block;height:100%;background:#22c5e9;width:100%;transition:width .25s}.enemy .hpbar i{background:#e45757}.battleHint{text-align:center;color:#a9c5d2;font-size:10px;margin:4px 0}.autoRow{display:flex;align-items:center;justify-content:flex-end;gap:5px;margin:2px 1px 5px;color:#b8cfda;font-size:9px}.autoRow input{width:13px;height:13px;accent-color:#ffd83d;margin:0}.autoRow label{cursor:pointer;display:flex;align-items:center;gap:4px}.zoneTitle{font-weight:900;margin:6px 0 4px;color:#ffd83d;font-size:12px}.zones{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.zone{min-height:30px;padding:3px 2px;border:1px solid #2aa5d6;border-radius:9px;background:rgba(5,37,57,.72);font-size:9px;font-weight:900}.zone.selected{background:rgba(26,151,205,.72);box-shadow:0 0 0 2px rgba(255,216,61,.7) inset}.defzones{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.defzone{min-height:29px;padding:3px 1px;border:1px solid #2a6f91;border-radius:9px;background:rgba(5,27,42,.78);font-size:9px;font-weight:900}.defzone.selected{background:rgba(178,132,31,.62);border-color:#ffd83d}.battleAction{width:100%;margin-top:8px;height:36px;border:2px solid #37b8ef;border-radius:10px;background:rgba(12,75,105,.72);font-weight:900;font-size:11px}.battleAction:disabled{opacity:.45}.battleLog{min-height:36px;border:1px solid #176da3;border-radius:10px;padding:6px 7px;font-size:10px;color:#d7e6ed;margin-top:6px}.battleReward{text-align:center;padding:8px;border:1px solid #c99a2e;border-radius:11px;background:rgba(83,61,12,.35);margin-top:8px}.battleAgain{width:100%;height:38px;margin-top:6px;border:1px solid #ffd83d;border-radius:11px;background:rgba(95,71,14,.65);font-weight:900}@media(max-width:360px){#places{width:102px;top:275px}#quest{width:140px}.bottomBtn{font-size:9px}.bottomBtn span{font-size:21px}.zones,.defzones{gap:3px}.zone{font-size:9px}}</style>
 </head>
 <body>
 <div id="game">
@@ -61,7 +61,7 @@
 <script>
 const toast=document.getElementById('toast');
 const SAVE='territory_save';
-const defaultState={coins:79,gems:1330,energy:200,xp:0,level:3,questWins:0,hp:100,maxHp:100};
+const defaultState={coins:79,gems:1330,energy:200,xp:0,level:3,questWins:0,hp:100,maxHp:100,strength:5,agility:5};
 let state=loadState();
 let battle=null;
 function loadState(){try{return {...defaultState,...JSON.parse(localStorage.getItem(SAVE)||'{}')}}catch(e){return {...defaultState}}}
@@ -76,63 +76,88 @@ function updateHUD(){
 }
 function show(t){toast.textContent=t;toast.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>toast.classList.remove('show'),1400)}
 function openSheet(title){document.getElementById('sheetTitle').textContent=title;document.getElementById('sheetBody').innerHTML='<div class="item"><b>'+title+'</b><br>Раздел готов к развитию.</div>';document.getElementById('modal').classList.add('show')}
-function closeSheet(){document.getElementById('modal').classList.remove('show');battle=null}
+function closeSheet(){clearTimeout(battleTimer);clearTimeout(autoTimer);document.getElementById('modal').classList.remove('show');battle=null}
 const zones=['Голова','Грудь','Живот','Пояс','Ноги'];
 const enemies=[
- {name:'Уличный боец',hp:95,maxHp:95,damage:12,armor:1},
- {name:'Наёмник Sdolars',hp:120,maxHp:120,damage:15,armor:2},
- {name:'Гвардеец замка',hp:145,maxHp:145,damage:18,armor:3},
- {name:'Капитан стражи',hp:175,maxHp:175,damage:21,armor:4}
+ {name:'Уличный боец',hp:95,maxHp:95,damage:12,armor:1,crit:.08},
+ {name:'Наёмник Sdolars',hp:120,maxHp:120,damage:15,armor:2,crit:.10},
+ {name:'Гвардеец замка',hp:145,maxHp:145,damage:18,armor:3,crit:.12},
+ {name:'Капитан стражи',hp:175,maxHp:175,damage:21,armor:4,crit:.15}
 ];
+let battleTimer=null;let autoTimer=null;
 function openBattle(){
  if(state.energy<10){show('Недостаточно энергии');return}
- battle={enemy:{...enemies[Math.min(state.questWins,enemies.length-1)]},turn:'player',attack:null,defense:[],log:'Выберите зону атаки и две зоны защиты.',playerHp:state.hp||state.maxHp,anim:''};
+ battle={enemy:{...enemies[Math.min(state.questWins,enemies.length-1)]},turn:'player',round:1,attack:null,defense:[],enemyAttack:null,enemyDefense:[],log:'Выберите зону атаки и две зоны защиты.',playerHp:state.hp||state.maxHp,anim:'',locked:false,auto:false};
  renderBattle();document.getElementById('modal').classList.add('show');
 }
+function pickEnemyTactics(){
+ const shuffled=[...zones].sort(()=>Math.random()-.5);
+ battle.enemyAttack=shuffled[0];battle.enemyDefense=shuffled.slice(1,3);
+}
 function renderBattle(){
- const e=battle.enemy, pct=Math.max(0,e.hp/e.maxHp*100);
+ if(!battle)return;
+ const e=battle.enemy,pct=Math.max(0,e.hp/e.maxHp*100),ppct=Math.max(0,battle.playerHp/state.maxHp*100);
  document.getElementById('sheetTitle').textContent='Арена · бой';
  document.getElementById('sheetBody').innerHTML=`
- <div class="battleStage"><div class="fighterSprite ${battle.anim==='playerAttack'?'attack':''}">🧔<small>Воин</small></div><div class="fighterSprite ${battle.anim==='enemyAttack'?'attack':''}">☠️<small>${e.name}</small></div></div><div class="battleTop"><div class="fighter"><b>🧔 Воин · ур. ${state.level}</b><div class="hpbar"><i style="width:${Math.max(0,battle.playerHp/state.maxHp*100)}%"></i></div></div><div class="fighter enemy"><b>☠️ ${e.name}</b><div class="hpbar"><i style="width:${pct}%"></i></div></div></div>
- <div class="battleHint">Ход ${battle.turn==='player'?'воина':'противника'}</div>
- <div class="zoneTitle">1. Куда атаковать?</div><div class="zones">${zones.map(z=>`<button class="zone ${battle.attack===z?'selected':''}" onclick="selectAttack('${z}')">${z}</button>`).join('')}</div>
- <div class="zoneTitle">2. Какие две зоны защищать?</div><div class="defzones">${zones.map(z=>`<button class="defzone ${battle.defense.includes(z)?'selected':''}" onclick="selectDefense('${z}')">${z}</button>`).join('')}</div>
- <button class="battleAction" ${battle.attack&&battle.defense.length===2?'':'disabled'} onclick="playerStrike()">⚔️ Нанести удар</button>
+ <div class="battleStage"><div class="fighterSprite ${battle.anim==='playerAttack'?'attack':''} ${battle.anim==='playerHit'?'hit':''}">🧔<small>Воин</small></div><div class="fighterSprite ${battle.anim==='enemyAttack'?'attack':''} ${battle.anim==='enemyHit'?'hit':''}">☠️<small>${e.name}</small></div></div>
+ <div class="battleTop"><div class="fighter"><b>🧔 Воин · ур. ${state.level}</b><div class="hpbar"><i style="width:${ppct}%"></i></div><small>${Math.ceil(battle.playerHp)} / ${state.maxHp} HP</small></div><div class="fighter enemy"><b>☠️ ${e.name}</b><div class="hpbar"><i style="width:${pct}%"></i></div><small>${Math.ceil(e.hp)} / ${e.maxHp} HP</small></div></div>
+ <div class="battleHint">Раунд ${battle.round} · ${battle.turn==='player'?'ваш ход':'ход противника'}</div><div class="autoRow"><label><input type="checkbox" ${battle.auto?'checked':''} onchange="toggleAuto(this.checked)"> Автобой</label></div>
+ <div class="zoneTitle">1. Куда атаковать?</div><div class="zones">${zones.map(z=>`<button class="zone ${battle.attack===z?'selected':''}" ${battle.turn!=='player'||battle.locked?'disabled':''} onclick="selectAttack('${z}')">${z}</button>`).join('')}</div>
+ <div class="zoneTitle">2. Какие две зоны защищать?</div><div class="defzones">${zones.map(z=>`<button class="defzone ${battle.defense.includes(z)?'selected':''}" ${battle.turn!=='player'||battle.locked?'disabled':''} onclick="selectDefense('${z}')">${z}</button>`).join('')}</div>
+ <button class="battleAction" ${battle.attack&&battle.defense.length===2&&battle.turn==='player'&&!battle.locked?'':'disabled'} onclick="playerStrike()">⚔️ Нанести удар</button>
  <div class="battleLog">${battle.log}</div>`;
 }
-function selectAttack(z){if(!battle||battle.turn!=='player')return;battle.attack=z;renderBattle()}
-function selectDefense(z){if(!battle||battle.turn!=='player')return;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);renderBattle()}
+function toggleAuto(on){if(!battle)return;battle.auto=!!on;clearTimeout(autoTimer);renderBattle();if(battle.auto&&battle.turn==='player'&&!battle.locked) scheduleAutoTurn()}
+function scheduleAutoTurn(){clearTimeout(autoTimer);if(!battle||!battle.auto||battle.turn!=='player'||battle.locked)return;autoTimer=setTimeout(()=>{if(!battle||!battle.auto||battle.turn!=='player'||battle.locked)return;const shuffled=[...zones].sort(()=>Math.random()-.5);battle.attack=shuffled[0];battle.defense=shuffled.slice(1,3);renderBattle();autoTimer=setTimeout(()=>{if(battle&&battle.auto&&battle.turn==='player'&&!battle.locked)playerStrike()},260)},350)}
+function selectAttack(z){if(!battle||battle.turn!=='player'||battle.locked||battle.auto)return;battle.attack=z;renderBattle()}
+function selectDefense(z){if(!battle||battle.turn!=='player'||battle.locked||battle.auto)return;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);renderBattle()}
 function playerStrike(){
- if(!battle||battle.turn!=='player'||!battle.attack||battle.defense.length!==2)return;
- state.energy=Math.max(0,state.energy-10);
- const e=battle.enemy, hit=Math.random()>.12;
- battle.anim='playerAttack';
- let dmg=0;
- if(hit){const base=22+Math.floor(Math.random()*13);const crit=Math.random()<.12;dmg=Math.max(4,base-e.armor)+(crit?Math.floor(base*.6):0);e.hp=Math.max(0,e.hp-dmg);battle.log=`⚔️ Удар в «${battle.attack}»: −${dmg}${crit?' КРИТИЧЕСКИЙ УДАР!':''}`}
- else battle.log='💨 Промах! Противник увернулся.';
+ if(!battle||battle.turn!=='player'||battle.locked||!battle.attack||battle.defense.length!==2)return;
+ battle.locked=true;state.energy=Math.max(0,state.energy-10);pickEnemyTactics();battle.anim='playerAttack';
+ const e=battle.enemy,attackZone=battle.attack;let dmg=0;
+ const miss=Math.random() < Math.max(.05,.10-state.agility/200);
+ if(miss){battle.log=`💨 Воин атаковал «${attackZone}», но промахнулся.`}
+ else if(battle.enemyDefense.includes(attackZone)){battle.log=`🛡️ Противник заблокировал «${attackZone}». Урон: 0.`}
+ else{
+  const base=22+Math.floor(Math.random()*13)+Math.floor(state.strength||5);
+  const crit=Math.random()<(.10+Math.min(.15,(state.strength||5)/200));
+  dmg=Math.max(4,base-e.armor)+(crit?Math.floor(base*.6):0);e.hp=Math.max(0,e.hp-dmg);
+  battle.log=`⚔️ Удар в «${attackZone}»: −${dmg} HP${crit?' · КРИТ!':''}`;
+ }
  if(e.hp<=0){winBattle();return}
- battle.turn='enemy';renderBattle();setTimeout(enemyStrike,500)
+ battle.turn='enemy';renderBattle();clearTimeout(battleTimer);battleTimer=setTimeout(enemyStrike,650)
 }
 function enemyStrike(){
  if(!battle)return;
- const e=battle.enemy;const target=zones[Math.floor(Math.random()*zones.length)];const blocked=battle.defense.includes(target);let dmg=0;
- battle.anim='enemyAttack';
- if(!blocked){dmg=Math.max(3,e.damage+Math.floor(Math.random()*7));battle.playerHp=Math.max(0,battle.playerHp-dmg);state.hp=battle.playerHp;battle.log=`☠️ Противник атаковал «${target}»: −${dmg} HP.`}else battle.log=`🛡️ Блок! Атака в «${target}» остановлена.`;
+ const e=battle.enemy,target=e.enemyAttack||zones[Math.floor(Math.random()*zones.length)],blocked=battle.defense.includes(target);
+ battle.anim='enemyAttack';let dmg=0;
+ if(blocked){battle.log=`🛡️ Блок! Атака «${target}» остановлена.`}
+ else{
+  const dodge=Math.random() < Math.min(.25,(state.agility||5)/100);
+  if(dodge) battle.log=`💨 Воин увернулся от атаки в «${target}».`;
+  else{
+   const base=e.damage+Math.floor(Math.random()*7),crit=Math.random()<e.crit;dmg=Math.max(3,base+(crit?Math.floor(base*.5):0));battle.playerHp=Math.max(0,battle.playerHp-dmg);state.hp=battle.playerHp;
+   battle.log=`☠️ ${e.name} атаковал «${target}»: −${dmg} HP${crit?' · КРИТ!':''}`;
+  }
+ }
  if(battle.playerHp<=0){loseBattle();return}
- battle.turn='player';renderBattle();
+ battle.round++;battle.attack=null;battle.defense=[];battle.enemyAttack=null;battle.enemyDefense=[];battle.anim='';battle.turn='player';battle.locked=false;saveState();renderBattle();if(battle.auto)scheduleAutoTurn()
 }
 function loseBattle(){
- state.hp=0;saveState();
- document.getElementById('sheetBody').innerHTML=`<div class="battleReward"><b>💀 Поражение</b><br>Воин повержен. Энергия потрачена.</div><button class="battleAgain" onclick="closeSheet();state.hp=state.maxHp;saveState();">Восстановиться</button>`;
+ clearTimeout(battleTimer);state.hp=0;saveState();
+ document.getElementById('sheetBody').innerHTML=`<div class="battleReward"><b>💀 Поражение</b><br>Воин повержен. Энергия −10.</div><button class="battleAgain" onclick="recoverAfterLoss()">❤️ Восстановиться</button>`;
 }
+function recoverAfterLoss(){state.hp=state.maxHp;saveState();closeSheet();show('HP восстановлено')}
 function winBattle(){
- const reward=60,xp=15;state.hp=state.maxHp;state.coins+=reward;state.xp+=xp;state.questWins=Math.min(3,state.questWins+1);
- let levelText='';const need=state.level*100;if(state.xp>=need){state.xp-=need;state.level++;levelText=' Уровень повышен!'}
+ clearTimeout(battleTimer);const reward=60,xp=15;state.hp=state.maxHp;state.coins+=reward;state.xp+=xp;state.questWins=Math.min(3,state.questWins+1);
+ let levelText='';let need=state.level*100;
+ while(state.xp>=need){state.xp-=need;state.level++;levelText+=` Уровень ${state.level}!`;need=state.level*100}
+ const done=state.questWins>=3;
+ if(done){state.coins+=180;state.xp+=45;state.questWins=0;show('Патруль Sdolars завершён')}
  saveState();
- const done=state.questWins>=3;document.getElementById('sheetBody').innerHTML=`<div class="battleReward"><b>🏆 Победа!</b><br>+${reward} 🟡 · +${xp} XP${levelText}${done?'<br><br>🎯 Квест «Патруль Sdolars» выполнен!<br>Доп. награда: +180 🟡 +45 XP':''}</div><button class="battleAgain" onclick="nextBattle()">${done?'Продолжить':'Следующий противник'}</button>`;
- if(done){state.coins+=180;state.xp+=45;state.questWins=0;saveState();show('Патруль Sdolars завершён')}
+ document.getElementById('sheetBody').innerHTML=`<div class="battleReward"><b>🏆 Победа!</b><br>+${reward} 🟡 · +${xp} XP${levelText?'<br>⬆️'+levelText:''}${done?'<br><br>🎯 Квест «Патруль Sdolars» выполнен!<br>Доп. награда: +180 🟡 +45 XP':''}</div><button class="battleAgain" onclick="nextBattle()">${done?'Продолжить':'Следующий противник'}</button>`;
 }
-function nextBattle(){closeSheet();setTimeout(openBattle,80)}
+function nextBattle(){closeSheet();setTimeout(openBattle,100)}
 updateHUD();
 </script>
 </body>
