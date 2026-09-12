@@ -1,13 +1,3 @@
-# Territory — s23
+# Territory — s24
 
-Мобильная игровая сцена Territory:
-- фон занимает весь экран и остаётся резким;
-- воин остаётся частью сцены;
-- маленькие прозрачные кнопки локаций справа;
-- одна кнопка «Арена» по центру над чатом;
-- компактный патруль;
-- нет дублирующего ряда кнопок;
-- нижняя панель содержит только основную навигацию;
-- Cloudflare / Wrangler / Worker в игре отсутствуют.
-
-Для GitHub достаточно загрузить `index.html` и `README.md`.
+Compact UI revision: sharp full-screen background, very small transparent right-side location buttons, patrol widget reduced to roughly one-third size, one small centered Arena button, single bottom navigation. No Cloudflare/Wrangler/Worker references.
