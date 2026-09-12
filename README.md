@@ -1,19 +1,18 @@
-# Territory — Sdolars — S88 FIXED
+# Territory — Sdolars / S88 FIXED
 
-Исправленная версия для ручной загрузки в GitHub.
+Release replacement files for GitHub.
 
-## Что исправлено
-- Убран сломанный `worker.js` с `const ZONES =;`.
-- Бой приведён к 4 зонам: Голова / Грудь / Пояс / Ноги.
-- Атака: 1 зона. Защита: 2 разные зоны.
-- Убрана вторая копия `index.html` из Worker: теперь Worker отдаёт реальный `index.html` из Static Assets.
-- Исправлен Telegram Web App script URL.
-- Добавлен `assets` binding в `wrangler.jsonc`.
-- `index.html` и Worker используют одну и ту же 4-зонную боевую логику.
-- API/ Durable Object маршруты сохранены.
+Files:
+- worker.js
+- index.html
+- wrangler.jsonc
 
-## Загрузка
-Загрузить содержимое этой папки в корень репозитория GitHub и заменить старые:
-`worker.js`, `index.html`, `wrangler.jsonc`, `package.json`.
-
-После Deploy Cloudflare Worker должен отдавать `/index.html` именно из Static Assets.
+Critical fixes:
+- server-side energy regeneration runs at the beginning of every GameHub.action()
+- district.travel rejects insufficient energy with `no_energy`
+- tactical battle uses exactly 4 zones
+- attack = 1 numeric zone
+- defs = exactly 2 different numeric zones
+- client sends `defs: [0, 2]`-style payload
+- `/ws` WebSocket chat route
+- Static Assets binding configured in wrangler.jsonc
