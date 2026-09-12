@@ -1,221 +1,65 @@
-<!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#061321">
-<meta name="territory-build" content="s89-visual">
-<title>Territory — Sdolars</title>
+<meta name="theme-color" content="#061321"><title>Territory — Sdolars</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#02070d;color:#fff;font-family:Arial,system-ui,sans-serif}
-button,input{font:inherit}
-button{border:0}
-#app{position:relative;width:100%;height:100dvh;max-width:900px;margin:auto;overflow:hidden;background:#061321}
-#home{position:absolute;inset:0;background:#061321 center/contain no-repeat url("./assets/home-screen.png?v=s90")}
-#hotspots{position:absolute;inset:0;z-index:5}
-.hot{position:absolute;background:transparent;border:0;padding:0}
-.hot:active{background:rgba(255,210,60,.08)}
-/* Coordinates follow the generated 840x1874 reference and scale with screen width. */
-.h-quest{left:0;top:9.5%;width:47%;height:9%}
-.h-bonus{right:0;top:9.5%;width:40%;height:8.5%}
-.h-left1{left:0;top:19%;width:16%;height:6%}
-.h-left2{left:0;top:26%;width:16%;height:6%}
-.h-left3{left:0;top:34%;width:16%;height:6%}
-.h-forge{right:0;top:36%;width:40%;height:6%}
-.h-tavern{right:0;top:42%;width:40%;height:6%}
-.h-shop{right:0;top:48%;width:40%;height:6%}
-.h-battle{left:2%;bottom:15.5%;width:23%;height:8%}
-.h-inv{left:25%;bottom:15.5%;width:24%;height:8%}
-.h-gear{left:50%;bottom:15.5%;width:24%;height:8%}
-.h-quest2{right:1%;bottom:15.5%;width:24%;height:8%}
-.h-chat{left:0;right:0;bottom:8%;height:7%}
-.h-city{left:0;bottom:0;width:16.7%;height:8%}
-.h-hero{left:16.7%;bottom:0;width:16.7%;height:8%}
-.h-inventory{left:33.4%;bottom:0;width:16.7%;height:8%}
-.h-quests{left:50.1%;bottom:0;width:16.7%;height:8%}
-.h-guild{left:66.8%;bottom:0;width:16.6%;height:8%}
-.h-more{right:0;bottom:0;width:16.6%;height:8%}
-
-#panel{display:none;position:absolute;inset:0;z-index:20;background:linear-gradient(#061321f5,#02070df8);backdrop-filter:blur(8px);padding:12px;overflow:auto}
-#panel.open{display:block}
-.panel-inner{max-width:720px;margin:auto;padding-bottom:30px}
-.panel-head{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:2;background:#061321ee;padding-bottom:10px}
-.panel-head h2{margin:0;flex:1;font-size:20px}
-.close{background:#102b3d;border:1px solid #3c91ba;color:#fff;border-radius:10px;padding:9px 13px;font-weight:900}
-.card{background:linear-gradient(145deg,#0b2639,#071522);border:1px solid #347da2;border-radius:13px;padding:12px;margin:8px 0;box-shadow:0 5px 20px #0008}
-.card b{display:block;margin-bottom:4px}
-.muted{color:#9bb8ca;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.action{width:100%;padding:11px;border-radius:10px;background:#0a75a8;border:1px solid #43c9ff;color:#fff;font-weight:900}
-.action.gold{background:#6d4a08;border-color:#ffd33b}
-.action.purple{background:#4e1490;border-color:#b56aff}
-.action.green{background:#08734f;border-color:#35e6a7}
-.action.red{background:#7d1825;border-color:#ff6376}
-.list{display:grid;gap:8px}
-.item{display:flex;align-items:center;gap:10px}
-.item .grow{flex:1}
-input{width:100%;background:#06131f;border:1px solid #2c6c8b;border-radius:9px;color:#fff;padding:11px}
-.chatlog{height:52dvh;overflow:auto;background:#030d16;border:1px solid #245b77;border-radius:10px;padding:8px}
-.msg{padding:7px 0;border-bottom:1px solid #123044}
-.msg b{color:#7fd2ff}
-.chatrow{display:flex;gap:7px;margin-top:7px}
-.chatrow .action{width:auto;padding-inline:16px}
-
-#battle{display:none;position:absolute;inset:0;z-index:30;background:#02070df5;padding:12px;overflow:auto}
-#battle.open{display:block}
-.battle-inner{max-width:720px;margin:auto}
-.enemy{background:#28131a;border:1px solid #9b4652;border-radius:12px;padding:12px}
-.hp{height:12px;background:#17070a;border-radius:9px;overflow:hidden;margin-top:7px}
-.hp i{display:block;height:100%;background:#e44358}
-.zone-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
-.zone{padding:14px 8px;border-radius:10px;background:#0a2032;border:1px solid #2d6d8f;color:#fff;font-weight:900}
-.zone.sel{border-color:#ffd33b;background:#46390b;box-shadow:0 0 0 1px #ffd33b inset}
-.label{color:#8fd8ff;font-size:12px;font-weight:900;margin-top:13px;text-transform:uppercase}
-#toast{position:fixed;z-index:50;left:50%;bottom:18px;transform:translateX(-50%);background:#071d2d;border:1px solid #45bde9;border-radius:10px;padding:10px 14px;display:none;max-width:90%;text-align:center}
-@media (min-width:700px){#home{background-size:contain}}
-</style>
-</head>
-<body>
-<div id="app">
-  <div id="home"></div>
-
-  <!-- Transparent functional hit areas preserve the exact visual composition. -->
-  <div id="hotspots">
-    <button class="hot h-quest" onclick="openPanel('quest')"></button>
-    <button class="hot h-bonus" onclick="claimBonus()"></button>
-    <button class="hot h-left1" onclick="openPanel('bonus')"></button>
-    <button class="hot h-left2" onclick="openPanel('events')"></button>
-    <button class="hot h-left3" onclick="openPanel('vip')"></button>
-    <button class="hot h-forge" onclick="openPanel('workshop')"></button>
-    <button class="hot h-tavern" onclick="openPanel('tavern')"></button>
-    <button class="hot h-shop" onclick="openPanel('workshop')"></button>
-    <button class="hot h-battle" onclick="startBattle()"></button>
-    <button class="hot h-inv" onclick="openPanel('inventory')"></button>
-    <button class="hot h-gear" onclick="openPanel('equipment')"></button>
-    <button class="hot h-quest2" onclick="openPanel('quest')"></button>
-    <button class="hot h-chat" onclick="openPanel('chat')"></button>
-    <button class="hot h-city" onclick="closePanel()"></button>
-    <button class="hot h-hero" onclick="openPanel('hero')"></button>
-    <button class="hot h-inventory" onclick="openPanel('inventory')"></button>
-    <button class="hot h-quests" onclick="openPanel('quest')"></button>
-    <button class="hot h-guild" onclick="openPanel('guild')"></button>
-    <button class="hot h-more" onclick="openPanel('more')"></button>
-  </div>
-
-  <section id="panel">
-    <div class="panel-inner">
-      <div class="panel-head"><h2 id="panelTitle">Territory</h2><button class="close" onclick="closePanel()">✕</button></div>
-      <div id="panelBody"></div>
-    </div>
-  </section>
-
-  <section id="battle">
-    <div class="battle-inner">
-      <button class="close" onclick="closeBattle()">← Назад</button>
-      <div class="enemy" style="margin-top:8px">
-        <b id="enemyName">Противник</b>
-        <div class="hp"><i id="enemyHp"></i></div>
-        <div id="enemyHpText">90 / 90</div>
-      </div>
-      <div class="label">Атака — выбери 1 из 4 зон</div>
-      <div id="attackZones" class="zone-grid"></div>
-      <div class="label">Защита — выбери ровно 2 разные зоны</div>
-      <div id="defenseZones" class="zone-grid"></div>
-      <div id="battleMsg" class="card">Выбери атаку и две защиты.</div>
-      <button class="action" onclick="submitTurn()">Подтвердить ход</button>
-    </div>
-  </section>
-  <div id="toast"></div>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#02070d;color:#fff;font-family:Arial,system-ui,sans-serif}button{font:inherit;cursor:pointer}
+#app{position:relative;width:100%;height:100dvh;overflow:hidden;background:#061321}
+#scene{position:absolute;inset:0;background:#061321 center/cover no-repeat url("./assets/home-screen.png?v=s89final")}
+#hit{position:absolute;inset:0;z-index:4}.hot{position:absolute;background:transparent;border:0;padding:0}
+.hot:active{background:#ffd43b12}
+.q{left:0;top:9%;width:48%;height:10%}.bonus{right:0;top:9%;width:42%;height:10%}.left1{left:0;top:20%;width:17%;height:7%}.left2{left:0;top:27%;width:17%;height:7%}.left3{left:0;top:34%;width:17%;height:7%}.forge{right:0;top:37%;width:41%;height:7%}.tavern{right:0;top:44%;width:41%;height:7%}.shop{right:0;top:51%;width:41%;height:7%}.battle{left:1%;bottom:15%;width:24%;height:9%}.inv{left:25%;bottom:15%;width:25%;height:9%}.gear{left:50%;bottom:15%;width:25%;height:9%}.quests{right:0;bottom:15%;width:25%;height:9%}.chat{left:0;right:0;bottom:8%;height:7%}.nav1{left:0;bottom:0;width:16.7%;height:8%}.nav2{left:16.7%;bottom:0;width:16.7%;height:8%}.nav3{left:33.4%;bottom:0;width:16.7%;height:8%}.nav4{left:50.1%;bottom:0;width:16.7%;height:8%}.nav5{left:66.8%;bottom:0;width:16.6%;height:8%}.nav6{right:0;bottom:0;width:16.6%;height:8%}
+.overlay{display:none;position:absolute;inset:0;z-index:10;background:#02070df2;backdrop-filter:blur(7px);padding:12px;overflow:auto}.overlay.open{display:block}.box{max-width:720px;margin:auto}.head{display:flex;gap:8px;align-items:center;position:sticky;top:0;background:#061321f5;padding-bottom:9px;z-index:2}.head h2{flex:1;margin:0}.close{background:#102c40;border:1px solid #43b8e9;color:white;border-radius:9px;padding:9px 12px}.card{background:linear-gradient(145deg,#0b293c,#07131e);border:1px solid #3d8daf;border-radius:12px;padding:11px;margin:8px 0}.muted{color:#9fc0d2;font-size:13px}.btn{display:block;width:100%;padding:11px;border-radius:10px;background:#0877aa;border:1px solid #43caff;color:#fff;font-weight:900;margin-top:8px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.zone{padding:14px 8px;background:#0b2335;color:#fff;border:1px solid #347d9e;border-radius:10px;font-weight:900}.zone.sel{border-color:#ffd43b;background:#4a3a09}.enemy{background:#241118;border:1px solid #a54b59;border-radius:12px;padding:12px}.hp{height:11px;background:#12070a;border-radius:8px;overflow:hidden}.hp i{display:block;height:100%;background:#ef4558}.label{margin:12px 0 6px;color:#8edcff;font-size:12px;font-weight:900}.log{height:50dvh;overflow:auto;background:#030c14;border:1px solid #22566f;border-radius:10px;padding:8px}.msg{padding:7px 0;border-bottom:1px solid #123044}.msg b{color:#7bd4ff}.row{display:flex;gap:7px;margin-top:7px}.row input{flex:1}.input{background:#06131e;border:1px solid #2c6d8a;border-radius:9px;color:white;padding:11px}.toast{position:fixed;z-index:50;left:50%;bottom:20px;transform:translateX(-50%);background:#071c2c;border:1px solid #43b8e9;border-radius:10px;padding:10px 14px;display:none}
+</style></head><body><div id="app"><div id="scene"></div>
+<div id="hit">
+<button class="hot q" onclick="openPanel('quest')"></button><button class="hot bonus" onclick="claim('daily.claim')"></button>
+<button class="hot left1" onclick="openPanel('bonus')"></button><button class="hot left2" onclick="openPanel('events')"></button><button class="hot left3" onclick="openPanel('vip')"></button>
+<button class="hot forge" onclick="openPanel('forge')"></button><button class="hot tavern" onclick="openPanel('tavern')"></button><button class="hot shop" onclick="openPanel('shop')"></button>
+<button class="hot battle" onclick="startBattle()"></button><button class="hot inv" onclick="openPanel('inventory')"></button><button class="hot gear" onclick="openPanel('hero')"></button><button class="hot quests" onclick="openPanel('quest')"></button><button class="hot chat" onclick="openPanel('chat')"></button>
+<button class="hot nav1" onclick="closePanel()"></button><button class="hot nav2" onclick="openPanel('hero')"></button><button class="hot nav3" onclick="openPanel('inventory')"></button><button class="hot nav4" onclick="openPanel('quest')"></button><button class="hot nav5" onclick="openPanel('guild')"></button><button class="hot nav6" onclick="openPanel('more')"></button>
 </div>
-
+<section id="panel" class="overlay"><div class="box"><div class="head"><h2 id="pt">Territory</h2><button class="close" onclick="closePanel()">✕</button></div><div id="pb"></div></div></section>
+<section id="battle" class="overlay"><div class="box"><button class="close" onclick="closeBattle()">← Назад</button><div id="enemy" class="enemy" style="margin-top:8px"></div><div class="label">АТАКА — 1 ЗОНА</div><div id="att" class="grid"></div><div class="label">ЗАЩИТА — РОВНО 2 РАЗНЫЕ ЗОНЫ</div><div id="defs" class="grid"></div><div id="round" class="card">Выбери атаку и две защиты.</div><button class="btn" onclick="turn()">Подтвердить ход</button></div></section>
+<div id="toast" class="toast"></div></div>
 <script>
-const zones=['Голова','Грудь','Пояс','Ноги'];
-let state=null, selectedAttack=null, selectedDefs=new Set(), enemy=null, ws=null;
-
-function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';clearTimeout(window.__t);window.__t=setTimeout(()=>e.style.display='none',2200)}
-async function sendAction(type,extra={}){
-  try{
-    const r=await fetch('/api/action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,...extra})});
-    const d=await r.json();
-    if(d.state) state=d.state;
-    if(!d.ok) toast(d.error||'Ошибка');
-    return d;
-  }catch(e){toast('Нет соединения');return {ok:false}}
-}
-async function loadState(){
-  try{const r=await fetch('/api/state',{method:'POST',headers:{'Content-Type':'application/json'}});const d=await r.json();if(d.state)state=d.state}catch(e){}
-}
-function openPanel(type){
-  const p=document.getElementById('panel'), title=document.getElementById('panelTitle'), body=document.getElementById('panelBody');
-  const map={
-    quest:['Задания',`<div class="card"><b>Поговори с кузнецом</b><span class="muted">Кузница · награда 120 монет + 20 XP</span><button class="action gold" onclick="completeQuest()">Завершить</button></div>`],
-    bonus:['Бонусы',`<div class="card"><b>🎁 Ежедневный бонус</b><span class="muted">250 монет + 20 XP</span><button class="action gold" onclick="claimBonus()">Забрать</button></div>`],
-    events:['События',`<div class="card"><b>⚔️ Арена Sdolars</b><span class="muted">Тактические бои на 4 зоны.</span><button class="action" onclick="closePanel();startBattle()">Войти в бой</button></div>`],
-    vip:['VIP',`<div class="card"><b>👑 VIP Territory</b><span class="muted">Раздел подготовлен под серверные бонусы и привилегии.</span></div>`],
-    workshop:['Кузница и магазин','<div id="shopList" class="list"></div>'],
-    tavern:['Таверна',`<div class="card"><b>🍺 Найм героев</b><span class="muted">Герои и наёмники будут подключены к серверным данным.</span></div>`],
-    inventory:['Инвентарь','<div id="inventoryList" class="list"></div>'],
-    equipment:['Экипировка','<div id="equipmentList" class="list"></div>'],
-    hero:['Герой','<div id="heroList"></div>'],
-    guild:['Гильдия',`<div class="card"><b>🛡️ Sdolars</b><span class="muted">Участники: 1 · Рейтинг: 1000</span><button class="action purple" onclick="toast('Управление гильдией подключено')">Управление</button></div>`],
-    chat:['Чат игры','<div id="chatLog" class="chatlog"></div><div class="chatrow"><input id="chatInput" maxlength="500" placeholder="Сообщение..."><button class="action" onclick="sendChat()">➤</button></div>'],
-    more:['Ещё',`<div class="grid"><button class="action" onclick="openPanel('districts')">🗺️ Районы</button><button class="action" onclick="openPanel('settings')">⚙️ Настройки</button><button class="action" onclick="openPanel('achievements')">🏆 Достижения</button><button class="action" onclick="openPanel('season')">🏅 Сезон</button></div>`],
-    districts:['Районы','<div id="districtList" class="list"></div>'],
-    settings:['Настройки',`<div class="card"><b>Язык</b><button class="action" onclick="toast('Русский интерфейс активен')">RU</button><button class="action alt" onclick="toast('English UI — следующий этап')">EN</button></div>`],
-    achievements:['Достижения',`<div class="card"><b>🏆 Первые шаги</b><span class="muted">Победи первого противника.</span></div>`],
-    season:['Сезон',`<div class="card"><b>Сезон Sdolars</b><span class="muted">Сезонная система готова для подключения наград.</span></div>`]
-  };
-  const x=map[type]||map.more; title.textContent=x[0]; body.innerHTML=x[1]; p.classList.add('open');
-  if(type==='workshop')renderShop(); if(type==='inventory')renderInventory(); if(type==='equipment')renderEquipment();
-  if(type==='hero')renderHero(); if(type==='districts')renderDistricts(); if(type==='chat')connectChat();
-}
+const zones=['Голова','Грудь','Пояс','Ноги'];let state=null,battle=null,attack=null,defenses=new Set(),ws=null;
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>e.style.display='none',2200)}
+async function callApi(action,data={}){try{const r=await fetch('/api/action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:action,...data})});const d=await r.json();if(d.state)state=d.state;if(!d.ok)toast(d.error||'Ошибка');return d}catch(e){toast('Нет соединения');return{ok:false}}}
+async function load(){try{const r=await fetch('/api/state',{method:'POST'});const d=await r.json();state=d.state||d.player}catch(e){}}
 function closePanel(){document.getElementById('panel').classList.remove('open')}
-function renderShop(){const e=document.getElementById('shopList');if(!e)return;e.innerHTML=(state?.catalog||[]).map(i=>`<div class="card item"><div style="font-size:26px">${i.icon||'⚔️'}</div><div class="grow"><b>${i.name}</b><span class="muted">${i.price} монет</span></div><button class="action gold" style="width:auto" onclick="buy('${i.id}')">Купить</button></div>`).join('')}
-function renderInventory(){const e=document.getElementById('inventoryList');if(!e)return;e.innerHTML=(state?.inventory||[]).map(i=>`<div class="card item"><div style="font-size:25px">${i.icon||'🎒'}</div><div class="grow"><b>${i.name}</b><span class="muted">${i.equipped?'Экипировано':'В инвентаре'}</span></div><button class="action" style="width:auto" onclick="itemAction('${i.id}','${i.equipped?'unequip':'equip'}')">${i.equipped?'Снять':'Надеть'}</button></div>`).join('')||'<div class="card">Инвентарь пуст.</div>'}
-function renderEquipment(){const e=document.getElementById('equipmentList');if(!e)return;e.innerHTML=`<div class="card"><b>⚔️ ${state?.equipped?.name||'Кулаки'}</b><span class="muted">Текущее оружие</span></div><div class="card"><b>Сила ${state?.strength||0} · Ловкость ${state?.agility||0}</b><span class="muted">Свободные очки: ${state?.freePoints||0}</span></div>`}
-function renderHero(){const e=document.getElementById('heroList');if(!e)return;e.innerHTML=`<div class="card"><b>${state?.name||'S$$'}</b><span class="muted">Уровень ${state?.level||1} · XP ${state?.exp||0}/${state?.maxExp||100}</span></div><div class="grid"><button class="action" onclick="addStat('strength')">Сила +</button><button class="action" onclick="addStat('agility')">Ловкость +</button></div>`}
-function renderDistricts(){const e=document.getElementById('districtList');if(!e)return;e.innerHTML=(state?.districts||[]).map(d=>`<div class="card item"><div style="font-size:26px">${d.icon||'🗺️'}</div><div class="grow"><b>${d.name}</b><span class="muted">Ур. ${d.level} · ${d.cost} ⚡</span></div><button class="action" style="width:auto" onclick="travel('${d.id}')">${d.unlocked?'Войти':'Закрыто'}</button></div>`).join('')}
-async function buy(id){const d=await sendAction('item.buy',{item:id});if(d.ok){toast('Куплено');renderShop()}}
-async function itemAction(id,action){const d=await sendAction('item.'+action,{item:id});if(d.ok){renderInventory();renderEquipment();toast('Готово')}}
-async function addStat(stat){const d=await sendAction('stat.add',{stat});if(d.ok)renderHero()}
-async function travel(id){const d=await sendAction('district.travel',{district:id});if(d.ok)toast('Переход выполнен');renderDistricts()}
-async function claimBonus(){const d=await sendAction('bonus.claim');if(d.ok)toast('Бонус получен')}
-async function completeQuest(){const d=await sendAction('quest.complete');if(d.ok){toast('Задание выполнено');openPanel('quest')}}
-function startBattle(){
-  closePanel(); document.getElementById('battle').classList.add('open'); selectedAttack=null;selectedDefs=new Set();
-  document.getElementById('battleMsg').textContent='Начинаем бой...';
-  sendAction('battle.start').then(d=>{if(!d.ok){closeBattle();return} enemy=d.enemy||{name:'Противник',hp:90,maxHp:90};renderBattle()});
+function openPanel(type){const p=document.getElementById('panel'),t=document.getElementById('pt'),b=document.getElementById('pb');p.classList.add('open');
+ const views={
+ quest:['Задания',`<div class="card"><b>Поговори с кузнецом</b><div class="muted">Награда: 150 монет + 80 XP</div><button class="btn" onclick="claim('quest.complete')">Выполнить</button></div>`],
+ bonus:['Бонусы',`<div class="card"><b>🎁 Ежедневная награда</b><div class="muted">250 монет + 10 энергии + 20 XP</div><button class="btn" onclick="claim('daily.claim')">Забрать</button></div>`],
+ events:['События',`<div class="card"><b>⚔️ Событие Sdolars</b><div class="muted">Стоимость: 3 энергии</div><button class="btn" onclick="claim('event.fight')">Участвовать</button></div>`],
+ vip:['VIP',`<div class="card"><b>👑 VIP Territory</b><div class="muted">Раздел зарезервирован под серверные привилегии.</div></div>`],
+ forge:['Кузница',`<div class="card"><b>🔨 Крафт оружия</b><div class="muted">Нужно: 2 железа, 2 дерева, 1 кожи.</div><button class="btn" onclick="claim('craft')">Ковать</button></div><div class="card"><b>Уровень кузницы: ${state?.forgeLevel||0}</b></div>`],
+ tavern:['Таверна',`<div class="card"><b>🍺 Нанять героя</b><div class="muted">Стоимость: 300 монет</div><button class="btn" onclick="claim('tavern.recruit')">Нанять</button></div>`],
+ shop:['Магазин',`<div id="shop"></div>`],
+ inventory:['Инвентарь',`<div id="items"></div>`],
+ hero:['Персонаж',`<div class="card"><b>${state?.playerName||'Игрок'}</b><div class="muted">Уровень ${state?.level||1} · XP ${state?.exp||0}/${state?.maxExp||100}</div><div class="muted">HP ${state?.hp||0}/${state?.maxHp||0} · Сила ${state?.strength||0} · Ловкость ${state?.agility||0}</div><div class="muted">Свободные очки: ${state?.freePoints||0}</div><div class="grid"><button class="btn" onclick="stat('strength')">Сила +</button><button class="btn" onclick="stat('agility')">Ловкость +</button></div></div>`],
+ guild:['Гильдия',`<div class="card"><b>${state?.guildName||'Sdolars'}</b><div class="muted">Участники: ${state?.guildMembers||1} · Вклад: ${state?.guildContrib||0} · Рейтинг: ${state?.rating||1000}</div><button class="btn" onclick="guild()">Внести 100 монет</button></div>`],
+ chat:['Чат игры',`<div id="chatlog" class="log"></div><div class="row"><input id="chatinput" class="input" maxlength="500" placeholder="Сообщение"><button class="btn" style="width:auto" onclick="sendChat()">➤</button></div>`],
+ more:['Ещё',`<div class="grid"><button class="btn" onclick="claim('resource.gather')">🌲 Ресурсы</button><button class="btn" onclick="claim('rest')">❤️ Отдых</button><button class="btn" onclick="claim('achievement.claim')">🏆 Достижение</button><button class="btn" onclick="claim('season.claim')">🏅 Сезон</button></div><div class="card"><b>Материалы</b><div class="muted">Железо ${state?.materials?.iron||0} · Дерево ${state?.materials?.wood||0} · Кожа ${state?.materials?.leather||0} · Травы ${state?.materials?.herbs||0}</div></div>`]
+ };
+ const v=views[type]||views.more;t.textContent=v[0];b.innerHTML=v[1];
+ if(type==='shop')renderShop();if(type==='inventory')renderItems();if(type==='chat')connectChat();
 }
-function renderBattle(){
-  document.getElementById('enemyName').textContent=enemy.name;
-  document.getElementById('enemyHpText').textContent=`${enemy.hp} / ${enemy.maxHp}`;
-  document.getElementById('enemyHp').style.width=Math.max(0,enemy.hp/enemy.maxHp*100)+'%';
-  document.getElementById('attackZones').innerHTML=zones.map((z,i)=>`<button class="zone ${selectedAttack===i?'sel':''}" onclick="pickAttack(${i})">${z}</button>`).join('');
-  document.getElementById('defenseZones').innerHTML=zones.map((z,i)=>`<button class="zone ${selectedDefs.has(i)?'sel':''}" onclick="pickDefense(${i})">${z}</button>`).join('');
-}
-function pickAttack(i){selectedAttack=i;renderBattle()}
-function pickDefense(i){if(selectedDefs.has(i))selectedDefs.delete(i);else if(selectedDefs.size<2)selectedDefs.add(i);renderBattle()}
-async function submitTurn(){
-  if(selectedAttack===null)return toast('Выбери атаку');
-  if(selectedDefs.size!==2)return toast('Нужно выбрать ровно 2 защиты');
-  const defs=[...selectedDefs]; // server receives numeric array, e.g. [0,2]
-  const d=await sendAction('battle.turn',{attack:selectedAttack,defs});
-  if(!d.ok)return;
-  if(d.enemy)enemy=d.enemy;
-  document.getElementById('battleMsg').textContent=d.result||'Ход выполнен';
-  selectedAttack=null;selectedDefs=new Set();renderBattle();
-  if(d.finished){toast(d.won?'Победа!':'Поражение');setTimeout(closeBattle,900)}
-}
+function renderShop(){const e=document.getElementById('shop');if(!e)return;e.innerHTML=[['knife','🔪','Нож',220],['heavyaxe','🪓','Тяжёлый топор',700],['steel','🛡️','Стальная броня',650],['bandage','🩹','Аптечка',80]].map(x=>`<div class="card"><b>${x[1]} ${x[2]}</b><div class="muted">${x[3]} монет</div><button class="btn" onclick="buy('${x[0]}')">Купить</button></div>`).join('')}
+function renderItems(){const e=document.getElementById('items');if(!e)return;e.innerHTML=(state?.items||[]).map(i=>`<div class="card"><b>${i.icon} ${i.name}</b><div class="muted">${i.type} · ${i.equipped?'Экипировано':'В инвентаре'} · x${i.qty}</div><button class="btn" onclick="item('${i.id}','${i.equipped?'unequip':'equip'}')">${i.equipped?'Снять':'Надеть'}</button>${i.type==='Расходник'?`<button class="btn" onclick="item('${i.id}','use')">Использовать</button>`:''}</div>`).join('')||'<div class="card">Инвентарь пуст.</div>'}
+async function claim(a,d={}){const x=await callApi(a,d);if(x.ok){toast('Готово');if(document.getElementById('panel').classList.contains('open'))openPanel(document.getElementById('pt').textContent==='Магазин'?'shop':'more')}}
+async function buy(id){const x=await callApi('item.buy',{item:id});if(x.ok){toast('Куплено');renderShop()}}
+async function item(id,a){const x=await callApi('item.'+a,{id});if(x.ok){renderItems();toast('Готово')}}
+async function stat(s){const x=await callApi('stat.add',{stat:s});if(x.ok)openPanel('hero')}
+async function guild(){const x=await callApi('guild.contribute',{amount:100});if(x.ok)openPanel('guild')}
+function startBattle(){closePanel();document.getElementById('battle').classList.add('open');attack=null;defenses=new Set();callApi('battle.start').then(x=>{if(!x.ok){closeBattle();return}battle=x.battle;renderBattle()})}
+function renderBattle(){const e=document.getElementById('enemy'),a=document.getElementById('att'),d=document.getElementById('defs');e.innerHTML=`<b>${battle.enemy.name}</b><div class="hp"><i style="width:${battle.enemyHp/battle.enemy.hp*100}%"></i></div><div>${battle.enemyHp} / ${battle.enemy.hp}</div>`;
+a.innerHTML=zones.map((z,i)=>`<button class="zone ${attack===i?'sel':''}" onclick="pickA(${i})">${z}</button>`).join('');
+d.innerHTML=zones.map((z,i)=>`<button class="zone ${defenses.has(i)?'sel':''}" onclick="pickD(${i})">${z}</button>`).join('')}
+function pickA(i){attack=i;renderBattle()}function pickD(i){if(defenses.has(i))defenses.delete(i);else if(defenses.size<2)defenses.add(i);renderBattle()}
+async function turn(){if(attack===null)return toast('Выбери атаку');if(defenses.size!==2)return toast('Нужно выбрать 2 разные защиты');const x=await callApi('battle.turn',{attack,defs:[...defenses]});if(!x.ok)return;const r=x.round;document.getElementById('round').innerHTML=`Атака: ${zones[r.attack]} · Защита: ${r.defs.map(i=>zones[i]).join(', ')}<br>Враг атаковал: ${zones[r.enemyAttack]} · ${r.blocked?'БЛОК':''}${r.dodge?' УКЛОНЕНИЕ':''}<br>Урон: ${r.playerDamage} · Ответный урон: ${r.enemyDamage}`;
+if(x.result==='win'){const q=await callApi('battle.reward');toast(q.ok?'Победа!':'Ошибка награды');setTimeout(closeBattle,700)}else if(x.result==='loss'){await callApi('battle.loss');toast('Поражение');setTimeout(closeBattle,700)}else{battle.enemyHp=r.enemyHp;renderBattle()}attack=null;defenses=new Set()}
 function closeBattle(){document.getElementById('battle').classList.remove('open')}
-function connectChat(){
-  const log=document.getElementById('chatLog'); if(!log)return;
-  if(ws&&ws.readyState===1)return;
-  const proto=location.protocol==='https:'?'wss':'ws'; ws=new WebSocket(`${proto}://${location.host}/ws`);
-  ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='chat'){const row=document.createElement('div');row.className='msg';const b=document.createElement('b');b.textContent=m.name||'Игрок';row.append('');row.appendChild(b);row.append(' '+(m.text||''));log.appendChild(row);log.scrollTop=log.scrollHeight}}catch(_){}};
-}
-function sendChat(){const i=document.getElementById('chatInput');if(!i||!i.value.trim()||!ws)return;if(ws.readyState!==1)return toast('Чат подключается');ws.send(JSON.stringify({type:'chat',name:state?.name||'Игрок',text:i.value.trim()}));i.value=''}
-loadState();
-</script>
-</body>
-</html>
+function connectChat(){if(ws&&ws.readyState===1)return;const proto=location.protocol==='https:'?'wss':'ws';ws=new WebSocket(`${proto}://${location.host}/ws`);ws.onmessage=e=>{try{const m=JSON.parse(e.data),log=document.getElementById('chatlog');if(!log)return;const row=document.createElement('div');row.className='msg';const b=document.createElement('b');b.textContent=m.name||'Игрок';row.append(b,document.createTextNode(' '+(m.text||'')));log.appendChild(row);log.scrollTop=log.scrollHeight}catch{}}}
+function sendChat(){const i=document.getElementById('chatinput');if(!i||!i.value.trim()||!ws||ws.readyState!==1)return toast('Чат подключается');ws.send(JSON.stringify({type:'chat',name:state?.playerName||'Игрок',text:i.value.trim()}));i.value=''}
+load();
+</script></body></html>

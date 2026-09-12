@@ -2,6 +2,11 @@
   "name": "territory-sdolars",
   "version": "1.0.0",
   "private": true,
-  "scripts": {"dev":"wrangler dev","deploy":"wrangler deploy"},
-  "devDependencies": {"wrangler":"^4.33.1"}
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --assets ."
+  },
+  "devDependencies": {
+    "wrangler": "^4.33.1"
+  }
 }
