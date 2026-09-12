@@ -1,24 +1,17 @@
-# Territory — Sdolars s75
+# Territory — Sdolars S90
 
-Global gameplay build based directly on the approved s60 working base.
+Рабочая GitHub-версия на базе последнего проекта, который открывается без старой Cloudflare-версии.
 
-- 4 attack zones and 4 defense zones; no belly zone
-- 2 defense selections
-- automatic strike after selection
-- 15-second timeout = loss
-- compact battle history and auto-battle checkbox
-- character progression and persistent stats
-- districts with level gates, enemies, rewards and win counters
-- inventory/equipment
-- progressive forge upgrades
-- quests and rewards
-- casino excluded
-- approved city screen preserved
+Добавлено в S90:
+- тактический бой: 1 атака + 2 защиты; 5 зон: Голова, Грудь, Живот, Пояс, Ноги;
+- автобой и таймер хода;
+- инвентарь, экипировка, магазин, продажа/выброс/использование;
+- кузница и улучшение оружия;
+- районы, события, задания, достижения, гильдия, таверна;
+- общий/клановый чат через WebSocket;
+- RU/EN;
+- ежедневные награды, сезон, ресурсы и развитие;
+- казино Sdolars с сохранением баланса;
+- сохранена серверная логика последней рабочей GitHub-версии.
 
-
-## s76 — gameplay loop update
-- Battle now costs 3 energy.
-- Victory/loss persists battle statistics and HP.
-- Victory advances active adventure quest and daily win mission.
-- Victory grants level progression and free attribute points when XP threshold is reached.
-- Version markers updated to s76.
+Файлы index.html и worker.js синхронизированы: worker содержит ту же HTML-версию.
