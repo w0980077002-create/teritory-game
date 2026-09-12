@@ -201,90 +201,157 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 </style>
 
 <style>
-/* S63 — battle is a single-screen mobile layout */
-.vikingBattle{
-  padding:4px!important;
+/* S64 — battle is designed as ONE visible mobile screen */
+.panel:has(.vikingBattle){
+  max-height:calc(100dvh - 8px)!important;
+  height:calc(100dvh - 8px)!important;
+  overflow:hidden!important;
+  padding:5px!important;
+  border-radius:14px 14px 0 0!important;
+}
+.panel:has(.vikingBattle) h2{
+  height:36px!important;
+  line-height:36px!important;
+  margin:0 0 3px!important;
+  font-size:22px!important;
+}
+.panel:has(.vikingBattle) .close{
+  height:32px!important;
+  padding:2px 9px!important;
+  font-size:22px!important;
+}
+.panel:has(.vikingBattle) .vikingBattle{
+  height:calc(100% - 39px)!important;
+  box-sizing:border-box!important;
+  padding:3px!important;
   margin:0!important;
-  border-radius:10px!important;
+  border-radius:9px!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
 }
-.vikingBattle .fighters{
-  height:142px!important;
+.panel:has(.vikingBattle) .fighters{
+  flex:0 0 150px!important;
+  height:150px!important;
+  min-height:150px!important;
   padding:2px!important;
-  gap:4px!important;
+  gap:3px!important;
 }
-.vikingBattle .fighters:after{bottom:43px!important;font-size:13px!important}
-.vikingBattle .fighter{padding:2px!important;border-radius:7px!important}
-.vikingBattle .fighter img,.vikingBattle .fighter .vikingSvg{
-  height:92px!important;
-  border-radius:5px!important;
+.panel:has(.vikingBattle) .fighter{
+  padding:2px!important;
+  border-radius:6px!important;
 }
-.vikingBattle .fighterName{font-size:10px!important;margin:1px 0!important}
-.vikingBattle .fighterRole{font-size:7px!important;margin:0 0 1px!important}
-.vikingBattle .fhp{height:5px!important}
-.vikingBattle .fhpText{font-size:8px!important;margin-top:1px!important}
-.vikingBattle .autoRow{margin:3px 0!important}
-.vikingBattle .autoBtn{height:28px!important;font-size:9px!important}
-.vikingBattle .autoHint{display:none!important}
+.panel:has(.vikingBattle) .fighter img,
+.panel:has(.vikingBattle) .fighter .vikingSvg{
+  height:105px!important;
+  object-fit:contain!important;
+  border-radius:4px!important;
+}
+.panel:has(.vikingBattle) .fighterName{
+  font-size:9px!important;
+  margin:1px 0!important;
+}
+.panel:has(.vikingBattle) .fighterRole{
+  font-size:6px!important;
+  margin:0!important;
+}
+.panel:has(.vikingBattle) .fhp{height:4px!important}
+.panel:has(.vikingBattle) .fhpText{
+  font-size:7px!important;
+  margin:0!important;
+}
+.panel:has(.vikingBattle) .fighters:after{
+  bottom:42px!important;
+  font-size:12px!important;
+}
+.panel:has(.vikingBattle) .autoRow{
+  flex:0 0 27px!important;
+  margin:2px 0!important;
+}
+.panel:has(.vikingBattle) .autoBtn{
+  height:27px!important;
+  font-size:9px!important;
+}
+.panel:has(.vikingBattle) .autoHint{display:none!important}
 
-.vikingBattle .card{
-  padding:5px 6px!important;
-  margin:3px 0!important;
-  border-radius:8px!important;
+/* Turn + attack + defense are compact cards, not tall panels. */
+.panel:has(.vikingBattle) .card{
+  padding:4px 5px!important;
+  margin:2px 0!important;
+  border-radius:7px!important;
 }
-.vikingBattle .card>b{
-  font-size:13px!important;
-}
-.vikingBattle .card:first-of-type{
-  height:30px!important;
+.panel:has(.vikingBattle) .card>b{font-size:12px!important}
+.panel:has(.vikingBattle) .card:first-of-type{
+  flex:0 0 25px!important;
+  height:25px!important;
   display:flex!important;
   align-items:center!important;
 }
-.vikingBattle .zones{
+.panel:has(.vikingBattle) .card:nth-of-type(2){
+  flex:0 0 67px!important;
+  height:67px!important;
+}
+.panel:has(.vikingBattle) .card:nth-of-type(3){
+  flex:0 0 82px!important;
+  height:82px!important;
+}
+.panel:has(.vikingBattle) .zones{
+  display:grid!important;
+  grid-template-columns:repeat(5,1fr)!important;
   gap:3px!important;
   margin-top:3px!important;
 }
-.vikingBattle .zones button{
-  height:32px!important;
+.panel:has(.vikingBattle) .zones button{
+  width:auto!important;
+  height:30px!important;
+  min-width:0!important;
   padding:0 2px!important;
   font-size:9px!important;
-  border-radius:6px!important;
+  border-radius:5px!important;
 }
-.vikingBattle .card p{
-  margin:4px 0 0!important;
-  font-size:11px!important;
-}
-.vikingBattle .goldBtn{
-  height:42px!important;
-  padding:0!important;
-  margin:3px 0!important;
-  font-size:15px!important;
-}
-.vikingBattle .card:last-child{
-  height:88px!important;
-  overflow:hidden!important;
-}
-.vikingBattle #battleLog{
-  height:62px!important;
-  overflow-y:auto!important;
-  margin-top:3px!important;
+.panel:has(.vikingBattle) .card p{
+  margin:3px 0 0!important;
   font-size:10px!important;
-  line-height:1.2!important;
 }
-.vikingBattle #battleLog div{
-  margin:1px 0!important;
+.panel:has(.vikingBattle) .goldBtn{
+  flex:0 0 40px!important;
+  height:40px!important;
+  min-height:40px!important;
+  padding:0!important;
+  margin:2px 0!important;
+  font-size:14px!important;
+  border-radius:8px!important;
 }
 
-/* On narrow phones keep every battle control inside one screen. */
+/* History is always visible; only old entries scroll inside this small area. */
+.panel:has(.vikingBattle) .card:last-child{
+  flex:1 1 auto!important;
+  min-height:70px!important;
+  height:auto!important;
+  overflow:hidden!important;
+}
+.panel:has(.vikingBattle) #battleLog{
+  height:58px!important;
+  max-height:58px!important;
+  overflow-y:auto!important;
+  margin-top:2px!important;
+  font-size:9px!important;
+  line-height:1.15!important;
+}
+.panel:has(.vikingBattle) #battleLog div{margin:1px 0!important}
+
 @media(max-width:500px){
-  .panel{padding:6px!important;max-height:100dvh!important}
-  .vikingBattle .fighters{height:128px!important}
-  .vikingBattle .fighter img,.vikingBattle .fighter .vikingSvg{height:80px!important}
-  .vikingBattle .card{padding:4px 5px!important;margin:2px 0!important}
-  .vikingBattle .zones button{height:29px!important;font-size:8px!important}
-  .vikingBattle .card:first-of-type{height:27px!important}
-  .vikingBattle .goldBtn{height:38px!important;font-size:14px!important}
-  .vikingBattle .card:last-child{height:78px!important}
-  .vikingBattle #battleLog{height:52px!important;font-size:9px!important}
+  .panel:has(.vikingBattle) h2{font-size:20px!important;height:34px!important;line-height:34px!important}
+  .panel:has(.vikingBattle) .fighters{
+    flex-basis:132px!important;height:132px!important;min-height:132px!important
+  }
+  .panel:has(.vikingBattle) .fighter img,
+  .panel:has(.vikingBattle) .fighter .vikingSvg{height:88px!important}
+  .panel:has(.vikingBattle) .card:nth-of-type(2){flex-basis:62px!important;height:62px!important}
+  .panel:has(.vikingBattle) .card:nth-of-type(3){flex-basis:76px!important;height:76px!important}
+  .panel:has(.vikingBattle) .zones button{height:28px!important;font-size:8px!important}
+  .panel:has(.vikingBattle) .goldBtn{flex-basis:38px!important;height:38px!important;min-height:38px!important}
+  .panel:has(.vikingBattle) #battleLog{height:54px!important;max-height:54px!important;font-size:8px!important}
 }
 </style>
 
@@ -436,8 +503,7 @@ function battle(){
     </div>
     <div class="autoRow"><button class="autoBtn" id="autoBtn" onclick="toggleAutoBattle()">▶ АВТОБОЙ</button></div>
     <div class="autoHint" id="autoHint">Автобой сам выбирает атаку и 2 зоны защиты каждый ход.</div>
-    <div class="card"><b>Ход: <span id="turnNo">1</span></b></div>
-    <div class="card"><b>Атака — выбери 1 зону</b><div class="zones" id="attacks">${ZONES.map((x,i)=>'<button onclick="pickAttack('+i+',this)">'+x+'</button>').join('')}</div></div>
+    <div class="card"><b>Ход: <span id="turnNo">1</span> · Атака — выбери 1 зону</b><div class="zones" id="attacks">${ZONES.map((x,i)=>'<button onclick="pickAttack('+i+',this)">'+x+'</button>').join('')}</div></div>
     <div class="card"><b>Защита — выбери 2 зоны</b><div class="zones" id="defs">${ZONES.map((x,i)=>'<button onclick="pickDef('+i+',this)">'+x+'</button>').join('')}</div><p>Выбрано: <b id="dc">0/2</b></p></div>
     <button class="goldBtn" onclick="strikeTurn()">⚔️ Сделать ход</button>
     <div class="card"><b>История боя</b><div id="battleLog">Выберите атаку и две зоны защиты.</div></div>
