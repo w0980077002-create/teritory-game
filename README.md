@@ -1,21 +1,24 @@
-# Territory — Sdolars · S90 FINAL
+# Territory — Sdolars s75
 
-Готовая мобильная сборка Territory для текущего Cloudflare Workers backend.
+Global gameplay build based directly on the approved s60 working base.
 
-## Состав
+- 4 attack zones and 4 defense zones; no belly zone
+- 2 defense selections
+- automatic strike after selection
+- 15-second timeout = loss
+- compact battle history and auto-battle checkbox
+- character progression and persistent stats
+- districts with level gates, enemies, rewards and win counters
+- inventory/equipment
+- progressive forge upgrades
+- quests and rewards
+- casino excluded
+- approved city screen preserved
 
-- index.html — финальный мобильный интерфейс
-- worker.js — текущий серверный GameHub и игровая логика
-- wrangler.jsonc — Cloudflare Workers, Durable Objects и Static Assets
-- package.json — команды Wrangler
-- assets/home-screen.png — фон игровой сцены
-- assets/home-screen-full.png — полный исходный арт
 
-## Установка
-
-1. Скопируйте содержимое этой папки в репозиторий.
-2. Сохраните worker.js, wrangler.jsonc, package.json и папку assets.
-3. Установите зависимости командой `npm install`.
-4. Опубликуйте проект командой `npm run deploy`.
-
-Фронтенд использует POST /api/state и POST /api/action. Боевой интерфейс работает с четырьмя зонами сервера: атака — одна зона, защита — две разные зоны. После завершения раунда используются серверные действия battle.reward и battle.loss.
+## s76 — gameplay loop update
+- Battle now costs 3 energy.
+- Victory/loss persists battle statistics and HP.
+- Victory advances active adventure quest and daily win mission.
+- Victory grants level progression and free attribute points when XP threshold is reached.
+- Version markers updated to s76.
