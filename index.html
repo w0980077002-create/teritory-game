@@ -199,6 +199,95 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
   .fighter img,.fighter .vikingSvg{height:76px}
 }
 </style>
+
+<style>
+/* S63 — battle is a single-screen mobile layout */
+.vikingBattle{
+  padding:4px!important;
+  margin:0!important;
+  border-radius:10px!important;
+}
+.vikingBattle .fighters{
+  height:142px!important;
+  padding:2px!important;
+  gap:4px!important;
+}
+.vikingBattle .fighters:after{bottom:43px!important;font-size:13px!important}
+.vikingBattle .fighter{padding:2px!important;border-radius:7px!important}
+.vikingBattle .fighter img,.vikingBattle .fighter .vikingSvg{
+  height:92px!important;
+  border-radius:5px!important;
+}
+.vikingBattle .fighterName{font-size:10px!important;margin:1px 0!important}
+.vikingBattle .fighterRole{font-size:7px!important;margin:0 0 1px!important}
+.vikingBattle .fhp{height:5px!important}
+.vikingBattle .fhpText{font-size:8px!important;margin-top:1px!important}
+.vikingBattle .autoRow{margin:3px 0!important}
+.vikingBattle .autoBtn{height:28px!important;font-size:9px!important}
+.vikingBattle .autoHint{display:none!important}
+
+.vikingBattle .card{
+  padding:5px 6px!important;
+  margin:3px 0!important;
+  border-radius:8px!important;
+}
+.vikingBattle .card>b{
+  font-size:13px!important;
+}
+.vikingBattle .card:first-of-type{
+  height:30px!important;
+  display:flex!important;
+  align-items:center!important;
+}
+.vikingBattle .zones{
+  gap:3px!important;
+  margin-top:3px!important;
+}
+.vikingBattle .zones button{
+  height:32px!important;
+  padding:0 2px!important;
+  font-size:9px!important;
+  border-radius:6px!important;
+}
+.vikingBattle .card p{
+  margin:4px 0 0!important;
+  font-size:11px!important;
+}
+.vikingBattle .goldBtn{
+  height:42px!important;
+  padding:0!important;
+  margin:3px 0!important;
+  font-size:15px!important;
+}
+.vikingBattle .card:last-child{
+  height:88px!important;
+  overflow:hidden!important;
+}
+.vikingBattle #battleLog{
+  height:62px!important;
+  overflow-y:auto!important;
+  margin-top:3px!important;
+  font-size:10px!important;
+  line-height:1.2!important;
+}
+.vikingBattle #battleLog div{
+  margin:1px 0!important;
+}
+
+/* On narrow phones keep every battle control inside one screen. */
+@media(max-width:500px){
+  .panel{padding:6px!important;max-height:100dvh!important}
+  .vikingBattle .fighters{height:128px!important}
+  .vikingBattle .fighter img,.vikingBattle .fighter .vikingSvg{height:80px!important}
+  .vikingBattle .card{padding:4px 5px!important;margin:2px 0!important}
+  .vikingBattle .zones button{height:29px!important;font-size:8px!important}
+  .vikingBattle .card:first-of-type{height:27px!important}
+  .vikingBattle .goldBtn{height:38px!important;font-size:14px!important}
+  .vikingBattle .card:last-child{height:78px!important}
+  .vikingBattle #battleLog{height:52px!important;font-size:9px!important}
+}
+</style>
+
 </head>
 <body>
 <div id="app">
