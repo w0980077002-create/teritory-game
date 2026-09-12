@@ -8,522 +8,268 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;width:100%;height:100%;background:#061421;color:#fff;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
 button{font:inherit;color:inherit;border:0;cursor:pointer}
-#app{height:100dvh;display:flex;flex-direction:column;max-width:720px;margin:auto;background:#061421}
+#app{height:100dvh;max-width:720px;margin:auto;display:flex;flex-direction:column;background:#061421}
 .hud{height:154px;flex:0 0 154px;background:linear-gradient(180deg,#061b2d,#061421);padding:10px 12px;display:grid;grid-template-columns:105px 1fr;gap:10px;border-bottom:3px solid #128bd4}
-.avatar{width:105px;height:105px;border:3px solid #1699e8;border-radius:20px;background:linear-gradient(135deg,#203b50,#09131e);display:flex;align-items:center;justify-content:center;font-size:46px;position:relative;overflow:hidden}
-.avatar span{position:absolute;bottom:2px;left:4px;background:#0c2840;border:2px solid #9ddcff;border-radius:10px;padding:2px 7px;font-size:16px}
-.hud-main{min-width:0}
-.name-row{display:flex;align-items:center;justify-content:space-between;gap:5px}
-.player-name{font-size:24px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.level{font-size:15px;color:#6ac9ff;font-weight:800}
-.xp{height:9px;border:2px solid #187fb8;border-radius:8px;margin:7px 0 9px;overflow:hidden}
-.xp i{display:block;height:100%;width:0;background:#22a7e9}
-.resources{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
-.res{height:42px;border:2px solid #1578b9;border-radius:14px;background:#09263c;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px}
-.res b{font-size:17px;margin-right:3px}
-.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:6px}
-.icon-btn{height:42px;border:2px solid #126ca9;border-radius:13px;background:#09263c;display:flex;align-items:center;justify-content:center;font-size:20px;position:relative}
-.badge{position:absolute;right:-3px;top:-8px;min-width:25px;height:25px;padding:2px 6px;border-radius:15px;background:#ff4770;border:2px solid #ff9ab0;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center}
-.scene{position:relative;flex:1;min-height:0;overflow:auto;background:
-radial-gradient(circle at 50% 20%,rgba(70,150,220,.25),transparent 40%),
-linear-gradient(160deg,#1e6fa7 0,#284f72 35%,#10273a 65%,#07131e 100%)}
-.scene:before{content:"";position:absolute;inset:0;background:
-linear-gradient(180deg,rgba(10,35,55,.15),rgba(0,0,0,.25)),
-radial-gradient(circle at 78% 24%,rgba(255,255,255,.8) 0 1px,transparent 2px);
-opacity:.7;pointer-events:none}
-.castle{position:absolute;top:6%;left:0;right:0;text-align:center;font-size:76px;filter:drop-shadow(0 10px 10px #00111e);opacity:.9}
-.mountain{position:absolute;top:19%;left:0;right:0;text-align:center;font-size:105px;opacity:.75;filter:drop-shadow(0 8px 6px #071522)}
-.hero-art{position:absolute;left:50%;bottom:2%;transform:translateX(-50%);font-size:220px;line-height:1;filter:drop-shadow(0 12px 12px #000);user-select:none}
-.panel{position:absolute;z-index:4;border:3px solid #1688d0;border-radius:20px;background:rgba(5,30,49,.94);box-shadow:0 8px 25px #0008;padding:13px}
-.quest{left:14px;top:18px;width:272px}
-.bonus{right:14px;top:26px;width:218px;border-color:#ffd51e;text-align:center;background:rgba(30,12,65,.94)}
-.panel-title{font-weight:900;color:#ffd83b;font-size:17px;margin-bottom:8px}
-.panel-main{font-size:17px;font-weight:900}
-.panel-sub{font-size:14px;color:#9ab7cb;margin-top:5px}
-.side{position:absolute;right:14px;top:42%;z-index:5;width:260px;display:grid;gap:7px}
-.side button{height:68px;border:3px solid #1688d0;border-radius:18px;background:#082b46;text-align:left;padding:8px 15px;font-weight:900;font-size:17px;display:flex;align-items:center;gap:10px}
-.side button span{font-size:25px}
-.left-side{position:absolute;left:14px;top:40%;z-index:5;display:grid;gap:7px}
-.left-side button{width:80px;height:78px;border:3px solid #1688d0;border-radius:17px;background:#082b46;font-size:13px;font-weight:900}
-.left-side span{display:block;font-size:25px;margin-bottom:3px}
-.main-nav{position:absolute;left:14px;right:14px;bottom:10px;z-index:6;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-.main-nav button{height:92px;border:3px solid #159be9;border-radius:18px;background:#0b3a5c;font-weight:900;font-size:17px}
-.main-nav button:nth-child(2){border-color:#f1a900;background:#865400}
-.main-nav button:nth-child(3){border-color:#8b31ef;background:#48139a}
-.main-nav button:nth-child(4){border-color:#16d28a;background:#087b54}
-.main-nav span{display:block;font-size:27px;margin-bottom:5px}
-.chat{position:absolute;left:24px;right:24px;bottom:108px;height:58px;border-top:2px solid #14577e;display:flex;align-items:center;justify-content:space-between;font-weight:900}
-.chat small{display:block;color:#9eb7c7;margin-top:3px}
-.bottom{height:80px;flex:0 0 80px;background:#061b2c;border-top:2px solid #164968;display:grid;grid-template-columns:repeat(6,1fr)}
-.bottom button{background:#071e31;border-right:1px solid #164968;color:#9db7c8;font-size:12px;font-weight:900}
-.bottom button.active{color:#ffe33e;border-bottom:5px solid #ffe33e}
-.bottom span{display:block;font-size:22px;margin-bottom:4px}
-.modal{position:fixed;z-index:20;inset:0;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center}
-.modal.show{display:flex}
-.sheet{width:min(720px,100%);max-height:88dvh;overflow:auto;background:#071a2a;border:2px solid #177fc0;border-bottom:0;border-radius:25px 25px 0 0;padding:18px 15px 28px}
-.sheet h2{margin:0 0 12px;color:#ffd83b}
-.close{float:right;background:#173b54;border-radius:10px;padding:7px 12px;font-weight:900}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.card{background:#0a2941;border:2px solid #176ca2;border-radius:16px;padding:12px}
-.card h3{margin:0 0 6px;font-size:17px}
-.card p{margin:4px 0;color:#aac0cf;font-size:14px}
-.card button,.primary{margin-top:8px;width:100%;padding:11px;border-radius:12px;background:#117dc0;font-weight:900}
-.card button:disabled{opacity:.45}
-.combat{padding-bottom:20px}
-.enemy{display:flex;align-items:center;gap:12px;background:#0a2941;border:2px solid #bd3b57;border-radius:17px;padding:12px}
-.enemy-art{font-size:65px}
-.hp{height:12px;background:#1c2630;border-radius:8px;overflow:hidden;border:1px solid #7b8790;margin-top:5px}
-.hp i{display:block;height:100%;background:#ef3655;width:100%}
-.combat-note{margin:12px 0;color:#9db6c8}
-.zone-title{font-weight:900;margin:12px 0 7px}
-.zones{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
-.zone{padding:10px 3px;border:2px solid #176da6;border-radius:10px;background:#09283f;font-size:12px;font-weight:900}
-.zone.selected{background:#146da4;border-color:#70d3ff;box-shadow:0 0 0 2px #70d3ff55}
-.zone.def.selected{background:#7d243d;border-color:#ff7090}
-.log{min-height:80px;max-height:120px;overflow:auto;background:#061521;border-radius:12px;padding:9px;margin-top:12px;font-size:13px;color:#c3d5df}
-.toast{position:fixed;z-index:50;left:50%;bottom:92px;transform:translate(-50%,20px);background:#092b45;border:2px solid #39b8ff;border-radius:14px;padding:12px 18px;font-weight:900;opacity:0;pointer-events:none;transition:.25s;max-width:90%;text-align:center}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.statline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #17425d}
-.reset{background:#8b263b!important}
-@media(max-width:430px){
- .hud{height:145px;flex-basis:145px}.avatar{width:96px;height:96px}.player-name{font-size:21px}
- .side{width:240px;right:10px}.side button{height:61px}.hero-art{font-size:190px}.castle{font-size:65px}.mountain{font-size:85px}
- .main-nav button{height:82px;font-size:15px}.main-nav{bottom:8px}.chat{bottom:98px}
-}
+.avatar{width:105px;height:105px;border:3px solid #1699e8;border-radius:20px;background:linear-gradient(135deg,#203b50,#09131e);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative}.avatar span{position:absolute;bottom:2px;left:4px;background:#0c2840;border:2px solid #9ddcff;border-radius:10px;padding:2px 7px;font-size:16px}
+.name-row{display:flex;align-items:center;justify-content:space-between}.player-name{font-size:23px;font-weight:900}.level{font-size:14px;color:#6ac9ff;font-weight:800}
+.xp{height:9px;border:2px solid #187fb8;border-radius:8px;margin:7px 0 3px;overflow:hidden}.xp i{display:block;height:100%;background:#22a7e9;width:0}
+#xpText{font-size:12px}.resources{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:5px}.res{height:38px;border:2px solid #1578b9;border-radius:13px;background:#09263c;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}.res b{font-size:17px;margin-right:3px}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:5px}.icon-btn{height:38px;border:2px solid #126ca9;border-radius:12px;background:#09263c;font-size:19px;position:relative}
+.scene{position:relative;flex:1;min-height:0;overflow:hidden;background:linear-gradient(160deg,#1f70a7,#274e70 38%,#10273a 68%,#07131e)}.castle{position:absolute;top:4%;left:0;right:0;text-align:center;font-size:78px;filter:drop-shadow(0 10px 10px #00111e)}.mountain{position:absolute;top:19%;left:0;right:0;text-align:center;font-size:105px;opacity:.72}.hero-art{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);font-size:220px;line-height:1;filter:drop-shadow(0 12px 12px #000)}
+.panel{position:absolute;z-index:3;border:3px solid #1688d0;border-radius:20px;background:rgba(5,30,49,.94);box-shadow:0 8px 25px #0008;padding:12px}.quest{left:14px;top:18px;width:270px}.bonus{right:14px;top:25px;width:215px;border-color:#ffd51e;text-align:center;background:rgba(30,12,65,.94)}.panel-title{font-weight:900;color:#ffd83b;font-size:16px;margin-bottom:7px}.panel-main{font-size:17px;font-weight:900}.panel-sub{font-size:13px;color:#9ab7cb;margin-top:4px}
+.side{position:absolute;right:14px;top:41%;z-index:4;width:260px;display:grid;gap:7px}.side button{height:66px;border:3px solid #1688d0;border-radius:18px;background:#082b46;text-align:left;padding:8px 14px;font-weight:900;font-size:17px;display:flex;align-items:center;gap:10px}.side button span{font-size:25px}.side small{display:block;color:#9ab7cb;font-size:12px;margin-top:2px}
+.left-side{position:absolute;left:14px;top:39%;z-index:4;display:grid;gap:7px}.left-side button{width:80px;height:76px;border:3px solid #1688d0;border-radius:17px;background:#082b46;font-size:12px;font-weight:900}.left-side span{display:block;font-size:24px;margin-bottom:3px}
+.main-nav{position:absolute;left:14px;right:14px;bottom:10px;z-index:5;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.main-nav button{height:88px;border:3px solid #159be9;border-radius:18px;background:#0b3a5c;font-weight:900;font-size:16px}.main-nav button:nth-child(2){border-color:#f1a900;background:#865400}.main-nav button:nth-child(3){border-color:#8b31ef;background:#48139a}.main-nav button:nth-child(4){border-color:#16d28a;background:#087b54}.main-nav span{display:block;font-size:27px;margin-bottom:4px}
+.chat{position:absolute;left:24px;right:24px;bottom:104px;height:52px;border-top:2px solid #14577e;display:flex;align-items:center;justify-content:space-between;font-weight:900}.chat small{display:block;color:#9eb7c7;margin-top:2px}.bottom{height:80px;flex:0 0 80px;background:#061b2c;border-top:2px solid #164968;display:grid;grid-template-columns:repeat(6,1fr)}.bottom button{background:#071e31;border-right:1px solid #164968;color:#9db7c8;font-size:12px;font-weight:900}.bottom button.active{color:#ffe33e;border-bottom:5px solid #ffe33e}.bottom span{display:block;font-size:21px;margin-bottom:4px}
+.modal{position:fixed;z-index:20;inset:0;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center}.modal.show{display:flex}.sheet{width:min(720px,100%);max-height:89dvh;overflow:auto;background:#071a2a;border:2px solid #177fc0;border-bottom:0;border-radius:25px 25px 0 0;padding:17px 14px 28px}.sheet h2{margin:0 0 12px;color:#ffd83b}.close{float:right;background:#173b54;border-radius:10px;padding:7px 12px;font-weight:900}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.card{background:#0a2941;border:2px solid #176ca2;border-radius:16px;padding:11px}.card h3{margin:0 0 6px;font-size:17px}.card p{margin:4px 0;color:#aac0cf;font-size:13px}.card button,.primary{margin-top:8px;width:100%;padding:11px;border-radius:12px;background:#117dc0;font-weight:900}.card button:disabled{opacity:.4}.danger{background:#8b263b!important}.statline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #17425d}.enemy{display:flex;align-items:center;gap:12px;background:#0a2941;border:2px solid #bd3b57;border-radius:17px;padding:10px}.enemy-art{font-size:60px}.hp{height:12px;background:#1c2630;border-radius:8px;overflow:hidden;border:1px solid #7b8790;margin-top:5px}.hp i{display:block;height:100%;background:#ef3655;width:100%}.combat-note{margin:10px 0;color:#9db6c8;font-size:14px}.zone-title{font-weight:900;margin:10px 0 6px}.zones{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.zone{padding:9px 2px;border:2px solid #176da6;border-radius:10px;background:#09283f;font-size:11px;font-weight:900}.zone.selected{background:#146da4;border-color:#70d3ff}.zone.def.selected{background:#7d243d;border-color:#ff7090}.log{min-height:70px;max-height:115px;overflow:auto;background:#061521;border-radius:12px;padding:8px;margin-top:10px;font-size:12px;color:#c3d5df}.loot{margin-top:10px;padding:11px;border:2px solid #e8b82c;border-radius:14px;background:#2a2110}.loot b{color:#ffd83b}.rarity-common{color:#d8e2e8}.rarity-rare{color:#57c7ff}.rarity-epic{color:#cf79ff}.toast{position:fixed;z-index:50;left:50%;bottom:92px;transform:translate(-50%,20px);background:#092b45;border:2px solid #39b8ff;border-radius:14px;padding:11px 17px;font-weight:900;opacity:0;pointer-events:none;transition:.25s;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:430px){.hud{height:145px;flex-basis:145px}.avatar{width:96px;height:96px}.player-name{font-size:21px}.side{width:240px;right:10px}.side button{height:61px}.hero-art{font-size:190px}.castle{font-size:65px}.mountain{font-size:85px}.main-nav button{height:82px;font-size:15px}.chat{bottom:98px}}
 </style>
 </head>
 <body>
 <div id="app">
 <header class="hud">
   <div class="avatar">🧔‍♂️<span id="hudLevel">1</span></div>
-  <div class="hud-main">
+  <div>
     <div class="name-row"><div class="player-name" id="hudName">Воин</div><div class="level">Уровень <span id="level">1</span></div></div>
-    <div class="xp"><i id="xpBar"></i></div>
-    <div id="xpText">0/300</div>
-    <div class="resources">
-      <div class="res"><b>🟡</b><span id="coins">1000</span> +</div>
-      <div class="res"><b>◆</b><span id="sdolars">500</span> +</div>
-      <div class="res"><b>ϟ</b><span id="energy">20</span> +</div>
-    </div>
-    <div class="actions">
-      <button class="icon-btn" onclick="showSimple('Почта','Новых сообщений нет.')">✉️<span class="badge" id="mailBadge">0</span></button>
-      <button class="icon-btn" onclick="showSimple('Достижения','Победы, улучшения и найм героев учитываются автоматически.')">🏆</button>
-      <button class="icon-btn" onclick="showSimple('Настройки','Игра сохраняется автоматически в памяти браузера.')">⚙️</button>
-      <button class="icon-btn" onclick="toggleLang()">🇬🇧</button>
-    </div>
+    <div class="xp"><i id="xpBar"></i></div><div id="xpText">0/300 XP</div>
+    <div class="resources"><div class="res"><b>🟡</b><span id="coins">1000</span></div><div class="res"><b>◆</b><span id="sdolars">500</span></div><div class="res"><b>ϟ</b><span id="energy">20</span></div></div>
+    <div class="actions"><button class="icon-btn" onclick="showSimple('Почта','Новых сообщений нет.')">✉️</button><button class="icon-btn" onclick="openPanel('loot')">🎁</button><button class="icon-btn" onclick="showSimple('Настройки','Состояние сохраняется автоматически.')">⚙️</button><button class="icon-btn" onclick="showSimple('Territory','Локальная MVP-версия для GitHub Pages.')">ⓘ</button></div>
   </div>
 </header>
 
 <main class="scene">
-  <div class="castle">🏰</div>
-  <div class="mountain">🏔️🏔️🏔️</div>
-  <div class="hero-art">🧔🏻‍♂️</div>
-
-  <div class="panel quest" onclick="openPanel('quests')">
-    <div class="panel-title">Текущее задание</div>
-    <div class="panel-main" id="questText">Победи в первом бою ›</div>
-    <div class="panel-sub">⚒ Кузница</div>
-  </div>
-
-  <div class="panel bonus">
-    <div class="panel-title">🎁 Ежедневный бонус</div>
-    <div class="panel-main" id="bonusTimer">Готов</div>
-  </div>
-
-  <div class="left-side">
-    <button onclick="showSimple('Бонусы','За победы получай Sdolars и опыт.')"><span>🎁</span>Бонусы</button>
-    <button onclick="showSimple('События','События доступны в следующих обновлениях.')"><span>❗</span>События</button>
-    <button onclick="showSimple('VIP','VIP пока не активирован в MVP.')"><span>♛</span>VIP</button>
-  </div>
-
+  <div class="castle">🏰</div><div class="mountain">🏔️🏔️🏔️</div><div class="hero-art">🧔🏻‍♂️</div>
+  <div class="panel quest" onclick="openPanel('quests')"><div class="panel-title">Текущее задание</div><div class="panel-main" id="questText">Победи в бою ›</div><div class="panel-sub">⚔️ Тактический бой</div></div>
+  <div class="panel bonus"><div class="panel-title">🎁 Последняя добыча</div><div class="panel-main" id="lastLoot">Нет</div></div>
+  <div class="left-side"><button onclick="openPanel('loot')"><span>🎁</span>Лут</button><button onclick="showSimple('События','Случайные события будут добавлены позже.')"><span>❗</span>События</button><button onclick="showSimple('VIP','VIP не входит в этот MVP.')"><span>♛</span>VIP</button></div>
   <div class="side">
     <button onclick="openPanel('forge')"><span>⚒️</span><div>Кузница<small>Улучшение снаряжения</small></div></button>
     <button onclick="openPanel('tavern')"><span>🍺</span><div>Таверна<small>Найм героев</small></div></button>
     <button onclick="openPanel('shop')"><span>🎒</span><div>Магазин<small>Предметы и снаряжение</small></div></button>
   </div>
-
-  <div class="chat"><div>💬 <span>Чат игры</span><small>Общий чат и чат клана</small></div><b>Открыть ›</b></div>
-
-  <div class="main-nav">
-    <button onclick="openPanel('combat')"><span>⚔️</span>Бой</button>
-    <button onclick="openPanel('inventory')"><span>🎒</span>Инвентарь</button>
-    <button onclick="openPanel('equipment')"><span>🛡️</span>Экипировка</button>
-    <button onclick="openPanel('quests')"><span>📜</span>Задания</button>
-  </div>
+  <div class="chat"><div>💬 Чат игры<small>Локальная MVP-версия</small></div><b>Открыть ›</b></div>
+  <div class="main-nav"><button onclick="openPanel('combat')"><span>⚔️</span>Бой</button><button onclick="openPanel('inventory')"><span>🎒</span>Инвентарь</button><button onclick="openPanel('equipment')"><span>🛡️</span>Экипировка</button><button onclick="openPanel('quests')"><span>📜</span>Задания</button></div>
 </main>
 
-<nav class="bottom">
-  <button class="active" onclick="closePanel()"><span>🏠</span>Город</button>
-  <button onclick="openPanel('heroes')"><span>⚔️</span>Герои</button>
-  <button onclick="openPanel('inventory')"><span>🎒</span>Инвентарь</button>
-  <button onclick="openPanel('quests')"><span>📜</span>Задания</button>
-  <button onclick="showSimple('Гильдия','Система гильдий будет подключена следующим этапом.')"><span>👥</span>Гильдия</button>
-  <button onclick="showSimple('Ещё','MVP содержит город, бой, кузницу, таверну, магазин и сохранение.')"><span>☰</span>Ещё</button>
-</nav>
+<nav class="bottom"><button class="active" onclick="closePanel()"><span>🏠</span>Город</button><button onclick="openPanel('heroes')"><span>⚔️</span>Герои</button><button onclick="openPanel('inventory')"><span>🎒</span>Инвентарь</button><button onclick="openPanel('quests')"><span>📜</span>Задания</button><button onclick="showSimple('Гильдия','Гильдия будет следующим модулем.')"><span>👥</span>Гильдия</button><button onclick="showSimple('Ещё','MVP: бой, лут, кузница, таверна, магазин и сохранение.')"><span>☰</span>Ещё</button></nav>
 </div>
-
-<div class="modal" id="modal" onclick="if(event.target===this)closePanel()">
-  <section class="sheet" id="sheet"></section>
-</div>
+<div class="modal" id="modal" onclick="if(event.target===this)closePanel()"><section class="sheet" id="sheet"></section></div>
 <div class="toast" id="toast"></div>
 
 <script>
 'use strict';
 
-/* =========================
-   TERRITORY MVP — MONOLITH
-   ========================= */
+/* Territory MVP: весь игровой код находится в этом файле. */
 
-const SAVE_KEY = 'territory_mvp_s2';
-const ZONES = ['Голова','Грудь','Живот','Пояс','Ноги'];
-const HERO_NAMES = ['Рагнар','Ивар','Сигрид','Эйрик','Астрид','Хальвар','Фрейя','Гуннар','Лагерта','Торстен'];
+const SAVE_KEY='territory_combat_loot_mvp';
+const ZONES=['Голова','Грудь','Живот','Пояс','Ноги'];
 
-const DEFAULT_STATE = {
-  name:'Воин',
-  level:1,
-  xp:0,
-  xpToLevel:300,
-  sdo:500,
-  coins:1000,
-  energy:20,
-  maxEnergy:20,
-  strength:10,
-  agility:10,
-  weapon:'Кулаки',
-  weaponBonus:0,
-  equipment:[],
-  recruited:[],
-  wins:0,
-  losses:0,
-  battles:0,
-  forgeLevel:0,
-  dailyClaimed:false,
-  dailyClaimAt:0,
-  quest:{firstBattle:false, forge:false, recruit:false, shop:false},
-  inventory:[],
-  language:'ru'
+const ENEMIES=[
+ {name:'Уличный боец',icon:'🥷',hp:90,str:8,level:1},
+ {name:'Наёмник',icon:'🪖',hp:125,str:12,level:2},
+ {name:'Северный воин',icon:'🧔',hp:165,str:16,level:3},
+ {name:'Элитный страж',icon:'🛡️',hp:215,str:21,level:4}
+];
+
+const LOOT=[
+ {name:'Малое зелье силы',rarity:'common',str:2,agi:0,value:30},
+ {name:'Кожаные перчатки',rarity:'common',str:1,agi:3,value:40},
+ {name:'Стальной клинок',rarity:'rare',str:7,agi:0,value:90},
+ {name:'Плащ ловкача',rarity:'rare',str:0,agi:7,value:90},
+ {name:'Северный топор',rarity:'epic',str:12,agi:1,value:180},
+ {name:'Руна воина',rarity:'epic',str:6,agi:6,value:220}
+];
+
+const DEFAULT={
+ name:'Воин',level:1,xp:0,xpToLevel:300,sdo:500,coins:1000,energy:20,maxEnergy:20,
+ strength:10,agility:10,weapon:'Кулаки',weaponBonus:0,equipment:[],inventory:[],recruited:[],
+ wins:0,losses:0,battles:0,forgeLevel:0,lastLoot:'Нет',lootHistory:[],
+ quest:{firstBattle:false,forge:false,recruit:false,shop:false}
 };
 
-let state = loadState();
-let combat = null;
-let toastTimer = null;
+let state=loadState(), combat=null, toastTimer=null;
 
 function loadState(){
-  try{
-    const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-    return saved ? merge(DEFAULT_STATE,saved) : structuredClone(DEFAULT_STATE);
-  }catch(e){
-    return structuredClone(DEFAULT_STATE);
-  }
+ try{const x=JSON.parse(localStorage.getItem(SAVE_KEY));return x?merge(DEFAULT,x):structuredClone(DEFAULT)}
+ catch(e){return structuredClone(DEFAULT)}
 }
-function merge(base, saved){
-  const out = {...base,...saved};
-  out.quest = {...base.quest,...(saved.quest||{})};
-  out.equipment = Array.isArray(saved.equipment)?saved.equipment:[];
-  out.inventory = Array.isArray(saved.inventory)?saved.inventory:[];
-  out.recruited = Array.isArray(saved.recruited)?saved.recruited:[];
-  return out;
+function merge(base,x){
+ const s={...base,...x,quest:{...base.quest,...(x.quest||{})}};
+ ['equipment','inventory','recruited','lootHistory'].forEach(k=>{s[k]=Array.isArray(x[k])?x[k]:[]});
+ return s;
 }
-function save(){ localStorage.setItem(SAVE_KEY,JSON.stringify(state)); }
-function money(n){return Math.max(0,Math.floor(n));}
-function canPay(cost){return state.sdo>=cost;}
-function pay(cost){state.sdo-=cost;}
-function toast(text){
-  const el=document.getElementById('toast');
-  el.textContent=text; el.classList.add('show');
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2600);
-}
+function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(state))}
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove('show'),2500)}
 function updateUI(){
-  document.getElementById('hudName').textContent=state.name;
-  document.getElementById('level').textContent=state.level;
-  document.getElementById('hudLevel').textContent=state.level;
-  document.getElementById('coins').textContent=money(state.coins);
-  document.getElementById('sdolars').textContent=money(state.sdo);
-  document.getElementById('energy').textContent=state.energy.toFixed(state.energy%1?1:0);
-  document.getElementById('xpText').textContent=state.xp+'/'+state.xpToLevel;
-  document.getElementById('xpBar').style.width=Math.min(100,state.xp/state.xpToLevel*100)+'%';
-  document.getElementById('questText').textContent =
-    !state.quest.firstBattle ? 'Победи в первом бою ›' :
-    !state.quest.forge ? 'Улучши экипировку ›' :
-    !state.quest.recruit ? 'Найми героя ›' :
-    !state.quest.shop ? 'Купи снаряжение ›' : 'Все MVP-задания выполнены ›';
-  updateBonus();
-  save();
+ document.getElementById('hudName').textContent=state.name;
+ document.getElementById('level').textContent=state.level;
+ document.getElementById('hudLevel').textContent=state.level;
+ document.getElementById('coins').textContent=Math.floor(state.coins);
+ document.getElementById('sdolars').textContent=Math.floor(state.sdo);
+ document.getElementById('energy').textContent=Number.isInteger(state.energy)?state.energy:state.energy.toFixed(1);
+ document.getElementById('xpText').textContent=state.xp+'/'+state.xpToLevel+' XP';
+ document.getElementById('xpBar').style.width=Math.min(100,state.xp/state.xpToLevel*100)+'%';
+ document.getElementById('lastLoot').textContent=state.lastLoot||'Нет';
+ document.getElementById('questText').textContent=!state.quest.firstBattle?'Победи в бою ›':!state.quest.forge?'Улучши экипировку ›':!state.quest.recruit?'Найми героя ›':!state.quest.shop?'Купи снаряжение ›':'Все задания выполнены ›';
+ save();
 }
-function addXP(amount){
-  state.xp += amount;
-  while(state.xp >= state.xpToLevel){
-    state.xp -= state.xpToLevel;
-    state.level++;
-    state.strength += 1;
-    state.agility += 1;
-    toast('Новый уровень: '+state.level+'! Сила и ловкость +1');
-  }
+function addXP(n){
+ state.xp+=n;
+ while(state.xp>=state.xpToLevel){
+   state.xp-=state.xpToLevel;state.level++;state.strength++;state.agility++;
+   toast('Новый уровень '+state.level+'! Сила и ловкость +1');
+ }
 }
-function updateBonus(){
-  const t=document.getElementById('bonusTimer');
-  if(state.dailyClaimAt && Date.now()-state.dailyClaimAt<86400000){
-    const left=86400000-(Date.now()-state.dailyClaimAt);
-    const h=Math.floor(left/3600000),m=Math.floor(left%3600000/60000),s=Math.floor(left%60000/1000);
-    t.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  }else{
-    t.textContent='Забрать';
-  }
+
+/* ---------- combat + loot ---------- */
+function newCombat(){
+ if(state.energy<1){toast('Недостаточно энергии.');return false}
+ const pool=ENEMIES.filter(e=>e.level<=state.level+1);
+ const e=pool[Math.floor(Math.random()*pool.length)];
+ const scale=Math.max(0,state.level-e.level);
+ combat={enemy:{...e,hp:e.hp+scale*20,maxHp:e.hp+scale*20,str:e.str+scale*2},
+ playerHp:100+state.level*10,playerMaxHp:100+state.level*10,attack:null,defense:[],log:['Противник: '+e.name+'. Выбери атаку и две защиты.'],finished:false};
+ return true;
+}
+function openCombat(){
+ if(!combat||combat.finished){if(!newCombat())return}
+ openPanel('combat');
+}
+function combatPanel(){
+ if(!combat){if(!newCombat())return ''}
+ return `<button class="close" onclick="closePanel()">✕</button><h2>⚔️ Тактический бой</h2>
+ <div class="enemy"><div class="enemy-art">${combat.enemy.icon}</div><div style="flex:1"><b>${combat.enemy.name}</b><div>${combat.enemy.hp}/${combat.enemy.maxHp} HP</div><div class="hp"><i id="enemyHpBar"></i></div></div></div>
+ <div class="combat-note">На каждом ходу: <b>1 зона атаки</b> + <b>2 разные зоны защиты</b>.</div>
+ <div class="zone-title">Атака</div><div class="zones">${ZONES.map((z,i)=>`<button class="zone atk" data-zone="${i}" onclick="selectAttack(${i})">${z}</button>`).join('')}</div>
+ <div class="zone-title">Защита</div><div class="zones">${ZONES.map((z,i)=>`<button class="zone def" data-zone="${i}" onclick="selectDefense(${i})">${z}</button>`).join('')}</div>
+ <button class="primary" onclick="combatTurn()">⚔️ Совершить ход</button>
+ <button class="primary danger" onclick="restartCombat()">↻ Сдаться и начать новый бой</button>
+ <div class="log" id="combatLog">${combat.log.slice(-8).map(x=>'• '+x).join('<br>')}</div>
+ ${combat.finished&&combat.loot?`<div class="loot">🎁 <b>Добыча</b><br>${combat.loot.name?`${combat.loot.name} <span class="rarity-${combat.loot.rarity}">(${combat.loot.rarity})</span>`:'Только награда'}<br>◆ +${combat.reward} · XP +${combat.xp}</div>`:''}`;
+}
+function renderCombat(){
+ if(!combat)return;
+ document.querySelectorAll('.zone.atk').forEach(b=>b.classList.toggle('selected',+b.dataset.zone===combat.attack));
+ document.querySelectorAll('.zone.def').forEach(b=>b.classList.toggle('selected',combat.defense.includes(+b.dataset.zone)));
+ const bar=document.getElementById('enemyHpBar');if(bar)bar.style.width=Math.max(0,combat.enemy.hp/combat.enemy.maxHp*100)+'%';
+ const log=document.getElementById('combatLog');if(log)log.innerHTML=combat.log.slice(-8).map(x=>'• '+x).join('<br>');
+}
+function selectAttack(i){if(!combat||combat.finished)return;combat.attack=i;renderCombat()}
+function selectDefense(i){
+ if(!combat||combat.finished)return;
+ const p=combat.defense.indexOf(i);
+ if(p>=0)combat.defense.splice(p,1);
+ else if(combat.defense.length<2)combat.defense.push(i);
+ else toast('Нужно выбрать ровно 2 зоны защиты.');
+ renderCombat();
+}
+function combatTurn(){
+ if(!combat||combat.finished)return;
+ if(combat.attack===null||combat.defense.length!==2){toast('Выбери 1 атаку и 2 защиты.');return}
+ if(state.energy<1){toast('Недостаточно энергии.');return}
+ state.energy--;
+
+ const blockedByEnemy=Math.random()<.28;
+ const crit=Math.random()<Math.min(.32,.08+state.strength*.009);
+ const hit=Math.random()<Math.min(.95,.68+state.agility*.007);
+ let dmg=0;
+ if(hit&&!blockedByEnemy){
+   dmg=9+state.strength+state.weaponBonus+(crit?Math.ceil((9+state.strength)*.55):0);
+   combat.enemy.hp=Math.max(0,combat.enemy.hp-dmg);
+   combat.log.push((crit?'КРИТ! ':'')+'Попадание в '+ZONES[combat.attack]+': -'+dmg+' HP.');
+ }else if(blockedByEnemy)combat.log.push('Противник закрыл твою зону атаки.');
+ else combat.log.push('Ты промахнулся.');
+ if(combat.enemy.hp<=0){finishWin();renderCombat();return}
+
+ const enemyZone=Math.floor(Math.random()*5);
+ const blocked=combat.defense.includes(enemyZone);
+ const dodge=Math.random()<Math.min(.35,.05+state.agility*.012);
+ if(blocked)combat.log.push('Ты заблокировал '+ZONES[enemyZone]+'.');
+ else if(dodge)combat.log.push('Ты увернулся от удара в '+ZONES[enemyZone]+'.');
+ else{
+   const edmg=5+combat.enemy.str;
+   combat.playerHp=Math.max(0,combat.playerHp-edmg);
+   combat.log.push(combat.enemy.name+' ударил в '+ZONES[enemyZone]+': -'+edmg+' HP.');
+ }
+ if(combat.playerHp<=0){finishLoss();renderCombat();return}
+ combat.attack=null;combat.defense=[];
+ updateUI();renderCombat();
+}
+function finishWin(){
+ combat.finished=true;state.wins++;state.battles++;state.quest.firstBattle=true;
+ const reward=30+state.level*12+Math.floor(Math.random()*21),xp=90+state.level*25;
+ state.sdo+=reward;addXP(xp);
+ const roll=Math.random(), lootChance=roll<.10?0:roll<.38?1:roll<.80?2:3;
+ let item=null;
+ if(Math.random()<.72){
+   const pool=LOOT.filter(x=>x.rarity==='common');
+   const pool2=LOOT.filter(x=>x.rarity==='rare');
+   const pool3=LOOT.filter(x=>x.rarity==='epic');
+   const source=lootChance===0?pool:lootChance===1?pool2:lootChance===2?[...pool2,...pool]:[...pool3,...pool2];
+   item=source[Math.floor(Math.random()*source.length)];
+   const found={...item};
+   state.inventory.push(found.name);state.lootHistory.unshift(found.name);state.lootHistory=state.lootHistory.slice(0,20);
+   state.lastLoot=found.name;
+   combat.loot=found;
+   combat.log.push('Добыча: '+found.name+'.');
+ }else{state.lastLoot='◆ '+reward+' Sdolars';combat.log.push('В этот раз предмет не выпал.')}
+ combat.reward=reward;combat.xp=xp;
+ combat.log.push('ПОБЕДА! +'+reward+' ◆ и +'+xp+' XP.');
+ toast(item?'Победа! Выпал лут: '+item.name:'Победа! +'+reward+' ◆');
+ updateUI();
+}
+function finishLoss(){
+ combat.finished=true;state.losses++;state.battles++;
+ combat.log.push('ПОРАЖЕНИЕ. Награда не получена.');
+ toast('Поражение. Попробуй другую тактику.');
+ updateUI();
+}
+function restartCombat(){combat=null;openCombat()}
+
+/* ---------- loot ---------- */
+function lootPanel(){
+ return `<button class="close" onclick="closePanel()">✕</button><h2>🎁 Добыча</h2>
+ <div class="card"><p>Последняя добыча:</p><h3>${state.lastLoot||'Нет'}</h3><p>Всего предметов: <b>${state.lootHistory.length}</b></p></div>
+ <div class="card" style="margin-top:9px">${state.lootHistory.length?state.lootHistory.map(x=>`<div class="statline"><span>🎁 ${x}</span><b>найден</b></div>`).join(''):'Предметы ещё не найдены. Побеждай в боях.'}</div>`;
 }
 
 /* ---------- panels ---------- */
 function openPanel(type){
-  const modal=document.getElementById('modal'), sheet=document.getElementById('sheet');
-  let html='';
-  if(type==='combat') html=combatPanel();
-  if(type==='forge') html=forgePanel();
-  if(type==='tavern') html=tavernPanel();
-  if(type==='shop') html=shopPanel();
-  if(type==='inventory') html=inventoryPanel();
-  if(type==='equipment') html=equipmentPanel();
-  if(type==='heroes') html=heroesPanel();
-  if(type==='quests') html=questsPanel();
-  if(!html)return;
-  sheet.innerHTML=html; modal.classList.add('show');
-  if(type==='combat') renderCombatState();
+ let h='';
+ if(type==='combat'){if(!combat&&!newCombat())return;h=combatPanel()}
+ else if(type==='loot')h=lootPanel();
+ else if(type==='forge')h=forgePanel();
+ else if(type==='tavern')h=tavernPanel();
+ else if(type==='shop')h=shopPanel();
+ else if(type==='inventory')h=inventoryPanel();
+ else if(type==='equipment')h=equipmentPanel();
+ else if(type==='heroes')h=heroesPanel();
+ else if(type==='quests')h=questsPanel();
+ document.getElementById('sheet').innerHTML=h;document.getElementById('modal').classList.add('show');if(type==='combat')renderCombat();
 }
-function closePanel(){document.getElementById('modal').classList.remove('show');}
-function showSimple(title,text){
-  document.getElementById('sheet').innerHTML=`<button class="close" onclick="closePanel()">✕</button><h2>${title}</h2><div class="card">${text}</div>`;
-  document.getElementById('modal').classList.add('show');
-}
+function closePanel(){document.getElementById('modal').classList.remove('show')}
+function showSimple(t,x){document.getElementById('sheet').innerHTML=`<button class="close" onclick="closePanel()">✕</button><h2>${t}</h2><div class="card">${x}</div>`;document.getElementById('modal').classList.add('show')}
 
-function combatPanel(){
-  if(!combat) startCombat();
-  return `<div class="combat">
-    <button class="close" onclick="closePanel()">✕</button>
-    <h2>⚔️ Тактический бой</h2>
-    <div class="enemy">
-      <div class="enemy-art">👹</div>
-      <div style="flex:1"><b>Воин Sdolars</b><div>${combat.enemyHp}/${combat.enemyMaxHp} HP</div><div class="hp"><i id="enemyHpBar"></i></div></div>
-    </div>
-    <div class="combat-note">Выбери <b>1 зону атаки</b> и <b>2 разные зоны защиты</b>, затем нажми «Ход».</div>
-    <div class="zone-title">Атака — 1 зона</div>
-    <div class="zones">${ZONES.map((z,i)=>`<button class="zone atk" data-zone="${i}" onclick="selectAttack(${i})">${z}</button>`).join('')}</div>
-    <div class="zone-title">Защита — 2 зоны</div>
-    <div class="zones">${ZONES.map((z,i)=>`<button class="zone def" data-zone="${i}" onclick="selectDefense(${i})">${z}</button>`).join('')}</div>
-    <button class="primary" onclick="combatTurn()">⚔️ Совершить ход</button>
-    <button class="primary reset" onclick="startCombat();renderCombatState()">↻ Новый бой</button>
-    <div class="log" id="combatLog">${combat.log.map(x=>'• '+x).join('<br>')}</div>
-  </div>`;
-}
-function startCombat(){
-  if(state.energy<1){
-    toast('Недостаточно энергии.');
-    combat=null; return;
-  }
-  combat={
-    enemyMaxHp:100+state.level*20,
-    enemyHp:100+state.level*20,
-    enemyStrength:8+state.level*2,
-    playerHp:100+state.level*10,
-    playerMaxHp:100+state.level*10,
-    attack:null,
-    defense:[],
-    log:['Бой начался. Выбери зоны.'],
-    finished:false
-  };
-}
-function selectAttack(i){
-  if(!combat||combat.finished)return;
-  combat.attack=i; renderCombatState();
-}
-function selectDefense(i){
-  if(!combat||combat.finished)return;
-  const idx=combat.defense.indexOf(i);
-  if(idx>=0) combat.defense.splice(idx,1);
-  else if(combat.defense.length<2) combat.defense.push(i);
-  else toast('Можно выбрать только 2 зоны защиты.');
-  renderCombatState();
-}
-function renderCombatState(){
-  if(!combat)return;
-  document.querySelectorAll('.zone.atk').forEach(b=>b.classList.toggle('selected',+b.dataset.zone===combat.attack));
-  document.querySelectorAll('.zone.def').forEach(b=>b.classList.toggle('selected',combat.defense.includes(+b.dataset.zone)));
-  const hp=document.getElementById('enemyHpBar');
-  if(hp)hp.style.width=Math.max(0,combat.enemyHp/combat.enemyMaxHp*100)+'%';
-  const log=document.getElementById('combatLog');
-  if(log)log.innerHTML=combat.log.slice(-8).map(x=>'• '+x).join('<br>');
-}
-function combatTurn(){
-  if(!combat||combat.finished)return;
-  if(combat.attack===null || combat.defense.length!==2){
-    toast('Выбери 1 атаку и 2 зоны защиты.');
-    return;
-  }
-  if(state.energy<1){
-    toast('Недостаточно энергии.');
-    return;
-  }
-  state.energy--;
-  const hitChance=Math.min(.95,.70+state.agility*.008);
-  const enemyBlocked=combat.defense.includes(combat.attack);
-  const crit=Math.random()<Math.min(.30,.05+state.strength*.01);
-  let playerDamage=0;
-  if(Math.random()<hitChance && !enemyBlocked){
-    playerDamage=10+state.strength+state.weaponBonus+(crit?8:0);
-    combat.enemyHp=Math.max(0,combat.enemyHp-playerDamage);
-    combat.log.push((crit?'КРИТ! ':'')+'Ты попал в '+ZONES[combat.attack]+' и нанёс '+playerDamage+' урона.');
-  }else{
-    combat.log.push('Атака противника оказалась эффективной — твой удар не прошёл.');
-  }
-  if(combat.enemyHp<=0){
-    winBattle();
-    renderCombatState();
-    return;
-  }
+function forgePanel(){const cost=80+state.forgeLevel*60;return `<button class="close" onclick="closePanel()">✕</button><h2>⚒️ Кузница</h2><div class="card"><h3>Улучшение экипировки</h3><p>Уровень: ${state.forgeLevel}</p><p>Сила ${state.strength} · Ловкость ${state.agility}</p><p>Цена: <b>${cost} ◆</b></p><button onclick="upgradeForge()">Улучшить: +2/+2</button></div>`}
+function upgradeForge(){const c=80+state.forgeLevel*60;if(state.sdo<c){toast('Недостаточно Sdolars.');return}state.sdo-=c;state.forgeLevel++;state.strength+=2;state.agility+=2;state.quest.forge=true;save();updateUI();toast('Кузница улучшена: +2 сила, +2 ловкость');openPanel('forge')}
 
-  const enemyAttack=Math.floor(Math.random()*5);
-  const blocked=combat.defense.includes(enemyAttack);
-  const dodge=Math.random()<Math.min(.35,.05+state.agility*.012);
-  if(!blocked && !dodge){
-    const dmg=5+combat.enemyStrength;
-    combat.playerHp=Math.max(0,combat.playerHp-dmg);
-    combat.log.push('Противник атаковал '+ZONES[enemyAttack]+' и нанёс '+dmg+' урона.');
-  }else if(blocked){
-    combat.log.push('Ты заблокировал атаку в зоне '+ZONES[enemyAttack]+'.');
-  }else{
-    combat.log.push('Ты увернулся от атаки.');
-  }
-  if(combat.playerHp<=0){
-    loseBattle();
-    renderCombatState();
-    return;
-  }
-  combat.attack=null; combat.defense=[];
-  renderCombatState(); updateUI();
-}
-function winBattle(){
-  combat.finished=true; state.wins++; state.battles++;
-  const reward=30+state.level*10, xp=90+state.level*10;
-  state.sdo+=reward; addXP(xp); state.quest.firstBattle=true;
-  combat.log.push(`ПОБЕДА! +${reward} ◆ Sdolars, +${xp} XP.`);
-  toast(`Победа! +${reward} ◆ и +${xp} XP`);
-  updateUI();
-}
-function loseBattle(){
-  combat.finished=true; state.losses++; state.battles++;
-  combat.log.push('Поражение. Восстановись и попробуй снова.');
-  toast('Поражение. Энергия потрачена.');
-  updateUI();
-}
+const HERO_NAMES=['Рагнар','Ивар','Сигрид','Эйрик','Астрид','Хальвар','Фрейя','Гуннар','Лагерта','Торстен'];
+function tavernPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>🍺 Таверна</h2><div class="card"><h3>Найм героя — 120 ◆</h3><p>Героев: ${state.recruited.length}</p><button onclick="recruitHero()">Нанять</button></div><div class="card" style="margin-top:9px">${state.recruited.length?state.recruited.map(x=>`<div class="statline">⚔️ ${x}<b>Нанят</b></div>`).join(''):'Героев пока нет.'}</div>`}
+function recruitHero(){if(state.sdo<120){toast('Недостаточно Sdolars.');return}state.sdo-=120;const a=HERO_NAMES.filter(x=>!state.recruited.includes(x));const n=(a.length?a:HERO_NAMES)[Math.floor(Math.random()*(a.length?a:HERO_NAMES).length)];state.recruited.push(n);state.quest.recruit=true;save();updateUI();toast('Вы наняли героя '+n);openPanel('tavern')}
 
-/* ---------- forge ---------- */
-function forgePanel(){
-  const cost=80+state.forgeLevel*60;
-  return `<button class="close" onclick="closePanel()">✕</button><h2>⚒️ Кузница</h2>
-  <div class="card">
-    <h3>Улучшение экипировки</h3>
-    <p>Уровень кузницы: <b>${state.forgeLevel}</b></p>
-    <p>Сила: <b>${state.strength}</b> · Ловкость: <b>${state.agility}</b></p>
-    <p>Следующее улучшение: <b>+2 к силе</b> и <b>+2 к ловкости</b>.</p>
-    <p>Стоимость: <b>${cost} ◆</b></p>
-    <button onclick="upgradeForge()">Улучшить</button>
-  </div>`;
-}
-function upgradeForge(){
-  const cost=80+state.forgeLevel*60;
-  if(!canPay(cost)){toast('Недостаточно Sdolars.');return}
-  pay(cost); state.forgeLevel++; state.strength+=2; state.agility+=2; state.quest.forge=true;
-  save(); updateUI(); toast('Экипировка улучшена: +2 сила, +2 ловкость.');
-  openPanel('forge');
-}
+const SHOP=[{name:'Стальной меч',cost:180,str:5,agi:0},{name:'Кожаная броня',cost:150,str:0,agi:4},{name:'Боевой шлем',cost:120,str:2,agi:2},{name:'Тяжёлый топор',cost:260,str:8,agi:-1}];
+function shopPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>🎒 Магазин</h2><div class="grid">${SHOP.map((x,i)=>`<div class="card"><h3>${x.name}</h3><p>Сила +${x.str} · Ловкость ${x.agi>=0?'+':''}${x.agi}</p><p>${x.cost} ◆</p><button onclick="buyItem(${i})">Купить</button></div>`).join('')}</div>`}
+function buyItem(i){const x=SHOP[i];if(state.sdo<x.cost){toast('Недостаточно Sdolars.');return}state.sdo-=x.cost;state.strength+=x.str;state.agility+=x.agi;state.weapon=x.name;state.weaponBonus+=Math.max(0,x.str);state.inventory.push(x.name);state.equipment.push(x.name);state.quest.shop=true;save();updateUI();toast('Куплено: '+x.name);openPanel('shop')}
 
-/* ---------- tavern ---------- */
-function tavernPanel(){
-  return `<button class="close" onclick="closePanel()">✕</button><h2>🍺 Таверна</h2>
-  <div class="card"><h3>Найм героя</h3><p>Стоимость: <b>120 ◆</b></p><p>Нанятые герои: <b>${state.recruited.length}</b></p><button onclick="recruitHero()">Нанять героя</button></div>
-  <div class="card" style="margin-top:10px">${state.recruited.length?state.recruited.map((x,i)=>`<div class="statline"><span>⚔️ ${x}</span><b>#${i+1}</b></div>`).join(''):'Героев пока нет.'}</div>`;
-}
-function recruitHero(){
-  const cost=120;
-  if(!canPay(cost)){toast('Недостаточно Sdolars.');return}
-  pay(cost);
-  const available=HERO_NAMES.filter(x=>!state.recruited.includes(x));
-  const name=(available.length?available:HERO_NAMES)[Math.floor(Math.random()*(available.length?available:HERO_NAMES).length)];
-  state.recruited.push(name); state.quest.recruit=true;
-  save(); updateUI(); toast('Вы наняли героя '+name);
-  openPanel('tavern');
-}
+function inventoryPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>🎒 Инвентарь</h2><div class="card"><p>Оружие: <b>${state.weapon}</b></p>${state.inventory.length?state.inventory.map(x=>`<div class="statline">🎒 ${x}</div>`).join(''):'Инвентарь пуст.'}</div>`}
+function equipmentPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>🛡️ Экипировка</h2><div class="card"><div class="statline">⚔️ Сила <b>${state.strength}</b></div><div class="statline">🏃 Ловкость <b>${state.agility}</b></div><div class="statline">🔨 Кузница <b>${state.forgeLevel}</b></div><div class="statline">⚔️ Оружие <b>${state.weapon}</b></div></div>`}
+function heroesPanel(){return `<button class="close" onclick="closePanel()">✕</button><h2>⚔️ Герои</h2><div class="card">${state.recruited.length?state.recruited.map(x=>`<div class="statline">🧔 ${x}<b>Нанят</b></div>`).join(''):'Героев нет.'}</div>`}
+function questsPanel(){const q=state.quest;return `<button class="close" onclick="closePanel()">✕</button><h2>📜 Задания</h2><div class="card"><div class="statline">⚔️ Победа <b>${q.firstBattle?'✓':'○'}</b></div><div class="statline">⚒ Кузница <b>${q.forge?'✓':'○'}</b></div><div class="statline">🍺 Герой <b>${q.recruit?'✓':'○'}</b></div><div class="statline">🎒 Магазин <b>${q.shop?'✓':'○'}</b></div></div>`}
 
-/* ---------- shop ---------- */
-const SHOP=[
-  {name:'Стальной меч',cost:180,str:5,agi:0},
-  {name:'Кожаная броня',cost:150,str:0,agi:4},
-  {name:'Боевой шлем',cost:120,str:2,agi:2},
-  {name:'Тяжёлый топор',cost:260,str:8,agi:-1}
-];
-function shopPanel(){
-  return `<button class="close" onclick="closePanel()">✕</button><h2>🎒 Магазин</h2>
-  <div class="grid">${SHOP.map((x,i)=>`<div class="card"><h3>${x.name}</h3><p>Сила +${x.str} · Ловкость ${x.agi>=0?'+':''}${x.agi}</p><p>Цена: <b>${x.cost} ◆</b></p><button onclick="buyItem(${i})">Купить</button></div>`).join('')}</div>`;
-}
-function buyItem(i){
-  const item=SHOP[i];
-  if(!canPay(item.cost)){toast('Недостаточно Sdolars.');return}
-  pay(item.cost); state.strength+=item.str; state.agility+=item.agi;
-  state.weapon=item.name; state.weaponBonus+=Math.max(0,item.str);
-  state.equipment.push(item.name); state.inventory.push(item.name); state.quest.shop=true;
-  save(); updateUI(); toast('Куплено: '+item.name);
-  openPanel('shop');
-}
-
-/* ---------- inventory/equipment ---------- */
-function inventoryPanel(){
-  return `<button class="close" onclick="closePanel()">✕</button><h2>🎒 Инвентарь</h2>
-  <div class="card"><p>Оружие: <b>${state.weapon}</b></p><p>Предметов: <b>${state.inventory.length}</b></p>
-  ${state.inventory.length?state.inventory.map(x=>`<div class="statline">🎒 ${x}</div>`).join(''):'Инвентарь пуст.'}</div>`;
-}
-function equipmentPanel(){
-  return `<button class="close" onclick="closePanel()">✕</button><h2>🛡️ Экипировка</h2>
-  <div class="card">
-  <div class="statline"><span>⚔️ Сила</span><b>${state.strength}</b></div>
-  <div class="statline"><span>🏃 Ловкость</span><b>${state.agility}</b></div>
-  <div class="statline"><span>🔨 Кузница</span><b>${state.forgeLevel}</b></div>
-  <div class="statline"><span>⚔️ Оружие</span><b>${state.weapon}</b></div>
-  </div>`;
-}
-function heroesPanel(){
-  return `<button class="close" onclick="closePanel()">✕</button><h2>⚔️ Герои</h2>
-  <div class="card"><p>Нанятые герои: <b>${state.recruited.length}</b></p>
-  ${state.recruited.length?state.recruited.map(x=>`<div class="statline">🧔 ${x}<span>Нанят</span></div>`).join(''):'Пока никого нет. Иди в таверну.'}</div>`;
-}
-function questsPanel(){
-  const q=state.quest;
-  return `<button class="close" onclick="closePanel()">✕</button><h2>📜 Задания</h2>
-  <div class="card">
-  <div class="statline"><span>⚔️ Победить в первом бою</span><b>${q.firstBattle?'✓':'○'}</b></div>
-  <div class="statline"><span>⚒ Улучшить экипировку</span><b>${q.forge?'✓':'○'}</b></div>
-  <div class="statline"><span>🍺 Нанять героя</span><b>${q.recruit?'✓':'○'}</b></div>
-  <div class="statline"><span>🎒 Купить снаряжение</span><b>${q.shop?'✓':'○'}</b></div>
-  </div>
-  <button class="primary" onclick="claimDaily()">🎁 Ежедневный бонус</button>`;
-}
-function claimDaily(){
-  if(state.dailyClaimAt && Date.now()-state.dailyClaimAt<86400000){
-    toast('Бонус уже получен.');return;
-  }
-  state.dailyClaimAt=Date.now(); state.sdo+=100; state.energy=Math.min(state.maxEnergy,state.energy+5);
-  save();updateUI();toast('Ежедневный бонус: +100 ◆ и +5 энергии');
-  openPanel('quests');
-}
-
-/* ---------- misc ---------- */
-function toggleLang(){
-  state.language=state.language==='ru'?'en':'ru';
-  toast(state.language==='en'?'English mode is ready for the MVP interface.':'Русский язык включён.');
-  save();
-}
-setInterval(updateUI,1000);
-updateUI();
-
-/* Save when page leaves */
+setInterval(()=>{updateUI()},1000);
 window.addEventListener('beforeunload',save);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
+updateUI();
 </script>
 </body>
 </html>
