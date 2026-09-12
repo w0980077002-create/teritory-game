@@ -1,4 +1,4 @@
-# Territory — Sdolars s58
+# Territory — Sdolars s60
 
-The main city screen is preserved from the approved s47 build. Do not change the city background, character scale, or main layout without explicit approval.
-The Worker keeps the server/Durable Object layer from the later build.
+Главный экран — утверждённый HTML s47 без визуальных изменений. Не менять фон, масштаб персонажа или основную компоновку без явного запроса.
+Worker использует JSON-строковое встраивание HTML, чтобы браузерный JavaScript не повреждался.
