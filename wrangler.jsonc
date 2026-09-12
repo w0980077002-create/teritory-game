@@ -1,23 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "territory-sdolars",
+  "name": "territory-game",
   "main": "worker.js",
   "compatibility_date": "2026-09-10",
-  "vars": {
-    "ALLOW_GUESTS": "true"
-  },
+  "vars": { "ALLOW_GUESTS": "true" },
   "durable_objects": {
-    "bindings": [
-      {
-        "name": "GAME_HUB",
-        "class_name": "GameHub"
-      }
-    ]
+    "bindings": [{ "name": "GAME_HUB", "class_name": "GameHub" }]
   },
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["GameHub"]
-    }
-  ]
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["GameHub"] }]
 }
