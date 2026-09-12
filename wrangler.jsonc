@@ -4,10 +4,6 @@
   "main": "worker.js",
   "compatibility_date": "2026-09-10",
   "vars": { "ALLOW_GUESTS": "true" },
-  "assets": {
-    "directory": ".",
-    "binding": "ASSETS"
-  },
   "durable_objects": {
     "bindings": [
       { "name": "GAME_HUB", "class_name": "GameHub" }
