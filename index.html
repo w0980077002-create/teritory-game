@@ -427,7 +427,7 @@ applyLanguage();
 </script>
 </body></html>
 
-state.maxHp??=120; state.strength??=12; state.agility??=9; state.wins??=0; state.eventProgress??=0; state.guildMembers??=1; state.recruited??=[]; state.settings??={sound:true,fx:true}; state.lang??='RU';
+state.maxExp??=300; state.maxHp??=120; state.strength??=12; state.agility??=9; state.wins??=0; state.eventProgress??=0; state.guildMembers??=1; state.recruited??=[]; state.settings??={sound:true,fx:true}; state.lang??='RU';
 `;
     modal.classList.add('open'); window._battle=b;
   };
@@ -618,29 +618,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 <style>
 .chatEmojiBar{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;padding:5px 6px;background:#071d30;border-top:1px solid #164c6b}.chatEmoji{height:27px;border:1px solid #236f99;border-radius:6px;background:#0a3150;color:#fff;font-size:15px;line-height:1;cursor:pointer;padding:0}.chatEmoji:active{transform:scale(.94)}.chatStatus{margin-left:5px;font-size:8px;color:#67f29d;font-weight:900}.chatOffline{color:#ff7c89}.serverTag{float:right;margin-right:5px;color:#67f29d;font-size:7px;font-weight:900}@media(max-width:500px){.chatEmoji{height:25px;font-size:14px}.chatEmojiBar{gap:2px;padding:4px}}</style>
 
-<style>
-/* s19 — compact centered battle emblem */
-@media (max-width:420px){.actions{width:158px;bottom:13%}.action{width:158px;height:158px}.action .battleArt{width:70px;height:70px}.action span{font-size:22px}}
-/* s15 — compact mobile battle */
-.vikingBattle{padding:6px;border-radius:12px}.fighters{gap:5px}.fighter{padding:4px;border-radius:10px}.fighter img,.fighter .vikingSvg{height:108px;object-fit:cover}.fighterName{font-size:11px;margin:3px 0 2px}.fighterRole{font-size:7px;margin-bottom:2px}.fhp{height:7px}.fhpText{font-size:8px}.vikingBattle>.card{padding:7px;margin:5px 0}.vikingBattle>.card p{margin:4px 0}.autoRow{margin:4px 0}.autoBtn{height:34px}.autoHint{font-size:8px;margin:1px 0 4px}.vikingBattle .zones{gap:3px}.vikingBattle .zones button{padding:7px 1px;font-size:10px}.vikingBattle .goldBtn{padding:9px 8px;font-size:12px}.vikingBattle #battleLog{font-size:10px;line-height:1.25}.panel{padding:10px}.panel h2{font-size:18px;margin:2px 0 7px}
-</style>
 
-<style id="s22-battle-button">
-/* s22 — compact centered battle emblem, about half the previous size */
-.actions{left:50%!important;right:auto!important;width:86px!important;transform:translateX(-50%)!important;bottom:13%!important;display:grid!important;grid-template-columns:1fr!important;justify-items:center!important;z-index:6!important}
-.actions .action{width:86px!important;min-width:86px!important;max-width:86px!important;height:86px!important;min-height:86px!important;max-height:86px!important;margin:0!important;padding:4px!important;box-sizing:border-box!important;border-radius:50%!important;border:2px solid #29b9ff!important;box-shadow:0 0 0 3px rgba(8,31,49,.92),0 0 16px rgba(20,180,255,.42),0 5px 12px rgba(0,0,0,.55),inset 0 0 15px rgba(30,190,255,.25)!important}
-.actions .action:before{inset:5px!important;border-width:1.5px!important}
-.actions .action .battleArt{width:52px!important;height:52px!important;margin-bottom:0!important;filter:drop-shadow(0 2px 4px rgba(0,0,0,.75)) drop-shadow(0 0 6px rgba(255,170,40,.35))!important}
-.actions .action span{font-size:13px!important;line-height:13px!important;margin-top:-1px!important;text-shadow:0 2px 4px #000,0 0 7px rgba(255,210,70,.35)!important}
-@media(max-width:420px){.actions{width:80px!important}.actions .action{width:80px!important;min-width:80px!important;max-width:80px!important;height:80px!important;min-height:80px!important;max-height:80px!important}.actions .action .battleArt{width:48px!important;height:48px!important}.actions .action span{font-size:12px!important;line-height:12px!important}}
-<style>
-/* ===== s36 VISIBLE CITY COMMAND BAR ===== */
-.s36bar{position:absolute;left:3%;right:3%;top:30.5%;z-index:8;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;background:rgba(4,20,34,.90);border:1px solid #197fb8;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,.45)}
-.s36chip{min-width:0;height:31px;padding:0 3px;border:1px solid #246f98;border-radius:6px;background:#092b42;color:#e8f7ff;font-size:8px;font-weight:900;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.s36chip b{display:block;font-size:9px;color:#ffd94a}
-.s36chip:active{transform:scale(.97);background:#104363}
-@media(max-width:420px){.s36bar{top:30.8%;gap:3px;padding:3px}.s36chip{height:29px;font-size:7px}.s36chip b{font-size:8px}}
-</style>
 
 <style>
 .pvpFighters{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 8px}.pvpFighter{background:#09263b;border:1px solid #268ed0;border-radius:9px;padding:5px;text-align:center;overflow:hidden}.pvpFighter.pvpEnemy{border-color:#b53a4b}.pvpFighter img{width:100%;height:105px;object-fit:cover;border-radius:7px;background:#081522;display:block}.pvpFighter b{display:block;font-size:10px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pvpFighter span{display:block;font-size:8px;color:#9bc5df;margin:2px 0 4px}
@@ -655,7 +633,6 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 <main class="world">
 <button class="quest" onclick="openP(&quot;quests&quot;)"><small>Текущее задание</small><strong>Поговори с кузнецом　›</strong><span>⌖ Кузница</span></button>
 <button class="daily" onclick="openP(&quot;bonus&quot;)"><span class="chest">🎁</span><b>Ежедневный бонус</b><time id="timer">23:45:00</time></button>
-<div class="s36bar" id="s36bar"><button class="s36chip" onclick="s35Character()">🧔 <b id="s36lvl">Герой</b><span id="s36stats">HP · ⚔️</span></button><button class="s36chip" onclick="s35Inventory()">🎒 <b>Экипировка</b><span id="s36gear">Оружие · Броня</span></button><button class="s36chip" onclick="s35Missions()">🎯 <b>Задания</b><span id="s36mission">Сегодня</span></button><button class="s36chip" onclick="s35Leaderboard()">🏆 <b id="s36rating">Рейтинг 1000</b><span id="s36wins">Победы · Сезон</span></button></div>
 <div class="left"><button class="smallBtn" onclick="openP(&quot;bonus&quot;)"><span class="icon">🎁</span>Бонусы<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;events&quot;)"><span class="icon">▦</span>События<div class="badge">!</div></button><button class="smallBtn" onclick="openP(&quot;vip&quot;)"><span class="icon">♛</span>VIP</button></div>
 <div class="right"><button class="location" onclick="openP(&quot;forge&quot;)"><span class="icon">⚒</span><div><strong>Кузница</strong><small>Улучшение снаряжения</small></div><div class="badge">!</div></button><button class="location" onclick="openP(&quot;tavern&quot;)"><span class="icon">🍺</span><div><strong>Таверна</strong><small>Найм героев</small></div><div class="badge">!</div></button><button class="location" onclick="openP(&quot;shop&quot;)"><span class="icon">🎒</span><div><strong>Магазин</strong><small>Предметы и снаряжение</small></div></button></div>
 <div class="actions"><button class="action" onclick="battle()"><svg class="battleArt" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="axeSteel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#b8d8e8"/><stop offset=".7" stop-color="#647c8d"/><stop offset="1" stop-color="#263844"/></linearGradient><linearGradient id="axeWood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9b5a27"/><stop offset=".5" stop-color="#5c2d16"/><stop offset="1" stop-color="#24140e"/></linearGradient><linearGradient id="axeGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe77a"/><stop offset=".5" stop-color="#d99a24"/><stop offset="1" stop-color="#6d3d0a"/></linearGradient></defs><g transform="rotate(-7 50 50)"><path d="M49 18L31 83" stroke="url(#axeWood)" stroke-width="7" stroke-linecap="round"/><path d="M24 24Q7 22 8 42Q9 58 27 54L38 47L31 39L20 43Q18 38 20 34Q22 31 32 34Z" fill="url(#axeSteel)" stroke="#172a35" stroke-width="2"/><path d="M22 28L31 30" stroke="#fff" stroke-width="2" opacity=".55"/></g><g transform="rotate(7 50 50)"><path d="M51 18L69 83" stroke="url(#axeWood)" stroke-width="7" stroke-linecap="round"/><path d="M76 24Q93 22 92 42Q91 58 73 54L62 47L69 39L80 43Q82 38 80 34Q78 31 68 34Z" fill="url(#axeSteel)" stroke="#172a35" stroke-width="2"/><path d="M78 28L69 30" stroke="#fff" stroke-width="2" opacity=".55"/></g><circle cx="50" cy="50" r="9" fill="url(#axeGold)" stroke="#6b3e0b" stroke-width="2"/><path d="M46 50h8M50 46v8" stroke="#fff2a3" stroke-width="1.5"/></svg><span>Бой</span></button></div>
@@ -1161,55 +1138,6 @@ const ENEMIES=[
 })();
 </script>
 <script>
-/* ===== s36 VISIBLE CITY COMMAND BAR ===== */
-(function(){
-  function s36Refresh(){
-    const lvl=document.getElementById('s36lvl'),stats=document.getElementById('s36stats'),gear=document.getElementById('s36gear'),mission=document.getElementById('s36mission'),rating=document.getElementById('s36rating'),wins=document.getElementById('s36wins');
-    if(!lvl||!window.state)return;
-    const w=(state.items||[]).find(x=>x.equipped&&x.type==='Оружие'),a=(state.items||[]).find(x=>x.equipped&&x.type==='Броня');
-    lvl.textContent='Уровень '+(state.level||1); stats.textContent='❤️ '+(state.hp||0)+' · ⚔️ '+(15+Math.floor((state.strength||0)*.7)+(w?.damage||0));
-    gear.textContent=(w?w.name:'Без оружия')+' · '+(a?a.name:'Без брони');
-    const ms=state.dailyMissions?.items||[]; mission.textContent=ms.length?ms.filter(x=>!x.claimed).length+' активных':'Открой задания';
-    rating.textContent='Рейтинг '+(state.rating||1000); wins.textContent='Победы '+(state.wins||0)+' · Сезон';
-  }
-  window.s36Refresh=s36Refresh;
-  setTimeout(s36Refresh,300); setInterval(s36Refresh,1500);
-})();
-/* ===== s35 GLOBAL GAME SYSTEMS ===== */
-(function(){
-  const A=()=>window.territoryServerAction;
-  const tr=(ru,en)=>state.lang==='EN'?en:ru;
-  const e=x=>String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-  function pane(title,html){pt.textContent=title;pb.innerHTML=html;modal.classList.add('open');if(window.applyLanguage)applyLanguage()}
-  function card(x){return '<div class="card">'+x+'</div>'}
-  function stats(){const weapon=(state.items||[]).find(x=>x.equipped&&x.type==='Оружие'),armor=(state.items||[]).find(x=>x.equipped&&x.type==='Броня');return card('<b>🧔 '+tr('Персонаж Sdolars','Sdolars Character')+'</b><p>⚔️ '+tr('Урон','Damage')+': <b>'+(15+Math.floor((state.strength||0)*.7)+(weapon?.damage||0))+'</b> · 🛡️ '+tr('Защита','Defense')+': <b>'+(armor?.defense||0)+'</b></p><p>💪 '+tr('Сила','Strength')+': '+state.strength+' · 🏃 '+tr('Ловкость','Agility')+': '+state.agility+' · ❤️ HP: '+state.hp+'/'+state.maxHp+'</p><p>⭐ '+tr('Свободные очки','Free points')+': <b>'+state.freePoints+'</b></p>')+
-    card('<b>⚔️ '+tr('Экипировка','Equipment')+'</b>'+['Оружие','Броня'].map(type=>{const it=(state.items||[]).find(x=>x.equipped&&x.type===type);return '<p>'+ (type==='Оружие'?'🪓':'🛡️')+' '+tr(type,type==='Оружие'?'Weapon':'Armor')+': <b>'+(it?e(it.name):tr('не экипировано','not equipped'))+'</b></p>'}).join(''))+
-    card('<b>📦 '+tr('Ресурсы','Materials')+'</b><p>⛓️ '+(state.materials?.iron||0)+' · 🪵 '+(state.materials?.wood||0)+' · 🧵 '+(state.materials?.leather||0)+' · 🌿 '+(state.materials?.herbs||0)+'</p>');}
-  function missions(){const ms=state.dailyMissions?.items||[];let h=card('<b>🎯 '+tr('Ежедневные задания','Daily Missions')+'</b><p>'+tr('Задания обновляются каждый день.','Missions refresh every day.')+'</p>');if(!ms.length)return h+card(tr('Загрузка заданий...','Loading missions...'));const names={wins:['⚔️','Победы','Wins'],scout:['🔎','Исследования','Scouting'],forge:['⚒️','Улучшения кузницы','Forge upgrades']};ms.forEach(m=>{const n=names[m.id]||['🎯',m.id,m.id];h+=card('<b>'+n[0]+' '+tr(n[1],n[2])+'</b><p>'+m.progress+'/'+m.goal+' · 🎁 '+m.reward+' 🪙 · ⭐ '+m.xp+' XP</p><button '+((m.claimed||m.progress<m.goal)?'disabled ':'')+'onclick="s34Mission(\''+e(m.id)+'\')">'+(m.claimed?tr('Получено','Claimed'):tr('Забрать','Claim'))+'</button></div>')});return h}
-  function craft(){const mats=state.materials||{};const recipes=[['sharpened_axe','🪓','Заточённый топор','Sharpened Axe','+26 урон','500 🪙 · ⛓️3 · 🪵2'],['hunter_armor','🥋','Охотничья броня','Hunter Armor','+22 защита','450 🪙 · ⛓️2 · 🧵3'],['medkit_pack','🩹','Большая аптечка','Large Medkit','2 использования','120 🪙 · 🌿2']];let h=card('<b>⚒️ '+tr('Мастерская','Workshop')+'</b><p>⛓️ '+(mats.iron||0)+' · 🪵 '+(mats.wood||0)+' · 🧵 '+(mats.leather||0)+' · 🌿 '+(mats.herbs||0)+'</p>');recipes.forEach(r=>h+=card('<b>'+r[1]+' '+tr(r[2],r[3])+'</b><p>'+tr(r[4],r[4])+' · '+r[5]+'</p><button class="goldBtn" onclick="s34Craft(\''+r[0]+'\')">🔨 '+tr('Создать','Craft')+'</button></div>'));return h}
-  function season(){const sr=state.season||{};const rating=Number(state.rating||sr.rating||1000);const next=rating<1200?1200:rating<1500?1500:rating<1800?1800:2000;return card('<b>🏆 '+tr('Сезон Sdolars','Sdolars Season')+'</b><p>'+tr('Текущий рейтинг','Current rating')+': <b>'+rating+'</b></p><p>'+tr('Лучший рейтинг','Best rating')+': <b>'+(sr.bestRating||rating)+'</b> · '+tr('Победы сезона','Season wins')+': <b>'+(sr.wins||0)+'</b></p><div class="fhp"><i style="width:'+Math.min(100,rating/next*100)+'%"></i></div><p>'+tr('Следующая лига','Next league')+': <b>'+next+'</b></p>')+card('<b>🥇 '+tr('Лиги','Leagues')+'</b><p>🟤 0–1199 · ⚪ 1200–1499 · 🟡 1500–1799 · 🔵 1800–1999 · 🔴 2000+</p>');}
-  function guild(){return card('<b>👥 '+tr('Гильдия','Guild')+'</b><p>'+tr('Гильдия','Guild')+': <b>'+e(state.guildName||tr('Нет гильдии','No guild'))+'</b></p><p>⭐ '+tr('Уровень','Level')+': '+(state.guildLevel||1)+' · 💰 '+tr('Вклад','Contribution')+': '+(state.guildContribution||0)+'</p>')+'<div class="grid2"><button onclick="s34Guild(100)">💰 +100</button><button onclick="s34Guild(500)">💰 +500</button></div>'}
-  window.s34Character=()=>pane(tr('Персонаж','Character'),stats());
-  window.s34Missions=()=>pane(tr('Ежедневные задания','Daily Missions'),missions());
-  window.s34CraftMenu=()=>pane(tr('Мастерская','Workshop'),craft());
-  window.s34Season=()=>pane(tr('Сезонный рейтинг','Season Rating'),season());
-  window.s34GuildMenu=()=>pane(tr('Гильдия','Guild'),guild());
-  window.s34Mission=async id=>{if(await A()?.('mission.claim',{id})){toast(tr('🎁 Награда получена','🎁 Reward claimed'));s34Missions()}};
-  window.s34Craft=async id=>{if(await A()?.('craft',{recipe:id})){toast(tr('⚒️ Предмет создан','⚒️ Item crafted'));s34CraftMenu()}};
-  window.s34Guild=async amount=>{if(await A()?.('guild.contribute',{amount})){toast(tr('👥 Вклад внесён','👥 Contribution added'));s34GuildMenu()}};
-  const oldMore=window.openP;
-  const previousOpenP=window.openP;
-  window.openP=function(k){
-    if(k==='more'){
-      const base='<div class="grid2"><button onclick="s34Character()">🧔 '+tr('Персонаж','Character')+'</button><button onclick="s34Missions()">🎯 '+tr('Дневные задания','Daily Missions')+'</button><button onclick="s34CraftMenu()">⚒️ '+tr('Мастерская','Workshop')+'</button><button onclick="s34Season()">🏆 '+tr('Сезон','Season')+'</button><button onclick="s34GuildMenu()">👥 '+tr('Гильдия','Guild')+'</button><button onclick="s33World()">🌍 '+tr('Мир Sdolars','Sdolars World')+'</button></div>';
-      pane(tr('Sdolars — глобальное меню','Sdolars — Global Menu'),base);return;
-    }
-    return oldMore(k);
-  };
-  // Keep the new systems visible from the existing More/Extra button.
-})();
-</script>
-<script>
 /* ===== s35 GLOBAL GAME SYSTEMS ===== */
 (function(){
   const A=()=>window.territoryServerAction;
@@ -1323,4 +1251,4 @@ const ENEMIES=[
 </script>
 </body></html>
 
-state.maxHp??=120; state.strength??=12; state.agility??=9; state.wins??=0; state.eventProgress??=0; state.guildMembers??=1; state.recruited??=[]; state.settings??={sound:true,fx:true}; state.lang??='RU';
+state.maxExp??=300; state.maxHp??=120; state.strength??=12; state.agility??=9; state.wins??=0; state.eventProgress??=0; state.guildMembers??=1; state.recruited??=[]; state.settings??={sound:true,fx:true}; state.lang??='RU';
