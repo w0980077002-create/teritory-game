@@ -378,6 +378,59 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .autoCheck input{width:14px!important;height:14px!important;margin:0!important}
 .battleHistory #battleLog{max-height:90px!important;overflow-y:auto!important;font-size:10px!important;line-height:1.2!important}
 </style>
+
+<style>
+/* S71 — compact battle: no giant empty panel, four zones in attack AND defense */
+.panel:has(.vikingBattle){
+  height:auto!important;
+  max-height:92dvh!important;
+  overflow:hidden!important;
+  padding:6px!important;
+}
+.panel:has(.vikingBattle) .vikingBattle{
+  height:auto!important;
+  display:block!important;
+  overflow:hidden!important;
+  padding:4px!important;
+}
+.panel:has(.vikingBattle) .fighters{
+  height:auto!important;
+  min-height:0!important;
+  flex:none!important;
+  padding:2px!important;
+}
+.panel:has(.vikingBattle) .fighter img,
+.panel:has(.vikingBattle) .fighter .vikingSvg{
+  height:96px!important;
+}
+.panel:has(.vikingBattle) .autoCheck{
+  margin:4px 0!important;
+}
+.panel:has(.vikingBattle) .card{
+  height:auto!important;
+  min-height:0!important;
+  flex:none!important;
+  padding:5px!important;
+  margin:3px 0!important;
+}
+.panel:has(.vikingBattle) .zones{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:4px!important;
+}
+.panel:has(.vikingBattle) .zones button{
+  width:auto!important;
+  height:34px!important;
+  font-size:9px!important;
+}
+.panel:has(.vikingBattle) .card:last-child{
+  min-height:0!important;
+}
+.panel:has(.vikingBattle) #battleLog{
+  height:72px!important;
+  max-height:72px!important;
+  overflow-y:auto!important;
+}
+</style>
 </head>
 <body>
 <div id="app">
@@ -418,8 +471,8 @@ function applyTelegramPlayer(){
   }catch(e){}
 }
 const modal=document.getElementById('modal'),pt=document.getElementById('pt'),pb=document.getElementById('pb');
-const ZONES=['Голова','Грудь','Живот','Пояс','Ноги'];
-const ATTACK_ZONES=[0,1,3,4];
+const ZONES=['Голова','Грудь','Пояс','Ноги'];
+const ATTACK_ZONES=[0,1,2,3];
 const KEY='sdolars_s1_save';
 let state={coins:1779,level:3,exp:120,items:[
  {id:'axe',name:'Боевой топор',type:'Оружие',icon:'🪓',damage:12,price:450,equipped:true},
@@ -536,10 +589,10 @@ function stopBattleTimer(){const b=window._battle;if(b?.timer){clearInterval(b.t
 function startBattleTimer(){stopBattleTimer();const b=window._battle,el=document.getElementById('battleTimer');if(!b||!el)return;b.deadline=Date.now()+15000;const tick=()=>{const left=Math.max(0,b.deadline-Date.now()),sec=Math.ceil(left/1000);el.textContent=String(sec);el.classList.toggle('danger',sec<=5);if(left<=0){stopBattleTimer();b.locked=true;el.textContent='0';const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⏱️ Время вышло — поражение.</div>'+log.innerHTML;}};tick();b.timer=setInterval(tick,200)}
 function toggleAutoBattle(){const b=window._battle;if(!b)return;b.auto=!!document.getElementById('autoBattle')?.checked;if(b.auto)autoBattleStep();else stopAutoBattle()}
 function stopAutoBattle(){const b=window._battle;if(!b)return;b.auto=false;if(b.autoTimer){clearTimeout(b.autoTimer);b.autoTimer=null}}
-function autoBattleStep(){const b=window._battle;if(!b||!b.auto||b.locked)return;b.attack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)];b.defs=[];while(b.defs.length<2){const z=Math.floor(Math.random()*5);if(!b.defs.includes(z))b.defs.push(z)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===ATTACK_ZONES.indexOf(b.attack)));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(true),450)}
+function autoBattleStep(){const b=window._battle;if(!b||!b.auto||b.locked)return;b.attack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)];b.defs=[];while(b.defs.length<2){const z=Math.floor(Math.random()*4);if(!b.defs.includes(z))b.defs.push(z)}document.querySelectorAll('#attacks button').forEach((x,i)=>x.classList.toggle('sel',i===ATTACK_ZONES.indexOf(b.attack)));document.querySelectorAll('#defs button').forEach((x,i)=>x.classList.toggle('sel',b.defs.includes(i)));document.getElementById('dc').textContent='2/2';b.autoTimer=setTimeout(()=>strikeTurn(true),450)}
 function pickAttack(i,el){const b=window._battle;if(!b||b.locked)return;document.querySelectorAll('#attacks button').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');b.attack=i;startBattleTimer()}
 function pickDef(i,el){const b=window._battle;if(!b||b.locked)return;const d=b.defs;if(d.includes(i)){b.defs=b.defs.filter(x=>x!==i);el.classList.remove('sel')}else if(d.length<2){d.push(i);el.classList.add('sel')}document.getElementById('dc').textContent=b.defs.length+'/2';if(b.attack!==null&&b.defs.length===2)strikeTurn(false)}
-function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked)return;if(b.attack===null||b.defs.length!==2){if(b.auto)autoBattleStep();else toast('Выбери атаку и 2 зоны защиты');return}b.locked=true;const enemyAttack=Math.floor(Math.random()*5),blocked=b.defs.includes(enemyAttack),base=totalDamage(),crit=Math.random()<Math.min(.35,.08+state.strength*.01),hit=b.attack!==enemyAttack,playerDamage=hit?base+(crit?Math.round(base*.5):0):0,enemyDamage=blocked?0:Math.max(4,10+Math.floor(Math.random()*7));b.hp=Math.max(0,b.hp-playerDamage);b.playerHp=Math.max(0,b.playerHp-(blocked?0:enemyDamage));
+function strikeTurn(fromAuto){const b=window._battle;if(!b||b.locked)return;if(b.attack===null||b.defs.length!==2){if(b.auto)autoBattleStep();else toast('Выбери атаку и 2 зоны защиты');return}b.locked=true;const enemyAttack=Math.floor(Math.random()*4),blocked=b.defs.includes(enemyAttack),base=totalDamage(),crit=Math.random()<Math.min(.35,.08+state.strength*.01),hit=b.attack!==enemyAttack,playerDamage=hit?base+(crit?Math.round(base*.5):0):0,enemyDamage=blocked?0:Math.max(4,10+Math.floor(Math.random()*7));b.hp=Math.max(0,b.hp-playerDamage);b.playerHp=Math.max(0,b.playerHp-(blocked?0:enemyDamage));
 const pf=document.getElementById('playerFighter'),ef=document.getElementById('enemyFighter');if(pf)pf.classList.remove('vikingAttack','vikingAction');if(ef)ef.classList.remove('vikingAttack','vikingAction');void document.body.offsetWidth;if(pf)pf.classList.add('vikingAttack');if(ef)ef.classList.add(playerDamage?'vikingAction':'vikingAttack');
 const eHp=document.getElementById('enemyHp'),pHp=document.getElementById('playerHp');if(eHp)eHp.textContent=b.hp+'/100 HP';if(pHp)pHp.textContent=b.playerHp+'/'+state.maxHp+' HP';const eb=document.getElementById('enemyBar'),pbar=document.getElementById('playerBar');if(eb)eb.style.width=b.hp+'%';if(pbar)pbar.style.width=Math.max(0,b.playerHp/state.maxHp*100)+'%';const log=document.getElementById('battleLog');if(log)log.innerHTML='<div>⚔️ Твоя атака: <b>'+ZONES[b.attack]+'</b> — '+(hit?'попадание':'промах')+(crit?' · <b>КРИТ!</b>':'')+' · Урон: <b>'+playerDamage+'</b></div><div>🛡️ Защита: '+ZONES[b.defs[0]]+', '+ZONES[b.defs[1]]+' — '+(blocked?'блок':'не блок')+'</div><div>🪓 Ледяной тролль атаковал: <b>'+ZONES[enemyAttack]+'</b> — '+(blocked?'заблокировано':'урон '+(blocked?0:enemyDamage))+'</div>';
 if(b.hp<=0){stopAutoBattle();state.coins+=200;state.exp+=40;state.wins++;save();if(log)log.innerHTML='<b>🏆 Победа над Ледяной тролльом! +200 🪙 +40 XP</b><br>'+log.innerHTML;setTimeout(closeP,1000);return}if(b.playerHp<=0){stopAutoBattle();if(log)log.innerHTML='<b>💀 Ледяной тролль победил.</b><br>'+log.innerHTML;setTimeout(closeP,1000);return}b.attack=null;b.defs=[];document.querySelectorAll('#attacks button,#defs button').forEach(x=>x.classList.remove('sel'));startBattleTimer();const dc=document.getElementById('dc');if(dc)dc.textContent='0/2';setTimeout(()=>{b.locked=false;if(b.auto)autoBattleStep()},fromAuto?350:250)}
