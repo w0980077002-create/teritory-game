@@ -1,7 +1,19 @@
-# Territory — Sdolars — S87
+# Territory — Sdolars — S88 FIXED
 
-S87 is based directly on S83. The broken VIP string is repaired, and the later fragile battle override is replaced with a guarded implementation.
+Исправленная версия для ручной загрузки в GitHub.
 
-Battle: exactly 4 zones; attack 1; defense 2. Bottom navigation is hidden during battle and restored after close. Active yellow underline is disabled. Worker embeds exact index.html.
+## Что исправлено
+- Убран сломанный `worker.js` с `const ZONES =;`.
+- Бой приведён к 4 зонам: Голова / Грудь / Пояс / Ноги.
+- Атака: 1 зона. Защита: 2 разные зоны.
+- Убрана вторая копия `index.html` из Worker: теперь Worker отдаёт реальный `index.html` из Static Assets.
+- Исправлен Telegram Web App script URL.
+- Добавлен `assets` binding в `wrangler.jsonc`.
+- `index.html` и Worker используют одну и ту же 4-зонную боевую логику.
+- API/ Durable Object маршруты сохранены.
 
-Validation: every inline script and worker.js pass node --check; embedded HTML equals index.html.
+## Загрузка
+Загрузить содержимое этой папки в корень репозитория GitHub и заменить старые:
+`worker.js`, `index.html`, `wrangler.jsonc`, `package.json`.
+
+После Deploy Cloudflare Worker должен отдавать `/index.html` именно из Static Assets.

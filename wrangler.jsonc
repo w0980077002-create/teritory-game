@@ -6,15 +6,16 @@
   "vars": {
     "ALLOW_GUESTS": "true"
   },
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS"
+  },
   "durable_objects": {
     "bindings": [
-      { "name": "GAME_HUB", "class_name": "GameHub" }
+      {"name":"GAME_HUB","class_name":"GameHub"}
     ]
   },
   "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["GameHub"]
-    }
+    {"tag":"v1","new_sqlite_classes":["GameHub"]}
   ]
 }
