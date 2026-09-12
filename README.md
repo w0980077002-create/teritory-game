@@ -1,12 +1,7 @@
-# Territory — Sdolars s75
+# Territory — Sdolars — S87
 
-S75 — цельная мобильная игровая сборка на базе текущей Territory.
+S87 is based directly on S83. The broken VIP string is repaired, and the later fragile battle override is replaced with a guarded implementation.
 
-## Игровой цикл
-Город → герой → экипировка → районы → разведка/ресурсы → тактический бой → награды/XP → улучшение → гильдия → сезон → казино (только внутриигровые монеты) → чат.
+Battle: exactly 4 zones; attack 1; defense 2. Bottom navigation is hidden during battle and restored after close. Active yellow underline is disabled. Worker embeds exact index.html.
 
-## Бой
-Ровно 4 зоны: Голова, Грудь, Пояс, Ноги. Игрок выбирает 1 зону атаки и 2 зоны защиты. Противник использует те же 4 зоны.
-
-## Сервер
-`worker.js` содержит ту же HTML-сборку и серверную логику, поэтому Worker не должен отдавать старую страницу.
+Validation: every inline script and worker.js pass node --check; embedded HTML equals index.html.
