@@ -1,16 +1,19 @@
-# Territory — Sdolars — S80
+# Territory — Sdolars — S81
 
-S80 is a direct repair of the current Territory build.
+S81 fixes the two issues visible in the S80 phone screenshot at source level.
 
-Fixed from the phone screenshot:
-- Removed the yellow active-tab underline from the bottom navigation.
-- Fixed bottom navigation selector: the real buttons are `.bottom button`, not `.nav-item`.
-- Added one capture-phase delegated mobile click handler for the four large action buttons.
-- The first large action button explicitly calls the real `window.battle()` function.
-- Worker embeds the exact same index.html.
-- Worker version = s80.
-- 4 combat zones remain: Голова / Грудь / Пояс / Ноги.
-- Attack = 1 zone; Defense = 2 zones.
-- S80 marker is shown on the city screen so deployment can be verified.
+1. Bottom yellow active-tab stripe:
+   - forced off with border/background/box-shadow/outline overrides.
 
-If the phone still shows `S78`, it is not loading this build.
+2. Main Battle button and navigation:
+   - the previous delegated selector was removed;
+   - direct inline handlers now call an EARLY mobile bridge defined before the main application script;
+   - the bridge calls the real `battle()` / `openP()` functions at tap time and retries once if the app script has not finished initializing;
+   - battle errors are caught instead of silently leaving the user on the city screen.
+
+Other invariants:
+- 4 battle zones only: Голова / Грудь / Пояс / Ноги.
+- Attack 1, defense 2.
+- Worker embeds exact index.html.
+- Worker version s81.
+- Node syntax checks pass.
