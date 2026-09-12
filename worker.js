@@ -463,7 +463,7 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/health") {
-      return json({ ok: true, build: "s88-fixed", zones: 4, energyRegenMs: 300000 });
+      return json({ ok: true, build: "s90-clean-fon", zones: 4, energyRegenMs: 300000 });
     }
 
     if (url.pathname.startsWith("/api/")) {
@@ -482,7 +482,16 @@ export default {
       return env.GAME_HUB.get(id).fetch(request);
     }
 
-    if (env.ASSETS) return env.ASSETS.fetch(request);
+    if (env.ASSETS) {
+      const assetResponse = await env.ASSETS.fetch(request);
+      if (url.pathname === "/" || url.pathname === "/index.html") {
+        const h = new Headers(assetResponse.headers);
+        h.set("Cache-Control", "no-store, no-cache, must-revalidate");
+        h.set("Pragma", "no-cache");
+        return new Response(assetResponse.body, {status: assetResponse.status, statusText: assetResponse.statusText, headers: h});
+      }
+      return assetResponse;
+    }
     return new Response("Territory Sdolars", { status: 404 });
   }
 };
