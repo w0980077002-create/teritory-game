@@ -1650,6 +1650,47 @@ let b=document.createElement('button');b.className='s72-btn main';b.textContent=
  document.addEventListener('DOMContentLoaded',mount); if(document.readyState!=='loading')mount();
 })();
 </script>
+
+<script id="s78-realtime-client">
+(function(){
+  'use strict';
+  const KEY='territory_s78_network';
+  const cfg=window.TERRITORY_SERVER_CONFIG||{url:'',auto:false};
+  let state={playerId:'',room:'',connected:false,ws:null,lastError:'',events:0};
+  try{Object.assign(state,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){}
+  function save(){localStorage.setItem(KEY,JSON.stringify({playerId:state.playerId,room:state.room,connected:false,events:state.events}));}
+  function id(){return 'tg_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-5);}
+  if(!state.playerId) state.playerId=id();
+  function apiBase(){return String(cfg.url||'').replace(/\/$/,'');}
+  function send(type,payload){if(!state.ws||state.ws.readyState!==1)return false;state.ws.send(JSON.stringify({type,payload:payload||{},room:state.room,playerId:state.playerId,ts:Date.now()}));state.events++;save();return true;}
+  function open(){
+    if(!apiBase()){alert('Сервер ещё не настроен. Игра продолжает работать в локальном режиме.');return;}
+    if(state.ws&&state.ws.readyState===1)return;
+    try{
+      const base=apiBase().replace(/^http/,'ws');
+      state.ws=new WebSocket(base+'/ws');
+      state.ws.onopen=function(){state.connected=true;state.lastError='';send('HELLO',{name:'Игрок'});if(state.room)send('ROOM_JOIN',{room:state.room});render();};
+      state.ws.onmessage=function(ev){try{const m=JSON.parse(ev.data);state.events++;if(m.room)state.room=m.room;save();render();if(window.TerritoryRealtime&&typeof window.TerritoryRealtime.onEvent==='function')window.TerritoryRealtime.onEvent(m);}catch(e){}};
+      state.ws.onerror=function(){state.lastError='Ошибка соединения';render();};
+      state.ws.onclose=function(){state.connected=false;state.ws=null;save();render();};
+    }catch(e){state.lastError=e.message||'Ошибка';render();}
+  }
+  function close(){if(state.ws)state.ws.close();state.connected=false;save();render();}
+  function create(){if(!state.connected){open();return;}send('ROOM_CREATE',{});}
+  function join(){const c=prompt('Код комнаты (6 символов):',state.room||'');if(!c)return;if(!state.connected)open();state.room=c.trim().toUpperCase().slice(0,12);save();if(state.connected)send('ROOM_JOIN',{room:state.room});render();}
+  function attack(data){return send('GAME_ACTION',data);}
+  function render(){
+    const old=document.getElementById('s78NetworkPanel');if(old)old.remove();
+    const b=document.createElement('div');b.id='s78NetworkPanel';b.style.cssText='position:fixed;left:10px;right:10px;bottom:82px;z-index:9998;background:rgba(10,17,24,.96);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:12px;color:#fff;font:14px Arial;box-shadow:0 10px 30px rgba(0,0,0,.35)';
+    b.innerHTML='<div style="font-weight:800;font-size:16px;margin-bottom:8px">🌐 Онлайн Territory</div><div style="opacity:.8;margin-bottom:8px">ID: '+state.playerId+' · '+(state.connected?'🟢 подключено':'⚪ локальный режим')+'</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button data-a="connect">'+(state.connected?'Отключиться':'Подключиться')+'</button><button data-a="create">Создать комнату</button><button data-a="join">Войти в комнату</button></div><div style="margin-top:8px">Комната: <b>'+((state.room||'—').replace(/[<>&\"']/g,''))+'</b> · событий: '+state.events+'</div>'+(state.lastError?'<div style="color:#ff9b9b;margin-top:6px">'+state.lastError+'</div>':'');
+    b.querySelectorAll('button').forEach(x=>{x.style.cssText='background:#263544;color:#fff;border:1px solid #526579;border-radius:9px;padding:8px 10px';x.onclick=function(){const a=x.dataset.a;if(a==='connect')state.connected?close():open();if(a==='create')create();if(a==='join')join();};});
+    document.body.appendChild(b);
+  }
+  window.TerritoryRealtime={connect:open,disconnect:close,createRoom:create,joinRoom:join,send:send,gameAction:attack,state:state,onEvent:null};
+  setTimeout(render,800);
+  if(cfg.auto)setTimeout(open,1200);
+})();
+</script>
 </body>
 </html>
 
