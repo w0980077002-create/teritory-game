@@ -1,4 +1,3 @@
-Territory S90 — tactical arena block. Built from S88. The main Arena button now opens the S90 tactical combat system with 5 attack zones, exactly 2 defense zones, enemy AI, rounds, HP, energy, animations, combat log and rewards.
+Territory S91 — stable tactical arena base.
 
-
-S90: fixed Arena button interaction on mobile; added pointer/touch/click fallback and highest z-index.
+S91 keeps the working S90 game and hardens the main Arena button for Android/touch input.

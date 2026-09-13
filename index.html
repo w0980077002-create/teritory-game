@@ -88,7 +88,7 @@ document.addEventListener('click',e=>{let x=e.target.closest('button,a,[role=but
     <button class="place" onclick="openSheet('Game')"><span>🎲</span>Game</button>
   </div>
 
-  <button id="arena" onclick="openBattle()"><span>⚔️</span><b>Арена</b></button>
+  <button id="arena" type="button"><span>⚔️</span><b>Арена</b></button>
 
   <div id="chat"><div class="chatText">💬 Городской чат <small>12 онлайн</small></div><button class="chatBtn" onclick="show('Чат открыт')">Открыть</button></div>
 
@@ -1808,31 +1808,32 @@ const old=window.openSheet;window.openSheet=function(title){if(title==='Лобб
 setTimeout(()=>{const nav=[...document.querySelectorAll('button')].find(b=>(b.textContent||'').trim()==='Аккаунт');if(nav&&!document.getElementById('s83LobbyBtn')){const b=document.createElement('button');b.id='s83LobbyBtn';b.className=nav.className;b.innerHTML='<span>🌐</span>Лобби';b.onclick=s83Lobby;nav.parentNode.insertBefore(b,nav.nextSibling)}},1000);
 })();
 </script>
-<script id="s90-arena-button-fix">
+
+
+<style id="s91-arena-button-fix">
+#arena{position:fixed!important;left:50%!important;bottom:154px!important;transform:translateX(-50%)!important;z-index:2147483647!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-user-select:none!important;user-select:none!important}
+#arena *{pointer-events:none!important}
+</style>
+<script id="s91-arena-button-fix">
 (()=>{
-  const fire=()=>{
-    if(typeof window.openBattle!=='function') return;
-    try{window.openBattle()}catch(e){console.error('Arena open error',e)}
+  const open=()=>{
+    try{
+      const fn=window.s89Arena||window.openBattle;
+      if(typeof fn!=='function'){console.error('S91: arena handler missing');return}
+      fn();
+    }catch(err){console.error('S91: arena open failed',err)}
   };
-  let last=0;
-  const hit=(e)=>{
-    const a=document.getElementById('arena') || document.getElementById('s88pvpBtn');
-    if(!a)return;
-    const r=a.getBoundingClientRect(), x=e.clientX ?? (e.touches&&e.touches[0]?.clientX), y=e.clientY ?? (e.touches&&e.touches[0]?.clientY);
-    if(x==null||y==null||x<r.left||x>r.right||y<r.top||y>r.bottom)return;
-    const now=Date.now();
-    if(now-last<450)return;
-    last=now;
-    e.preventDefault();e.stopPropagation();
-    fire();
-  };
-  document.addEventListener('pointerup',hit,true);
-  document.addEventListener('touchend',hit,true);
-  document.addEventListener('click',hit,true);
-  const fix=()=>{
+  const wire=()=>{
     const a=document.getElementById('arena');
-    if(a){a.style.zIndex='2147483647';a.style.pointerEvents='auto';a.removeAttribute('onclick');a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fire()},{capture:true});}
+    if(!a||a.dataset.s91wired==='1')return;
+    a.dataset.s91wired='1';
+    a.removeAttribute('onclick');
+    a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open();},{capture:true});
+    a.addEventListener('pointerup',e=>{e.preventDefault();e.stopPropagation();open();},{capture:true});
+    a.addEventListener('touchend',e=>{e.preventDefault();e.stopPropagation();open();},{capture:true,passive:false});
   };
-  fix();setTimeout(fix,300);setTimeout(fix,1000);setTimeout(fix,2000);
+  wire();
+  document.addEventListener('DOMContentLoaded',wire,{once:false});
+  setTimeout(wire,100);setTimeout(wire,500);setTimeout(wire,1200);setTimeout(wire,2500);
 })();
 </script>
