@@ -1,1 +1,2 @@
-Territory S96 — tactical arena rebuilt as one complete gameplay block on the verified S86 working base. The original Arena button/openBattle path is preserved; only the final battle renderer and combat interactions are upgraded.
+Territory S98 — FULL ARENA
+Built from the working S97 base. Existing Arena button/navigation is preserved; the final Arena implementation is appended as a self-contained override. Includes opponent selection, tactical 5-zone combat, two-zone defense, skills, AI, animations, rewards, XP, streak and battle history.
