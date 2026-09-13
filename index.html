@@ -253,5 +253,39 @@ window.s39Achievements=s39Achievements;window.s39Daily=s39Daily;
 })();
 </script>
 
+<script id="s40-global-js">
+(()=>{
+const IK='territory_s34_inventory';
+const MAT={"Деталь корабля":35,"Механическая деталь":40,"Карта слухов":25,"Жетон стражи":45,"Редкий товар":55,"Знак патруля":30};
+function inv(){try{return JSON.parse(localStorage.getItem(IK)||'[]')}catch(e){return[]}}
+function put(a){localStorage.setItem(IK,JSON.stringify(a))}
+function st(){return typeof state!=='undefined'?state:null}
+function save(){try{saveState()}catch(e){}}
+function panel40(title,html){if(typeof panel==='function')panel(title,html);else alert(title+'\\n'+html.replace(/<[^>]+>/g,''))}
+function mats(){let a=inv(),r={};a.filter(x=>x.o&&x.t==='loot').forEach(x=>r[x.n]=(r[x.n]||0)+1);return r}
+function totalLoot(){return inv().filter(x=>x.o&&x.t==='loot').length}
+window.s40Forge=()=>{
+ let p=st()||{}, a=inv(), m=mats(), w=a.find(x=>x.o&&x.t==='weapon'&&x.e), ar=a.find(x=>x.o&&x.t==='armor'&&x.e);
+ let wh=w?`<div class="s40card"><b>⚔️ ${w.n}</b><small>Урон: ${w.d}</small><button class="s40btn" onclick="s40Upgrade('weapon')">Улучшить · 🟡${100+(w.d||5)*8}</button></div>`:'<div class="s40card">Оружие не экипировано.</div>';
+ let ah=ar?`<div class="s40card"><b>🛡️ ${ar.n}</b><small>Защита: ${ar.a}</small><button class="s40btn" onclick="s40Upgrade('armor')">Улучшить · 🟡${120+(ar.a||0)*7}</button></div>`:'<div class="s40card">Броня не экипирована.</div>';
+ let list=Object.keys(MAT).map(n=>`<span class="s40mat">${n}: <b>${m[n]||0}</b></span>`).join('');
+ panel40('⚒️ Кузница Sdolars',`<div class="s40note">Здесь трофеи из районов превращаются в усиление экипировки. Для улучшения нужны 2 любых трофея и монеты.</div><div class="s40mats">${list}</div>${wh}${ah}<div class="s40card"><b>♻️ Продать трофеи</b><small>Каждый найденный трофей приносит свою рыночную цену.</small><button class="s40btn danger" onclick="s40SellLoot()">Продать всё · 🟡${Object.keys(MAT).reduce((q,n)=>q+(m[n]||0)*MAT[n],0)}</button></div>`)
+}
+window.s40Upgrade=type=>{
+ let p=st();if(!p)return;let a=inv(), loot=a.filter(x=>x.o&&x.t==='loot');if(loot.length<2){alert('Нужно минимум 2 трофея из районов');return}
+ let target=a.find(x=>x.o&&x.t===type&&x.e);if(!target){alert(type==='weapon'?'Сначала экипируй оружие.':'Сначала экипируй броню.');return}
+ let cost=type==='weapon'?100+(target.d||5)*8:120+(target.a||0)*7;if((p.coins||0)<cost){alert('Недостаточно монет. Нужно '+cost);return}
+ let take=loot.slice(0,2);take.forEach(x=>x.o=0);p.coins-=cost;
+ if(type==='weapon'){target.d=(target.d||5)+4;target.n=target.n.replace(/ \+\d+$/,'')+' +'+target.d}else{target.a=(target.a||0)+3;target.n=target.n.replace(/ \+\d+$/,'')+' +'+target.a}
+ put(a);save();alert('Экипировка усилена!');window.s40Forge()
+}
+window.s40SellLoot=()=>{let p=st();if(!p)return;let a=inv(),sum=0,n=0;a.forEach(x=>{if(x.o&&x.t==='loot'){sum+=MAT[x.n]||20;n++;x.o=0}});if(!n){alert('Трофеев для продажи нет');return}p.coins=(p.coins||0)+sum;put(a);save();alert('Продано трофеев: '+n+' · +'+sum+' монет');window.s40Forge()}
+window.s40Stats=()=>{let p=st()||{},a=inv(),loot=a.filter(x=>x.o&&x.t==='loot').length,w=a.find(x=>x.o&&x.t==='weapon'&&x.e),ar=a.find(x=>x.o&&x.t==='armor'&&x.e);panel40('📊 Развитие героя',`<div class="s40grid"><div>⚔️ Урон<br><b>${w?.d||5}</b></div><div>🛡️ Защита<br><b>${ar?.a||0}</b></div><div>💪 Сила<br><b>${p.strength||5}</b></div><div>🏃 Ловкость<br><b>${p.agility||5}</b></div></div><div class="s40note">Трофеи: <b>${loot}</b> · Победы: <b>${p.questWins||0}</b> · Уровень: <b>${p.level||1}</b></div><button class="s40btn wide" onclick="s40Forge()">⚒️ Открыть кузницу</button>`)}
+function inject(){let m=document.getElementById('inventoryModal');if(!m||!m.querySelector('.s40invbar')){if(!m)return;let box=m.querySelector('.s34box');if(!box)return;let b=document.createElement('div');b.className='s40invbar';b.innerHTML='<button onclick="s40Forge()">⚒️ Кузница</button><button onclick="s40Stats()">📊 Развитие</button>';box.insertBefore(b,box.children[1]||null)}}
+new MutationObserver(inject).observe(document.documentElement,{childList:true,subtree:true});setTimeout(inject,300);
+const style=document.createElement('style');style.textContent=`.s40invbar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}.s40invbar button,.s40btn{border:1px solid #c99a2e;border-radius:9px;padding:8px;background:#3b2e0d;color:#ffe28a;font-weight:900}.s40btn{margin-top:7px;width:100%}.s40btn.wide{margin-top:9px}.s40btn.danger{border-color:#9b4b4b;background:#472323;color:#ffd0d0}.s40card{border:1px solid #24586c;background:#102630;border-radius:11px;padding:9px;margin:7px 0}.s40card b{display:block}.s40card small{display:block;opacity:.7;margin-top:3px}.s40mats{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}.s40mat{font-size:9px;border:1px solid #31586a;border-radius:7px;padding:5px;background:#0d202b}.s40note{border:1px solid #31586a;background:#0d202b;border-radius:10px;padding:9px;font-size:10px;line-height:1.35}.s40grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.s40grid>div{background:#102630;border:1px solid #24586c;border-radius:10px;padding:10px;text-align:center;font-size:10px}.s40grid b{font-size:18px;color:#ffd83d}`;document.head.appendChild(style);
+})();
+</script>
+
 </body>
 </html>
