@@ -1,3 +1,1 @@
-Territory S88 — TACTICAL ARENA
-
-Built on S87. Adds a complete visual tactical battle block: 5 attack zones, exactly 2 defense zones, body-zone UI, HP bars, turn state, combat log, and server validation.
+Territory S89 — tactical arena block. Built from S88. The main Arena button now opens the S89 tactical combat system with 5 attack zones, exactly 2 defense zones, enemy AI, rounds, HP, energy, animations, combat log and rewards.
