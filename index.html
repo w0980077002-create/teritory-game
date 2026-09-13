@@ -1883,4 +1883,22 @@ let b=document.createElement('button');b.className='s74-btn main';b.textContent=
   ensure();document.addEventListener('DOMContentLoaded',addButton);setTimeout(addButton,700);setTimeout(addButton,1800);
   window.s76Multiplayer=open;
 })();
-</script>\n
+</script>\n<style id="s79-account-style">
+.s79card{background:linear-gradient(180deg,#18212d,#101721);border:1px solid #2b3a4c;border-radius:16px;padding:13px;margin:9px 0;box-shadow:0 8px 22px rgba(0,0,0,.18)}
+.s79grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.s79muted{opacity:.72;font-size:12px}.s79ok{font-weight:800}.s79btn{width:100%;border:0;border-radius:12px;padding:11px;background:#26384c;color:#fff;font-weight:800;margin-top:7px}.s79code{font-family:monospace;font-size:18px;letter-spacing:2px}
+</style>
+<script id="s79-telegram-accounts">
+(()=>{
+const K='territory_s79_account';
+const load=()=>{try{return JSON.parse(localStorage.getItem(K)||'{}')}catch(e){return {}}};
+const save=x=>localStorage.setItem(K,JSON.stringify(x));
+function tg(){return window.Telegram&&Telegram.WebApp?Telegram.WebApp:null}
+function identity(){const w=tg(),u=w&&w.initDataUnsafe&&w.initDataUnsafe.user;return {id:u&&String(u.id)||'',name:u?((u.first_name||'')+' '+(u.last_name||'')).trim()||u.username||'Игрок':'Игрок',username:u&&u.username||''}}
+async function api(path,opts){const w=tg(),h=Object.assign({'content-type':'application/json'},opts&&opts.headers||{});if(w&&w.initData)h['x-telegram-init-data']=w.initData;let base=localStorage.getItem('territory_server_url')||'';if(!base)return null;try{const r=await fetch(base+path,Object.assign({},opts||{}, {headers:h}));return await r.json()}catch(e){return null}}
+window.s79Account=async function(){const me=identity(),a=load();a.telegramId=me.id||a.telegramId||'';a.name=me.name||a.name||'Игрок';a.username=me.username||a.username||'';save(a);let remote=a.telegramId?await api('/api/profile?id='+encodeURIComponent(a.telegramId)):null;let p=remote&&remote.profile||a;const h=`<div class="s79card"><b>👤 Аккаунт Territory</b><div class="s79muted">Личность игрока привязана к Telegram, когда игра открыта внутри Telegram.</div></div><div class="s79card"><div class="s79grid"><div><span class="s79muted">Имя</span><br><b>${p.name||'Игрок'}</b></div><div><span class="s79muted">Telegram ID</span><br><b>${p.id||'Не получен'}</b></div></div><div style="margin-top:9px"><span class="s79muted">Клан</span><br><b>${p.clan||'Клан Sdolars'}</b></div><button class="s79btn" onclick="s79Sync()">🔄 Синхронизировать профиль</button></div>`;if(typeof panel==='function')panel('👤 Аккаунт',h);else if(typeof openSheet==='function')openSheet('Аккаунт',h)};
+window.s79Sync=async function(){const me=identity(),p=typeof window.player==='function'?window.player():{};if(!me.id){alert('Открой игру внутри Telegram, чтобы получить Telegram ID.');return}const a={telegramId:me.id,name:me.name,clan:'Клан Sdolars',level:+p.level||1,xp:+p.xp||0};save(a);const r=await api('/api/profile',{method:'POST',body:JSON.stringify(a)});alert(r&&r.ok?'✅ Профиль синхронизирован с сервером.':'⚠️ Сервер недоступен. Локальный профиль сохранён.');s79Account()};
+window.s79SetServer=function(){const cur=localStorage.getItem('territory_server_url')||'';const u=prompt('Адрес S78/S79 сервера (например https://your-server.example)',cur);if(u!==null){localStorage.setItem('territory_server_url',u.replace(/\/$/,''));alert('Адрес сервера сохранён.')}};
+const oldOpen=window.openSheet;window.openSheet=function(title){if(title==='Аккаунт'||title==='Профиль онлайн')return s79Account();return oldOpen&&oldOpen.apply(this,arguments)};
+setTimeout(()=>{const nav=[...document.querySelectorAll('button')].find(b=>(b.textContent||'').trim()==='Профиль');if(nav&&!document.getElementById('s79AccountBtn')){const b=document.createElement('button');b.id='s79AccountBtn';b.className=nav.className;b.innerHTML='<span>👤</span>Аккаунт';b.onclick=()=>s79Account();nav.parentNode.insertBefore(b,nav.nextSibling)}},800);
+})();
+</script>

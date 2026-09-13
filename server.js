@@ -4,6 +4,11 @@ const crypto=require('crypto');
 const WebSocket=require('ws');
 const PORT=Number(process.env.PORT||8080);
 const BOT_TOKEN=process.env.TELEGRAM_BOT_TOKEN||'';
+const fs=require('fs');
+const DATA_FILE=process.env.TERRITORY_DATA_FILE||'./territory-data.json';
+let db={players:{},clans:{}};
+try{if(fs.existsSync(DATA_FILE))db=Object.assign(db,JSON.parse(fs.readFileSync(DATA_FILE,'utf8')))}catch(e){}
+function persist(){try{fs.writeFileSync(DATA_FILE,JSON.stringify(db,null,2))}catch(e){}}
 const rooms=new Map();
 const players=new Map();
 const MAX_ROOM=50;
@@ -25,7 +30,10 @@ function snapshot(room){return {room,players:[...rooms.get(room).values()].map(x
 function broadcast(room,msg,except){const set=rooms.get(room);if(!set)return;const raw=JSON.stringify(msg);for(const c of set){if(c!==except&&c.readyState===WebSocket.OPEN)c.send(raw);}}
 const server=http.createServer((req,res)=>{
   if(req.method==='OPTIONS'){res.writeHead(204,{'access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type,x-telegram-init-data'});return res.end();}
-  if(req.url==='/health'){return json(res,200,{ok:true,service:'territory-s78',rooms:rooms.size,players:players.size});}
+  if(req.url==='/health'){return json(res,200,{ok:true,service:'territory-s79',rooms:rooms.size,online:players.size,accounts:Object.keys(db.players).length,clans:Object.keys(db.clans).length});}
+  if(req.url==='/api/profile'&&req.method==='GET'){const u=new URL(req.url,'http://territory');const id=String(u.searchParams.get('id')||'');if(!id||!db.players[id])return json(res,404,{ok:false,error:'profile_not_found'});return json(res,200,{ok:true,profile:db.players[id]});}
+  if(req.url==='/api/profile'&&req.method==='POST'){let raw='';req.on('data',d=>raw+=d);req.on('end',()=>{let b={};try{b=JSON.parse(raw||'{}')}catch(e){};const id=String(b.telegramId||'');if(!id)return json(res,400,{ok:false,error:'telegram_id_required'});const old=db.players[id]||{};db.players[id]={id,name:String(b.name||old.name||'Игрок').slice(0,32),clan:String(b.clan||old.clan||'Клан Sdolars').slice(0,32),level:Number(b.level||old.level||1),xp:Number(b.xp||old.xp||0),updatedAt:Date.now()};persist();json(res,200,{ok:true,profile:db.players[id]});});return;}
+  if(req.url==='/api/clan'&&req.method==='GET'){const u=new URL(req.url,'http://territory');const id=String(u.searchParams.get('id')||'');const c=db.clans[id];if(!c)return json(res,404,{ok:false,error:'clan_not_found'});return json(res,200,{ok:true,clan:c});}
   if(req.url==='/api/room'&&req.method==='POST'){
     let raw='';req.on('data',d=>raw+=d);req.on('end',()=>{let b={};try{b=JSON.parse(raw||'{}')}catch(e){}const r=roomCode();rooms.set(r,new Set());json(res,201,{ok:true,room:r});});return;
   }
@@ -40,8 +48,10 @@ wss.on('connection',(ws,req)=>{
     if(type==='HELLO'){
       const auth=verifyTelegram(req.headers['x-telegram-init-data']||'');
       if(!auth.ok){ws.send(JSON.stringify({type:'AUTH_ERROR',error:auth.reason||'telegram_auth_failed'}));return ws.close();}
-      players.set(playerId,{ws,telegramId:auth.telegramId,name:String(m.payload&&m.payload.name||'Игрок').slice(0,32)});
-      ws.send(JSON.stringify({type:'WELCOME',playerId,verified:auth.verified}));return;
+      const name=String(m.payload&&m.payload.name||'Игрок').slice(0,32);
+      players.set(playerId,{ws,telegramId:auth.telegramId,name});
+      if(auth.telegramId){const old=db.players[String(auth.telegramId)]||{};db.players[String(auth.telegramId)]={id:String(auth.telegramId),name,clan:String(m.payload&&m.payload.clan||old.clan||'Клан Sdolars').slice(0,32),level:Number(m.payload&&m.payload.level||old.level||1),xp:Number(m.payload&&m.payload.xp||old.xp||0),updatedAt:Date.now()};persist();}
+      ws.send(JSON.stringify({type:'WELCOME',playerId,telegramId:auth.telegramId,verified:auth.verified,profile:auth.telegramId?db.players[String(auth.telegramId)]:null}));return;
     }
     if(!players.has(playerId)){ws.send(JSON.stringify({type:'ERROR',error:'hello_required'}));return;}
     if(type==='ROOM_CREATE'){const r=roomCode();rooms.set(r,new Set([ws]));current=r;players.get(playerId).room=r;ws.send(JSON.stringify({type:'ROOM_CREATED',room:r,state:snapshot(r)}));return;}
