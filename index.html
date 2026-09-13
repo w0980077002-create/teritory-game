@@ -353,5 +353,40 @@ const oldCastle=window.s35Castle;if(oldCastle){window.s35Castle=function(){oldCa
 const css=document.createElement('style');css.textContent='.s42hero,.s42note{background:#0d202b;border:1px solid #31586a;border-radius:11px;padding:10px;margin:7px 0;font-size:10px;line-height:1.4}.s42hero b{display:block;font-size:14px}.s42hero small,.s42card small{display:block;opacity:.72;margin-top:4px}.s42row{display:flex;justify-content:space-between;align-items:center;background:#102630;border:1px solid #24586c;border-radius:9px;padding:9px;margin:6px 0;font-size:10px}.s42card{background:#111f29;border:1px solid #7d6330;border-radius:11px;padding:10px;margin:8px 0}.s42card.boss{border-color:#b48a36}.s42card b{font-size:12px}.s42btn{width:100%;margin-top:8px;border:1px solid #c99a2e;border-radius:9px;padding:8px;background:#3b2e0d;color:#ffe28a;font-weight:900}.s42btn:disabled{opacity:.4}.s42note{opacity:.85}';document.head.appendChild(css);
 })();
 </script>
+
+<script id="s44-global-js">(()=>{
+const K='territory_s44_city';
+const DEF={rep:0,claimed:[],eventDay:'',eventDone:false,bounties:[0,0,0],craft:{},fame:0};
+function d44(){try{return Object.assign({},DEF,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){return {...DEF}}}
+function sv44(x){localStorage.setItem(K,JSON.stringify(x))}
+function p44(){try{return JSON.parse(localStorage.getItem('territory_save')||'{}')}catch(e){return {}}}
+function save44(p){localStorage.setItem('territory_save',JSON.stringify(p));try{if(typeof render==='function')render()}catch(e){}}
+function day44(){return new Date().toISOString().slice(0,10)}
+function panel44(title,body){if(typeof panel42==='function')panel42(title,body);else if(typeof panel==='function')panel(title,body)}
+function reset44(){let x=d44();if(x.eventDay!==day44()){x.eventDay=day44();x.eventDone=false;x.claimed=[];x.bounties=[0,0,0];sv44(x)}return x}
+const contracts=[
+ ['⚔️ Охота','Победи 2 врагов на арене',2,120,35],
+ ['🗺️ Разведка','Выполни 2 активности районов',2,110,30],
+ ['🏚️ Крепость','Победи этап экспедиции',1,160,45]
+];
+window.s44City=function(){let x=reset44(),p=p44(),wins=Math.min(2,x.bounties[0]||0),acts=Math.min(2,x.bounties[1]||0),exp=Math.min(1,x.bounties[2]||0);let rep=x.rep||0;
+let h='<div class="s44hero"><b>🏙️ Sdolars — жизнь города</b><small>Городские задания меняются каждый день. Выполняй их и повышай репутацию.</small></div>';
+h+='<div class="s44stats"><span>⭐ Репутация <b>'+rep+'</b></span><span>🏅 Известность <b>'+Math.floor(rep/5)+'</b></span><span>🟡 Монеты <b>'+(p.coins||0)+'</b></span></div>';
+contracts.forEach((c,i)=>{let prog=[wins,acts,exp][i],done=x.claimed.includes(i);h+='<div class="s44card"><b>'+c[0]+'</b><small>'+c[1]+'</small><div class="s44prog"><i style="width:'+Math.min(100,prog/c[2]*100)+'%"></i></div><small>Прогресс: '+prog+'/'+c[2]+' · 🟡 '+c[3]+' · XP '+c[4]+' · ⭐ +'+(i===2?3:2)+'</small><button class="s44btn" '+(prog>=c[2]&&!done?'':'disabled')+' onclick="s44Claim('+i+')">'+(done?'Выполнено сегодня':'Забрать награду')+'</button></div>'});
+h+='<div class="s44card"><b>🌆 Событие дня</b><small>«Ночь фонарей» — городская активность. Один раз в день можно получить дополнительную награду.</small><button class="s44btn" '+(x.eventDone?'disabled':'')+' onclick="s44Event()">'+(x.eventDone?'Событие уже пройдено':'Участвовать · ⚡20')+'</button></div>';
+panel44('🏙️ Город Sdolars',h)};
+window.s44Claim=function(i){let x=reset44(),p=p44();if(x.claimed.includes(i)||[x.bounties[0],x.bounties[1],x.bounties[2]][i]<contracts[i][2])return;x.claimed.push(i);x.rep+=i===2?3:2;p.coins=(p.coins||0)+contracts[i][3];p.xp=(p.xp||0)+contracts[i][4];save44(p);sv44(x);alert('Городской контракт выполнен: +'+contracts[i][3]+' монет · +'+contracts[i][4]+' XP · ⭐ репутация');s44City()};
+window.s44Event=function(){let x=reset44(),p=p44();if(x.eventDone)return;if((p.energy||0)<20){alert('Недостаточно энергии');return}p.energy-=20;let luck=Math.random(),coins=luck>.8?300:luck>.35?180:100,xp=luck>.8?80:45;x.eventDone=true;x.rep+=luck>.8?3:1;p.coins=(p.coins||0)+coins;p.xp=(p.xp||0)+xp;save44(p);sv44(x);alert('🌆 Событие завершено: +'+coins+' монет · +'+xp+' XP · ⭐ репутация');s44City()};
+window.s44ArenaWin=function(){let x=reset44();x.bounties[0]=Math.min(2,(x.bounties[0]||0)+1);sv44(x)};
+window.s44Activity=function(){let x=reset44();x.bounties[1]=Math.min(2,(x.bounties[1]||0)+1);sv44(x)};
+window.s44ExpWin=function(){let x=reset44();x.bounties[2]=Math.min(1,(x.bounties[2]||0)+1);sv44(x)};
+const oldS43=window.s43Move;if(oldS43)window.s43Move=function(z){oldS43.apply(this,arguments)};
+const oldArenaWin=window.winBattle;if(oldArenaWin)window.winBattle=function(){let r=oldArenaWin.apply(this,arguments);try{s44ArenaWin()}catch(e){}return r};
+const oldDistrictActivity=window.districtActivity;if(oldDistrictActivity)window.districtActivity=function(){let r=oldDistrictActivity.apply(this,arguments);try{s44Activity()}catch(e){}return r};
+const oldS43Move=window.s43Move;if(oldS43Move)window.s43Move=function(z){oldS43Move.apply(this,arguments);try{let x=d44(); if(typeof window.s42Expedition==='function'){} }catch(e){}};
+const navHook=document.createElement('style');navHook.textContent='.s44hero{background:linear-gradient(135deg,#102833,#162029);border:1px solid #476273;border-radius:12px;padding:11px;margin:7px 0}.s44hero b{display:block;font-size:15px}.s44hero small,.s44card small{display:block;opacity:.72;margin-top:4px}.s44stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:7px 0}.s44stats span{background:#102630;border:1px solid #285164;border-radius:9px;padding:8px 5px;text-align:center;font-size:9px}.s44stats b{display:block;font-size:13px;margin-top:3px}.s44card{background:#101d25;border:1px solid #36515e;border-radius:11px;padding:10px;margin:7px 0}.s44card b{font-size:12px}.s44btn{width:100%;margin-top:8px;border:1px solid #c99a2e;border-radius:9px;padding:8px;background:#3b2e0d;color:#ffe28a;font-weight:900}.s44btn:disabled{opacity:.4}.s44prog{height:5px;background:#24343c;border-radius:9px;margin-top:7px;overflow:hidden}.s44prog i{display:block;height:100%;background:#c99a2e}.s44card:last-child{border-color:#82662d}';document.head.appendChild(navHook);
+document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Город'||t.startsWith('Город')){e.preventDefault();e.stopImmediatePropagation();s44City()}},true);
+setInterval(()=>{let x=reset44();},60000);
+})();</script>
 </body>
 </html>

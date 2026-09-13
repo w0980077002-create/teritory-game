@@ -1,2 +1,2 @@
-# Territory S43 REAL
-Экспедиция получила настоящий пошаговый PvE-бой: выбор зоны атаки, блоки противника, критические удары, уклонения, урон от экипировки, HP, победа/поражение, награды и лут.
+# Territory S44 REAL
+Global city systems: daily city contracts, reputation, daily event, rewards and integration with arena/district activity. GitHub-only static build.
