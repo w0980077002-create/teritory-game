@@ -98,7 +98,25 @@ const server=http.createServer((req,res)=>{
     const id=clean(u.searchParams.get('id'),40),q=mmQueue.get(id);mmCandidates();
     if(!q)return json(res,200,{ok:true,queue:null});return json(res,200,{ok:true,queue:mmPublic(q)});
   }
-  if(u.pathname==='/api/room'&&req.method==='POST')return body(req,b=>{const r=roomCode();rooms.set(r,new Set());return json(res,201,{ok:true,room:r})});
+  if(u.pathname==='/api/players'&&req.method==='GET'){
+    const q=clean(u.searchParams.get('q')||'',40).toLowerCase(); const clan=clean(u.searchParams.get('clan')||'',80).toLowerCase();
+    const online=[...players.values()].map(x=>x.telegramId||x.playerId).filter(Boolean);
+    const arr=Object.values(db.players).filter(p=>{const n=(p.name||'').toLowerCase();const c=(p.clan||'').toLowerCase();return (!q||n.includes(q)||String(p.id).includes(q))&&(!clan||c.includes(clan))}).slice(0,50).map(p=>({id:p.id,name:p.name,clan:p.clan||'',level:p.level||1,xp:p.xp||0,online:online.includes(String(p.id))}));
+    return json(res,200,{ok:true,players:arr});
+  }
+  if(u.pathname==='/api/player'&&req.method==='GET'){
+    const id=clean(u.searchParams.get('id'),40); const p=db.players[id]; if(!p)return json(res,404,{ok:false,error:'player_not_found'});
+    return json(res,200,{ok:true,player:{id:p.id,name:p.name,clan:p.clan||'',level:p.level||1,xp:p.xp||0,online:[...players.values()].some(x=>String(x.telegramId||x.playerId)===id)}});
+  }
+  if(u.pathname==='/api/friends'&&req.method==='POST')return body(req,b=>{
+    const {a,id}=playerIdFrom(req,b); if(!a.ok&&BOT_TOKEN)return json(res,401,{ok:false,error:'telegram_auth_failed'}); if(!id||!b.targetId)return json(res,400,{ok:false,error:'ids_required'});
+    const p=ensurePlayer(id,a.user?.first_name||'Игрок'); const t=ensurePlayer(clean(b.targetId,40),'Игрок'); p.friends=Array.isArray(p.friends)?p.friends:[]; t.friendRequests=Array.isArray(t.friendRequests)?t.friendRequests:[];
+    if(!p.friends.includes(t.id))p.friendRequests.push(id); persist(); return json(res,200,{ok:true,requested:true});
+  });
+  if(u.pathname==='/api/clan/invite'&&req.method==='POST')return body(req,b=>{
+    const {a,id}=playerIdFrom(req,b); if(!a.ok&&BOT_TOKEN)return json(res,401,{ok:false,error:'telegram_auth_failed'}); const c=clanByMember(id); if(!c)return json(res,400,{ok:false,error:'no_clan'}); const target=ensurePlayer(clean(b.targetId,40),'Игрок'); target.clanInvites=Array.isArray(target.clanInvites)?target.clanInvites:[]; if(!target.clanInvites.includes(c.id))target.clanInvites.push(c.id); persist(); return json(res,200,{ok:true,clan:c.name});
+  });
+    if(u.pathname==='/api/room'&&req.method==='POST')return body(req,b=>{const r=roomCode();rooms.set(r,new Set());return json(res,201,{ok:true,room:r})});
   return json(res,404,{ok:false,error:'not_found'});
 });
 const wss=new WebSocket.Server({server,path:'/ws'});
