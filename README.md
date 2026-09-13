@@ -1,3 +1,1 @@
-# Territory S59
-
-S59 adds the character skills and specialization system, connected to combat, PvP, war and siege hooks.
+Territory S60 — GitHub-only mobile game. Added a visible Sdolars LIVE city panel with live resources, current district, guild level, clock, and direct actions for Patrol, Districts, and Tavern. Progress remains in localStorage.
