@@ -1,29 +1,20 @@
-# Territory S78 — REALTIME SERVER
+# Territory S80 — REAL CLAN DATABASE
 
-S78 turns the S77 client bridge into a real WebSocket/HTTP server foundation.
+S80 adds a persistent server-side clan database on top of S79.
 
-## Included
-- `index.html` — GitHub Pages client, still works without a server.
-- `server.js` — authoritative room/event relay over WebSocket.
-- `package.json` — Node.js dependency definition.
-- `/health` — server health endpoint.
-- `POST /api/room` — creates a room code.
-- `/ws` — realtime WebSocket endpoint.
-- Room join/leave, presence, game-event broadcast.
-- Optional Telegram Web App `initData` HMAC verification through `TELEGRAM_BOT_TOKEN`.
-- Maximum 50 connected clients per room.
+## Server
+- Node.js + ws
+- Persistent JSON database (`territory-data.json`)
+- Clan create / list / join / leave
+- Server-side clan membership and roles
+- Telegram initData verification when `TELEGRAM_BOT_TOKEN` is configured
+- `/health` endpoint
 
-## Important deployment architecture
-GitHub Pages remains the static frontend. It cannot run `server.js` itself. The server therefore has to be deployed separately on a Node.js-capable host, while the game continues to be served from GitHub Pages. No Cloudflare files or dependency are included.
+## Client
+- Online clan panel
+- Create or join a clan
+- Member roster
+- Server refresh
+- Leave clan
 
-Set the client endpoint before enabling automatic connection:
-```html
-<script>window.TERRITORY_SERVER_CONFIG={url:'https://YOUR-SERVER.example',auto:true};</script>
-```
-
-For Telegram verification, set:
-```bash
-TELEGRAM_BOT_TOKEN=...
-```
-
-The current client deliberately stays in local mode until a real server URL is configured; it does not fake an online connection.
+GitHub Pages remains the static game client. The Node server must be hosted separately for cross-device online functionality. Cloudflare is not required.
