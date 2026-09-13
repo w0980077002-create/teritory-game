@@ -1,13 +1,7 @@
-Territory S103 — index integration fix
+Territory S104 — clean index integration
 
-This package is based on the current S102 integrated runtime.
+This build replaces the old index.html with a clean mobile-first Territory/Sdolars shell.
+It contains no S72/S73/S74 legacy buttons: Командный штаб, ОСАДА, ЛОГИСТИКА.
+It loads s102-client.js and keeps the existing S102 server/runtime files.
 
-Changes:
-1. Fixed duplicate loadIncoming() declaration in s102-client.js.
-2. Added runtime cleanup of legacy S72/S73/S74 buttons and their legacy UI nodes.
-3. The cleanup runs during boot, so the existing index.html can remain untouched while the current server injects s102-client.js.
-4. Tactical PvP remains 4 zones: Head / Chest / Belt / Legs, with 1 attack + 2 defense zones.
-
-IMPORTANT:
-The GitHub connector rejected the attempted write to main with HTTP 403, so this package is ready to upload but has NOT been falsely claimed as committed to GitHub.
-The existing GitHub index.html was not overwritten.
+GitHub note: the attempt to write index.html through the GitHub connector was rejected with HTTP 403, so this ZIP is the verified local build and has NOT been falsely claimed as committed.
