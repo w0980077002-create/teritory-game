@@ -417,6 +417,39 @@ const oldMove=window.s43Move;if(oldMove)window.s43Move=function(z){let before=((
 const st=document.createElement('style');st.textContent='.s45hero{background:linear-gradient(135deg,#132b35,#171f28);border:1px solid #557080;border-radius:12px;padding:11px;margin:7px 0}.s45hero b{display:block;font-size:15px}.s45hero small,.s45card small{display:block;opacity:.72;margin-top:4px}.s45stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:7px 0}.s45stats span{background:#102630;border:1px solid #285164;border-radius:9px;padding:8px 4px;text-align:center;font-size:9px}.s45stats b{display:block;font-size:13px;margin-top:3px}.s45card{background:#101d25;border:1px solid #36515e;border-radius:11px;padding:10px;margin:7px 0}.s45row{display:flex;justify-content:space-between;gap:7px;align-items:center;background:#13242d;border:1px solid #294955;border-radius:8px;padding:8px;margin:5px 0;font-size:10px}.s45row span{flex:1}.s45btn{border:1px solid #c99a2e;border-radius:8px;padding:7px 9px;background:#3b2e0d;color:#ffe28a;font-weight:900;font-size:10px}.s45btn:disabled{opacity:.4}.s45note{opacity:.7;font-size:9px;margin-top:7px}';document.head.appendChild(st);
 document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Город'||t.startsWith('Город')){setTimeout(()=>{let b=document.querySelectorAll('.s44card');if(b.length){let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s45open')){let q=document.createElement('button');q.className='s44btn s45open';q.textContent='🌍 Живой мир Sdolars';q.onclick=()=>s45World();body.appendChild(q)}}},30)}} ,true);
 })();</script>
+
+<style>
+.s53board{margin-top:10px;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(8,12,18,.72)}
+.s53card{padding:10px;margin-top:8px;border-radius:12px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08)}
+.s53card b{display:block}.s53card small{display:block;opacity:.72;margin-top:3px;line-height:1.35}.s53card button{margin-top:8px;width:100%;padding:9px;border:0;border-radius:9px;font-weight:700}
+.s53top{display:flex;justify-content:space-between;gap:8px;font-size:12px;opacity:.9}.s53bar{height:7px;border-radius:8px;background:#222;margin-top:7px;overflow:hidden}.s53bar i{display:block;height:100%;background:#d9a441}
+</style>
+<script>
+(()=>{
+const KEY='territory_s53_ops';
+const defs=[
+ {id:'patrol',n:'Ночной патруль',ico:'🕯️',desc:'Проведи бой и зачисти опасный сектор города.',need:'win',req:1,c:180,x:35,g:30,e:12},
+ {id:'supply',n:'Поставка оружия',ico:'📦',desc:'Найди ресурсы в районах и доставь их на базу.',need:'district',req:2,c:220,x:45,g:40,e:18},
+ {id:'siege',n:'Подготовка осады',ico:'🏰',desc:'Участвуй в осаде и помоги гильдии подготовить удар.',need:'siege',req:1,c:260,x:55,g:50,e:20}
+];
+function day(){let d=new Date();return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate()}
+function load(){let x;try{x=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){} if(!x||x.day!==day()){x={day:day(),done:{},claimed:{},contrib:0};localStorage.setItem(KEY,JSON.stringify(x))}return x}
+function save(x){localStorage.setItem(KEY,JSON.stringify(x))}
+function prog(x,d){let v=0;
+ if(d.need==='win'){try{v=Math.max(0,(JSON.parse(localStorage.getItem('territory_s35')||'{}').questWins||0))}catch(e){} }
+ if(d.need==='district'){try{let z=JSON.parse(localStorage.getItem('territory_s35_districts')||'[]');v=Array.isArray(z)?z.length:0}catch(e){} if(!v){v=Math.min(2,+(localStorage.getItem('territory_s37_visited')||0))}}
+ if(d.need==='siege'){try{let z=JSON.parse(localStorage.getItem('territory_s49_siege')||'{}');v=+z.attacks||0}catch(e){}}
+ return Math.min(d.req,v)
+}
+function panel(title,html){if(window.panel)window.panel(title,html);else if(window.openSheet)window.openSheet(title)}
+window.s53Ops=function(){let x=load();let rows=defs.map(d=>{let pr=prog(x,d),done=!!x.done[d.id],claimed=!!x.claimed[d.id];return '<div class="s53card"><b>'+d.ico+' '+d.n+'</b><small>'+d.desc+'</small><div class="s53top"><span>Прогресс '+pr+'/'+d.req+'</span><span>🟡 '+d.c+' · XP '+d.x+' · Гильдия +'+d.g+'</span></div><div class="s53bar"><i style="width:'+Math.round(pr/d.req*100)+'%"></i></div><button '+(claimed||done?'disabled':'')+' onclick="s53Claim(\''+d.id+'\')">'+(claimed?'Получено':done?'Выполнено':'Взять задание')+'</button></div>'}).join('');let h='<div class="s53board"><b>📜 Оперативный штаб</b><small>Ежедневно доступны три задания. Выполненные операции дают реальные награды и опыт гильдии.</small>'+rows+'</div>';panel('📜 Операции гильдии',h)};
+window.s53Claim=function(id){let x=load(),d=defs.find(a=>a.id===id);if(!d||x.claimed[id])return;let pr=prog(x,d);if(pr<d.req){alert('Задание ещё не выполнено');return}x.claimed[id]=true;x.contrib+=d.g;save(x);
+ try{let p=JSON.parse(localStorage.getItem('territory_player')||localStorage.getItem('territory_state')||'{}');if(p.coins!=null){p.coins+=d.c;p.xp=(p.xp||0)+d.x;localStorage.setItem(localStorage.getItem('territory_player')?'territory_player':'territory_state',JSON.stringify(p))}}catch(e){}
+ let gx=+(localStorage.getItem('territory_guild_xp')||0)+d.g,lvl=+(localStorage.getItem('territory_guild_lvl')||1);while(gx>=100){gx-=100;lvl++;}localStorage.setItem('territory_guild_xp',gx);localStorage.setItem('territory_guild_lvl',lvl);alert('Операция завершена! +'+d.c+' монет, +'+d.x+' XP, +'+d.g+' опыта гильдии');s53Ops()};
+document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Гильдия'||t.startsWith('Гильдия'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s53open')){let b=document.createElement('button');b.className='s35btn s53open';b.style.cssText='width:100%;margin-top:8px';b.textContent='📜 Оперативные задания';b.onclick=s53Ops;body.appendChild(b)}},70)},true);
+})();
+</script>
+
 </body>
 
 <script id="s51-guild-base">
@@ -508,6 +541,39 @@ const oldGuild=window.s46Guild;if(oldGuild){window.s46Guild=function(){oldGuild.
 document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Гильдия'||t.startsWith('Гильдия'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s49open')){let b=document.createElement('button');b.className='s35btn s49open';b.style.cssText='width:100%;margin-top:8px';b.textContent='🏰 Тактическая осада';b.onclick=s49Siege;body.appendChild(b)}},30)},true);
 })();
 </script>
+
+<style>
+.s53board{margin-top:10px;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(8,12,18,.72)}
+.s53card{padding:10px;margin-top:8px;border-radius:12px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08)}
+.s53card b{display:block}.s53card small{display:block;opacity:.72;margin-top:3px;line-height:1.35}.s53card button{margin-top:8px;width:100%;padding:9px;border:0;border-radius:9px;font-weight:700}
+.s53top{display:flex;justify-content:space-between;gap:8px;font-size:12px;opacity:.9}.s53bar{height:7px;border-radius:8px;background:#222;margin-top:7px;overflow:hidden}.s53bar i{display:block;height:100%;background:#d9a441}
+</style>
+<script>
+(()=>{
+const KEY='territory_s53_ops';
+const defs=[
+ {id:'patrol',n:'Ночной патруль',ico:'🕯️',desc:'Проведи бой и зачисти опасный сектор города.',need:'win',req:1,c:180,x:35,g:30,e:12},
+ {id:'supply',n:'Поставка оружия',ico:'📦',desc:'Найди ресурсы в районах и доставь их на базу.',need:'district',req:2,c:220,x:45,g:40,e:18},
+ {id:'siege',n:'Подготовка осады',ico:'🏰',desc:'Участвуй в осаде и помоги гильдии подготовить удар.',need:'siege',req:1,c:260,x:55,g:50,e:20}
+];
+function day(){let d=new Date();return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate()}
+function load(){let x;try{x=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){} if(!x||x.day!==day()){x={day:day(),done:{},claimed:{},contrib:0};localStorage.setItem(KEY,JSON.stringify(x))}return x}
+function save(x){localStorage.setItem(KEY,JSON.stringify(x))}
+function prog(x,d){let v=0;
+ if(d.need==='win'){try{v=Math.max(0,(JSON.parse(localStorage.getItem('territory_s35')||'{}').questWins||0))}catch(e){} }
+ if(d.need==='district'){try{let z=JSON.parse(localStorage.getItem('territory_s35_districts')||'[]');v=Array.isArray(z)?z.length:0}catch(e){} if(!v){v=Math.min(2,+(localStorage.getItem('territory_s37_visited')||0))}}
+ if(d.need==='siege'){try{let z=JSON.parse(localStorage.getItem('territory_s49_siege')||'{}');v=+z.attacks||0}catch(e){}}
+ return Math.min(d.req,v)
+}
+function panel(title,html){if(window.panel)window.panel(title,html);else if(window.openSheet)window.openSheet(title)}
+window.s53Ops=function(){let x=load();let rows=defs.map(d=>{let pr=prog(x,d),done=!!x.done[d.id],claimed=!!x.claimed[d.id];return '<div class="s53card"><b>'+d.ico+' '+d.n+'</b><small>'+d.desc+'</small><div class="s53top"><span>Прогресс '+pr+'/'+d.req+'</span><span>🟡 '+d.c+' · XP '+d.x+' · Гильдия +'+d.g+'</span></div><div class="s53bar"><i style="width:'+Math.round(pr/d.req*100)+'%"></i></div><button '+(claimed||done?'disabled':'')+' onclick="s53Claim(\''+d.id+'\')">'+(claimed?'Получено':done?'Выполнено':'Взять задание')+'</button></div>'}).join('');let h='<div class="s53board"><b>📜 Оперативный штаб</b><small>Ежедневно доступны три задания. Выполненные операции дают реальные награды и опыт гильдии.</small>'+rows+'</div>';panel('📜 Операции гильдии',h)};
+window.s53Claim=function(id){let x=load(),d=defs.find(a=>a.id===id);if(!d||x.claimed[id])return;let pr=prog(x,d);if(pr<d.req){alert('Задание ещё не выполнено');return}x.claimed[id]=true;x.contrib+=d.g;save(x);
+ try{let p=JSON.parse(localStorage.getItem('territory_player')||localStorage.getItem('territory_state')||'{}');if(p.coins!=null){p.coins+=d.c;p.xp=(p.xp||0)+d.x;localStorage.setItem(localStorage.getItem('territory_player')?'territory_player':'territory_state',JSON.stringify(p))}}catch(e){}
+ let gx=+(localStorage.getItem('territory_guild_xp')||0)+d.g,lvl=+(localStorage.getItem('territory_guild_lvl')||1);while(gx>=100){gx-=100;lvl++;}localStorage.setItem('territory_guild_xp',gx);localStorage.setItem('territory_guild_lvl',lvl);alert('Операция завершена! +'+d.c+' монет, +'+d.x+' XP, +'+d.g+' опыта гильдии');s53Ops()};
+document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Гильдия'||t.startsWith('Гильдия'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s53open')){let b=document.createElement('button');b.className='s35btn s53open';b.style.cssText='width:100%;margin-top:8px';b.textContent='📜 Оперативные задания';b.onclick=s53Ops;body.appendChild(b)}},70)},true);
+})();
+</script>
+
 </body>
 
 <script id="s51-guild-base">
