@@ -1,3 +1,3 @@
-Territory S86 — CLEAN WAR UI
+Territory S88 — TACTICAL ARENA
 
-Built on S85. Removed the standalone Command HQ, Siege and Logistics buttons and their legacy panels. The working game base and remaining systems are preserved.
+Built on S87. Adds a complete visual tactical battle block: 5 attack zones, exactly 2 defense zones, body-zone UI, HP bars, turn state, combat log, and server validation.
