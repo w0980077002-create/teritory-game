@@ -1,8 +1,9 @@
-# Territory — S66 GitHub Pages V2
+# Territory — S66 Clan Clean V1
 
-This build is based on the working S61→S66 game and adds a hard S66 guild redirect.
+Built from the current S66 GitHub Pages build.
 
-## Deploy
-Upload `index.html`, `README.md`, and `.nojekyll` to the repository root on the `main` branch. GitHub Pages should use `main / (root)`.
+The old Guild button/event chain is detached by cloning the DOM button and replacing it with one clean entry point named **Клан**.
 
-Build marker: `S66-GUILD-FORCE-V2`.
+No Cloudflare is used. GitHub Pages only: `main / (root)`.
+
+Build marker: `S66-CLAN-CLEAN-V1`.
