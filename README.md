@@ -1,20 +1,17 @@
-# Territory S80 — REAL CLAN DATABASE
+# Territory S81 — REAL PVP CLAN WAR
 
-S80 adds a persistent server-side clan database on top of S79.
+S81 продолжает S80 и добавляет серверные PvP-бои между игроками.
 
-## Server
-- Node.js + ws
-- Persistent JSON database (`territory-data.json`)
-- Clan create / list / join / leave
-- Server-side clan membership and roles
-- Telegram initData verification when `TELEGRAM_BOT_TOKEN` is configured
-- `/health` endpoint
+## Что внутри
+- index.html — клиент GitHub Pages;
+- server.js — Node.js + WebSocket/HTTP API;
+- s80-client.js — серверная база кланов клиента.
 
-## Client
-- Online clan panel
-- Create or join a clan
-- Member roster
-- Server refresh
-- Leave clan
+## S81 PvP API
+- POST /api/pvp/challenge
+- GET /api/pvp/incoming?id=...
+- POST /api/pvp/accept
+- GET /api/pvp/mine?id=...
+- POST /api/pvp/action
 
-GitHub Pages remains the static game client. The Node server must be hosted separately for cross-device online functionality. Cloudflare is not required.
+Для настоящего онлайна сервер нужно разместить отдельно от GitHub Pages и указать его адрес в localStorage `territory_server_url`.
