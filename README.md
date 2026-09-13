@@ -1,1 +1,2 @@
-Territory S60 — GitHub-only mobile game. Added a visible Sdolars LIVE city panel with live resources, current district, guild level, clock, and direct actions for Patrol, Districts, and Tavern. Progress remains in localStorage.
+# Territory S61
+GitHub-only build. S61 removes the broken S60 city overlay and adds a compact, interactive Battle Readiness panel in a safe area below the quest.
