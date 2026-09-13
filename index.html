@@ -316,5 +316,37 @@ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=bu
 const css=document.createElement('style');css.textContent='.s41hero,.s41note{background:#0d202b;border:1px solid #31586a;border-radius:11px;padding:10px;margin:7px 0;font-size:11px;line-height:1.35}.s41hero b{display:block;font-size:14px}.s41hero small,.s41row small{display:block;opacity:.68;margin-top:3px}.s41grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.s41grid>div{background:#102630;border:1px solid #24586c;border-radius:10px;padding:9px;text-align:center;font-size:10px}.s41grid b{display:block;font-size:15px;margin:4px}.s41grid button,.s41btn{width:100%;border:1px solid #c99a2e;border-radius:8px;padding:7px;background:#3b2e0d;color:#ffe28a;font-weight:900}.s41row{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#102630;border:1px solid #24586c;border-radius:10px;padding:9px;margin:6px 0;font-size:11px}.s41row span{flex:1}.s41btn{margin-top:7px}';document.head.appendChild(css);
 })();
 </script>
+<script id="s42-global-js">
+(()=>{
+const K='territory_s42_expedition';
+const DEF={stage:0,keys:0,run:0,best:0,completed:0,claim:false};
+function gs(){try{return {...DEF,...JSON.parse(localStorage.getItem(K)||'{}')}}catch(e){return {...DEF}}}
+function sv(x){localStorage.setItem(K,JSON.stringify(x))}
+function P(){return typeof state!=='undefined'?state:null}
+function save(){try{saveState()}catch(e){}}
+function panel42(t,h){if(typeof panel==='function')panel(t,h);else alert(t+'\n'+h.replace(/<[^>]+>/g,''))}
+function inv(){try{return JSON.parse(localStorage.getItem('territory_s34_inventory')||'[]')}catch(e){return[]}}
+function put(a){localStorage.setItem('territory_s34_inventory',JSON.stringify(a))}
+const stages=[
+ {name:'Ворота старой крепости',icon:'🏚️',cost:12,enemies:1,reward:55,xp:18,desc:'Разведай вход и пробейся через дозор.'},
+ {name:'Затопленный двор',icon:'🌊',cost:15,enemies:2,reward:75,xp:24,desc:'Вода скрывает старые сундуки и опасных мародёров.'},
+ {name:'Подземные казармы',icon:'🕯️',cost:18,enemies:2,reward:95,xp:32,desc:'Внутри остались припасы старого гарнизона.'},
+ {name:'Зал оружия',icon:'⚔️',cost:22,enemies:3,reward:125,xp:42,desc:'Здесь охраняют лучшие трофеи экспедиции.'},
+ {name:'Тронный зал',icon:'👑',cost:28,enemies:1,reward:220,xp:70,desc:'Финальная схватка с хозяином крепости.'}
+];
+function addLoot(){let a=inv(), pool=[['Старый герб','rare',90],['Ключ крепости','uncommon',50],['Осколок реликвии','epic',160]],z=pool[Math.floor(Math.random()*pool.length)],id='exp42_'+z[0],old=a.find(x=>x.id===id);if(old)old.count=(old.count||1)+1;else a.push({id,n:z[0],t:'loot',rarity:z[1],price:z[2],o:1,e:0,count:1,d:0,a:0});put(a);return z}
+function reward(p,c,x){p.coins=(p.coins||0)+c;p.xp=(p.xp||0)+x;let ups=0;while(p.xp>=(p.level||1)*100){p.xp-=(p.level||1)*100;p.level=(p.level||1)+1;p.freePoints=(p.freePoints||0)+2;ups++}save();return ups}
+window.s42Expedition=function(){let x=gs(),p=P()||{},st=Math.min(5,x.stage||0),cur=stages[st]||stages[4],done=x.stage>=5;let progress=st+'/5';let h='<div class="s42hero"><b>🏚️ Затерянная крепость</b><small>Пошаговая PvE-экспедиция. Каждый этап требует энергии. Победа открывает следующий этап.</small></div>';
+h+='<div class="s42row"><span>Прогресс экспедиции</span><b>'+progress+'</b></div><div class="s42row"><span>Лучший забег</span><b>'+x.best+'/5</b></div><div class="s42row"><span>Пройдено экспедиций</span><b>'+x.completed+'</b></div>';
+if(!done){h+='<div class="s42card"><b>'+cur.icon+' Этап '+(st+1)+': '+cur.name+'</b><small>'+cur.desc+'</small><small>⚔️ Опасность: '+cur.enemies+' противника · ⚡ '+cur.cost+' энергии · 🟡 '+cur.reward+' · XP '+cur.xp+'</small><button class="s42btn" '+((p.energy||0)>=cur.cost?'':'disabled')+' onclick="s42Run()">Начать этап</button></div>'}else{h+='<div class="s42card boss"><b>👑 Крепость покорена</b><small>Ты завершил все 5 этапов. Следующий забег снова начнётся с ворот.</small><button class="s42btn" onclick="s42Reset()">Начать новый забег</button></div>'}
+h+='<div class="s42note">Награды экспедиции сохраняются в общей экономике и инвентаре. На финальном этапе шанс редкого трофея выше.</div>';panel42('🏚️ Экспедиция',h)};
+window.s42Run=function(){let x=gs(),p=P();if(!p||x.stage>=5)return;let cur=stages[x.stage];if((p.energy||0)<cur.cost){alert('Недостаточно энергии');return}p.energy-=cur.cost;let chance=Math.random(),mult=chance<.12?.55:chance>.84?1.6:1;let c=Math.floor(cur.reward*mult),xp=Math.floor(cur.xp*mult);let text=chance<.12?'⚠️ Засада! Награда уменьшена.':chance>.84?'🔥 Идеальный проход! Повышенная награда.':'Этап пройден.';x.stage++;x.best=Math.max(x.best,x.stage);let loot='';if(chance>.58||x.stage===5){let z=addLoot();loot=' 🎁 '+z[0]+' ('+z[1]+')'}reward(p,c,xp);if(x.stage===5){x.completed++;x.keys=(x.keys||0)+1}sv(x);alert(text+' +'+c+' монет · +'+xp+' XP.'+loot+(x.stage===5?' 🏆 Экспедиция завершена!':''));s42Expedition()};
+window.s42Reset=function(){let x=gs();if(x.stage<5)return;x.stage=0;sv(x);s42Expedition()};
+// Add the expedition entry to the existing district screen without replacing the district system.
+const oldDistricts=window.s35Districts;if(oldDistricts){window.s35Districts=function(){oldDistricts.apply(this,arguments);setTimeout(()=>{let body=document.getElementById('s35Body');if(!body||body.querySelector('.s42open'))return;let b=document.createElement('button');b.className='s35btn s42open';b.style.cssText='width:100%;margin-top:8px';b.textContent='🏚️ Экспедиция в крепость';b.onclick=()=>s42Expedition();body.appendChild(b)},20)}}
+const oldCastle=window.s35Castle;if(oldCastle){window.s35Castle=function(){oldCastle.apply(this,arguments);setTimeout(()=>{let body=document.getElementById('s35Body');if(!body||body.querySelector('.s42open'))return;let b=document.createElement('button');b.className='s35btn s42open';b.style.cssText='width:100%;margin-top:7px';b.textContent='🏚️ Отправиться в экспедицию';b.onclick=()=>s42Expedition();body.appendChild(b)},20)}}
+const css=document.createElement('style');css.textContent='.s42hero,.s42note{background:#0d202b;border:1px solid #31586a;border-radius:11px;padding:10px;margin:7px 0;font-size:10px;line-height:1.4}.s42hero b{display:block;font-size:14px}.s42hero small,.s42card small{display:block;opacity:.72;margin-top:4px}.s42row{display:flex;justify-content:space-between;align-items:center;background:#102630;border:1px solid #24586c;border-radius:9px;padding:9px;margin:6px 0;font-size:10px}.s42card{background:#111f29;border:1px solid #7d6330;border-radius:11px;padding:10px;margin:8px 0}.s42card.boss{border-color:#b48a36}.s42card b{font-size:12px}.s42btn{width:100%;margin-top:8px;border:1px solid #c99a2e;border-radius:9px;padding:8px;background:#3b2e0d;color:#ffe28a;font-weight:900}.s42btn:disabled{opacity:.4}.s42note{opacity:.85}';document.head.appendChild(css);
+})();
+</script>
 </body>
 </html>
