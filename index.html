@@ -1735,6 +1735,32 @@ window.s80Clan=()=>render('home');window.openClanOnline=window.s80Clan;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{const old=document.getElementById('clanButton');if(old){old.removeAttribute('onclick');old.onclick=()=>render('home')}},600));else setTimeout(()=>{const old=document.getElementById('clanButton');if(old){old.removeAttribute('onclick');old.onclick=()=>render('home')}},600);
 })();
 </script>
+
+<style id="s82-matchmaking-style">
+.s82card{background:linear-gradient(180deg,#182534,#0e151e);border:1px solid #30465b;border-radius:16px;padding:13px;margin:9px 0}.s82grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.s82stat{background:#111b26;border-radius:12px;padding:11px;text-align:center}.s82stat b{display:block;font-size:20px}.s82muted{opacity:.7;font-size:12px}.s82btn{width:100%;border:0;border-radius:12px;padding:12px;margin-top:8px;background:#29445d;color:#fff;font-weight:800}.s82btn.primary{background:#356d91}.s82btn.stop{background:#5d343a}.s82spin{display:inline-block;animation:s82spin 1s linear infinite}@keyframes s82spin{to{transform:rotate(360deg)}}
+</style>
+
+<script id="s82-real-matchmaking">
+(()=>{
+const K='territory_s82_matchmaking';const load=()=>{try{return Object.assign({status:'idle',queue:null,history:[]},JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){return {status:'idle',queue:null,history:[]}}};let st=load();const save=()=>localStorage.setItem(K,JSON.stringify(st));
+const tg=()=>window.Telegram&&Telegram.WebApp?Telegram.WebApp:null;const me=()=>{const u=tg()?.initDataUnsafe?.user||{};return{id:u.id?String(u.id):'',name:[u.first_name,u.last_name].filter(Boolean).join(' ')||u.username||'Игрок'}};
+const base=()=>localStorage.getItem('territory_server_url')||'';async function api(p,o={}){if(!base())return{ok:false,error:'server_not_configured'};const h=Object.assign({'content-type':'application/json'},o.headers||{});if(tg()?.initData)h['x-telegram-init-data']=tg().initData;try{const r=await fetch(base()+p,Object.assign({},o,{headers:h}));return await r.json()}catch(e){return{ok:false,error:'server_unavailable'}}}
+const panel2=(t,h)=>{if(typeof window.panel==='function')return window.panel(t,h);if(typeof window.openSheet==='function')return window.openSheet(t,h)};
+let timer=null;
+async function status(){const id=me().id;if(!id||!base())return null;const r=await api('/api/matchmaking/status?id='+encodeURIComponent(id));if(r.ok){st.queue=r.queue;st.status=r.queue?r.queue.status:'idle';save()}return r}
+function render(){const q=st.queue;let h='<div class="s82card"><b>🎯 Поиск соперника</b><p class="s82muted">Сервер автоматически подбирает игрока с близким рейтингом. Чем дольше поиск, тем шире диапазон подбора.</p></div>';
+if(!base())h+='<div class="s82card"><b>⚠️ Сервер не подключён</b><p class="s82muted">Укажи адрес сервера в разделе «Аккаунт».</p></div>';
+else if(q?.status==='searching')h+='<div class="s82card"><div style="text-align:center;font-size:28px"><span class="s82spin">⟳</span></div><h3 style="text-align:center;margin:6px 0">Ищем соперника</h3><div class="s82grid"><div class="s82stat"><b>'+q.rating+'</b><span class="s82muted">Твой рейтинг</span></div><div class="s82stat"><b>'+Math.floor((Date.now()-q.joinedAt)/1000)+'с</b><span class="s82muted">В поиске</span></div></div><button class="s82btn stop" data-stop>✖ Остановить поиск</button></div>';
+else if(q?.status==='matched')h+='<div class="s82card"><div style="text-align:center;font-size:34px">⚔️</div><h3 style="text-align:center">Соперник найден!</h3><div class="s82grid"><div class="s82stat"><b>'+q.rating+'</b><span class="s82muted">Твой рейтинг</span></div><div class="s82stat"><b>'+q.opponent.rating+'</b><span class="s82muted">Рейтинг врага</span></div></div><p style="text-align:center"><b>'+q.opponent.name+'</b></p><button class="s82btn primary" data-openmatch>⚔️ Открыть бой</button></div>';
+else h+='<div class="s82card"><div class="s82grid"><div class="s82stat"><b>MM</b><span class="s82muted">Автоподбор</span></div><div class="s82stat"><b>⚔️</b><span class="s82muted">PvP</span></div></div><button class="s82btn primary" data-start>🎯 Найти бой</button></div>';
+h+='<div class="s82card"><b>Как работает подбор</b><div class="s82muted" style="line-height:1.6;margin-top:7px">• учитывается уровень игрока<br>• учитывается рейтинг<br>• одинаковый клан не подбирается<br>• после нахождения создаётся реальный серверный PvP-матч</div></div>';panel2('🎯 Matchmaking',h);bind();}
+function bind(){document.querySelector('[data-start]')?.addEventListener('click',async()=>{const m=me();if(!m.id)return alert('Открой игру внутри Telegram.');const r=await api('/api/matchmaking/join',{method:'POST',body:JSON.stringify({playerId:m.id,name:m.name})});if(!r.ok)return alert('⚠️ '+r.error);st.queue=r.queue;st.status=r.queue.status;save();render();poll()});document.querySelector('[data-stop]')?.addEventListener('click',async()=>{const m=me();await api('/api/matchmaking/leave',{method:'POST',body:JSON.stringify({playerId:m.id})});st.queue=null;st.status='idle';save();if(timer)clearInterval(timer);render()});document.querySelector('[data-openmatch]')?.addEventListener('click',()=>{if(typeof window.s81PvP==='function')window.s81PvP();else alert('Открой раздел PvP.');});}
+async function poll(){if(timer)clearInterval(timer);timer=setInterval(async()=>{const r=await status();if(r?.queue?.status==='matched'){clearInterval(timer);render()}},2500)}
+async function open(){await status();render();if(st.queue?.status==='searching')poll()}
+function add(){if(document.getElementById('s82mmBtn'))return;const b=document.createElement('button');b.id='s82mmBtn';b.className='bottomBtn';b.innerHTML='<span>🎯</span>Поиск';b.onclick=open;const nav=document.querySelector('.bottomNav');if(nav)nav.insertBefore(b,nav.lastElementChild||null)}
+add();document.addEventListener('DOMContentLoaded',add);setTimeout(add,700);setTimeout(add,1800);window.s82Matchmaking=open;
+})();
+</script>
 </body>
 </html>
 

@@ -1,1 +1,1 @@
-{"name":"territory-s81-real-pvp","version":"0.81.0","private":true,"main":"server.js","scripts":{"start":"node server.js","check":"node --check server.js"},"dependencies":{"ws":"^8.18.0"}}
+{"name":"territory-s82-real-matchmaking","version":"0.81.0","private":true,"main":"server.js","scripts":{"start":"node server.js","check":"node --check server.js"},"dependencies":{"ws":"^8.18.0"}}
