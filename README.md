@@ -1,9 +1,21 @@
-# Territory — S66 Clan Clean V1
+# Territory — S67 GLOBAL CLAN
 
-Built from the current S66 GitHub Pages build.
+Глобальное развитие клана поверх рабочей версии S66 Clan Clean.
 
-The old Guild button/event chain is detached by cloning the DOM button and replacing it with one clean entry point named **Клан**.
+## Что добавлено
+- 🛡️ единая кнопка **Клан**;
+- 🏰 штаб клана с уровнем, опытом, репутацией и казной;
+- ⚔️ клановые войны: атаки, победы/поражения и боевой рейтинг;
+- 🗺️ захват 6 районов с процентом контроля и доходом в казну;
+- 🔧 4 технологии клана: Арсенал, Крепость, Торговля, Академия;
+- 👑 роли участников и расширенный состав;
+- 📜 клановые задания;
+- 🎁 ежедневная награда;
+- 🏦 казна и улучшение штаба;
+- 📜 журнал событий;
+- 💾 сохранение прогресса в localStorage;
+- 📱 интерфейс рассчитан на мобильный экран и Telegram Web App;
+- 🚫 Cloudflare не используется.
 
-No Cloudflare is used. GitHub Pages only: `main / (root)`.
-
-Build marker: `S66-CLAN-CLEAN-V1`.
+## GitHub Pages
+Папка содержит `index.html` и `.nojekyll`. Для GitHub Pages используйте `main` → `/ (root)`.
