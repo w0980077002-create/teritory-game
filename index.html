@@ -480,30 +480,6 @@ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=bu
  document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Профиль'||t.startsWith('Профиль'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s59open')){let b=document.createElement('button');b.className='s35btn s59open';b.style.cssText='width:100%;margin-top:8px';b.textContent='⚔️ Навыки персонажа';b.onclick=s59Skills;body.appendChild(b)}},50)},true);
 })();
 </script>
-
-<script id="s62-city-action">
-(()=>{
-const K='territory_s62_city_action';
-const EVENTS=[
- {id:'guard',ico:'🛡️',name:'Дозор у ворот',desc:'Помочь страже отбить налёт.',rep:'guard',coins:55,xp:12},
- {id:'trade',ico:'⚖️',name:'Сделка на рынке',desc:'Помочь торговцам сохранить караван.',rep:'merchants',coins:70,xp:14},
- {id:'port',ico:'⚓',name:'Тревога в порту',desc:'Помочь портовым бойцам.',rep:'port',coins:60,xp:13}
-];
-function day(){let d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
-function load(){try{let x=JSON.parse(localStorage.getItem(K)||'{}');if(x.day!==day())x={day:day(),event:EVENTS[Math.floor(Math.random()*EVENTS.length)].id,done:false};return x}catch(e){return {day:day(),event:'guard',done:false}}}
-function save(x){localStorage.setItem(K,JSON.stringify(x))}
-function P(){try{return JSON.parse(localStorage.getItem('territory_save')||'{}')}catch(e){return {}}}
-function SP(p){localStorage.setItem('territory_save',JSON.stringify(p));try{if(typeof render==='function')render()}catch(e){}}
-function repKey(k){return 'territory_s57_rep_'+k}
-function open(){let x=load(),e=EVENTS.find(v=>v.id===x.event)||EVENTS[0],p=P();let h='<div class="s62hero"><b>'+e.ico+' '+e.name+'</b><small>'+e.desc+'</small></div><div class="s62stats"><span>🪙 Награда <b>+'+e.coins+'</b></span><span>⭐ XP <b>+'+e.xp+'</b></span><span>🤝 Репутация <b>+'+8+'</b></span></div><button class="s62go" '+(x.done?'disabled':'')+' onclick="s62Do()">'+(x.done?'✓ Выполнено сегодня':'⚔️ Вмешаться')+'</button><small class="s62hint">Ежедневное событие · HP '+(p.hp||0)+' · ⚡ '+(p.energy||0)+'</small>';if(typeof window.panel==='function')window.panel('🌆 Событие города',h);else alert(e.name+'\n'+e.desc)}
-window.s62Do=function(){let x=load(),e=EVENTS.find(v=>v.id===x.event)||EVENTS[0],p=P();if(x.done){alert('Событие уже выполнено сегодня');return}if((p.energy||0)<12){alert('Нужно 12 энергии');return}p.energy-=12;p.coins=(p.coins||0)+e.coins;p.xp=(p.xp||0)+e.xp;localStorage.setItem(repKey(e.rep),String((+localStorage.getItem(repKey(e.rep))||0)+8));x.done=true;save(x);SP(p);alert(e.ico+' '+e.name+' завершено! +'+e.coins+' монет, +'+e.xp+' XP, +8 репутации');s62Open()}
-function s62Open(){open()}
-function mount(){if(document.getElementById('s62City'))return;let game=document.getElementById('game');if(!game)return;let b=document.createElement('button');b.id='s62City';b.type='button';b.innerHTML='<span>🌆 Событие города</span><small id="s62Mini">Открыть активность</small>';b.onclick=open;game.appendChild(b)}
-function refresh(){let x=load(),e=EVENTS.find(v=>v.id===x.event)||EVENTS[0],m=document.getElementById('s62Mini');if(m)m.textContent=x.done?'✓ Выполнено · '+e.name:e.ico+' '+e.name}
-const css=document.createElement('style');css.textContent='#s62City{position:absolute;z-index:9;left:16px;top:164px;width:148px;height:42px;border:1px solid rgba(47,181,235,.78);border-radius:11px;background:rgba(4,24,38,.52);color:#fff;text-align:left;padding:6px 9px;text-shadow:0 1px 2px #000}#s62City span{display:block;font-size:10px;font-weight:900}#s62City small{display:block;font-size:7px;opacity:.72;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.s62hero{background:linear-gradient(135deg,#182f38,#241d13);border:1px solid #82632e;border-radius:11px;padding:10px;margin:5px 0}.s62hero b{display:block;font-size:14px}.s62hero small{display:block;font-size:8px;opacity:.7;margin-top:3px}.s62stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:7px 0}.s62stats span{background:#10242e;border:1px solid #31515e;border-radius:8px;padding:7px 3px;text-align:center;font-size:7px}.s62stats b{display:block;font-size:10px;margin-top:3px}.s62go{width:100%;height:38px;border:1px solid #37b8ef;border-radius:9px;background:rgba(13,74,103,.78);font-weight:900;font-size:10px}.s62go:disabled{opacity:.45}.s62hint{display:block;font-size:7px;opacity:.6;margin-top:6px}';document.head.appendChild(css);mount();refresh();setInterval(refresh,1500);
-})();
-</script>
-
 </body>
 
 <script id="s51-guild-base">
