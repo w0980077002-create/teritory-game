@@ -122,8 +122,8 @@
           state.data=await load(pid);render();detail(x);
         }catch(e){alert(e.message)}
       };
-      const sell=el.querySelector("#s98-sell");
-      if(sell)sell.onclick=async()=>{
+      const sellBtn=el.querySelector("#s98-sell");
+      if(sellBtn)sellBtn.onclick=async()=>{
         try{await api("/api/market/sell",{method:"POST",body:JSON.stringify({playerId:pid,itemId:x.id,quantity:1})});
           state.data=await load(pid);state.selected=null;render();
         }catch(e){alert(e.message)}
