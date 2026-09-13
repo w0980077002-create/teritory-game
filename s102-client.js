@@ -78,3 +78,65 @@ function addNav(){const n=document.getElementById('s102nav');if(!n)return;if(!n.
 function boot(){addNav();setTimeout(addNav,300);setTimeout(addNav,1000)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+/* Territory S106 — живой игровой мир Sdolars поверх существующей игры */
+(()=>{'use strict';
+const WORLD_CSS=`
+#s106-world{position:fixed;inset:0;z-index:1000;background:#080909;color:#eee;overflow:hidden;font-family:Arial,sans-serif;touch-action:none}
+#s106-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.s106-hud{position:absolute;top:10px;left:10px;right:10px;display:flex;align-items:center;gap:8px;pointer-events:none;z-index:3}
+.s106-brand{padding:7px 11px;border:1px solid #6e542e;border-radius:12px;background:rgba(12,12,12,.86);box-shadow:0 5px 18px #0009;font-family:Georgia,serif;font-weight:700;letter-spacing:1px}
+.s106-stats{flex:1;display:flex;gap:6px;justify-content:flex-end}.s106-pill{padding:7px 9px;border:1px solid #403a31;border-radius:11px;background:rgba(15,15,15,.86);font-size:11px;font-weight:700}.s106-hp{color:#e6a08c}.s106-coin{color:#e0bc72}
+.s106-district{position:absolute;top:62px;left:50%;transform:translateX(-50%);padding:6px 12px;border:1px solid #6b512c;border-radius:999px;background:rgba(12,12,12,.72);font:700 11px Georgia,serif;letter-spacing:2px;z-index:3;white-space:nowrap}
+.s106-actions{position:absolute;right:10px;bottom:108px;display:flex;flex-direction:column;gap:7px;z-index:4}.s106-action{width:46px;height:46px;border:1px solid #594629;border-radius:50%;background:rgba(18,17,15,.9);color:#e7d4ae;font-size:19px;box-shadow:0 5px 16px #0008}.s106-action:active{transform:scale(.94)}
+.s106-joy{position:absolute;left:15px;bottom:104px;width:104px;height:104px;border:1px solid #594629;border-radius:50%;background:rgba(18,17,15,.42);z-index:4}.s106-stick{position:absolute;left:31px;top:31px;width:42px;height:42px;border-radius:50%;background:#695332;border:1px solid #9b7740;box-shadow:0 4px 14px #0008;transform:translate(0,0)}
+.s106-hint{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);padding:7px 12px;border:1px solid #413a31;border-radius:999px;background:rgba(8,8,8,.7);font-size:10px;color:#bdb5a8;z-index:3;opacity:0;transition:.25s;pointer-events:none}.s106-hint.show{opacity:1}
+.s106-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(88%,360px);padding:16px;border:1px solid #73572f;border-radius:17px;background:rgba(16,15,14,.96);box-shadow:0 20px 60px #000;z-index:10}.s106-card h3{margin:0 0 6px;font:700 20px Georgia,serif}.s106-card p{margin:5px 0;color:#aaa;font-size:12px;line-height:1.45}.s106-card button{width:100%;margin-top:9px;padding:11px;border:1px solid #76572e;border-radius:11px;background:#241b10;color:#f1d39b;font-weight:800}.s106-close{position:absolute!important;right:9px;top:9px;width:34px!important;height:34px;padding:0!important;margin:0!important;background:#1a1816!important;color:#ddd!important}
+.s106-fade{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,transparent 0 32%,rgba(0,0,0,.1) 58%,rgba(0,0,0,.55) 100%);pointer-events:none;z-index:2}
+@media(max-width:380px){.s106-brand{font-size:12px}.s106-pill{font-size:10px;padding:6px 7px}.s106-joy{bottom:100px}.s106-actions{bottom:103px}}
+`;
+function addStyle(){if(document.getElementById('s106css'))return;const s=document.createElement('style');s.id='s106css';s.textContent=WORLD_CSS;document.head.appendChild(s)}
+function esc106(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+let root,canvas,ctx,w,h,raf,world={x:0,y:0,dirX:0,dirY:0,district:'ЦЕНТР СДОЛАРС',name:'Игрок',hp:120,maxHp:120,coins:0,level:1};
+const zones=[
+ {id:'market',name:'Рыночная площадь',x:.18,y:.27,w:.25,h:.20,icon:'🏪',desc:'Торговцы снаряжением и обмен монет.',action:'market'},
+ {id:'arena',name:'Боевая арена',x:.58,y:.22,w:.25,h:.22,icon:'⚔️',desc:'Здесь решают споры кулаками и сталью.',action:'arena'},
+ {id:'guild',name:'Гильдейский двор',x:.12,y:.58,w:.28,h:.22,icon:'⚜️',desc:'Гильдии, приглашения и управление составом.',action:'guild'},
+ {id:'people',name:'Площадь людей',x:.59,y:.59,w:.28,h:.22,icon:'👥',desc:'Жители и бойцы Сдоларса.',action:'people'}
+];
+const npcs=[{x:.48,y:.44,name:'Кузнец',icon:'🧔'},{x:.72,y:.48,name:'Стражник',icon:'🛡️'},{x:.31,y:.70,name:'Торговец',icon:'🧑‍🌾'}];
+function resize(){const d=devicePixelRatio||1;w=innerWidth;h=innerHeight;canvas.width=w*d;canvas.height=h*d;ctx.setTransform(d,0,0,d,0,0)}
+function roundRect(c,x,y,ww,hh,r){c.beginPath();c.roundRect(x,y,ww,hh,r);c.fill()}
+function drawBuilding(z){const x=z.x*w,y=z.y*h,ww=z.w*w,hh=z.h*h;ctx.fillStyle='#171614';roundRect(ctx,x,y,ww,hh,10);ctx.strokeStyle='#5c492d';ctx.lineWidth=1;ctx.stroke();ctx.fillStyle='#28231c';ctx.beginPath();ctx.moveTo(x-5,y+8);ctx.lineTo(x+ww/2,y-18);ctx.lineTo(x+ww+5,y+8);ctx.closePath();ctx.fill();ctx.strokeStyle='#4e402b';ctx.stroke();ctx.font=Math.max(18,w*.045)+'px sans-serif';ctx.textAlign='center';ctx.fillStyle='#d6b777';ctx.fillText(z.icon,x+ww/2,y+hh*.55);ctx.font='700 '+Math.max(10,w*.028)+'px Arial';ctx.fillStyle='#d7d0c4';ctx.fillText(z.name,x+ww/2,y+hh*.83)}
+function draw(){ctx.clearRect(0,0,w,h);
+ let g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#151716');g.addColorStop(.48,'#22201b');g.addColorStop(1,'#0b0d0d');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+ // distant skyline
+ ctx.fillStyle='#101212';for(let i=0;i<12;i++){let bw=25+(i%4)*13,bh=70+(i*31)%95,x=i*(w/10)-20;ctx.fillRect(x,115,bw,bh);}
+ // roads
+ ctx.fillStyle='#111212';ctx.beginPath();ctx.moveTo(w*.42,105);ctx.lineTo(w*.58,105);ctx.lineTo(w*.72,h);ctx.lineTo(w*.25,h);ctx.closePath();ctx.fill();ctx.strokeStyle='#37332c';ctx.lineWidth=2;ctx.stroke();
+ ctx.strokeStyle='#5a4a31';ctx.lineWidth=1;ctx.setLineDash([10,12]);ctx.beginPath();ctx.moveTo(w*.5,120);ctx.lineTo(w*.49,h);ctx.stroke();ctx.setLineDash([]);
+ zones.forEach(drawBuilding);
+ // trees
+ for(let i=0;i<10;i++){let tx=(i*83+27)%w,ty=190+(i*71)%(Math.max(150,h-300));ctx.fillStyle='#30271c';ctx.fillRect(tx-2,ty,4,17);ctx.fillStyle='#1e3026';ctx.beginPath();ctx.arc(tx,ty,13,0,Math.PI*2);ctx.fill()}
+ // NPCs
+ npcs.forEach((n,i)=>{let x=n.x*w,y=n.y*h+Math.sin(performance.now()/500+i)*2;ctx.font='25px sans-serif';ctx.textAlign='center';ctx.fillText(n.icon,x,y);ctx.font='10px Arial';ctx.fillStyle='#aaa298';ctx.fillText(n.name,x,y+15)});
+ // player shadow + character
+ const px=w*.5+world.x,py=h*.48+world.y;ctx.fillStyle='#0008';ctx.beginPath();ctx.ellipse(px,py+19,17,6,0,0,Math.PI*2);ctx.fill();ctx.font='37px sans-serif';ctx.textAlign='center';ctx.fillText('🧍',px,py+12);ctx.font='700 10px Arial';ctx.fillStyle='#e0c487';ctx.fillText(world.name,px,py+29);
+ // subtle movement particles
+ for(let i=0;i<6;i++){let a=performance.now()/1200+i;let sx=px+Math.cos(a*1.7+i)*18,sy=py+Math.sin(a*1.3+i)*10;ctx.fillStyle='#a47c3c55';ctx.fillRect(sx,sy,2,2)}
+ raf=requestAnimationFrame(draw)}
+function hint(text){const e=document.querySelector('.s106-hint');if(!e)return;e.textContent=text;e.classList.add('show');clearTimeout(hint.t);hint.t=setTimeout(()=>e.classList.remove('show'),2200)}
+function openZone(z){const card=document.createElement('div');card.className='s106-card';card.innerHTML=`<button class="s106-close">×</button><h3>${z.icon} ${esc106(z.name)}</h3><p>${esc106(z.desc)}</p><button class="s106-enter">Войти</button>`;root.appendChild(card);card.querySelector('.s106-close').onclick=()=>card.remove();card.querySelector('.s106-enter').onclick=()=>{card.remove();try{window.TerritoryS102?.open(z.action)}catch(e){alert(e.message)}}}
+function pointer(x,y){for(const z of zones){if(x>=z.x*w&&x<=((z.x+z.w)*w)&&y>=z.y*h&&y<=((z.y+z.h)*h))return z}return null}
+function move(dx,dy){world.x=Math.max(-w*.18,Math.min(w*.18,world.x+dx));world.y=Math.max(-h*.12,Math.min(h*.12,world.y+dy));}
+function setupTouch(){let dragging=false,startX=0,startY=0;const joy=root.querySelector('.s106-joy'),stick=root.querySelector('.s106-stick');joy.addEventListener('pointerdown',e=>{dragging=true;joy.setPointerCapture(e.pointerId);startX=e.clientX;startY=e.clientY});joy.addEventListener('pointermove',e=>{if(!dragging)return;let dx=e.clientX-startX,dy=e.clientY-startY,len=Math.hypot(dx,dy)||1,max=31;if(len>max){dx=dx/len*max;dy=dy/len*max}stick.style.transform=`translate(${dx}px,${dy}px)`;move(dx*.10,dy*.10)});joy.addEventListener('pointerup',()=>{dragging=false;stick.style.transform='translate(0,0)'});joy.addEventListener('pointercancel',()=>{dragging=false;stick.style.transform='translate(0,0)'});
+ canvas.addEventListener('pointerup',e=>{const z=pointer(e.clientX,e.clientY);if(z)openZone(z);else {world.x=(e.clientX-w/2)*.08;world.y=(e.clientY-h*.48)*.06;hint('Ты переместился по Сдоларсу')}});
+ root.querySelector('[data-w="city"]').onclick=()=>{try{window.TerritoryS102?.open('city')}catch(e){}};
+ root.querySelector('[data-w="char"]').onclick=()=>{try{window.TerritoryS102?.open('char')}catch(e){}};
+ root.querySelector('[data-w="quest"]').onclick=()=>{try{window.TerritoryS102?.open('quests')}catch(e){}};
+}
+async function loadStats(){try{const d=await fetch('/api/character?id='+encodeURIComponent(window.TerritoryS102?.playerId?.()||localStorage.getItem('territory_player_id')||''));const j=await d.json();const s=j.stats;if(s){world.hp=s.hp??s.maxHp??120;world.maxHp=s.maxHp??120;world.coins=s.coins??0;world.level=s.level??1;world.name=(window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name)||'Игрок';const hp=document.querySelector('[data-hud="hp"]');if(hp)hp.textContent=`❤️ ${world.hp}/${world.maxHp}`;const coin=document.querySelector('[data-hud="coin"]');if(coin)coin.textContent=`🪙 ${world.coins}`;const lev=document.querySelector('[data-hud="lvl"]');if(lev)lev.textContent=`УР ${world.level}`}}catch(e){}}
+function build(){if(document.getElementById('s106-world'))return;addStyle();root=document.createElement('div');root.id='s106-world';root.innerHTML=`<canvas id="s106-canvas"></canvas><div class="s106-fade"></div><div class="s106-hud"><div class="s106-brand">TERRITORY</div><div class="s106-stats"><span class="s106-pill s106-hp" data-hud="hp">❤️ —</span><span class="s106-pill s106-coin" data-hud="coin">🪙 —</span><span class="s106-pill" data-hud="lvl">УР —</span></div></div><div class="s106-district">⚑ ${world.district}</div><div class="s106-actions"><button class="s106-action" data-w="char">🧍</button><button class="s106-action" data-w="quest">📜</button><button class="s106-action" data-w="city">🗺️</button></div><div class="s106-joy"><div class="s106-stick"></div></div><div class="s106-hint">Сдоларс живёт своей жизнью</div>`;document.body.appendChild(root);canvas=root.querySelector('#s106-canvas');ctx=canvas.getContext('2d');resize();addEventListener('resize',resize);setupTouch();loadStats();draw()}
+function init(){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build,{once:true});else build()}
+// delay lets the existing S102/S103 modules create their API facade first
+setTimeout(init,120);
+})();
