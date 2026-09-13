@@ -1185,4 +1185,58 @@ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=bu
   new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});
 })();
 </script>
+
+<!-- S66 GUILD ABSOLUTE FIX V4 -->
+<style id="s66-v4-style">
+#bottom{z-index:9999!important}
+#bottom .guildBtnS66{pointer-events:auto!important;touch-action:manipulation!important;position:relative;z-index:10000!important}
+</style>
+<script id="s66-v4-fix">
+(function(){
+  'use strict';
+  function launch(ev){
+    if(ev){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();}
+    if(typeof window.s66Guild==='function') window.s66Guild();
+    return false;
+  }
+  function killLegacySheet(){
+    var bodies=[document.getElementById('s35Body'),document.getElementById('sheetBody')];
+    var title=document.getElementById('s35Title');
+    var text=((title&&title.textContent)||'')+' '+bodies.map(function(x){return x?x.textContent:''}).join(' ');
+    if(/Гильдия/.test(text) && /Внести вклад/.test(text)){
+      var m=document.getElementById('s35')||document.getElementById('sheet');
+      if(m && m.style.display!=='none') m.style.display='none';
+      if(typeof window.s66Guild==='function') window.s66Guild();
+    }
+  }
+  function hardWire(){
+    document.querySelectorAll('#bottom .bottomBtn').forEach(function(el){
+      var t=(el.textContent||'').replace(/\s+/g,' ').trim();
+      if(t==='Гильдия' || t.indexOf('Гильдия')===0){
+        el.classList.add('guildBtnS66');
+        el.removeAttribute('onclick');
+        el.onclick=launch;
+        el.addEventListener('pointerdown',launch,true);
+        el.addEventListener('touchstart',launch,{capture:true,passive:false});
+      }
+    });
+  }
+  function start(){
+    hardWire();
+    killLegacySheet();
+    setTimeout(hardWire,50); setTimeout(hardWire,300); setTimeout(killLegacySheet,100);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
+  new MutationObserver(function(){hardWire();killLegacySheet();}).observe(document.documentElement,{subtree:true,childList:true});
+  document.addEventListener('pointerup',function(e){
+    var el=e.target.closest && e.target.closest('#bottom .guildBtnS66');
+    if(el) launch(e);
+  },true);
+  document.addEventListener('click',function(e){
+    var el=e.target.closest && e.target.closest('#bottom .guildBtnS66');
+    if(el) launch(e);
+  },true);
+  window.__S66_BUILD__='S66-GUILD-ABSOLUTE-FIX-V4';
+})();
+</script>
 </html>
