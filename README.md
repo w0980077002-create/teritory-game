@@ -1,2 +1,1 @@
-# Territory S44 REAL
-Global city systems: daily city contracts, reputation, daily event, rewards and integration with arena/district activity. GitHub-only static build.
+Territory S45 REAL — живой мир Sdolars: фракции, контракты, отношения NPC, события мира и динамические цены.
