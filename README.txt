@@ -1,12 +1,13 @@
-Territory S103 clean audit build
+Territory S103 — index integration fix
 
-Changes prepared locally:
-- Removed the three S72/S73/S74 button creation blocks from index.html via patches/remove-s72-s73-s74.js.
-- Fixed the S98 backpack syntax error caused by redeclaring `sell`.
-- Fixed S102 PvP client so a challenge is not auto-accepted as the target player; incoming challenges are shown and can be accepted by the actual recipient.
-- S102 server/client pass node --check.
+This package is based on the current S102 integrated runtime.
+
+Changes:
+1. Fixed duplicate loadIncoming() declaration in s102-client.js.
+2. Added runtime cleanup of legacy S72/S73/S74 buttons and their legacy UI nodes.
+3. The cleanup runs during boot, so the existing index.html can remain untouched while the current server injects s102-client.js.
+4. Tactical PvP remains 4 zones: Head / Chest / Belt / Legs, with 1 attack + 2 defense zones.
 
 IMPORTANT:
-The GitHub integration currently rejects write operations with HTTP 403, so the live GitHub index.html was NOT modified by this session. The patch script must be run against the exact current index.html before committing it. No claim of a GitHub upload is made.
-
-Runtime package uses s102-integrated.js as main. ws is required for runtime; container could not install it, so runtime WebSocket execution was not claimed as tested. Syntax checks were run.
+The GitHub connector rejected the attempted write to main with HTTP 403, so this package is ready to upload but has NOT been falsely claimed as committed to GitHub.
+The existing GitHub index.html was not overwritten.
