@@ -942,4 +942,62 @@ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=bu
 })();
 </script>
 
+
+<style id="s63-global-style">
+.s63grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.s63card{background:rgba(5,15,28,.78);border:1px solid rgba(40,190,255,.5);border-radius:14px;padding:10px;margin:7px 0}.s63card b{display:block}.s63small{font-size:12px;color:#a9c8dc}.s63btn{border:1px solid #27bfff;background:rgba(7,27,45,.9);color:#fff;border-radius:10px;padding:9px 10px;font-weight:700}.s63btn:disabled{opacity:.45}.s63bar{height:7px;background:#10283b;border-radius:8px;overflow:hidden;margin-top:5px}.s63bar i{display:block;height:100%;background:#23bdf5}.s63tag{float:right;font-size:11px;color:#ffd45a}.s63loot{color:#dff7ff}.s63danger{color:#ff9b9b}.s63good{color:#9ff0b0}.s63two{display:flex;gap:7px}.s63two>*{flex:1}.s63marketrow{display:flex;align-items:center;justify-content:space-between;gap:8px}.s63marketrow span{min-width:0}.s63marketrow small{display:block;color:#9db8c9}
+</style>
+
+
+<script id="s63-global-core">
+(()=>{
+ const SKEY='territory_s63_progress';
+ const DEF={districtWins:{},districtRuns:{},contracts:{},mastery:0,totalSold:0};
+ const read=()=>{try{return {...DEF,...JSON.parse(localStorage.getItem(SKEY)||'{}')}}catch(e){return {...DEF}}};
+ const write=x=>localStorage.setItem(SKEY,JSON.stringify(x));
+ const player=()=>typeof state!=='undefined'?state:null;
+ const inv=()=>{try{return JSON.parse(localStorage.getItem('territory_s34_inventory')||'[]')}catch(e){return[]}};
+ const save=()=>{try{saveState()}catch(e){}};
+ const D={
+  'Центральный':{i:'🏛️',need:1,threat:1,cost:10,reward:45,xp:15,enemy:0,loot:'Знак патруля',desc:'Городской центр. Безопасная точка для начала карьеры.'},
+  'Таверны':{i:'🍺',need:2,threat:2,cost:12,reward:55,xp:18,enemy:1,loot:'Карта слухов',desc:'Наёмники, слухи и быстрые контракты.'},
+  'Торговый квартал':{i:'⚖️',need:3,threat:2,cost:14,reward:65,xp:22,enemy:2,loot:'Редкий товар',desc:'Торговцы готовы платить за редкую добычу.'},
+  'Старый порт':{i:'⚓',need:4,threat:3,cost:16,reward:78,xp:26,enemy:4,loot:'Деталь корабля',desc:'Опасные доки и контрабандные грузы.'},
+  'Промзона':{i:'⚙️',need:5,threat:4,cost:18,reward:92,xp:31,enemy:5,loot:'Механическая деталь',desc:'Заброшенные цеха, охрана и ценные детали.'},
+  'Крепость':{i:'🏰',need:6,threat:5,cost:22,reward:115,xp:38,enemy:7,loot:'Жетон стражи',desc:'Самая опасная зона Sdolars. Здесь начинаются серьёзные бои.'}
+ };
+ const enemies=[
+  {name:'Уличный боец',hp:95,damage:12,armor:1,crit:.08,ico:'🥊'},
+  {name:'Наёмник Sdolars',hp:120,damage:15,armor:2,crit:.10,ico:'🔪'},
+  {name:'Гвардеец замка',hp:145,damage:18,armor:3,crit:.12,ico:'🛡️'},
+  {name:'Капитан стражи',hp:175,damage:21,armor:4,crit:.15,ico:'⚔️'},
+  {name:'Ветеран порта',hp:205,damage:24,armor:5,crit:.17,ico:'⚓'},
+  {name:'Охотник Sdolars',hp:235,damage:27,armor:6,crit:.19,ico:'🏹'},
+  {name:'Элитный страж',hp:270,damage:30,armor:7,crit:.21,ico:'🗡️'},
+  {name:'Босс района',hp:320,damage:34,armor:9,crit:.24,ico:'👹'}
+ ];
+ function visited(){try{return JSON.parse(localStorage.getItem('territory_visited')||'[]')}catch(e){return[]}}
+ function level(){return +(player()?.level||1)}
+ function district(){return localStorage.getItem('territory_district')||'Центральный'}
+ function markRun(d){let z=read();z.districtRuns[d]=(z.districtRuns[d]||0)+1;write(z)}
+ function addLoot(name){let a=inv(),id='s63_'+name.toLowerCase().replace(/[^a-zа-я0-9]+/gi,'_');let x=a.find(q=>q.id===id);if(x)x.o=1;else a.push({id,n:name,t:'loot',d:0,a:0,o:1,e:0});localStorage.setItem('territory_s34_inventory',JSON.stringify(a))}
+ function gainXP(p,xp){let text='',need=(p.level||1)*100;p.xp=(p.xp||0)+xp;while(p.xp>=need){p.xp-=need;p.level=(p.level||1)+1;p.freePoints=(p.freePoints||0)+2;text+=' Уровень '+p.level+'!';need=p.level*100}return text}
+ function contractState(){let z=read();let c=z.contracts||{};if(c.date!==new Date().toISOString().slice(0,10)){c={date:new Date().toISOString().slice(0,10),patrol:0,explore:visited().length,sell:0,claimed:{}};z.contracts=c;write(z)}return c}
+ function claim(key,reward,xp,label){let z=read(),c=contractState();if(c.claimed[key])return alert('Награда уже получена');let p=player();p.coins=(p.coins||0)+reward;let up=gainXP(p,xp);c.claimed[key]=1;z.contracts=c;write(z);save();alert('🎁 '+label+': +'+reward+' 🟡 · +'+xp+' XP.'+(up?' '+up:''));s63Quests()}
+ window.s63Districts=function(){let p=player()||{},cur=district(),v=visited(),h='<div class="s63card"><b>🗺️ Прогресс города</b><span class="s63small">Уровень '+(p.level||1)+' · исследовано '+v.length+'/6</span></div>';Object.entries(D).forEach(([n,x])=>{let unlocked=(p.level||1)>=x.need||v.includes(n),selected=n===cur,pr=read().districtRuns[n]||0;h+=`<div class="s63card"><b>${x.i} ${n}<span class="s63tag">Опасность ${x.threat}/5</span></b><span class="s63small">${x.desc}</span><div class="s63small">Требуется ур. ${x.need} · активности ${pr}</div><div class="s63two" style="margin-top:7px"><button class="s63btn" ${unlocked?'':'disabled'} onclick="s63Travel('${n}')">${selected?'📍 Здесь':'Перейти'}</button><button class="s63btn" ${unlocked?'':'disabled'} onclick="s63DistrictRun('${n}')">⚔️ Активность</button></div></div>`});panel('🗺️ Районы Sdolars · S63',h)};
+ window.s63Travel=function(n){let p=player();if(!D[n]||!p)return;if((p.level||1)<D[n].need&&!visited().includes(n)){alert('🔒 Район откроется на '+D[n].need+' уровне.');return}localStorage.setItem('territory_district',n);let v=visited();if(!v.includes(n))v.push(n);localStorage.setItem('territory_visited',JSON.stringify(v));let z=read();z.contracts=contractState();z.contracts.explore=v.length;write(z);s63Districts()};
+ window.s63DistrictRun=function(n){let p=player(),x=D[n];if(!p||!x)return;if((p.level||1)<x.need&&!visited().includes(n))return alert('Район ещё закрыт');if((p.energy||0)<x.cost)return alert('Недостаточно энергии');p.energy-=x.cost;let r=Math.random(),coins=x.reward,xp=x.xp,msg='Успешная вылазка';if(r<.14){coins=Math.floor(coins*.4);xp=Math.floor(xp*.5);msg='Неудача: пришлось отступить'}else if(r>.87){coins=Math.floor(coins*1.8);xp=Math.floor(xp*1.5);msg='💎 Редкая находка!'}p.coins=(p.coins||0)+coins;let up=gainXP(p,xp);markRun(n);let loot='';if(r>.68){loot=x.loot;addLoot(loot)}let z=read();z.contracts=contractState();z.contracts.explore=Math.max(z.contracts.explore||0,visited().length);write(z);save();alert(x.i+' '+n+': '+msg+'. +'+coins+' 🟡 · +'+xp+' XP'+(loot?' · 🎁 '+loot:'')+(up?' · '+up:''));s63Districts()};
+ window.s63DistrictBattle=function(n){let p=player(),x=D[n];if(!p||!x)return;if((p.level||1)<x.need){alert('🔒 Требуется уровень '+x.need);return}localStorage.setItem('territory_district',n);if(typeof openBattle==='function'){openBattle();if(typeof battle!=='undefined'&&battle){let e={...enemies[x.enemy]};battle.enemy={...e,hp:e.hp,maxHp:e.hp,tier:x.enemy};if(typeof renderBattle==='function')renderBattle()}}};
+ window.s63Quests=function(){let p=player()||{},c=contractState(),z=read(),w=+p.questWins||0,v=visited().length;let h='<div class="s63card"><b>📅 Контракты дня</b><span class="s63small">Обновляются один раз в день.</span></div>';const row=(key,title,desc,prog,max,reward,xp)=>{let done=prog>=max,claimed=!!c.claimed[key];return `<div class="s63card"><b>${title}</b><span class="s63small">${desc}</span><div class="s63bar"><i style="width:${Math.min(100,prog/max*100)}%"></i></div><span class="s63small">${Math.min(prog,max)}/${max} · +${reward} 🟡 +${xp} XP</span><button class="s63btn" style="width:100%;margin-top:7px" ${done&&!claimed?'':'disabled'} onclick="s63Claim('${key}',${reward},${xp},'${title.replace(/'/g,'')}')">${claimed?'Получено':done?'Забрать':'В процессе'}</button></div>`};h+=row('patrol','⚔️ Охота на бойцов','Победи противников на арене',w,5,220,55);h+=row('explorer','🗺️ Картограф Sdolars','Исследуй районы города',v,6,300,80);h+=row('sell','🪙 Торговец добычей','Продай 3 трофея в рынке',c.sell||0,3,150,35);panel('📜 Квесты · S63',h)};
+ window.s63Claim=(k,r,x,l)=>claim(k,r,x,l);
+ window.s63Economy=function(){let p=player()||{},a=inv().filter(x=>x.o),loot=a.filter(x=>x.t==='loot'),h='<div class="s63card"><b>🪙 Казна</b><span class="s63small">Монеты: '+(p.coins||0)+'</span></div>';if(!loot.length)h+='<div class="s63card">В рюкзаке нет трофеев для продажи.</div>';else loot.forEach(x=>{let price=25+(x.n.length%7)*8;h+=`<div class="s63card s63marketrow"><span><b>🎁 ${x.n}</b><small>Трофей района · цена ${price} 🟡</small></span><button class="s63btn" onclick="s63Sell('${x.id}',${price})">Продать</button></div>`});h+='<div class="s63card"><b>🛒 Улучшенное снаряжение</b><span class="s63small">Покупки добавляются прямо в рюкзак.</span></div>';[["s63_iron","Меч стражника","weapon",32,900],["s63_veteran","Доспех ветерана","armor",18,850]].forEach(q=>{let has=a.find(x=>x.id===q[0]);h+=`<div class="s63card s63marketrow"><span><b>${q[1]}</b><small>${q[2]==='weapon'?'⚔️ +'+q[3]+' урона':'🛡️ +'+q[3]+' защиты'} · ${q[4]} 🟡</small></span><button class="s63btn" ${has?'disabled':''} onclick="s63BuyGear('${q[0]}','${q[1]}','${q[2]}',${q[3]},${q[4]})">${has?'Есть':'Купить'}</button></div>`});panel('🪙 Экономика Sdolars · S63',h)};
+ window.s63Sell=function(id,price){let a=inv(),x=a.find(q=>q.id===id&&q.o&&q.t==='loot'),p=player();if(!x||!p)return;x.o=0;localStorage.setItem('territory_s34_inventory',JSON.stringify(a));p.coins=(p.coins||0)+price;let z=read();z.totalSold=(z.totalSold||0)+1;z.contracts=contractState();z.contracts.sell=(z.contracts.sell||0)+1;write(z);save();s63Economy()};
+ window.s63BuyGear=function(id,n,t,val,price){let p=player(),a=inv();if(!p||p.coins<price)return alert('Недостаточно монет');if(a.some(x=>x.id===id&&x.o))return;p.coins-=price;a.push({id,n,t,d:t==='weapon'?val:0,a:t==='armor'?val:0,o:1,e:0});localStorage.setItem('territory_s34_inventory',JSON.stringify(a));save();alert('Куплено: '+n+' и добавлено в рюкзак.');s63Economy()};
+ window.s63Progress=function(){let p=player()||{},z=read(),v=visited();let mastery=Math.max(z.mastery||0,+JSON.parse(localStorage.getItem('territory_s62_combat')||'{}').wins||0);panel('📈 Прогресс героя · S63',`<div class="s63card"><b>Воин Sdolars</b><span class="s63small">Уровень ${p.level||1} · ${p.xp||0}/${(p.level||1)*100} XP</span><div class="s63bar"><i style="width:${Math.min(100,(p.xp||0)/((p.level||1)*100)*100)}%"></i></div></div><div class="s63grid"><div class="s63card"><b>💪 ${p.strength||5}</b><span class="s63small">Сила</span></div><div class="s63card"><b>🏃 ${p.agility||5}</b><span class="s63small">Ловкость</span></div><div class="s63card"><b>🏆 ${mastery}</b><span class="s63small">Мастерство</span></div><div class="s63card"><b>🗺️ ${v.length}/6</b><span class="s63small">Районы</span></div></div><div class="s63card"><b>🎯 Следующая цель</b><span class="s63small">Открывай районы уровнем выше, собирай трофеи и усиливай экипировку.</span></div>`)};
+ // Keep existing buttons, but route them to the new S63 modules.
+ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Районы'||t.includes('Районы')){e.preventDefault();e.stopImmediatePropagation();s63Districts();return}if(t==='Квесты'||t.includes('Квесты')){e.preventDefault();e.stopImmediatePropagation();s63Quests();return}if(t==='Рынок'||t.includes('Рынок')){e.preventDefault();e.stopImmediatePropagation();s63Economy();return}if(t==='Профиль'||t.startsWith('Профиль')){e.preventDefault();e.stopImmediatePropagation();s63Progress();return}},true);
+ // Extend the S62 battle victory counter so daily patrol contracts advance with wins.
+ const oldWin=window.winBattle; if(typeof oldWin==='function'){window.winBattle=function(){oldWin();try{let z=read();z.contracts=contractState();z.contracts.patrol=Math.min(5,(z.contracts.patrol||0)+1);write(z)}catch(e){}}}
+})();
+</script>
+
 </html>
