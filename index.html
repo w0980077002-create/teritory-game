@@ -450,6 +450,36 @@ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=bu
 })();
 </script>
 
+
+<script id="s59-skills">
+(()=>{
+ const K='territory_s59_skills';
+ const DEF={points:0,chosen:'balanced',levels:{power:0,guard:0,precision:0,runner:0,commander:0}};
+ const SK=[
+  {id:'power',i:'💪',n:'Сила',d:'+4% урона в тактическом бою',max:5,c:120},
+  {id:'guard',i:'🛡️',n:'Стойкость',d:'-3% входящего урона',max:5,c:140},
+  {id:'precision',i:'🎯',n:'Точность',d:'+3% шанс критического удара',max:5,c:150},
+  {id:'runner',i:'⚡',n:'Выносливость',d:'+5 максимальной энергии',max:5,c:130},
+  {id:'commander',i:'👑',n:'Тактик',d:'+5% силы в PvP, войне и осаде',max:5,c:180}
+ ];
+ function load(){try{return {...DEF,...JSON.parse(localStorage.getItem(K)||'{}'),levels:{...DEF.levels,...(JSON.parse(localStorage.getItem(K)||'{}').levels||{})}}}catch(e){return JSON.parse(JSON.stringify(DEF))}}
+ function save(x){localStorage.setItem(K,JSON.stringify(x))}
+ function P(){try{return JSON.parse(localStorage.getItem('territory_save')||'{}')}catch(e){return {}}}
+ function SP(p){localStorage.setItem('territory_save',JSON.stringify(p));try{if(typeof render==='function')render()}catch(e){}}
+ function panel(t,h){if(typeof window.panel==='function')window.panel(t,h);else alert(t+'\n'+h.replace(/<[^>]+>/g,''))}
+ function total(x){return SK.reduce((a,k)=>a+(x.levels[k.id]||0),0)}
+ window.s59Skills=function(){let x=load(),cards=SK.map(k=>{let l=x.levels[k.id]||0,max=l>=k.max,c=k.c*(l+1);return '<div class="s59skill"><div class="s59ico">'+k.i+'</div><div class="s59info"><b>'+k.n+' · '+l+'/'+k.max+'</b><small>'+k.d+'</small><i><em style="width:'+(l/k.max*100)+'%"></em></i></div><button '+(max?'disabled':'onclick="s59Up(\''+k.id+'\')"')+'>'+(max?'MAX':c+' 🪙')+'</button></div>'}).join('');let h='<div class="s59hero"><b>⚔️ Навыки персонажа</b><small>Развивай специализацию. Навыки действуют в боях и связанных системах.</small></div><div class="s59stats"><span>⭐ Навыков <b>'+total(x)+'</b></span><span>🪙 Улучшение <b>монеты</b></span><span>🎯 Ветка <b>'+x.chosen+'</b></span></div><div class="s59card">'+cards+'</div><div class="s59card"><b>🎖️ Специализация</b><div class="s59spec"><button onclick="s59Spec(\'assault\')">⚔️ Штурмовик</button><button onclick="s59Spec(\'defender\')">🛡️ Защитник</button><button onclick="s59Spec(\'scout\')">🧭 Разведчик</button><button onclick="s59Spec(\'balanced\')">⚖️ Универсал</button></div><small>Текущая ветка: '+x.chosen+'</small></div>';panel('⚔️ Навыки и специализация',h)};
+ window.s59Up=function(id){let x=load(),k=SK.find(z=>z.id===id),p=P();if(!k)return;let l=x.levels[id]||0;if(l>=k.max)return;let c=k.c*(l+1);if((p.coins||0)<c){alert('Нужно '+c+' монет');return}p.coins-=c;x.levels[id]=l+1;SP(p);save(x);alert(k.n+' улучшен до '+x.levels[id]+' уровня');s59Skills()};
+ window.s59Spec=function(v){let x=load();x.chosen=v;save(x);alert('Специализация: '+v);s59Skills()};
+ window.s59Mods=function(){let x=load(),p=P(),l=x.levels;return {damage:1+(l.power||0)*.04,defense:1-(l.guard||0)*.03,crit:(l.precision||0)*.03,maxEnergy:(l.runner||0)*5,pvp:1+(l.commander||0)*.05,spec:x.chosen}};
+ const oldStrike=window.playerStrike;if(oldStrike)window.playerStrike=function(){window.s59Combat=s59Mods();return oldStrike.apply(this,arguments)};
+ const oldWar=window.s48Attack;if(oldWar)window.s48Attack=function(){window.s59War=s59Mods();return oldWar.apply(this,arguments)};
+ const oldSiege=window.s49Attack;if(oldSiege)window.s49Attack=function(){window.s59Siege=s59Mods();return oldSiege.apply(this,arguments)};
+ const oldPvp=window.s47Play;if(oldPvp)window.s47Play=function(){window.s59Pvp=s59Mods();return oldPvp.apply(this,arguments)};
+ const css=document.createElement('style');css.textContent='.s59hero{background:linear-gradient(135deg,#172b35,#241b14);border:1px solid #80622d;border-radius:12px;padding:11px;margin:7px 0}.s59hero b{display:block;font-size:15px}.s59hero small{display:block;opacity:.7;margin-top:4px;font-size:9px}.s59stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:7px 0}.s59stats span{background:#102630;border:1px solid #315361;border-radius:9px;padding:8px 3px;text-align:center;font-size:8px}.s59stats b{display:block;font-size:11px;margin-top:3px}.s59card{background:#101d25;border:1px solid #36515e;border-radius:11px;padding:8px;margin:7px 0}.s59skill{display:grid;grid-template-columns:30px 1fr 62px;gap:7px;align-items:center;background:#13242d;border:1px solid #294955;border-radius:9px;padding:7px;margin:5px 0}.s59ico{text-align:center;font-size:19px}.s59info b{display:block;font-size:10px}.s59info small{display:block;font-size:7px;opacity:.68;margin-top:2px}.s59info i{display:block;height:5px;background:#27363d;border-radius:5px;overflow:hidden;margin-top:5px}.s59info em{display:block;height:100%;background:#b48b36}.s59skill button,.s59spec button{border:1px solid #c99a2e;border-radius:8px;padding:7px 4px;background:#3b2e0d;color:#ffe28a;font-weight:900;font-size:8px}.s59skill button:disabled{opacity:.4}.s59spec{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:7px 0}.s59spec button{font-size:9px;min-height:38px}.s59card>small{font-size:7px;opacity:.65}';document.head.appendChild(css);
+ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Профиль'||t.startsWith('Профиль'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s59open')){let b=document.createElement('button');b.className='s35btn s59open';b.style.cssText='width:100%;margin-top:8px';b.textContent='⚔️ Навыки персонажа';b.onclick=s59Skills;body.appendChild(b)}},50)},true);
+})();
+</script>
 </body>
 
 <script id="s51-guild-base">
@@ -574,6 +604,36 @@ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=bu
 })();
 </script>
 
+
+<script id="s59-skills">
+(()=>{
+ const K='territory_s59_skills';
+ const DEF={points:0,chosen:'balanced',levels:{power:0,guard:0,precision:0,runner:0,commander:0}};
+ const SK=[
+  {id:'power',i:'💪',n:'Сила',d:'+4% урона в тактическом бою',max:5,c:120},
+  {id:'guard',i:'🛡️',n:'Стойкость',d:'-3% входящего урона',max:5,c:140},
+  {id:'precision',i:'🎯',n:'Точность',d:'+3% шанс критического удара',max:5,c:150},
+  {id:'runner',i:'⚡',n:'Выносливость',d:'+5 максимальной энергии',max:5,c:130},
+  {id:'commander',i:'👑',n:'Тактик',d:'+5% силы в PvP, войне и осаде',max:5,c:180}
+ ];
+ function load(){try{return {...DEF,...JSON.parse(localStorage.getItem(K)||'{}'),levels:{...DEF.levels,...(JSON.parse(localStorage.getItem(K)||'{}').levels||{})}}}catch(e){return JSON.parse(JSON.stringify(DEF))}}
+ function save(x){localStorage.setItem(K,JSON.stringify(x))}
+ function P(){try{return JSON.parse(localStorage.getItem('territory_save')||'{}')}catch(e){return {}}}
+ function SP(p){localStorage.setItem('territory_save',JSON.stringify(p));try{if(typeof render==='function')render()}catch(e){}}
+ function panel(t,h){if(typeof window.panel==='function')window.panel(t,h);else alert(t+'\n'+h.replace(/<[^>]+>/g,''))}
+ function total(x){return SK.reduce((a,k)=>a+(x.levels[k.id]||0),0)}
+ window.s59Skills=function(){let x=load(),cards=SK.map(k=>{let l=x.levels[k.id]||0,max=l>=k.max,c=k.c*(l+1);return '<div class="s59skill"><div class="s59ico">'+k.i+'</div><div class="s59info"><b>'+k.n+' · '+l+'/'+k.max+'</b><small>'+k.d+'</small><i><em style="width:'+(l/k.max*100)+'%"></em></i></div><button '+(max?'disabled':'onclick="s59Up(\''+k.id+'\')"')+'>'+(max?'MAX':c+' 🪙')+'</button></div>'}).join('');let h='<div class="s59hero"><b>⚔️ Навыки персонажа</b><small>Развивай специализацию. Навыки действуют в боях и связанных системах.</small></div><div class="s59stats"><span>⭐ Навыков <b>'+total(x)+'</b></span><span>🪙 Улучшение <b>монеты</b></span><span>🎯 Ветка <b>'+x.chosen+'</b></span></div><div class="s59card">'+cards+'</div><div class="s59card"><b>🎖️ Специализация</b><div class="s59spec"><button onclick="s59Spec(\'assault\')">⚔️ Штурмовик</button><button onclick="s59Spec(\'defender\')">🛡️ Защитник</button><button onclick="s59Spec(\'scout\')">🧭 Разведчик</button><button onclick="s59Spec(\'balanced\')">⚖️ Универсал</button></div><small>Текущая ветка: '+x.chosen+'</small></div>';panel('⚔️ Навыки и специализация',h)};
+ window.s59Up=function(id){let x=load(),k=SK.find(z=>z.id===id),p=P();if(!k)return;let l=x.levels[id]||0;if(l>=k.max)return;let c=k.c*(l+1);if((p.coins||0)<c){alert('Нужно '+c+' монет');return}p.coins-=c;x.levels[id]=l+1;SP(p);save(x);alert(k.n+' улучшен до '+x.levels[id]+' уровня');s59Skills()};
+ window.s59Spec=function(v){let x=load();x.chosen=v;save(x);alert('Специализация: '+v);s59Skills()};
+ window.s59Mods=function(){let x=load(),p=P(),l=x.levels;return {damage:1+(l.power||0)*.04,defense:1-(l.guard||0)*.03,crit:(l.precision||0)*.03,maxEnergy:(l.runner||0)*5,pvp:1+(l.commander||0)*.05,spec:x.chosen}};
+ const oldStrike=window.playerStrike;if(oldStrike)window.playerStrike=function(){window.s59Combat=s59Mods();return oldStrike.apply(this,arguments)};
+ const oldWar=window.s48Attack;if(oldWar)window.s48Attack=function(){window.s59War=s59Mods();return oldWar.apply(this,arguments)};
+ const oldSiege=window.s49Attack;if(oldSiege)window.s49Attack=function(){window.s59Siege=s59Mods();return oldSiege.apply(this,arguments)};
+ const oldPvp=window.s47Play;if(oldPvp)window.s47Play=function(){window.s59Pvp=s59Mods();return oldPvp.apply(this,arguments)};
+ const css=document.createElement('style');css.textContent='.s59hero{background:linear-gradient(135deg,#172b35,#241b14);border:1px solid #80622d;border-radius:12px;padding:11px;margin:7px 0}.s59hero b{display:block;font-size:15px}.s59hero small{display:block;opacity:.7;margin-top:4px;font-size:9px}.s59stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:7px 0}.s59stats span{background:#102630;border:1px solid #315361;border-radius:9px;padding:8px 3px;text-align:center;font-size:8px}.s59stats b{display:block;font-size:11px;margin-top:3px}.s59card{background:#101d25;border:1px solid #36515e;border-radius:11px;padding:8px;margin:7px 0}.s59skill{display:grid;grid-template-columns:30px 1fr 62px;gap:7px;align-items:center;background:#13242d;border:1px solid #294955;border-radius:9px;padding:7px;margin:5px 0}.s59ico{text-align:center;font-size:19px}.s59info b{display:block;font-size:10px}.s59info small{display:block;font-size:7px;opacity:.68;margin-top:2px}.s59info i{display:block;height:5px;background:#27363d;border-radius:5px;overflow:hidden;margin-top:5px}.s59info em{display:block;height:100%;background:#b48b36}.s59skill button,.s59spec button{border:1px solid #c99a2e;border-radius:8px;padding:7px 4px;background:#3b2e0d;color:#ffe28a;font-weight:900;font-size:8px}.s59skill button:disabled{opacity:.4}.s59spec{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:7px 0}.s59spec button{font-size:9px;min-height:38px}.s59card>small{font-size:7px;opacity:.65}';document.head.appendChild(css);
+ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Профиль'||t.startsWith('Профиль'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s59open')){let b=document.createElement('button');b.className='s35btn s59open';b.style.cssText='width:100%;margin-top:8px';b.textContent='⚔️ Навыки персонажа';b.onclick=s59Skills;body.appendChild(b)}},50)},true);
+})();
+</script>
 </body>
 
 <script id="s51-guild-base">
@@ -710,6 +770,83 @@ window.s55Hit=function(zone){let x=reset(load()),p=P(),st=stats();if(x.claimed||
 window.s55Claim=function(){let x=reset(load()),p=P();if(x.bossHp>0||x.claimed)return;let g=G(),t=T(),coins=700+(t.quartermaster||0)*35, xp=140+(x.phase*20);p.coins=(p.coins||0)+coins;p.xp=(p.xp||0)+xp;gx(120);x.claimed=true;save(x);SP(p);alert('🏆 Награда рейда: +'+coins+' монет, +'+xp+' XP, +120 опыта гильдии');s55Boss()};
 const css=document.createElement('style');css.textContent='.s55hero{background:linear-gradient(135deg,#321c1c,#171d28);border:1px solid #7b4034;border-radius:12px;padding:11px;margin:7px 0}.s55hero b{display:block;font-size:15px}.s55hero small{display:block;opacity:.7;font-size:9px;margin-top:4px}.s55boss{background:#111923;border:1px solid #6a3430;border-radius:11px;padding:10px;margin:7px 0}.s55bossname{display:flex;justify-content:space-between;font-size:11px}.s55bossname strong{color:#ffb16a}.s55hp{height:11px;background:#2a2528;border-radius:8px;overflow:hidden;margin:9px 0}.s55hp i{display:block;height:100%;background:#b84d45}.s55phase{font-size:8px;opacity:.75}.s55stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:7px 0}.s55stats span{background:#102630;border:1px solid #315361;border-radius:9px;padding:8px 3px;text-align:center;font-size:8px}.s55stats b{display:block;font-size:12px;margin-top:3px}.s55card{background:#101d25;border:1px solid #36515e;border-radius:11px;padding:8px;margin:7px 0}.s55zones{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}.s55zone{border:1px solid #9a6d2a;border-radius:8px;padding:9px 4px;background:#33270f;color:#ffe08a;font-weight:900;font-size:9px}.s55zone:last-child{grid-column:1/3}.s55note{background:#0d202b;border:1px solid #31586a;border-radius:10px;padding:9px;margin:7px 0;font-size:8px}.s55log{padding:5px 0;border-bottom:1px solid #20333c;font-size:8px}.s55reward{width:100%;border:1px solid #d5a52f;border-radius:9px;padding:11px;background:#46330b;color:#ffe89a;font-weight:900;margin-top:7px}.s55open{margin-top:8px!important;width:100%}';document.head.appendChild(css);
 document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Гильдия'||t.startsWith('Гильдия'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s55open')){let b=document.createElement('button');b.className='s35btn s55open';b.textContent='🐉 Гильдейский рейд';b.onclick=s55Boss;body.appendChild(b)}},85)},true);
+})();
+</script>
+
+<script id="s56-character-progression">
+(()=>{
+const K='territory_s56_character';
+const DEF={class:'Универсал',talents:{power:0,guard:0,agility:0,fortune:0},spent:0};
+const CL={
+ 'Штурмовик':{ico:'⚔️',desc:'Максимальный урон и критические удары.',bonus:'Урон +12%'},
+ 'Страж':{ico:'🛡️',desc:'Выживаемость и защита.',bonus:'Получаемый урон -12%'},
+ 'Разведчик':{ico:'🏹',desc:'Ловкость, уклонение и эффективность энергии.',bonus:'Уклонение +10%'},
+ 'Авантюрист':{ico:'💰',desc:'Больше наград и удачи в событиях.',bonus:'Награды +10%'}
+};
+function load(){try{return {...DEF,...JSON.parse(localStorage.getItem(K)||'{}'),talents:{...DEF.talents,...(JSON.parse(localStorage.getItem(K)||'{}').talents||{})}}}catch(e){return JSON.parse(JSON.stringify(DEF))}}
+function save(x){localStorage.setItem(K,JSON.stringify(x))}
+function P(){try{return JSON.parse(localStorage.getItem('territory_save')||'{}')}catch(e){return {}}}
+function SP(p){localStorage.setItem('territory_save',JSON.stringify(p));try{if(typeof render==='function')render()}catch(e){}}
+function inv(){try{return JSON.parse(localStorage.getItem('territory_s34_inventory')||'[]').filter(x=>x.o)}catch(e){return []}}
+function panel(t,h){if(typeof window.panel==='function')window.panel(t,h);else alert(t+'\n'+h.replace(/<[^>]+>/g,''))}
+function powerBonus(x){return 1+(x.talents.power||0)*.04}
+function rewardBonus(x){return 1+(x.talents.fortune||0)*.04}
+window.s56Character=function(){let x=load(),p=P(),a=inv(),w=a.find(i=>i.t==='weapon'&&i.e),ar=a.find(i=>i.t==='armor'&&i.e),points=(p.freePoints||0);let classes=Object.keys(CL).map(c=>{let z=CL[c];return '<button class="s56class '+(x.class===c?'active':'')+'" onclick="s56Class(\''+c+'\')"><b>'+z.ico+' '+c+'</b><small>'+z.desc+'</small><em>'+z.bonus+'</em></button>'}).join('');let ts=[['power','💥 Мощь','+4% урона за уровень'],['guard','🛡️ Стойкость','-3% входящего урона за уровень'],['agility','🏃 Реакция','+3% уклонения за уровень'],['fortune','🍀 Удача','+4% наград за уровень']].map(q=>'<div class="s56tal"><div><b>'+q[1]+' · ур. '+x.talents[q[0]]+'/5</b><small>'+q[2]+'</small></div><button '+(x.talents[q[0]]>=5||points<=0?'disabled':'')+' onclick="s56Talent(\''+q[0]+'\')">+1</button></div>').join('');let h='<div class="s56hero"><b>🧬 Развитие персонажа</b><small>Выбери специализацию и трать свободные очки на боевые таланты.</small></div><div class="s56card"><b>Текущая специализация</b><div class="s56current">'+(CL[x.class]?.ico||'⚔️')+' '+x.class+' <span>'+ (CL[x.class]?.bonus||'')+'</span></div></div><div class="s56card"><b>🎭 Специализации</b><div class="s56classes">'+classes+'</div></div><div class="s56card"><div class="s56title"><b>⭐ Таланты</b><span>Свободно: <strong>'+points+'</strong></span></div>'+ts+'</div><div class="s56card"><b>📊 Итоговые характеристики</b><div class="s56row">⚔️ Оружие <b>'+(w?.n||'Кулаки')+' · +'+(w?.d||5)+'</b></div><div class="s56row">🛡️ Броня <b>'+(ar?.n||'Нет')+' · +'+(ar?.a||0)+'</b></div><div class="s56row">💥 Множитель урона <b>x'+powerBonus(x).toFixed(2)+'</b></div><div class="s56row">🍀 Множитель наград <b>x'+rewardBonus(x).toFixed(2)+'</b></div></div>';panel('🧬 Развитие персонажа',h)};
+window.s56Class=function(c){let x=load();if(!CL[c])return;if(x.class===c)return;if(x.spent>0){if(!confirm('Сменить специализацию? Таланты сохранятся.'))return}x.class=c;save(x);alert('Специализация: '+c);s56Character()};
+window.s56Talent=function(k){let x=load(),p=P();if(!x.talents[k]||x.talents[k]<0)x.talents[k]=0;if((p.freePoints||0)<=0||x.talents[k]>=5)return;p.freePoints--;x.talents[k]++;x.spent++;SP(p);save(x);s56Character()};
+const oldStrike=window.playerStrike;if(oldStrike)window.playerStrike=function(){let x=load();window.s56DamageMult=powerBonus(x);return oldStrike.apply(this,arguments)};
+const oldHit=window.s55Hit;if(oldHit)window.s55Hit=function(zone){let x=load();window.s56BossMult=powerBonus(x);return oldHit.apply(this,arguments)};
+const oldClaim=window.s39Claim;if(oldClaim)window.s39Claim=function(k){let x=load();window.s56RewardMult=rewardBonus(x);return oldClaim.apply(this,arguments)};
+const css=document.createElement('style');css.textContent='.s56hero{background:linear-gradient(135deg,#182c38,#261c15);border:1px solid #86642d;border-radius:12px;padding:11px;margin:7px 0}.s56hero b{display:block;font-size:15px}.s56hero small{display:block;opacity:.7;font-size:9px;margin-top:4px}.s56card{background:#101d25;border:1px solid #36515e;border-radius:11px;padding:9px;margin:7px 0}.s56current{margin-top:7px;background:#182b34;border:1px solid #536e79;border-radius:9px;padding:10px;font-size:13px;font-weight:900}.s56current span{float:right;font-size:8px;color:#f2cf75}.s56classes{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}.s56class{min-height:72px;text-align:left;border:1px solid #35515d;border-radius:9px;background:#13242d;color:#fff;padding:8px}.s56class.active{border-color:#d0a33a;background:#30260f}.s56class b,.s56class small,.s56class em{display:block}.s56class b{font-size:10px}.s56class small{font-size:7px;opacity:.65;margin-top:4px}.s56class em{font-size:7px;color:#e9ca70;margin-top:5px;font-style:normal}.s56title{display:flex;justify-content:space-between}.s56title span{font-size:8px;opacity:.7}.s56tal{display:flex;align-items:center;justify-content:space-between;background:#13242d;border:1px solid #294955;border-radius:8px;padding:8px;margin-top:5px}.s56tal b,.s56tal small{display:block}.s56tal b{font-size:9px}.s56tal small{font-size:7px;opacity:.65;margin-top:2px}.s56tal button{width:34px;height:30px;border-radius:7px;border:1px solid #c99a2e;background:#3b2e0d;color:#ffe28a;font-weight:900}.s56tal button:disabled{opacity:.35}.s56row{display:flex;justify-content:space-between;padding:7px 2px;border-bottom:1px solid #243941;font-size:8px}.s56row:last-child{border-bottom:0}.s56open{margin-top:8px!important;width:100%}';document.head.appendChild(css);
+document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Профиль'||t.startsWith('Профиль'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s56open')){let b=document.createElement('button');b.className='s35btn s56open';b.textContent='🧬 Развитие персонажа';b.onclick=s56Character;body.appendChild(b)}},60)},true);
+})();
+</script>
+
+<script id="s57-npc-factions">
+(()=>{
+const K='territory_s57_social';
+const DEF={day:'',rep:{guard:0,merchants:0,port:0},favor:{}};
+const NPC=[
+ {id:'guard',ico:'🛡️',name:'Капитан Рейд',f:'Стража',desc:'Ценит порядок и защиту города.',bonus:'+5% наград за патруль'},
+ {id:'merchants',ico:'💰',name:'Маркус Вельд',f:'Торговцы',desc:'Ищет надёжных людей для сделок.',bonus:'+5% прибыли от торговли'},
+ {id:'port',ico:'⚓',name:'Ивар Портовый',f:'Порт',desc:'Знает все тайные маршруты Sdolars.',bonus:'+5% наград за экспедиции'},
+ {id:'guard2',ico:'⚔️',name:'Сержант Ворон',f:'Стража',desc:'Проверяет бойцов на прочность.',bonus:'+3% боевой эффективности'},
+ {id:'merchants2',ico:'📦',name:'Лира Складская',f:'Торговцы',desc:'Управляет городскими поставками.',bonus:'+5% к поставкам'},
+ {id:'port2',ico:'🧭',name:'Старый Норд',f:'Порт',desc:'Может вывести к редким ресурсам.',bonus:'+1 шанс редкой добычи'}
+];
+function day(){let d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function load(){let x;try{x={...DEF,...JSON.parse(localStorage.getItem(K)||'{}')}}catch(e){x={...DEF}};x.rep={...DEF.rep,...(x.rep||{})};x.favor={...(x.favor||{})};if(x.day!==day()){x.day=day();x.favor={};localStorage.setItem(K,JSON.stringify(x))}return x}
+function save(x){localStorage.setItem(K,JSON.stringify(x))}
+function P(){try{return JSON.parse(localStorage.getItem('territory_save')||'{}')}catch(e){return {}}}
+function SP(p){localStorage.setItem('territory_save',JSON.stringify(p));try{if(typeof render==='function')render()}catch(e){}}
+function panel(t,h){if(typeof window.panel==='function')window.panel(t,h);else alert(t+'\n'+h.replace(/<[^>]+>/g,''))}
+function level(v){return Math.max(0,Math.floor(v/25))}
+window.s57Social=function(){let x=load(),p=P();let cards=NPC.map(n=>{let r=x.rep[n.id.replace(/2$/,'')]||0,lv=level(r),done=!!x.favor[n.id];return '<div class="s57npc"><div class="s57ico">'+n.ico+'</div><div class="s57ni"><b>'+n.name+'</b><small>'+n.f+' · репутация '+r+' · уровень '+lv+'</small><small>'+n.desc+'</small><em>'+n.bonus+'</em></div><button '+(done?'disabled':'')+' onclick="s57Talk(\''+n.id+'\')">'+(done?'Сегодня ✓':'Поговорить')+'</button></div>'}).join('');let h='<div class="s57hero"><b>🤝 Люди Sdolars</b><small>Отношения с NPC теперь растут от действий и дают реальные бонусы.</small></div><div class="s57stats"><span>🛡️ Стража <b>'+x.rep.guard+'</b></span><span>💰 Торговцы <b>'+x.rep.merchants+'</b></span><span>⚓ Порт <b>'+x.rep.port+'</b></span></div><div class="s57card">'+cards+'</div><div class="s57note">📈 Каждые 25 репутации открывают новый уровень отношений. Ежедневный разговор даёт немного репутации и награду.</div>';panel('🤝 NPC и репутация',h)};
+window.s57Talk=function(id){let x=load(),n=NPC.find(z=>z.id===id),p=P();if(!n||x.favor[id])return;let f=n.id.replace(/2$/,'');let gain=6+Math.floor(Math.random()*7);x.rep[f]=(x.rep[f]||0)+gain;x.favor[id]=true;let coins=25+level(x.rep[f])*5;p.coins=(p.coins||0)+coins;p.xp=(p.xp||0)+5;SP(p);save(x);alert(n.name+' говорит: доверие растёт.\n+'+gain+' репутации · +'+coins+' монет · +5 XP');s57Social()};
+const oldDist=window.districtActivity;if(oldDist)window.districtActivity=function(id){let r=oldDist.apply(this,arguments);try{let x=load(),d=String(id||'').toLowerCase();let f=d.includes('порт')||d.includes('old')?'port':d.includes('торг')||d.includes('trade')?'merchants':'guard';x.rep[f]=(x.rep[f]||0)+2;save(x)}catch(e){}return r};
+const css=document.createElement('style');css.textContent='.s57hero{background:linear-gradient(135deg,#182f38,#251c14);border:1px solid #84642d;border-radius:12px;padding:11px;margin:7px 0}.s57hero b{display:block;font-size:15px}.s57hero small{display:block;opacity:.7;font-size:9px;margin-top:4px}.s57stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:7px 0}.s57stats span{background:#102630;border:1px solid #315361;border-radius:9px;padding:8px 3px;text-align:center;font-size:8px}.s57stats b{display:block;font-size:12px;margin-top:3px}.s57card{background:#101d25;border:1px solid #36515e;border-radius:11px;padding:8px;margin:7px 0}.s57npc{display:grid;grid-template-columns:30px 1fr 62px;gap:7px;align-items:center;background:#13242d;border:1px solid #294955;border-radius:9px;padding:7px;margin:5px 0}.s57ico{text-align:center;font-size:19px}.s57ni b,.s57ni small,.s57ni em{display:block}.s57ni b{font-size:10px}.s57ni small{font-size:7px;opacity:.68;margin-top:2px}.s57ni em{font-size:7px;color:#e8c86c;font-style:normal;margin-top:3px}.s57npc button{border:1px solid #c99a2e;border-radius:8px;padding:7px 3px;background:#3b2e0d;color:#ffe28a;font-weight:900;font-size:8px}.s57npc button:disabled{opacity:.4}.s57note{background:#0d202b;border:1px solid #31586a;border-radius:10px;padding:9px;margin:7px 0;font-size:8px}.s57open{width:100%;margin-top:8px!important}';document.head.appendChild(css);
+document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Город'||t.startsWith('Город')||t==='Профиль'||t.startsWith('Профиль'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s57open')){let b=document.createElement('button');b.className='s35btn s57open';b.textContent='🤝 NPC и репутация';b.onclick=s57Social;body.appendChild(b)}},70)},true);
+})();
+</script>
+
+<script id="s58-city-events">
+(()=>{
+const K='territory_s58_events', D={day:'',event:null,done:false,log:[]};
+const EVENTS=[
+ {id:'smugglers',ico:'⚓',name:'Контрабандисты в порту',desc:'Скрытая партия оружия прибыла ночью.',a:'Сообщить страже',b:'Помочь провести груз',fa:'guard',fb:'port',ca:80,cb:130,xa:12,xb:18},
+ {id:'caravan',ico:'🐎',name:'Караван под угрозой',desc:'Торговцы просят провести караван через опасный район.',a:'Взять охрану',b:'Потребовать долю',fa:'guard',fb:'merchants',ca:110,cb:170,xa:18,xb:14},
+ {id:'riot',ico:'🔥',name:'Беспорядки в квартале',desc:'На улицах вспыхнул конфликт между рабочими и охраной.',a:'Успокоить людей',b:'Поддержать охрану',fa:'merchants',fb:'guard',ca:90,cb:70,xa:16,xb:20}
+];
+function day(){let d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function load(){let x;try{x={...D,...JSON.parse(localStorage.getItem(K)||'{}')}}catch(e){x={...D}};x.log=Array.isArray(x.log)?x.log:[];if(x.day!==day()){x.day=day();x.event=EVENTS[Math.floor(Math.random()*EVENTS.length)];x.done=false;x.log=[];localStorage.setItem(K,JSON.stringify(x))}if(!x.event){x.event=EVENTS[Math.floor(Math.random()*EVENTS.length)];x.day=day();localStorage.setItem(K,JSON.stringify(x))}return x}
+function save(x){localStorage.setItem(K,JSON.stringify(x))}
+function P(){try{return JSON.parse(localStorage.getItem('territory_save')||'{}')}catch(e){return {}}}
+function SP(p){localStorage.setItem('territory_save',JSON.stringify(p));try{if(typeof render==='function')render()}catch(e){}}
+function panel(t,h){if(typeof window.panel==='function')window.panel(t,h);else alert(t+'\\n'+h.replace(/<[^>]+>/g,''))}
+window.s58Event=function(){let x=load(),e=x.event,p=P();let h='<div class="s58hero"><b>🌆 Событие Sdolars</b><small>Город живёт своей жизнью. Выбор сегодня меняет репутацию фракций и награду.</small></div><div class="s58event"><div class="s58ei">'+e.ico+'</div><b>'+e.name+'</b><p>'+e.desc+'</p></div><div class="s58choices"><button '+(x.done?'disabled':'')+' onclick="s58Choose(0)">⚔️ '+e.a+'<small>+'+e.ca+' 🪙 · +'+e.xa+' XP</small></button><button '+(x.done?'disabled':'')+' onclick="s58Choose(1)">💰 '+e.b+'<small>+'+e.cb+' 🪙 · +'+e.xb+' XP</small></button></div><div class="s58note">Решение даётся один раз в день. Репутация выбранной фракции +8.</div><div class="s58card"><b>📜 Последние события</b>'+(x.log.length?x.log.slice(-5).reverse().map(v=>'<div class="s58log">'+v+'</div>').join(''):'<small>Пока нет решений.</small>')+'</div>';panel('🌆 Событие города',h)};
+window.s58Choose=function(n){let x=load(),e=x.event,p=P();if(x.done)return;let coins=n?e.cb:e.ca,xp=n?e.xb:e.xa,f=n?e.fb:e.fa;p.coins=(p.coins||0)+coins;p.xp=(p.xp||0)+xp;let sk='territory_s57_social',r;try{r=JSON.parse(localStorage.getItem(sk)||'{}')}catch(err){r={}};r.rep={guard:0,merchants:0,port:0,...(r.rep||{})};r.rep[f]=(r.rep[f]||0)+8;r.favor=r.favor||{};r.favor['event_'+e.id]=true;r.eventBonus=(r.eventBonus||0)+1;localStorage.setItem(sk,JSON.stringify(r));x.done=true;x.log.push(e.ico+' '+e.name+': '+(n?e.b:e.a)+' · +'+coins+' 🪙 · +'+xp+' XP');save(x);SP(p);alert('Решение принято! +'+coins+' монет · +'+xp+' XP · +8 репутации');s58Event()};
+const css=document.createElement('style');css.textContent='.s58hero{background:linear-gradient(135deg,#19323a,#281c14);border:1px solid #87652d;border-radius:12px;padding:11px;margin:7px 0}.s58hero b{display:block;font-size:15px}.s58hero small{display:block;opacity:.7;font-size:9px;margin-top:4px}.s58event{background:#101c25;border:1px solid #76512b;border-radius:11px;padding:12px;margin:7px 0}.s58ei{font-size:30px;float:left;margin-right:10px}.s58event b{font-size:12px}.s58event p{font-size:9px;opacity:.72;min-height:30px}.s58choices{display:grid;grid-template-columns:1fr 1fr;gap:6px}.s58choices button{border:1px solid #b3832d;border-radius:9px;padding:9px 6px;background:#34270f;color:#ffe39a;font-weight:900;font-size:9px}.s58choices button small{display:block;font-size:7px;opacity:.7;margin-top:4px}.s58choices button:disabled{opacity:.4}.s58note,.s58card{background:#101d25;border:1px solid #36515e;border-radius:10px;padding:9px;margin:7px 0;font-size:8px}.s58log{padding:5px 0;border-bottom:1px solid #233841;font-size:8px}.s58open{width:100%;margin-top:8px!important}';document.head.appendChild(css);
+document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Город'||t.startsWith('Город'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s58open')){let b=document.createElement('button');b.className='s35btn s58open';b.textContent='🌆 Событие города';b.onclick=s58Event;body.appendChild(b)}},70)},true);
 })();
 </script>
 </html>
