@@ -1,8 +1,14 @@
-# Territory S46 REAL
-Global guild progression layer for Sdolars.
-- Guild levels and XP
-- Daily guild missions
-- Treasury and player contributions
-- Seasonal guild XP/rank
-- Arena, district and expedition actions feed guild progress
+# Territory S47 REAL
+
+S47 adds a local PvP tournament and seasonal ranking layer on top of S46 REAL.
+
+- Seasonal rating and rank tiers
+- 5 PvP matches per day
+- Simulated opponents matched near the player's rating
+- Win/loss rating changes and streaks
+- Season leaderboard
+- Season reward for 5 wins
+- PvP wins contribute guild XP
+- PvP rewards use the existing coins/XP/energy systems
 - LocalStorage persistence
+- GitHub-only static build; no Cloudflare Worker/Wrangler
