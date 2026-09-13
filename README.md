@@ -1,5 +1,3 @@
-Territory S93 — FULL COMBAT CORE
+Territory S94 — REAL WORKING BASE + COMBAT OVERHAUL
 
-Built directly from the verified S92 working base.
-
-This release keeps the existing Arena button/openBattle path and replaces only the combat block with a complete local tactical PvE combat loop: 1 attack zone, exactly 2 defense zones, enemy tactics, hit/miss, block, dodge, crit, armor, energy, rounds, rewards, XP, streak, quest progress, auto-battle, combat log and recovery.
+Built from the working S86/S92 line. S93 legacy override conflict removed so the S93 tactical engine is actually active. Mobile battle sheet compacted so attack/defense controls remain visible. Existing navigation and social/clan systems preserved.
