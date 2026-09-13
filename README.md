@@ -1,3 +1,11 @@
-# Territory S36 REAL
+# Territory — S37 REAL
 
-Продолжение S35. Добавлена связка инвентаря с боевой системой: оружие влияет на урон, броня снижает входящий урон, эликсир лечит, предметы можно экипировать/снимать/выбрасывать, свободные очки тратятся на Силу и Ловкость. Рынок выдаёт реальные предметы. Квесты учитывают покупки и посещённые районы. Тактическая арена сохранена. Cloudflare/Worker/Wrangler не используются.
+GitHub-only mobile Telegram Mini App build.
+
+## S37
+- Real district gameplay for all 6 Sdolars districts.
+- Each district has its own activity, energy cost, coins and XP reward.
+- Traveling records visited districts.
+- Explorer progress is shown in Districts and Quests.
+- Existing S36 tactical arena, inventory/equipment, market, tavern, guild, Game, quests and city UI remain the base.
+- No Cloudflare Worker or Wrangler files are included.
