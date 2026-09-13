@@ -88,7 +88,7 @@ document.addEventListener('click',e=>{let x=e.target.closest('button,a,[role=but
     <button class="place" onclick="openSheet('Game')"><span>🎲</span>Game</button>
   </div>
 
-  <button id="arena" type="button"><span>⚔️</span><b>Арена</b></button>
+  <button id="arena" type="button" onclick="window.s107ArenaLobby ? window.s107ArenaLobby() : (window.openBattle ? window.openBattle() : alert('Арена загружается…'))"><span>⚔️</span><b>Арена</b></button>
 
   <div id="chat"><div class="chatText">💬 Городской чат <small>12 онлайн</small></div><button class="chatBtn" onclick="show('Чат открыт')">Открыть</button></div>
 
@@ -1998,8 +1998,7 @@ setTimeout(()=>{const nav=[...document.querySelectorAll('button')].find(b=>(b.te
     window.openBattle=function(){ lobby(); };
     const arena=document.getElementById('arena');
     if(arena){
-      arena.onclick=function(ev){ev.preventDefault();ev.stopPropagation();lobby();};
-      arena.removeAttribute('onclick');
+      arena.onclick=function(ev){ev.preventDefault();lobby();};
     }
   }
   const originalClose=window.closeSheet;
