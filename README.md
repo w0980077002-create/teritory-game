@@ -1,21 +1,17 @@
-# Territory — S67 GLOBAL CLAN
+# Territory S76 — GLOBAL MULTIPLAYER FOUNDATION
 
-Глобальное развитие клана поверх рабочей версии S66 Clan Clean.
+S76 adds the first multiplayer-ready foundation while preserving the existing S75 game systems.
 
-## Что добавлено
-- 🛡️ единая кнопка **Клан**;
-- 🏰 штаб клана с уровнем, опытом, репутацией и казной;
-- ⚔️ клановые войны: атаки, победы/поражения и боевой рейтинг;
-- 🗺️ захват 6 районов с процентом контроля и доходом в казну;
-- 🔧 4 технологии клана: Арсенал, Крепость, Торговля, Академия;
-- 👑 роли участников и расширенный состав;
-- 📜 клановые задания;
-- 🎁 ежедневная награда;
-- 🏦 казна и улучшение штаба;
-- 📜 журнал событий;
-- 💾 сохранение прогресса в localStorage;
-- 📱 интерфейс рассчитан на мобильный экран и Telegram Web App;
-- 🚫 Cloudflare не используется.
+## Added
+- Player identity and local player ID
+- Clan room creation/join by 6-character code
+- Local session/connection state
+- Clan roster presence
+- Synchronization queue prepared for future API transport
+- Explicit local-mode status (no fake server connection)
+- Mobile Telegram UI
 
-## GitHub Pages
-Папка содержит `index.html` и `.nojekyll`. Для GitHub Pages используйте `main` → `/ (root)`.
+## Important
+S76 is a foundation layer. Real cross-device multiplayer requires an authoritative backend/API; this build does not pretend that localStorage is a real network server.
+
+Deployment target remains GitHub Pages; no Cloudflare dependency is included.

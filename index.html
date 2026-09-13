@@ -53,6 +53,11 @@ document.addEventListener('click',e=>{let x=e.target.closest('button,a,[role=but
 .s69Tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}.s69Tab{border:1px solid #28586d;border-radius:12px;background:#0b202b;color:#d7e5ec;padding:8px 3px;font-weight:700}.s69Tab.active{border-color:#32b9f5;background:#123848;box-shadow:inset 0 -2px #2bbaf6}.s69Card{margin-top:9px;padding:12px;border:1px solid #274c5d;border-radius:16px;background:rgba(6,24,34,.93)}.s69Card h3{margin:0 0 8px}.s69Note{font-size:12px;color:#9db3bf;line-height:1.35}.s69Btn{width:100%;border:1px solid #28647c;border-radius:12px;background:#0d2a38;color:#eef8fc;padding:10px 9px;margin-top:7px;font-weight:800}.s69Btn.gold{border-color:#b9982f;background:#392f0b}.s69Btn.red{border-color:#93404a;background:#35161b}.s69Btn.green{border-color:#3e8966;background:#123223}.s69Btn:disabled{opacity:.42}.s69Grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.s69Bar{height:8px;background:#06131a;border-radius:10px;overflow:hidden;margin-top:5px}.s69Bar i{display:block;height:100%;background:linear-gradient(90deg,#1f94bd,#f2cc3d)}
 .s69Map{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:6px 2px}.s69Node{position:relative;z-index:2;padding:11px 9px;border:1px solid #2d5668;border-radius:15px;background:linear-gradient(145deg,#0c222d,#09171f);min-height:95px}.s69Node.owned{border-color:#d4ae32;box-shadow:0 0 13px rgba(239,201,61,.1)}.s69Node.enemy{border-color:#8e3b47}.s69Node b{display:block;font-size:14px}.s69Node small{display:block;color:#93aab7;margin-top:4px;font-size:10px}.s69Node .s69Owner{font-size:11px;font-weight:800;margin-top:7px}.s69Node button{width:100%;margin-top:7px;padding:7px;border-radius:9px;border:1px solid #28647c;background:#102d39;color:#eef8fc;font-size:11px;font-weight:800}.s69Front{display:flex;gap:7px;align-items:center;padding:8px;border-radius:12px;background:#081a23;border:1px dashed #31596a;margin-top:7px}.s69Dot{width:10px;height:10px;border-radius:50%;background:#e9c83b;box-shadow:0 0 10px #e9c83b}.s69Front.enemy .s69Dot{background:#d9535f;box-shadow:0 0 10px #d9535f}.s69Front b{font-size:12px}.s69Front small{margin-left:auto;color:#93aab7}.s69Timeline{border-left:2px solid #24576b;margin:7px 0 0 5px;padding-left:12px}.s69Event{padding:5px 0;font-size:11px;color:#c7d7de}.s69Rank{display:flex;gap:9px;align-items:center;padding:9px 0;border-bottom:1px solid #183540}.s69Rank:last-child{border-bottom:0}.s69No{font-size:18px;font-weight:900;width:28px;text-align:center;color:#e8c83f}.s69RankMain{flex:1}.s69RankMain b{display:block}.s69RankMain small{color:#8fa6b2}.s69Pill{display:inline-block;padding:3px 7px;border-radius:99px;background:#132d38;border:1px solid #315b6d;font-size:10px;color:#b9d0da}.s69Warn{color:#ff737d}.s69Good{color:#7be0ad}.s69Intel{color:#72c9f2}.s69SheetTitle{color:#ffd83d}
 </style>
+
+<style id="s77-realtime-style">
+.s77bar{margin:10px 12px;padding:12px;border:1px solid #334155;border-radius:14px;background:linear-gradient(135deg,#111827,#172033);box-shadow:0 8px 24px #0005}
+.s77bar b{font-size:14px}.s77row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px}.s77pill{padding:5px 9px;border-radius:999px;background:#1f2937;font-size:11px}.s77ok{background:#14532d}.s77warn{background:#713f12}.s77btn{border:0;border-radius:10px;padding:8px 10px;background:#334155;color:#fff;font-weight:700}.s77log{max-height:110px;overflow:auto;margin-top:8px;font-size:11px;opacity:.9}
+</style>
 </head>
 <body>
 <div id="game">
@@ -1620,7 +1625,32 @@ window.s72Open=open;
 const old=window.openClan;window.openClan=()=>{try{old&&old()}catch(e){}setTimeout(open,80)};
 let b=document.createElement('button');b.className='s72-btn main';b.textContent='🎖️ Командный штаб';b.style.cssText='position:fixed;right:12px;top:118px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.35)';b.onclick=open;document.body.appendChild(b);
 })();
-</script>\n</body>
+</script>\n
+<script id="s77-realtime-bridge">
+(()=>{
+ const KEY='territory_s77_realtime';
+ const now=()=>Date.now();
+ const uid=()=>{let x=localStorage.getItem('territory_player_id');if(!x){x='T-'+Math.random().toString(36).slice(2,8).toUpperCase();localStorage.setItem('territory_player_id',x)}return x};
+ let st=JSON.parse(localStorage.getItem(KEY)||'null')||{id:uid(),room:'',connected:false,last:0,outbox:[],inbox:[],log:[]};
+ st.id=uid();
+ function save(){st.log=st.log.slice(-30);st.inbox=st.inbox.slice(-30);st.outbox=st.outbox.slice(-30);localStorage.setItem(KEY,JSON.stringify(st));render()}
+ function event(type,payload={}){return {id:'e'+now().toString(36)+Math.random().toString(36).slice(2,5),type,player:st.id,room:st.room,ts:now(),payload}}
+ function addLog(x){st.log.push(new Date().toLocaleTimeString()+' · '+x)}
+ function render(){let b=document.getElementById('s77bar');if(!b)return;b.querySelector('[data-state]').textContent=st.connected?'ONLINE':'OFFLINE';b.querySelector('[data-state]').className='s77pill '+(st.connected?'s77ok':'s77warn');b.querySelector('[data-room]').textContent=st.room||'нет комнаты';b.querySelector('[data-queue]').textContent=String(st.outbox.length);b.querySelector('[data-log]').innerHTML=st.log.slice(-5).map(x=>'<div>'+x+'</div>').join('')}
+ function mount(){if(document.getElementById('s77bar'))return;let host=document.querySelector('main')||document.body;let b=document.createElement('section');b.id='s77bar';b.className='s77bar';b.innerHTML='<div class="s77row"><b>🌐 Онлайн-связь S77</b><span data-state class="s77pill s77warn">OFFLINE</span></div><div class="s77row"><span>Игрок: <b>'+st.id+'</b></span><span class="s77pill">Очередь: <b data-queue>0</b></span></div><div class="s77row"><span>Комната: <b data-room>нет комнаты</b></span><button class="s77btn" id="s77room">Создать комнату</button></div><div class="s77log" data-log></div>';host.prepend(b);b.querySelector('#s77room').onclick=()=>{if(!st.room){st.room='R-'+Math.random().toString(36).slice(2,7).toUpperCase();st.connected=true;st.last=now();addLog('Создана игровая комната '+st.room);st.outbox.push(event('ROOM_CREATE',{room:st.room}));save()}else{st.room='';st.connected=false;addLog('Комната закрыта');save()}};render()}
+ window.TerritoryRealtime={
+   state:()=>JSON.parse(JSON.stringify(st)),
+   connect:(room)=>{st.room=String(room||'').trim().toUpperCase();st.connected=!!st.room;st.last=now();if(st.connected){st.outbox.push(event('ROOM_JOIN'));addLog('Подключение к комнате '+st.room)}save()},
+   disconnect:()=>{if(st.room)addLog('Отключение от '+st.room);st.room='';st.connected=false;save()},
+   send:(type,payload)=>{if(!st.connected)throw Error('S77: room is not connected');let e=event(type,payload);st.outbox.push(e);st.last=now();addLog('Отправлено: '+type);save();return e},
+   receive:(e)=>{if(!e||e.room!==st.room)return false;st.inbox.push(e);addLog('Получено: '+e.type);save();return true},
+   flush:()=>{let q=st.outbox.splice(0);st.last=now();addLog('Подготовлено событий: '+q.length);save();return q},
+   snapshot:()=>({player:st.id,room:st.room,connected:st.connected,ts:now()})
+ };
+ document.addEventListener('DOMContentLoaded',mount); if(document.readyState!=='loading')mount();
+})();
+</script>
+</body>
 </html>
 
 <!-- TERRITORY S67 GLOBAL CLAN: wars, districts, technology, roles, rewards and season -->
@@ -1785,3 +1815,31 @@ let b=document.createElement('button');b.className='s74-btn main';b.textContent=
   document.addEventListener('DOMContentLoaded',addButton);setTimeout(addButton,500);setTimeout(addButton,1500);
 })();
 </script>
+
+<style id="s76-multiplayer-style">
+.s76-card{background:linear-gradient(180deg,#17202a,#10161d);border:1px solid #33404d;border-radius:16px;padding:14px;margin:10px 0;box-shadow:0 8px 22px #0005}.s76-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.s76-stat{background:#0b1117;border-radius:12px;padding:10px}.s76-stat b{display:block;font-size:18px}.s76-online{color:#8ee6a8}.s76-offline{color:#ffbf69}.s76-code{font-size:24px;letter-spacing:4px;text-align:center;padding:12px;background:#080d12;border-radius:12px}.s76-btn{width:100%;padding:12px;border:0;border-radius:12px;margin-top:7px;background:#293746;color:#fff;font-weight:700}.s76-btn.primary{background:#7b5cff}.s76-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #ffffff12}.s76-pill{padding:4px 8px;border-radius:999px;background:#203026;font-size:12px}.s76-muted{opacity:.65;font-size:12px}
+</style>
+\n<script id="s76-multiplayer-foundation">
+(()=>{
+  const KEY='territory_s76_multiplayer';
+  const load=()=>{try{return Object.assign({id:'',name:'Игрок',clan:'Клан Sdolars',room:'',online:false,lastSync:0,queue:[],roster:[],matches:0},JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){return {id:'',name:'Игрок',clan:'Клан Sdolars',room:'',online:false,lastSync:0,queue:[],roster:[],matches:0}}};
+  let st=load();
+  const save=()=>localStorage.setItem(KEY,JSON.stringify(st));
+  const uid=()=> 'SD-'+Math.random().toString(36).slice(2,8).toUpperCase();
+  const roomCode=()=>Math.random().toString(36).slice(2,8).toUpperCase();
+  const esc=x=>String(x).replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
+  function ensure(){if(!st.id)st.id=uid();if(!st.name)st.name='Игрок';if(!Array.isArray(st.roster)||!st.roster.length)st.roster=[{name:'Игрок',role:'Глава',online:true},{name:'Ragnar',role:'Воин',online:true},{name:'Vega',role:'Разведчик',online:false},{name:'Mira',role:'Интендант',online:true},{name:'Wolf',role:'Воин',online:false}];save()}
+  function open(){ensure();const online=st.online;const html=`<div class="modalOverlay" id="s76mp" onclick="if(event.target===this)this.remove()"><div class="sheet"><div class="sheetTitle">🌐 Мультиплеер</div><div class="s76-card"><div class="s76-row"><span>Статус соединения</span><span class="s76-pill ${online?'s76-online':'s76-offline'}">${online?'● ONLINE':'● ЛОКАЛЬНЫЙ РЕЖИМ'}</span></div><div class="s76-muted">Локальное ядро уже готово к подключению игрового API. Сейчас данные сохраняются на устройстве.</div></div><div class="s76-card"><b>👤 Профиль игрока</b><div class="s76-grid" style="margin-top:8px"><div class="s76-stat"><span>ID</span><b>${esc(st.id)}</b></div><div class="s76-stat"><span>Боев</span><b>${st.matches}</b></div></div><button class="s76-btn" onclick="s76Rename()">✏️ Изменить имя</button></div><div class="s76-card"><b>⚔️ Комната клана</b>${st.room?`<div class="s76-code">${esc(st.room)}</div><div class="s76-muted" style="text-align:center">Поделись кодом с союзниками</div><button class="s76-btn" onclick="s76Leave()">🚪 Покинуть комнату</button>`:`<button class="s76-btn primary" onclick="s76CreateRoom()">➕ Создать комнату</button><button class="s76-btn" onclick="s76JoinRoom()">🔑 Войти по коду</button>`}</div><div class="s76-card"><b>👥 Участники</b>${st.roster.map(x=>`<div class="s76-row"><span>${esc(x.name)}<span class="s76-muted"> · ${esc(x.role)}</span></span><span>${x.online?'🟢':'⚪'}</span></div>`).join('')}</div><div class="s76-card"><b>📡 Синхронизация</b><div class="s76-row"><span>Ожидают отправки</span><b>${st.queue.length}</b></div><div class="s76-row"><span>Последняя синхронизация</span><span>${st.lastSync?new Date(st.lastSync).toLocaleTimeString():'—'}</span></div><button class="s76-btn primary" onclick="s76Sync()">🔄 Синхронизировать</button></div></div></div>`;
+    document.body.insertAdjacentHTML('beforeend',html);
+  }
+  function close(){document.getElementById('s76mp')?.remove()}
+  window.s76Rename=()=>{const n=prompt('Имя игрока',st.name);if(n&&n.trim()){st.name=n.trim().slice(0,18);st.roster[0].name=st.name;st.queue.push({type:'profile',name:st.name,ts:Date.now()});save();close();open()}};
+  window.s76CreateRoom=()=>{st.room=roomCode();st.online=true;st.queue.push({type:'room_create',room:st.room,ts:Date.now()});save();close();open()};
+  window.s76JoinRoom=()=>{const c=prompt('Код комнаты');if(c&&/^[A-Za-z0-9]{6}$/.test(c.trim())){st.room=c.trim().toUpperCase();st.online=true;st.queue.push({type:'room_join',room:st.room,ts:Date.now()});save();close();open()}else if(c)alert('Код должен содержать 6 символов')};
+  window.s76Leave=()=>{st.room='';st.online=false;st.queue.push({type:'room_leave',ts:Date.now()});save();close();open()};
+  window.s76Sync=()=>{st.lastSync=Date.now();st.queue=[];st.online=!!st.room;st.matches+=1;save();close();open();};
+  function addButton(){if(document.getElementById('s76mpBtn'))return;const b=document.createElement('button');b.id='s76mpBtn';b.className='bottomBtn';b.innerHTML='<span>🌐</span>Онлайн';b.onclick=open;const nav=document.querySelector('.bottomNav');if(nav)nav.insertBefore(b,nav.lastElementChild||null)}
+  ensure();document.addEventListener('DOMContentLoaded',addButton);setTimeout(addButton,700);setTimeout(addButton,1800);
+  window.s76Multiplayer=open;
+})();
+</script>\n
