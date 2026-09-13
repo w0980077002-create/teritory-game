@@ -869,5 +869,71 @@ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=bu
 </script>
 
 
+<style id="s62-core-style">
+.s62meta{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:6px 0}.s62meta div{background:rgba(9,28,39,.75);border:1px solid #31586a;border-radius:8px;padding:6px 3px;text-align:center;font-size:8px}.s62meta b{display:block;font-size:11px;color:#ffd83d;margin-top:2px}.s62loot{margin-top:7px;padding:8px;border:1px solid #9a742a;border-radius:10px;background:rgba(66,49,13,.35);font-size:9px}.s62loot b{color:#ffe39a}.s62tier{display:inline-block;padding:3px 6px;border-radius:7px;background:#172f3b;border:1px solid #356276;font-size:8px;margin-top:3px}.s62danger{color:#ff9b8f}
+</style>
+<script id="s62-core-gameplay">
+(()=>{
+ const KEY='territory_s62_combat';
+ const DEF={wins:0,losses:0,kills:0,streak:0,bestStreak:0,totalCoins:0,totalXp:0,loot:0};
+ function cs(){try{return {...DEF,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return {...DEF}}}
+ function csave(x){localStorage.setItem(KEY,JSON.stringify(x))}
+ const S62_ENEMIES=[
+  {name:'Уличный боец',hp:95,damage:12,armor:1,crit:.08,ico:'🥊'},
+  {name:'Наёмник Sdolars',hp:120,damage:15,armor:2,crit:.10,ico:'🔪'},
+  {name:'Гвардеец замка',hp:145,damage:18,armor:3,crit:.12,ico:'🛡️'},
+  {name:'Капитан стражи',hp:175,damage:21,armor:4,crit:.15,ico:'⚔️'},
+  {name:'Ветеран порта',hp:205,damage:24,armor:5,crit:.17,ico:'⚓'},
+  {name:'Охотник Sdolars',hp:235,damage:27,armor:6,crit:.19,ico:'🏹'},
+  {name:'Элитный страж',hp:270,damage:30,armor:7,crit:.21,ico:'🗡️'},
+  {name:'Босс района',hp:320,damage:34,armor:9,crit:.24,ico:'👹'}
+ ];
+ const LOOT=[
+  {n:'Кровавый кинжал',t:'weapon',d:16,a:0,ico:'🗡️'},
+  {n:'Стальной меч Sdolars',t:'weapon',d:25,a:0,ico:'⚔️'},
+  {n:'Броня ветерана',t:'armor',d:0,a:15,ico:'🛡️'},
+  {n:'Эликсир жизни',t:'consumable',d:0,a:0,ico:'🧪'}
+ ];
+ function addLoot(tier){
+  const chance=.28+Math.min(.32,tier*.04);if(Math.random()>chance)return null;
+  const pool=tier>=5?LOOT.slice(1):tier>=3?LOOT.slice(0,3):LOOT.slice(0,2);const q=pool[Math.floor(Math.random()*pool.length)];
+  try{let a=JSON.parse(localStorage.getItem('territory_s34_inventory')||'[]');let id='s62_'+q.n.toLowerCase().replace(/[^a-zа-я0-9]+/gi,'_')+'_'+Date.now();a.push({id,n:q.n,t:q.t,d:q.d,a:q.a,o:1,e:0});localStorage.setItem('territory_s34_inventory',JSON.stringify(a));let z=cs();z.loot++;csave(z);return q}
+  catch(e){return null}
+ }
+ function enemyFor(){let z=cs(),tier=Math.min(7,Math.floor(z.wins/3));return {...S62_ENEMIES[tier],tier}}
+ function combatMods(){let m=window.s59Mods?window.s59Mods():null;return m||{damage:1,defense:1,crit:0,pvp:1}}
+ window.s62CombatStats=()=>cs();
+ window.s62Combat=function(){let z=cs();panel('📊 Статистика боёв',`<div class="s62meta"><div>🏆 Побед<b>${z.wins}</b></div><div>💀 Поражений<b>${z.losses}</b></div><div>🔥 Серия<b>${z.streak}</b></div></div><div class="s62loot">Всего получено: <b>${z.totalCoins} 🟡</b> · <b>${z.totalXp} XP</b> · трофеев <b>${z.loot}</b>.</div>`)};
+ window.openBattle=function(){
+  if(state.energy<10){show('Недостаточно энергии');return}
+  const e=enemyFor();battle={enemy:e,turn:'player',round:1,attack:null,defense:[],enemyAttack:null,enemyDefense:[],log:'Выберите зону атаки и две зоны защиты.',playerHp:state.hp||state.maxHp,anim:'',locked:false,auto:false};renderBattle();document.getElementById('modal').classList.add('show')
+ };
+ window.renderBattle=function(){
+  if(!battle)return;const e=battle.enemy,pct=Math.max(0,e.hp/e.maxHp*100),ppct=Math.max(0,battle.playerHp/state.maxHp*100),z=cs();
+  document.getElementById('sheetTitle').textContent='Арена · тактический бой';
+  document.getElementById('sheetBody').innerHTML=`<div class="battleStage"><div class="fighterSprite ${battle.anim==='playerAttack'?'attack':''} ${battle.anim==='playerHit'?'hit':''}">🧔<small>Воин</small></div><div class="fighterSprite ${battle.anim==='enemyAttack'?'attack':''} ${battle.anim==='enemyHit'?'hit':''}">${e.ico}<small>${e.name}</small></div></div><div class="battleTop"><div class="fighter"><b>🧔 Воин · ур. ${state.level}</b><div class="hpbar"><i style="width:${ppct}%"></i></div><small>${Math.ceil(battle.playerHp)} / ${state.maxHp} HP</small></div><div class="fighter enemy"><b>${e.ico} ${e.name}</b><div class="hpbar"><i style="width:${pct}%"></i></div><small>${Math.ceil(e.hp)} / ${e.maxHp} HP</small></div></div><div class="s62meta"><div>⚔️ Уровень врага<b>${e.tier+1}</b></div><div>🔥 Серия<b>${z.streak}</b></div><div>⚡ Энергия<b>${state.energy}</b></div></div><div class="battleHint">Раунд ${battle.round} · ${battle.turn==='player'?'ваш ход':'ход противника'} <span class="s62tier">Сложность ${e.tier+1}/8</span></div><div class="autoRow"><label><input type="checkbox" ${battle.auto?'checked':''} onchange="toggleAuto(this.checked)"> Автобой</label></div><div class="zoneTitle">1. Куда атаковать?</div><div class="zones">${zones.map(q=>`<button class="zone ${battle.attack===q?'selected':''}" ${battle.turn!=='player'||battle.locked?'disabled':''} onclick="selectAttack('${q}')">${q}</button>`).join('')}</div><div class="zoneTitle">2. Какие две зоны защищать?</div><div class="defzones">${zones.map(q=>`<button class="defzone ${battle.defense.includes(q)?'selected':''}" ${battle.turn!=='player'||battle.locked?'disabled':''} onclick="selectDefense('${q}')">${q}</button>`).join('')}</div><button class="battleAction" ${battle.attack&&battle.defense.length===2&&battle.turn==='player'&&!battle.locked?'':'disabled'} onclick="playerStrike()">⚔️ Нанести удар · 10 ⚡</button><div class="battleLog">${battle.log}</div>`;
+ };
+ window.playerStrike=function(){
+  if(!battle||battle.turn!=='player'||battle.locked||!battle.attack||battle.defense.length!==2)return;
+  battle.locked=true;state.energy=Math.max(0,state.energy-10);pickEnemyTactics();battle.anim='playerAttack';const e=battle.enemy,attackZone=battle.attack,m=combatMods();let dmg=0;
+  const miss=Math.random()<Math.max(.03,.09-(state.agility||5)/220);
+  if(miss)battle.log=`💨 Воин атаковал «${attackZone}», но промахнулся.`;
+  else if(battle.enemyDefense.includes(attackZone))battle.log=`🛡️ Противник заблокировал «${attackZone}». Урон: 0.`;
+  else{const equip=window.TerritoryInventory?TerritoryInventory.getDamage():5;base=Math.max(1,equip+17+Math.floor(Math.random()*13)+(state.strength||5));const crit=Math.random()<Math.min(.35,.10+Math.min(.15,(state.strength||5)/200)+(m.crit||0));dmg=Math.max(4,Math.floor((base-e.armor)* (m.damage||1)))+(crit?Math.floor(base*.6):0);e.hp=Math.max(0,e.hp-dmg);battle.log=`⚔️ Удар в «${attackZone}»: −${dmg} HP${crit?' · КРИТ!':''}`}
+  if(e.hp<=0){winBattle();return}battle.turn='enemy';renderBattle();clearTimeout(battleTimer);battleTimer=setTimeout(enemyStrike,650)
+ };
+ window.enemyStrike=function(){
+  if(!battle)return;const e=battle.enemy,target=e.enemyAttack||zones[Math.floor(Math.random()*zones.length)],blocked=battle.defense.includes(target),m=combatMods();battle.anim='enemyAttack';let dmg=0;
+  if(blocked)battle.log=`🛡️ Блок! Атака «${target}» остановлена.`;else{const dodge=Math.random()<Math.min(.30,(state.agility||5)/100);if(dodge)battle.log=`💨 Воин увернулся от атаки в «${target}».`;else{const base=e.damage+Math.floor(Math.random()*7),crit=Math.random()<e.crit,armor=window.TerritoryInventory?window.TerritoryInventory.getDefense():0;dmg=Math.max(1,Math.floor((base+(crit?Math.floor(base*.5):0)-armor)*(m.defense||1)));battle.playerHp=Math.max(0,battle.playerHp-dmg);state.hp=battle.playerHp;battle.log=`☠️ ${e.name} атаковал «${target}»: −${dmg} HP${crit?' · КРИТ!':''}`}}
+  if(battle.playerHp<=0){loseBattle();return}battle.round++;battle.attack=null;battle.defense=[];battle.enemyAttack=null;battle.enemyDefense=[];battle.anim='';battle.turn='player';battle.locked=false;saveState();renderBattle();if(battle.auto)scheduleAutoTurn()
+ };
+ window.loseBattle=function(){clearTimeout(battleTimer);const z=cs();z.losses++;z.streak=0;csave(z);state.hp=0;saveState();document.getElementById('sheetBody').innerHTML=`<div class="battleReward"><b>💀 Поражение</b><br>Воин повержен. Энергия потрачена.</div><button class="battleAgain" onclick="recoverAfterLoss()">❤️ Восстановиться</button>`};
+ window.winBattle=function(){
+  clearTimeout(battleTimer);const e=battle.enemy,z=cs(),tier=e.tier||0,mods=combatMods();let reward=60+tier*28+Math.floor(z.streak*5),xp=15+tier*8+Math.floor(z.streak*2);if(mods.spec==='assault')reward+=10;state.hp=state.maxHp;state.coins+=reward;state.xp+=xp;state.questWins=Math.min(3,state.questWins+1);let levelText='',need=state.level*100;while(state.xp>=need){state.xp-=need;state.level++;state.freePoints=(state.freePoints||0)+2;levelText+=` Уровень ${state.level}!`;need=state.level*100}z.wins++;z.kills++;z.streak++;z.bestStreak=Math.max(z.bestStreak,z.streak);z.totalCoins+=reward;z.totalXp+=xp;const loot=addLoot(tier);if(loot)reward+=0;const done=state.questWins>=3;if(done){state.coins+=180;state.xp+=45;state.questWins=0;reward+=180;xp+=45}csave(z);saveState();document.getElementById('sheetBody').innerHTML=`<div class="battleReward"><b>🏆 Победа!</b><br>+${reward} 🟡 · +${xp} XP${levelText?'<br>⬆️'+levelText:''}${loot?`<div class="s62loot">🎁 Трофей: <b>${loot.ico} ${loot.n}</b></div>`:''}${done?'<br>🎯 Квест «Патруль Sdolars» выполнен!':''}</div><button class="battleAgain" onclick="nextBattle()">Следующий противник</button>`;
+ };
+ // Add one clear entry to the existing profile sheet, without replacing S61 systems.
+ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=button]');if(!el)return;let t=(el.textContent||'').trim();if(t==='Профиль'||t.startsWith('Профиль'))setTimeout(()=>{let body=document.getElementById('s35Body');if(body&&!body.querySelector('.s62stats')){let b=document.createElement('button');b.className='s35btn s62stats';b.style.cssText='width:100%;margin-top:8px';b.textContent='📊 Статистика боёв';b.onclick=s62Combat;body.appendChild(b)}},80)},true);
+})();
+</script>
 
 </html>
