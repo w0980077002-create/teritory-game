@@ -1808,3 +1808,31 @@ const old=window.openSheet;window.openSheet=function(title){if(title==='Лобб
 setTimeout(()=>{const nav=[...document.querySelectorAll('button')].find(b=>(b.textContent||'').trim()==='Аккаунт');if(nav&&!document.getElementById('s83LobbyBtn')){const b=document.createElement('button');b.id='s83LobbyBtn';b.className=nav.className;b.innerHTML='<span>🌐</span>Лобби';b.onclick=s83Lobby;nav.parentNode.insertBefore(b,nav.nextSibling)}},1000);
 })();
 </script>
+<script id="s90-arena-button-fix">
+(()=>{
+  const fire=()=>{
+    if(typeof window.openBattle!=='function') return;
+    try{window.openBattle()}catch(e){console.error('Arena open error',e)}
+  };
+  let last=0;
+  const hit=(e)=>{
+    const a=document.getElementById('arena') || document.getElementById('s88pvpBtn');
+    if(!a)return;
+    const r=a.getBoundingClientRect(), x=e.clientX ?? (e.touches&&e.touches[0]?.clientX), y=e.clientY ?? (e.touches&&e.touches[0]?.clientY);
+    if(x==null||y==null||x<r.left||x>r.right||y<r.top||y>r.bottom)return;
+    const now=Date.now();
+    if(now-last<450)return;
+    last=now;
+    e.preventDefault();e.stopPropagation();
+    fire();
+  };
+  document.addEventListener('pointerup',hit,true);
+  document.addEventListener('touchend',hit,true);
+  document.addEventListener('click',hit,true);
+  const fix=()=>{
+    const a=document.getElementById('arena');
+    if(a){a.style.zIndex='2147483647';a.style.pointerEvents='auto';a.removeAttribute('onclick');a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fire()},{capture:true});}
+  };
+  fix();setTimeout(fix,300);setTimeout(fix,1000);setTimeout(fix,2000);
+})();
+</script>
