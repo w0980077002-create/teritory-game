@@ -1,9 +1,8 @@
-# Territory S66 — GitHub Pages
+# Territory — S66 GitHub Pages V2
 
-Готовая версия S66 для загрузки напрямую в GitHub.
+This build is based on the working S61→S66 game and adds a hard S66 guild redirect.
 
-- index.html — актуальная игра S66 с исправленной кнопкой и окном Гильдии.
-- .nojekyll — GitHub Pages обслуживает файлы напрямую.
-- Папка содержит только файлы, необходимые для GitHub Pages.
+## Deploy
+Upload `index.html`, `README.md`, and `.nojekyll` to the repository root on the `main` branch. GitHub Pages should use `main / (root)`.
 
-Источник публикации: GitHub Pages из ветки main, папка / (root).
+Build marker: `S66-GUILD-FORCE-V2`.

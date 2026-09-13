@@ -1098,4 +1098,66 @@ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=bu
   };
 })();
 </script>
+
+<script id="s66-guild-force-v2">
+(function(){
+  // S66 FORCE V2: legacy guild UI is redirected at every entry point.
+  window.__TERRITORY_BUILD__='S66-GUILD-FORCE-V2';
+  function isLegacyGuildTitle(v){
+    v=String(v||'').replace(/\s+/g,' ').trim();
+    return v==='Гильдия' || v==='🛡️ Гильдия' || v==='🛡️ Гильдия Sdolars' || v==='🏴 Гильдия Sdolars';
+  }
+  if(typeof window.s66Guild==='function'){
+    const legacyPanel=window.panel;
+    if(typeof legacyPanel==='function' && !legacyPanel.__s66wrapped){
+      const wrapped=function(title,html){
+        if(isLegacyGuildTitle(title)) return window.s66Guild();
+        return legacyPanel.apply(this,arguments);
+      };
+      wrapped.__s66wrapped=true;
+      window.panel=wrapped;
+    }
+    const oldGuild=window.s35Guild;
+    if(typeof oldGuild==='function' && !oldGuild.__s66wrapped){
+      const guild=function(){ return window.s66Guild(); };
+      guild.__s66wrapped=true;
+      window.s35Guild=guild;
+    }
+  }
+  function forceGuildButton(){
+    document.querySelectorAll('button,a,[role="button"]').forEach(function(el){
+      const t=(el.textContent||'').replace(/\s+/g,' ').trim();
+      if(t==='Гильдия' || t==='🛡️ Гильдия' || (t.startsWith('Гильдия') && t.length<40)){
+        el.setAttribute('onclick','s66Guild()');
+        el.onclick=function(ev){if(ev){ev.preventDefault();ev.stopImmediatePropagation();}return window.s66Guild();};
+      }
+    });
+  }
+  function killLegacyGuild(){
+    const titleEls=document.querySelectorAll('#s35Title,#sheetTitle,h2,h3');
+    titleEls.forEach(function(el){
+      if(isLegacyGuildTitle(el.textContent)){
+        const panel35=document.getElementById('s35Panel');
+        if(panel35 && panel35.style.display!=='none') window.s66Guild();
+      }
+    });
+    const body=document.getElementById('s35Body');
+    if(body && /Внести вклад/.test(body.textContent||'') && /Гильдия/.test((document.getElementById('s35Title')||{}).textContent||'')){
+      window.s66Guild();
+    }
+  }
+  function boot(){forceGuildButton();killLegacyGuild();}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
+  document.addEventListener('click',function(e){
+    const el=e.target && e.target.closest ? e.target.closest('button,a,[role="button"]') : null;
+    if(!el)return;
+    const t=(el.textContent||'').replace(/\s+/g,' ').trim();
+    if(t==='Гильдия' || t==='🛡️ Гильдия' || (t.startsWith('Гильдия') && t.length<40)){
+      e.preventDefault();e.stopImmediatePropagation();window.s66Guild();
+    }
+  },true);
+  new MutationObserver(function(){forceGuildButton();killLegacyGuild();}).observe(document.documentElement,{subtree:true,childList:true});
+  setTimeout(boot,50); setTimeout(boot,250); setTimeout(boot,1000);
+})();
+</script>
 </html>
