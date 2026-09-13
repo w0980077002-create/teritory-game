@@ -1,3 +1,2 @@
-Territory S84 — FRIENDS & SOCIAL
-
-Built on S83. Adds server-backed friends, requests, private messages and clan invitations.
+# Territory S34
+База S33. Добавлены инвентарь, оружие, броня, экипировка, снятие, выбрасывание и сохранение.
