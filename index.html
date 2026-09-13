@@ -220,7 +220,7 @@ window.s35Districts=()=>{let cur=localStorage.getItem('territory_district')||'Ц
 window.s35Travel=d=>{localStorage.setItem('territory_district',d);let v=visited();if(!v.includes(d))v.push(d);localStorage.setItem('territory_visited',JSON.stringify(v));s35Districts()}
 window.districtActivity=districtActivity
 window.s35Quests=()=>{let p=s()||{},w=p.questWins||0,m=p.marketBought||0,v=visited();panel('📜 Квесты Sdolars',`<div class="s35row"><span><b>⚔️ Патруль Sdolars</b><small>Победи 3 противников</small></span><b>${w}/3</b></div><div class="s35row"><span><b>⚖️ Торговец</b><small>Сделай 3 покупки</small></span><b>${m}/3</b></div><div class="s35row"><span><b>🗺️ Исследователь</b><small>Посети все районы города</small></span><b>${v.length}/6</b></div>${v.length>=6?'<div class="s35note">🏆 Исследователь завершён</div>':''}`)}
-window.s35Guild=()=>{let xp=+localStorage.getItem('territory_guild_xp')||0,lvl=+localStorage.getItem('territory_guild_lvl')||1;panel('🛡️ Гильдия',`<div class="s35note">Гильдия Sdolars · уровень <b>${lvl}</b> · ${xp}/100 XP</div><button class="s35btn" style="margin-top:8px" onclick="s35Donate()">Внести вклад 🟡100</button>`)}
+window.s35Guild=()=>{if(typeof window.s66Guild==='function')return window.s66Guild();let xp=+localStorage.getItem('territory_guild_xp')||0,lvl=+localStorage.getItem('territory_guild_lvl')||1;panel('🛡️ Гильдия',`<div class="s35note">Гильдия Sdolars · уровень <b>${lvl}</b> · ${xp}/100 XP</div><button class="s35btn" style="margin-top:8px" onclick="s35Donate()">Внести вклад 🟡100</button>`)}
 window.s35Donate=()=>{let p=s();if(!p||p.coins<100){alert('Нужно 100 монет');return}p.coins-=100;let xp=(+localStorage.getItem('territory_guild_xp')||0)+25,lvl=+localStorage.getItem('territory_guild_lvl')||1;if(xp>=100){xp-=100;lvl++;alert('Гильдия получила новый уровень!')}localStorage.setItem('territory_guild_xp',xp);localStorage.setItem('territory_guild_lvl',lvl);save();s35Guild()}
 window.s35Tavern=()=>{panel('🍺 Таверна',`<div class="s35note">Восстановление энергии.</div><button class="s35btn" style="margin-top:8px" onclick="s35Rest()">Отдохнуть · 🟡40</button>`)}
 window.s35Rest=()=>{let p=s();if(!p||p.coins<40){alert('Нужно 40 монет');return}p.coins-=40;p.energy=Math.min(200,(p.energy||0)+50);save();s35Tavern()}
@@ -1158,6 +1158,31 @@ document.addEventListener('click',e=>{let el=e.target.closest('button,a,[role=bu
   },true);
   new MutationObserver(function(){forceGuildButton();killLegacyGuild();}).observe(document.documentElement,{subtree:true,childList:true});
   setTimeout(boot,50); setTimeout(boot,250); setTimeout(boot,1000);
+})();
+</script>
+
+<script id="s66-guild-source-fix">
+(function(){
+  window.__TERRITORY_BUILD__='S66-GUILD-SOURCE-FIX-V3';
+  // The original S35 capture listener runs first and calls s35Guild().
+  // Therefore the legacy function itself must route to S66, not only the event.
+  var guard=function(){
+    if(typeof window.s66Guild==='function') return window.s66Guild();
+  };
+  window.s35Guild=guard;
+  window.s39Guild=guard;
+  window.s50Guild=guard;
+  window.s65Guild=guard;
+  function fix(){
+    document.querySelectorAll('button,.bottomBtn').forEach(function(el){
+      var t=(el.textContent||'').replace(/\s+/g,' ').trim();
+      if(t==='Гильдия' || t==='🛡️ Гильдия' || (t.startsWith('Гильдия')&&t.length<40)) {
+        el.onclick=function(ev){if(ev){ev.preventDefault();ev.stopImmediatePropagation();}return guard();};
+      }
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix,{once:true});else fix();
+  new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});
 })();
 </script>
 </html>
