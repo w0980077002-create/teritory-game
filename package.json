@@ -1,1 +1,1 @@
-{"name":"territory-s82-real-matchmaking","version":"0.81.0","private":true,"main":"server.js","scripts":{"start":"node server.js","check":"node --check server.js"},"dependencies":{"ws":"^8.18.0"}}
+{"name":"territory-s102-integrated","version":"1.0.2","private":true,"main":"s102-integrated.js","scripts":{"start":"node s102-integrated.js","check":"node --check s102-integrated.js && node --check s102-client.js"},"dependencies":{"ws":"^8.18.0"}}
