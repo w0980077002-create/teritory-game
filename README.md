@@ -1,7 +1,3 @@
-Territory S85 — FRIENDS & SOCIAL
+Territory S86 — CLEAN WAR UI
 
-Built on S85. Adds server-backed friends, requests, private messages and clan invitations.
-
-
-## S85
-Tactical PvP update: one attack zone + two defense zones, server-side damage mitigation, persistent PvP rating/wins/losses.
+Built on S85. Removed the standalone Command HQ, Siege and Logistics buttons and their legacy panels. The working game base and remaining systems are preserved.
