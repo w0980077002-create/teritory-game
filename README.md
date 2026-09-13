@@ -1,3 +1,3 @@
-# Territory S83 — PLAYER LOBBY
+Territory S84 — FRIENDS & SOCIAL
 
-Based on S82 REAL MATCHMAKING. Adds server-backed player lobby, player profiles, friend requests, clan invitations and PvP shortcut. GitHub Pages remains the client; the Node/WebSocket server remains separate. No Cloudflare.
+Built on S83. Adds server-backed friends, requests, private messages and clan invitations.
