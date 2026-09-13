@@ -88,7 +88,7 @@ document.addEventListener('click',e=>{let x=e.target.closest('button,a,[role=but
     <button class="place" onclick="openSheet('Game')"><span>🎲</span>Game</button>
   </div>
 
-  <button id="arena" onclick="openBattle()"><span>⚔️</span><b>Арена</b></button>
+  <button id="arena" type="button"><span>⚔️</span><b>Арена</b></button>
 
   <div id="chat"><div class="chatText">💬 Городской чат <small>12 онлайн</small></div><button class="chatBtn" onclick="show('Чат открыт')">Открыть</button></div>
 
@@ -1975,46 +1975,38 @@ setTimeout(()=>{const nav=[...document.querySelectorAll('button')].find(b=>(b.te
 <style id="s108-arena-exit-style">
 .s108ExitNotice{margin-top:10px;padding:12px;border-radius:13px;border:1px solid rgba(231,104,104,.45);background:linear-gradient(145deg,#301b20,#160f13);color:#ffd9d9;font-size:11px;line-height:1.45}.s108ExitNotice b{display:block;color:#ff8585;font-size:13px;margin-bottom:4px}.s108LeaveBtn{width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(231,104,104,.45);background:#26171b;color:#ffd7d7;font-weight:900}
 </style>
-<script id="s108-arena-exit-lock">
+<script id="s109-arena-fix">
 (()=>{
- 'use strict';
- const KEY='territory_s107_battle_left';
- const IDKEY='territory_s107_battle_id';
- const read=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
- const write=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
- const markLeft=()=>{
-   try{
-     if(typeof battle==='undefined'||!battle||battle.ended)return false;
-     const id=String(battle.s107BattleId||read(IDKEY));
-     if(!id)return false;
-     write(KEY,id);
-     write('territory_s107_battle_status','left');
-     return true;
-   }catch(e){return false}
- };
- const originalClose=window.closeSheet;
- if(originalClose){
-   window.closeSheet=function(){
-     // Leaving an active started battle permanently removes this player from it.
-     markLeft();
-     return originalClose.apply(this,arguments);
-   };
- }
- const originalLobby=window.s107ArenaLobby;
- if(originalLobby){
-   window.s107ArenaLobby=function(){
-     return originalLobby.apply(this,arguments);
-   };
- }
- // Browser/app navigation away while a battle is active also counts as leaving.
- document.addEventListener('visibilitychange',()=>{
-   if(document.visibilityState==='hidden')markLeft();
- });
- window.addEventListener('pagehide',markLeft);
- window.s108CanRejoin=(id)=>String(read(KEY))!==String(id||'');
- window.s108ExitBattle=()=>{
-   markLeft();
-   if(typeof closeSheet==='function')closeSheet();
- };
+  'use strict';
+  const leftKey='territory_s107_battle_left';
+  const idKey='territory_s107_battle_id';
+  const read=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
+  const write=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+  const markLeft=()=>{
+    try{
+      if(typeof battle==='undefined'||!battle||battle.ended||!battle.s107BattleId)return false;
+      write(leftKey,String(battle.s107BattleId));
+      write('territory_s107_battle_status','left');
+      return true;
+    }catch(e){return false}
+  };
+  const leave=()=>{markLeft(); if(typeof closeSheet==='function') closeSheet();};
+  window.s109LeaveBattle=leave;
+  window.s109CanRejoin=id=>String(read(leftKey))!==String(id||'');
+  const lobby=window.s107ArenaLobby;
+  if(typeof lobby==='function'){
+    window.openBattle=function(){ lobby(); };
+    const arena=document.getElementById('arena');
+    if(arena){
+      arena.onclick=function(ev){ev.preventDefault();ev.stopPropagation();lobby();};
+      arena.removeAttribute('onclick');
+    }
+  }
+  const originalClose=window.closeSheet;
+  if(typeof originalClose==='function'){
+    window.closeSheet=function(){markLeft();return originalClose.apply(this,arguments);};
+  }
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')markLeft();});
+  window.addEventListener('pagehide',markLeft);
 })();
 </script>
