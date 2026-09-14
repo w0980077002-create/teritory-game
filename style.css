@@ -578,3 +578,24 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
  .final-actions{top:88px;right:8px}
  .hotspot-weapon{bottom:22%;height:14%}.hotspot-market{bottom:22%;height:14%}.hotspot-center{bottom:30%;height:13%}
 }
+
+/* Territory v15 — final real Sdolars scene */
+body:has(#home.active) .hud{display:none}
+body:has(#home.active) .bottom-nav{display:none}
+.home-real{padding:0!important;overflow:hidden!important;background:#07101a}
+.home-real.active{display:block!important}
+.real-home{position:relative;width:100%;height:100%;overflow:hidden;background:#07101a;display:flex;align-items:center;justify-content:center}
+.real-home-image{display:block;width:100%;height:100%;object-fit:fill;object-position:center;user-select:none;-webkit-user-drag:none}
+.hotspot{position:absolute;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;z-index:50}
+.hs-arena{right:1.5%;top:13.0%;width:18.5%;height:10.7%}
+.hs-market{right:1.5%;top:22.7%;width:18.5%;height:10.7%}
+.hs-inventory{right:1.5%;top:32.4%;width:18.5%;height:10.7%}
+.hs-districts{right:1.5%;top:42.1%;width:18.5%;height:10.7%}
+.hs-game{right:1.5%;top:51.8%;width:18.5%;height:10.7%}
+.hs-weapon{left:1.5%;top:50.7%;width:28%;height:10.2%}
+.hs-city{left:2%;top:6%;width:49%;height:10.5%}
+.hs-bottom-home{left:1%;bottom:0;width:18.5%;height:10.5%}
+.hs-bottom-arena{left:20.5%;bottom:0;width:18.5%;height:10.5%}
+.hs-bottom-districts{left:40.5%;bottom:0;width:18.5%;height:10.5%}
+.hs-bottom-profile{left:60.5%;bottom:0;width:18.5%;height:10.5%}
+.hs-bottom-shop{left:80.5%;bottom:0;width:18.5%;height:10.5%}
