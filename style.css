@@ -326,3 +326,147 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
  .district-sign{bottom:38%}.shop-sign{bottom:32%}.camp{bottom:26%}
  .street-depth{height:33%}.sidewalk{height:23%}.world-message{bottom:7%}
 }
+
+/* Territory v10 — строгая блочная композиция: ничего не наслаивается */
+.world{overflow:hidden}
+/* Верхний городской блок */
+.world-top{left:14px;right:74px;top:12px}
+.world-top>div{padding:6px 9px;border-radius:9px}
+.scene-time{top:14px;right:78px}
+/* Городской горизонт — ниже, чтобы не оставлять пустое поле */
+.distant-city{bottom:43%;height:19%;opacity:.72;align-items:flex-end}
+.distant-city i{width:7%;max-width:38px;min-width:18px}
+/* Средний блок города */
+.town{bottom:31%;height:150px;z-index:6}
+.house{width:105px;height:78px}
+.h1{left:3%}.h2{right:3%;transform:scale(.84)}
+.tower{width:68px;height:124px}
+/* Центральная улица — отдельный блок */
+.street-depth{left:23%;right:23%;bottom:0;height:36%;z-index:7}
+.sidewalk{width:17%;height:25%;z-index:8}
+/* Все точки взаимодействия — свои отдельные блоки */
+.district-sign{bottom:43%;z-index:18;padding:6px 10px;font-size:8px}
+.shop-sign{bottom:34%;z-index:18;padding:5px 8px;font-size:8px}
+.ss1{left:13%}.ss2{right:13%}
+/* Костёр отдельный блок, за героем */
+.camp{bottom:21%;z-index:11;transform:translateX(-50%) scale(.9)}
+/* Герой — передний, но компактный */
+.hero{bottom:7%;z-index:20}
+.hero-svg{width:82px;max-height:114px}
+.hero-shadow{width:84px;height:12px}
+.hero-glow{width:82px;height:12px}
+.nameplate{font-size:7px;padding:3px 8px}
+/* NPC — боковые блоки, ниже вывесок */
+.npc{bottom:13%;z-index:19;min-width:58px}
+.npc.n1{left:9%}.npc.n2{right:9%}
+.npc b{font-size:7px;padding:3px 7px}
+/* Прохожие не пересекают центрального игрока */
+.walker{bottom:18%;z-index:14;animation-duration:23s}
+.walker2{bottom:16%;animation-duration:27s}
+/* Мелкие предметы по краям */
+.crate{bottom:15%;z-index:13;font-size:20px}.cr1{left:5%}.cr2{right:5%}
+.barrel{bottom:15%;z-index:13;font-size:20px}.barrel1{left:25%}.barrel2{right:25%}
+.signpost{left:17%;bottom:17%;z-index:13;transform:scale(.7)}
+.bench{right:16%;bottom:16%;z-index:13;transform:skewX(-8deg) scale(.7)}
+.street-lamp{z-index:12}
+.lamp1{left:6%;bottom:23%;height:78px}.lamp2{right:6%;bottom:23%;height:78px}.lamp3{bottom:37%}
+.street-lantern-glow{z-index:10;bottom:23%}
+/* Сообщение — отдельный нижний левый блок */
+.world-message{left:12px;bottom:5%;z-index:24;max-width:205px;font-size:9px;padding:7px 9px}
+/* Правая колонка — отдельный UI-слой */
+.side-actions{top:68px;right:8px;z-index:30;gap:6px}
+.side-actions button{width:56px;min-height:50px}
+/* Не допускаем конфликтов на коротких экранах */
+@media(max-height:760px){
+ .distant-city{bottom:42%;height:18%}
+ .town{bottom:30%;height:136px}
+ .street-depth{height:34%;left:24%;right:24%}
+ .sidewalk{height:23%}
+ .district-sign{bottom:41%}
+ .shop-sign{bottom:33%}
+ .camp{bottom:20%}
+ .hero{bottom:6%}.hero-svg{width:76px;max-height:105px}
+ .npc{bottom:12%}.walker{bottom:17%}.walker2{bottom:15%}
+ .world-message{bottom:4%}
+}
+
+
+/* Territory v11 — FINISH MAIN SCREEN / modular final composition */
+#home.screen{background:#0b1117}
+#home .world{background:#0d1821;isolation:isolate}
+#home .sky{inset:0 0 48% 0;background:
+ radial-gradient(circle at 78% 24%,#e8edf022 0 2px,transparent 3px),
+ radial-gradient(circle at 24% 18%,#dce7ef22 0 1px,transparent 2px),
+ radial-gradient(circle at 61% 31%,#dce7ef18 0 1px,transparent 2px),
+ linear-gradient(180deg,#091523 0%,#10283a 46%,#35515a 100%)}
+#home .sky:before{content:"";position:absolute;right:17%;top:14%;width:34px;height:34px;border-radius:50%;background:#dfe8e9;box-shadow:0 0 24px #dbe7e855;opacity:.8}
+#home .sky:after{content:"";position:absolute;right:18%;top:15%;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8d9a9b55 0 4px,transparent 5px),radial-gradient(circle at 65% 62%,#89959644 0 5px,transparent 6px);opacity:.6}
+#home .bird{opacity:.35;z-index:2}
+#home .mountain{background:#182a33;opacity:.95;bottom:39%;height:25%}
+#home .m2{background:#20353d;opacity:.7;bottom:38%;height:20%}
+#home .distant-city{bottom:41%;height:20%;opacity:.8;gap:3px;z-index:3}
+#home .distant-city i{background:linear-gradient(180deg,#1d3038,#13242b);border-top:1px solid #40515a}
+#home .distant-city i:after{background:#d6b56b55;box-shadow:0 9px 0 #d6b56b2c,0 18px 0 #d6b56b1c}
+#home .town{bottom:32%;height:148px;z-index:6;filter:drop-shadow(0 12px 8px #0009)}
+#home .house{width:108px;height:76px;background:linear-gradient(90deg,#45352e,#6b503b 50%,#46352e);border:2px solid #272727;box-shadow:inset 0 12px #806044}
+#home .house:before{border-left-width:61px;border-right-width:61px;border-bottom:38px solid #28292d}
+#home .h1{left:2%}.h2{right:2%;transform:scale(.86)}
+#home .tower{left:43%;width:74px;height:130px;background:linear-gradient(90deg,#3d4143,#646669 48%,#3a3e40);border:3px solid #24282b}
+#home .tower:after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:20px;height:42px;background:#161a1c;border:2px solid #34383a;border-radius:3px 3px 0 0}
+#home .tower i{background:#151a1d;box-shadow:inset 0 0 0 2px #9d815855}
+#home .street-depth{left:22%;right:22%;height:37%;bottom:0;z-index:8;background:linear-gradient(180deg,#625447 0%,#4b443c 44%,#252321 100%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);box-shadow:inset 0 0 35px #0005}
+#home .street-depth:before{left:49%;width:2%;background:repeating-linear-gradient(180deg,#c5a970 0 9px,transparent 9px 25px);opacity:.45}
+#home .street-depth:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#10171b22 0 16%,transparent 16% 84%,#10171b22 84%);pointer-events:none}
+#home .sidewalk{height:27%;width:18%;bottom:0;z-index:9;background:linear-gradient(180deg,#4c4842,#2b2927);opacity:.95}
+#home .sw-left{clip-path:polygon(0 13%,100% 0,100% 100%,0 100%)}
+#home .sw-right{clip-path:polygon(0 0,100% 13%,100% 100%,0 100%)}
+#home .district-sign{position:absolute;left:50%;transform:translateX(-50%);bottom:43%;z-index:22;padding:8px 14px;border-radius:7px;background:linear-gradient(#2a2722,#171717);border:1px solid #b18a55;color:#e0c28f;letter-spacing:2px;font-size:8px;box-shadow:0 5px 14px #0009;white-space:nowrap}
+#home .district-sign:active{transform:translateX(-50%) scale(.97)}
+#home .shop-sign{position:absolute;bottom:33%;z-index:22;padding:6px 10px;border-radius:5px;background:linear-gradient(#403326,#211d1a);border:1px solid #9c7b50;color:#d8bd8c;font-size:8px;letter-spacing:1px;box-shadow:0 4px 10px #0008}
+#home .ss1{left:11%}.ss2{right:11%}
+#home .shop-sign:active{transform:scale(.96)}
+#home .camp{bottom:20%;z-index:12;font-size:25px;filter:drop-shadow(0 4px 5px #0008)}
+#home .camp .fire{animation:firePulse 1s ease-in-out infinite alternate}
+@keyframes firePulse{to{transform:scale(1.08) translateY(-2px);filter:brightness(1.18)}}
+#home .hero{bottom:6%;z-index:21}
+#home .hero-svg{width:80px;max-height:112px;filter:drop-shadow(0 8px 5px #000b)}
+#home .hero-shadow{width:78px;height:11px;background:#07090acc;filter:blur(4px)}
+#home .hero-glow{width:76px;height:14px;background:#e4b96844;filter:blur(8px)}
+#home .nameplate{margin-top:2px;font-size:7px;padding:3px 9px;background:#10161bcc;border-color:#637181}
+#home .npc{bottom:12%;z-index:20;min-width:58px}
+#home .npc.n1{left:8%}.npc.n2{right:8%}
+#home .npc b{font-size:7px;background:#10161de8;border-color:#627080;padding:3px 8px}
+#home .walker{bottom:18%;z-index:15}.walker2{bottom:16%;z-index:15}
+#home .barrel{bottom:14%;z-index:14;font-size:18px}
+#home .barrel1{left:23%}.barrel2{right:23%}
+#home .crate{bottom:14%;z-index:14;font-size:18px}
+#home .street-lamp{z-index:16;bottom:23%;height:78px}
+#home .lamp1{left:5%}.lamp2{right:5%}
+#home .lamp3{bottom:36%;height:55px;opacity:.65}
+#home .street-lamp i{animation:lampFlicker 3.2s ease-in-out infinite}
+#home .street-lantern-glow{z-index:13;bottom:23%;width:70px;height:70px;opacity:.8}
+#home .world-message{left:12px;bottom:5%;z-index:25;max-width:205px;background:#0e151dcc;border-color:#607080;border-radius:9px;font-size:9px;padding:7px 9px;box-shadow:0 4px 12px #0008}
+#home .world-events{display:none}
+#home .side-actions{top:66px;right:8px;z-index:35;gap:6px}
+#home .side-actions button{width:56px;min-height:50px;border-radius:12px;background:linear-gradient(#202a34e8,#151c23e8);border-color:#657485;box-shadow:0 4px 12px #0008}
+#home .side-actions button:first-child{margin-bottom:1px}
+#home .world-top{z-index:35;top:12px;left:12px;right:72px}
+#home .world-top>div{padding:7px 10px;background:#0c151de8;border-color:#5c6a79;border-radius:10px;box-shadow:0 5px 13px #0007}
+#home .world-top small{font-size:8px}.world-top b{font-size:14px;letter-spacing:1.5px}
+#home .world-top .icon-btn{right:-60px;top:0;width:42px;height:38px}
+#home .scene-time{top:14px;right:78px;z-index:35;padding:6px 8px;border-radius:9px;background:#0e151de8;border-color:#5c6a79;font-size:8px}
+#home .world:after{z-index:4;height:39%;background:linear-gradient(180deg,#51483f00 0%,#3a332d66 28%,#201e1bd9 100%);clip-path:none;pointer-events:none}
+#home .world:before{z-index:18;height:17%;background:linear-gradient(180deg,#16161600,#0b0b0bc7 90%);pointer-events:none}
+#home .bottom-nav{z-index:50;height:68px;background:#0f151b;border-top:1px solid #3f4a57}
+#home .bottom-nav button.active{color:#f0bd65}
+@media(max-width:760px){
+ #home .distant-city{bottom:40%;height:18%}
+ #home .town{bottom:31%;height:136px}
+ #home .street-depth{height:35%;left:23%;right:23%}
+ #home .district-sign{bottom:42%;font-size:7px;padding:7px 11px}
+ #home .shop-sign{bottom:33%;font-size:7px;padding:5px 8px}
+ #home .camp{bottom:20%;font-size:22px}
+ #home .hero{bottom:5%}.hero-svg{width:74px;max-height:104px}
+ #home .npc{bottom:11%}.walker{bottom:17%}.walker2{bottom:15%}
+ #home .world-message{bottom:4%;font-size:8px}
+}
