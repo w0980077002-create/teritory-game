@@ -25,53 +25,50 @@
 
   <main>
     <section id="home" class="screen active">
-      <div class="world-v11">
-        <div class="city-hud-block">
-          <div><small>ГОРОД</small><strong>SDOLARS</strong><span>ЦЕНТРАЛЬНЫЙ КВАРТАЛ</span></div>
-          <button class="icon-btn" data-screen="districts">⌖</button>
+      <div class="world-final">
+        <div class="final-sky"><span class="fstar a"></span><span class="fstar b"></span><span class="fstar c"></span><span class="final-moon"></span></div>
+        <div class="final-city-back"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+        <div class="final-location">
+          <small>ГОРОД</small><strong>SDOLARS</strong><span>ЦЕНТРАЛЬНЫЙ КВАРТАЛ</span>
+          <button data-screen="districts">⌖</button>
         </div>
-        <div class="time-block">19:42 <span>ВЕЧЕР</span> ◐</div>
+        <div class="final-time">19:42 · ВЕЧЕР <b>☾</b></div>
 
-        <div class="sky-v11"><i class="star s1"></i><i class="star s2"></i><i class="star s3"></i><i class="moon-v11"></i></div>
-        <div class="skyline-v11"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-
-        <div class="city-block left-block">
-          <div class="roof"></div><div class="facade"><i class="win w1"></i><i class="win w2"></i><i class="door"></i></div>
-          <button class="location-tag" data-screen="market">⚔ ОРУЖИЕ</button>
+        <div class="final-house fh-left">
+          <div class="fh-roof"></div><div class="fh-wall"><i></i><i></i><em></em></div>
+          <button data-screen="market">⚔ ОРУЖИЕ<small>Покупка и ремонт</small></button>
         </div>
-        <div class="city-block center-block">
-          <div class="gate-tower"><i class="gate-window"></i><i class="gate-door"></i><b>SD</b></div>
-          <button class="center-tag" data-screen="districts">SDOLARS · ЦЕНТР</button>
+        <div class="final-gate">
+          <div class="gate-crown"></div><div class="gate-wall"><span>SD</span><i></i><em></em></div>
+          <button data-screen="districts">SDOLARS · ЦЕНТР</button>
         </div>
-        <div class="city-block right-block">
-          <div class="roof"></div><div class="facade"><i class="win w1"></i><i class="win w2"></i><i class="door"></i></div>
-          <button class="location-tag" data-screen="market">🛒 РЫНОК</button>
-        </div>
-
-        <div class="street-v11"><i class="mark m1"></i><i class="mark m2"></i><i class="mark m3"></i></div>
-        <div class="lamp-v11 l1"><i></i></div><div class="lamp-v11 l2"><i></i></div>
-
-        <div class="camp-v11"><div class="fire-v11">🔥</div><b>ЛАГЕРЬ</b></div>
-
-        <div class="npc-v11 guard"><span class="npc-head"></span><span class="npc-body"></span><b>Страж</b></div>
-        <div class="npc-v11 trader"><span class="npc-head"></span><span class="npc-body"></span><b>Торговец</b></div>
-        <div class="npc-v11 citizen c1"><span class="npc-head"></span><span class="npc-body"></span></div>
-        <div class="npc-v11 citizen c2"><span class="npc-head"></span><span class="npc-body"></span></div>
-
-        <div class="hero-v11">
-          <div class="hero-aura"></div><div class="hero-body"><div class="hero-head"></div><div class="hero-torso"></div><div class="hero-arm a1"></div><div class="hero-arm a2"></div><div class="hero-leg l1"></div><div class="hero-leg l2"></div></div>
-          <div class="hero-name">SSS <i>LV.1</i></div>
+        <div class="final-house fh-right">
+          <div class="fh-roof"></div><div class="fh-wall"><i></i><i></i><em></em></div>
+          <button data-screen="market">🛒 РЫНОК<small>Торговля</small></button>
         </div>
 
-        <div class="message-v11">Sdolars живёт своей жизнью.</div>
-        <div class="quick-blocks">
+        <div class="final-street"><i></i><i></i><i></i></div>
+        <div class="final-lamp fl-left"><b></b></div><div class="final-lamp fl-right"><b></b></div>
+
+        <div class="final-guard final-npc left"><span class="npc-person guard-person"></span><b>Страж</b><small>Охрана города</small></div>
+        <div class="final-trader final-npc right"><span class="npc-person trader-person"></span><b>Торговец</b><small>Покупка / Продажа</small></div>
+        <div class="final-citizen fc1"><span class="npc-person"></span></div>
+        <div class="final-citizen fc2"><span class="npc-person"></span></div>
+
+        <div class="final-camp"><div class="camp-fire">🔥</div><b>ЛАГЕРЬ</b></div>
+        <div class="final-hero"><div class="hero-back"></div><div class="hero-head"></div><div class="hero-torso"></div><div class="hero-arm ha1"></div><div class="hero-arm ha2"></div><div class="hero-leg hl1"></div><div class="hero-leg hl2"></div><div class="final-hero-name">SSS <i>LV.1</i></div></div>
+
+        <div class="final-message">Sdolars живёт своей жизнью.<span>Здесь каждый найдёт своё место.</span></div>
+        <div class="final-status"><span>● Улицы открыты</span><span>● 2 события</span><span>● Ночь</span></div>
+
+        <div class="final-actions">
           <button data-screen="arena"><b>⚔️</b><span>Арена</span><small>Бой</small></button>
           <button data-screen="market"><b>🛒</b><span>Рынок</span><small>Торговля</small></button>
           <button data-screen="inventory"><b>🎒</b><span>Инвентарь</span><small>Снаряжение</small></button>
           <button data-screen="districts"><b>🗺️</b><span>Районы</span><small>Город</small></button>
-          <button data-screen="casino"><b>🎰</b><span>Казино</span><small>Удача</small></button>
+          <button data-screen="casino"><b>🎮</b><span>Game</span><small>Удача</small></button>
         </div>
-        <div class="bottom-city-strip"><span>● Улицы открыты</span><span>● 2 события</span><span>● Ночь</span></div>
       </div>
     </section>
 
@@ -125,7 +122,7 @@
         <div class="road r1"></div><div class="road r2"></div>
         <button class="map-point arena-point" data-screen="arena">⚔️<small>Арена</small></button>
         <button class="map-point market-point" data-screen="market">🛒<small>Рынок</small></button>
-        <button class="map-point casino-point" data-screen="casino">🎰<small>Казино</small></button>
+        <button class="map-point casino-point" data-screen="casino">🎰<small>Game</small></button>
         <button class="map-point port-point">⚓<small>Порт</small></button>
         <button class="map-point ruins-point">🏚️<small>Руины</small></button>
       </div>
@@ -147,7 +144,7 @@
     </section>
 
     <section id="casino" class="screen">
-      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>КАЗИНО</h2></div>
+      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>GAME</h2></div>
       <div class="casino-scene">
         <div class="neon">SDOLARS<br><strong>CASINO</strong></div>
         <div class="wheel" id="wheel">🎰</div>
