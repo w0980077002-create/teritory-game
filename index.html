@@ -25,72 +25,53 @@
 
   <main>
     <section id="home" class="screen active">
-      <div class="world">
-        <div class="world-top">
-          <div><small>ГОРОД</small><b>SDOLARS</b></div>
+      <div class="world-v11">
+        <div class="city-hud-block">
+          <div><small>ГОРОД</small><strong>SDOLARS</strong><span>ЦЕНТРАЛЬНЫЙ КВАРТАЛ</span></div>
           <button class="icon-btn" data-screen="districts">⌖</button>
         </div>
-        <div class="sky">
-          
-          <div class="bird b1">⌁</div><div class="bird b2">⌁</div>
+        <div class="time-block">19:42 <span>ВЕЧЕР</span> ◐</div>
+
+        <div class="sky-v11"><i class="star s1"></i><i class="star s2"></i><i class="star s3"></i><i class="moon-v11"></i></div>
+        <div class="skyline-v11"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+        <div class="city-block left-block">
+          <div class="roof"></div><div class="facade"><i class="win w1"></i><i class="win w2"></i><i class="door"></i></div>
+          <button class="location-tag" data-screen="market">⚔ ОРУЖИЕ</button>
         </div>
-        <div class="mountain m1"></div><div class="mountain m2"></div>
-        <div class="distant-city"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="pine p1">🌲</div><div class="pine p2">🌲</div><div class="pine p3">🌲</div>
-        <div class="town">
-          <div class="tower"><i></i><i></i><i></i></div>
-          <div class="house h1"><i class="house-window wleft"></i><i class="house-window wright"></i><span class="door"></span><b>SD</b></div><div class="house h2"><i class="house-window wleft"></i><i class="house-window wright"></i><span class="door"></span><b>OL</b></div>
-          <div class="roadline"></div>
+        <div class="city-block center-block">
+          <div class="gate-tower"><i class="gate-window"></i><i class="gate-door"></i><b>SD</b></div>
+          <button class="center-tag" data-screen="districts">SDOLARS · ЦЕНТР</button>
         </div>
-        <button class="district-sign" data-screen="districts">SDOLARS · ЦЕНТР</button>
-        <div class="street-depth"><i></i><i></i><i></i><span class="road-mark rm1"></span><span class="road-mark rm2"></span></div>
-        <div class="sidewalk sw-left"></div><div class="sidewalk sw-right"></div>
-        <div class="window-light wl1"></div><div class="window-light wl2"></div>
-        <button class="shop-sign ss1" data-screen="market">ОРУЖИЕ</button><button class="shop-sign ss2" data-screen="market">РЫНОК</button>
-        <div class="crate cr1">▦</div><div class="crate cr2">▦</div>
-        <div class="camp"><div class="fire">🔥</div><div class="smoke"><i></i><i></i><i></i></div><span>ЛАГЕРЬ</span></div>
-        <div class="hero">
-          <div class="hero-glow"></div>
-          <div class="hero-shadow"></div>
-          <svg class="hero-svg" viewBox="0 0 220 300" aria-label="Взрослый воин">
-            <defs>
-              <linearGradient id="armor" x1="0" x2="1"><stop offset="0"/><stop offset=".5" stop-color="#4b5563"/><stop offset="1"/></linearGradient>
-              <linearGradient id="skin" x1="0" x2="1"><stop offset="0" stop-color="#9a5b3d"/><stop offset=".5" stop-color="#d28a5a"/><stop offset="1" stop-color="#81462f"/></linearGradient>
-            </defs>
-            <circle cx="110" cy="61" r="43" fill="url(#skin)" stroke="#39241c" stroke-width="5"/>
-            <path d="M69 56Q74 15 112 14Q151 15 158 55L143 43Q125 54 98 48Q82 44 69 56Z" fill="#2a201d"/>
-            <path d="M80 74Q110 104 141 74Q137 116 110 121Q83 115 80 74Z" fill="#493029"/>
-            <circle cx="94" cy="61" r="5" fill="#171313"/><circle cx="128" cy="61" r="5" fill="#171313"/>
-            <path d="M99 80Q110 86 122 80" fill="none" stroke="#3a211b" stroke-width="4" stroke-linecap="round"/>
-            <path d="M72 119L45 151L61 235Q110 258 159 235L175 151L148 119Z" fill="url(#armor)" stroke="#171b20" stroke-width="6"/>
-            <path d="M76 132L110 170L144 132L139 218L110 232L81 218Z" fill="#252d36"/>
-            <path d="M48 148L24 205L47 215L73 169Z" fill="#343d47" stroke="#171b20" stroke-width="5"/>
-            <path d="M172 148L196 205L173 215L147 169Z" fill="#343d47" stroke="#171b20" stroke-width="5"/>
-            <path d="M77 230L64 286L92 286L110 239L128 286L156 286L143 230Z" fill="#171c22" stroke="#101317" stroke-width="5"/>
-            <path d="M52 151L27 123" stroke="#b7bdc4" stroke-width="8" stroke-linecap="round"/>
-          </svg>
-          <div class="nameplate">SSS <i>LV.1</i></div>
+        <div class="city-block right-block">
+          <div class="roof"></div><div class="facade"><i class="win w1"></i><i class="win w2"></i><i class="door"></i></div>
+          <button class="location-tag" data-screen="market">🛒 РЫНОК</button>
         </div>
-        <div class="street-lamp lamp1"><i></i></div>
-        <div class="street-lamp lamp2"><i></i></div>
-        <div class="street-lamp lamp3"><i></i></div>
-        <div class="street-shadow ss-left"></div><div class="street-shadow ss-right"></div>
-        <div class="street-prop signpost">S</div><div class="street-prop bench">▰</div>
-        <div class="barrel barrel1">🛢️</div><div class="barrel barrel2">🛢️</div>
-        <div class="street-lantern-glow glow1"></div><div class="street-lantern-glow glow2"></div>
-        <div class="npc n1"><span class="person"></span><b>Страж</b></div>
-        <div class="npc n2"><span class="person person-trader"></span><b>Торговец</b></div>
-        <div class="walker"><span class="person"></span><i>Житель</i></div>
-        <div class="walker walker2"><span class="person person-trader"></span><i>Житель</i></div>
-        <div class="scene-time">19:42 · ВЕЧЕР</div>
-        <div class="side-actions">
-          <button data-screen="arena">⚔️<span>Арена</span></button>
-          <button data-screen="market">🛒<span>Рынок</span></button>
-          <button data-screen="inventory">🎒<span>Инвентарь</span></button>
-          <button data-screen="districts">🗺️<span>Районы</span></button>
-          <button data-screen="casino">🎰<span>Казино</span></button>
+
+        <div class="street-v11"><i class="mark m1"></i><i class="mark m2"></i><i class="mark m3"></i></div>
+        <div class="lamp-v11 l1"><i></i></div><div class="lamp-v11 l2"><i></i></div>
+
+        <div class="camp-v11"><div class="fire-v11">🔥</div><b>ЛАГЕРЬ</b></div>
+
+        <div class="npc-v11 guard"><span class="npc-head"></span><span class="npc-body"></span><b>Страж</b></div>
+        <div class="npc-v11 trader"><span class="npc-head"></span><span class="npc-body"></span><b>Торговец</b></div>
+        <div class="npc-v11 citizen c1"><span class="npc-head"></span><span class="npc-body"></span></div>
+        <div class="npc-v11 citizen c2"><span class="npc-head"></span><span class="npc-body"></span></div>
+
+        <div class="hero-v11">
+          <div class="hero-aura"></div><div class="hero-body"><div class="hero-head"></div><div class="hero-torso"></div><div class="hero-arm a1"></div><div class="hero-arm a2"></div><div class="hero-leg l1"></div><div class="hero-leg l2"></div></div>
+          <div class="hero-name">SSS <i>LV.1</i></div>
         </div>
-        <div class="world-message" id="worldMessage">Sdolars живёт своей жизнью.</div>
+
+        <div class="message-v11">Sdolars живёт своей жизнью.</div>
+        <div class="quick-blocks">
+          <button data-screen="arena"><b>⚔️</b><span>Арена</span><small>Бой</small></button>
+          <button data-screen="market"><b>🛒</b><span>Рынок</span><small>Торговля</small></button>
+          <button data-screen="inventory"><b>🎒</b><span>Инвентарь</span><small>Снаряжение</small></button>
+          <button data-screen="districts"><b>🗺️</b><span>Районы</span><small>Город</small></button>
+          <button data-screen="casino"><b>🎰</b><span>Казино</span><small>Удача</small></button>
+        </div>
+        <div class="bottom-city-strip"><span>● Улицы открыты</span><span>● 2 события</span><span>● Ночь</span></div>
       </div>
     </section>
 
