@@ -518,3 +518,63 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
 .final-status{position:absolute;z-index:29;left:15px;right:100px;bottom:5px;display:flex;gap:5px}.final-status span{padding:5px 7px;border:1px solid #526173;background:#0b151dcc;border-radius:8px;color:#9ba7b2;font-size:6px}
 .final-actions{position:absolute;z-index:31;right:10px;top:72px;width:80px;display:flex;flex-direction:column;gap:6px}.final-actions button{height:65px;border-radius:14px;background:#101b25ee;border:1px solid #667587;box-shadow:0 5px 13px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center}.final-actions b{font-size:21px;line-height:21px}.final-actions span{font-size:8px;margin-top:2px}.final-actions small{font-size:6px;color:#8f9aa6;margin-top:2px}.final-actions button:active{transform:scale(.97)}
 @media(max-height:760px){.final-location{top:10px}.final-house{bottom:28%;height:120px}.final-gate{bottom:27%;height:166px}.final-hero{bottom:6%;transform:translateX(-50%) scale(.9)}.final-npc.left,.final-npc.right{bottom:12%}.final-actions{top:66px;gap:4px}.final-actions button{height:58px}.final-message{bottom:9%}.final-status{bottom:3px}}
+
+/* Territory v13 — real rendered Sdolars scene */
+.world-final{background:#07111b url('sdolars_scene.png') center center/cover no-repeat !important;}
+/* The generated scene is the visual foundation. Keep only functional HTML controls over it. */
+.world-final > .final-sky,
+.world-final > .final-city-back,
+.world-final > .final-house,
+.world-final > .final-gate,
+.world-final > .final-street,
+.world-final > .final-lamp,
+.world-final > .final-guard,
+.world-final > .final-trader,
+.world-final > .final-citizen,
+.world-final > .final-camp,
+.world-final > .final-hero{display:none !important}
+/* Functional controls sit over the real scene without drawing a second city. */
+.final-location{z-index:40;top:18px;left:18px}
+.final-time{z-index:40;top:22px;right:150px}
+.final-message{z-index:40;bottom:78px;left:18px}
+.final-actions{z-index:45}
+.final-status{display:none}
+.bottom-nav{z-index:60}
+@media(max-width:390px){
+ .final-location{transform:scale(.92);transform-origin:top left}
+ .final-time{right:138px;transform:scale(.9);transform-origin:top right}
+ .final-actions button{width:58px}
+}
+
+
+/* Territory v14 — cinematic real scene, functional UI over a clean scene crop */
+.world-final{
+  background:#07111b url('sdolars_scene_clean.png') center center/cover no-repeat !important;
+}
+.world-final:after{display:none !important}
+.world-final > .final-sky,
+.world-final > .final-city-back,
+.world-final > .final-house,
+.world-final > .final-gate,
+.world-final > .final-street,
+.world-final > .final-lamp,
+.world-final > .final-guard,
+.world-final > .final-trader,
+.world-final > .final-citizen,
+.world-final > .final-camp,
+.world-final > .final-hero,
+.world-final > .final-message{display:none !important}
+.final-location{z-index:50;top:18px;left:18px;width:218px}
+.final-time{z-index:50;top:22px;right:150px}
+.final-actions{z-index:55;top:92px;right:10px}
+.scene-hotspots{position:absolute;inset:0;z-index:35;pointer-events:none}
+.scene-hotspots .hotspot{position:absolute;display:block;padding:0;background:transparent;border:0;pointer-events:auto}
+.hotspot-weapon{left:5%;bottom:23%;width:27%;height:13%}
+.hotspot-market{right:5%;bottom:23%;width:27%;height:13%}
+.hotspot-center{left:30%;right:30%;bottom:31%;height:12%}
+@media(max-width:390px){
+ .final-location{transform:scale(.92);transform-origin:top left}
+ .final-time{right:138px;transform:scale(.9);transform-origin:top right}
+ .final-actions{top:88px;right:8px}
+ .hotspot-weapon{bottom:22%;height:14%}.hotspot-market{bottom:22%;height:14%}.hotspot-center{bottom:30%;height:13%}
+}
