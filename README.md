@@ -1,5 +1,6 @@
-Territory S107 — arena rebuild from the confirmed working S107 base.
+# Territory S121 — Arena Visual
 
-This version keeps the existing game/server files and adds the video-inspired Arena as the active Arena screen. The visible battle flow includes: VS transition, arena scene with two fighters, HP/levels, 30-second timer, compact skill bar, energy, auto combat, attack/crit/heal feedback, floating damage numbers, Victory/Defeat result and next-opponent flow.
+Base: Territory-S120-Restore-Working-UI.
 
-Upload the files from this folder to the repository root, replacing the existing files with the same names. For the first test, index.html is the important changed file; the other files are preserved from S107.
+Preserved S120 main UI, worker/server bridge, and server-authoritative arena logic.
+Updated only the Arena presentation and exposed live HP/level data from the worker for the Arena UI.
