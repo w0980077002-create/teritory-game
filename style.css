@@ -599,3 +599,48 @@ body:has(#home.active) .bottom-nav{display:none}
 .hs-bottom-districts{left:40.5%;bottom:0;width:18.5%;height:10.5%}
 .hs-bottom-profile{left:60.5%;bottom:0;width:18.5%;height:10.5%}
 .hs-bottom-shop{left:80.5%;bottom:0;width:18.5%;height:10.5%}
+
+/* Territory v16 — ЖИВОЙ ГОРОД: реальная сцена + анимационные слои */
+.real-home{isolation:isolate}
+.real-home-image{position:absolute;inset:0;width:100%;height:100%;z-index:1;transform:scale(1.012);animation:cityBreath 18s ease-in-out infinite alternate;will-change:transform}
+.live-city{position:absolute;inset:0;z-index:42;pointer-events:none;overflow:hidden}
+.scene-vignette{position:absolute;inset:0;background:radial-gradient(circle at 50% 48%,transparent 46%,rgba(0,0,0,.28) 100%);opacity:.65}
+.atmo-glow{position:absolute;border-radius:50%;filter:blur(18px);mix-blend-mode:screen;opacity:.24}
+.glow-a{width:90px;height:90px;left:8%;top:55%;background:#ffb34a;animation:glowPulse 2.2s ease-in-out infinite}
+.glow-b{width:100px;height:100px;right:7%;top:55%;background:#ffb34a;animation:glowPulse 2.7s ease-in-out infinite .3s}
+.banner{position:absolute;width:34px;height:76px;top:31%;background:linear-gradient(90deg,#08172b,#17365a,#08172b);border:1px solid #9c6b24;box-shadow:0 6px 12px #0008;transform-origin:top center;opacity:.82}
+.banner:after{content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);border-left:17px solid transparent;border-right:17px solid transparent;border-top:8px solid #17365a}
+.banner-left{left:25%;animation:flagWave 3.1s ease-in-out infinite}
+.banner-right{right:25%;animation:flagWave 2.7s ease-in-out infinite reverse}
+.fire{position:absolute;width:52px;height:72px;filter:drop-shadow(0 0 8px #ff8a24);opacity:.9}
+.fire:before,.fire:after{content:"";position:absolute;left:50%;bottom:8px;border-radius:50% 50% 45% 45%;transform-origin:center bottom}
+.fire:before{width:28px;height:48px;background:radial-gradient(circle at 50% 72%,#fff4a6 0 12%,#ffd34f 13% 34%,#ff7a1f 35% 68%,transparent 70%);animation:flame 1.05s ease-in-out infinite}
+.fire:after{width:18px;height:34px;background:#fff4c4;bottom:8px;animation:flame .72s ease-in-out infinite reverse}
+.fire i,.fire b,.fire em{position:absolute;display:block;border-radius:50%;background:#ffd36a;bottom:28px;left:50%;width:4px;height:4px;animation:ember 1.5s ease-out infinite;font-style:normal}
+.fire b{animation-delay:.5s}.fire em{animation-delay:1s}.fire-a{left:35%;top:67%}.fire-b{right:32%;top:68%;transform:scale(.72)}
+.smoke{position:absolute;width:55px;height:85px;bottom:29%;opacity:.2;filter:blur(4px)}
+.smoke i,.smoke b,.smoke em{position:absolute;width:24px;height:24px;border-radius:50%;background:#d8e1e5;animation:smokeUp 5s ease-out infinite}
+.smoke i{left:15px;bottom:0}.smoke b{left:29px;bottom:18px;animation-delay:1.3s}.smoke em{left:4px;bottom:35px;animation-delay:2.4s}
+.smoke-a{left:39%}.smoke-b{right:35%;transform:scale(.7);animation-delay:2s}
+.walker{position:absolute;bottom:38%;width:14px;height:30px;border-radius:8px 8px 3px 3px;background:linear-gradient(#d8a47e 0 25%,#202b37 26%);box-shadow:0 5px 5px #0007;opacity:.9;animation:walkScene 13s linear infinite}
+.walker:after{content:"";position:absolute;left:3px;bottom:-6px;width:3px;height:9px;background:#161b20;box-shadow:6px 0 #161b20;animation:steps .45s linear infinite alternate}
+.walker-a{left:-4%;animation-delay:-2s}.walker-b{left:-12%;bottom:44%;transform:scale(.72);animation-delay:-7s}
+.bird{position:absolute;color:#101d2caa;font-size:25px;font-weight:900;animation:birdFly 15s linear infinite}
+.bird-a{top:25%;left:-5%}.bird-b{top:30%;left:-20%;animation-delay:-8s;transform:scale(.7)}
+.rain{position:absolute;inset:0;opacity:.12;background-image:repeating-linear-gradient(108deg,transparent 0 17px,#c8e6ff 18px,#c8e6ff 19px,transparent 20px 34px);background-size:90px 90px;animation:rainMove .8s linear infinite}
+.spark{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffd77b;box-shadow:0 0 8px #ffb13b;animation:sparkFly 2.2s ease-out infinite}
+.spark-a{left:42%;top:71%}.spark-b{left:39%;top:74%;animation-delay:.8s}.spark-c{right:37%;top:72%;animation-delay:1.4s}
+.hotspot{z-index:60}
+@keyframes cityBreath{from{transform:scale(1.012) translate3d(0,0,0)}to{transform:scale(1.028) translate3d(-.35%,-.25%,0)}}
+@keyframes glowPulse{50%{opacity:.4;transform:scale(1.18)}}
+@keyframes flagWave{0%,100%{transform:skewX(0) rotate(0)}50%{transform:skewX(-8deg) rotate(1deg)}}
+@keyframes flame{0%,100%{transform:translateX(-50%) scaleY(1) rotate(-2deg)}50%{transform:translateX(-50%) scaleY(1.16) rotate(3deg)}}
+@keyframes ember{0%{transform:translate(-50%,0) scale(1);opacity:1}100%{transform:translate(-8px,-45px) scale(.2);opacity:0}}
+@keyframes smokeUp{0%{transform:translate(0,0) scale(.55);opacity:0}25%{opacity:.7}100%{transform:translate(18px,-75px) scale(1.5);opacity:0}}
+@keyframes walkScene{0%{left:-5%;transform:translateY(0)}45%{transform:translateY(-2px)}100%{left:105%;transform:translateY(0)}}
+@keyframes steps{to{transform:translateX(2px)}}
+@keyframes birdFly{0%{left:-8%;transform:translateY(0) scale(.8)}50%{transform:translateY(-15px) scale(1)}100%{left:108%;transform:translateY(4px) scale(.75)}}
+@keyframes rainMove{to{background-position:-40px 90px}}
+@keyframes sparkFly{0%{transform:translate(0,0) scale(1);opacity:0}20%{opacity:1}100%{transform:translate(15px,-55px) scale(.1);opacity:0}}
+@media (prefers-reduced-motion:reduce){.real-home-image,.banner,.fire:before,.fire:after,.walker,.bird,.rain,.smoke i,.smoke b,.smoke em,.spark{animation:none!important}}
+@media(max-width:390px){.banner{display:none}.walker{bottom:37%}.glow-a,.glow-b{opacity:.16}}
