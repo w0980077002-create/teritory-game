@@ -35,3 +35,68 @@
 .side-actions button:first-child{height:47px}
 .world-message{bottom:33%;max-width:260px}
 @media(max-height:700px){.hero-svg{width:140px;height:200px}.town{bottom:33%;transform:scale(.9);transform-origin:bottom}.npc{bottom:28%}}
+
+/* Territory v3 — плотнее игровая сцена, меньше пустоты */
+.world{min-height:0;height:100%;background:#26353a}
+.world:after{height:35%;background:linear-gradient(#5d503f 0,#41382e 55%,#262421 100%);clip-path:none}
+.town{bottom:31%;height:190px;z-index:3}
+.house{height:91px;width:116px}
+.tower{height:154px}
+.hero{bottom:23%;z-index:8}
+.hero-svg{width:142px;height:194px}
+.hero-shadow{width:145px;height:28px;bottom:0}
+.hero-glow{width:150px;bottom:3px}
+.npc{bottom:25%;font-size:27px;z-index:9}
+.n1{left:18%}.n2{right:18%}
+.street-lamp{position:absolute;z-index:7;bottom:28%;width:8px;height:108px;background:#24282b;border-radius:5px}
+.street-lamp:before{content:"";position:absolute;top:-5px;left:-15px;width:38px;height:8px;background:#252a2d;border-radius:5px;transform:rotate(-12deg)}
+.street-lamp i{position:absolute;top:-14px;left:-1px;width:11px;height:15px;border-radius:50%;background:#f1cf86;box-shadow:0 0 22px 9px #f1cf8655}
+.lamp1{left:9%}.lamp2{right:11%;transform:scale(.82);bottom:29%}
+.barrel{position:absolute;z-index:8;bottom:27%;font-size:31px;color:#8d6b49;filter:drop-shadow(0 4px 2px #0008)}
+.barrel1{left:30%}.barrel2{right:30%;transform:scale(.8)}
+.walker{position:absolute;z-index:7;bottom:28%;left:-30px;font-size:24px;animation:walkCity 14s linear infinite}
+@keyframes walkCity{0%{left:-35px}45%{left:55%}100%{left:110%}}
+.scene-time{position:absolute;right:78px;top:17px;z-index:12;background:#111820bb;border:1px solid #566272;border-radius:8px;padding:5px 7px;font-size:8px;color:#cbd1d8}
+.world-message{bottom:31%;left:10px;max-width:245px}
+.world-events{bottom:8px;right:72px;left:10px}
+.quickbar{position:relative;z-index:20}
+@media(max-height:760px){
+ .town{bottom:30%;height:160px}
+ .hero{bottom:21%}.hero-svg{width:125px;height:171px}
+ .npc{bottom:23%}.street-lamp{bottom:26%;height:90px}
+ .barrel{bottom:25%}.world-message{bottom:30%}
+}
+
+
+/* Territory v4 — город как игровая сцена, без лишней панели */
+main{flex:1;min-height:0;display:flex;flex-direction:column}
+.screen{height:100%;padding-bottom:0;overflow:hidden}
+.screen.active{height:100%}
+.world{height:100%;min-height:0;background:#202a2f}
+.world:after{z-index:1;height:43%;background:linear-gradient(180deg,#675746 0%,#4b4034 35%,#282622 100%);clip-path:polygon(0 9%,12% 4%,24% 11%,37% 3%,51% 10%,64% 4%,78% 12%,91% 5%,100% 9%,100% 100%,0 100%)}
+.sky{z-index:0;inset:0 0 43% 0;background:linear-gradient(180deg,#101d2c 0%,#2c4a58 58%,#536b70 100%)}
+.mountains,.mountain,.pine{z-index:1}
+.mountain{bottom:39%;height:28%;background:#26343a}
+.m2{bottom:38%;height:23%;opacity:.48}
+.pine{bottom:36%;font-size:62px;opacity:.85}.p2{font-size:72px}.p3{font-size:52px}
+.town{z-index:4;bottom:36%;height:185px;filter:drop-shadow(0 12px 7px #0009)}
+.house{height:92px;width:120px;background:linear-gradient(#695342,#493b32);border-width:2px}.house:before{border-left-width:68px;border-right-width:68px;border-bottom-width:43px;left:-15px}.h1{left:4%}.h2{right:4%;transform:scale(.82);transform-origin:bottom right}
+.tower{height:156px;left:44%;width:76px;background:linear-gradient(90deg,#3c4244,#5b5e5d,#353a3c)}
+.roadline{height:72px;bottom:-34px;background:linear-gradient(180deg,#685b4b,#3d3730);clip-path:polygon(0 48%,25% 18%,50% 42%,75% 12%,100% 34%,100% 100%,0 100%)}
+.hero{bottom:20%;z-index:10}.hero-svg{width:112px;height:153px}.hero-shadow{width:118px;height:18px}.hero-glow{width:120px;height:18px;bottom:1px}
+.nameplate{font-size:9px;padding:3px 7px;margin-top:-2px}
+.npc{z-index:10;bottom:23%;font-size:21px}.n1{left:16%}.n2{right:16%}.npc b{font-size:7px;padding:2px 5px}
+.street-lamp{z-index:8;bottom:30%;height:100px}.lamp1{left:7%}.lamp2{right:8%;transform:scale(.75);transform-origin:bottom}
+.barrel{z-index:9;bottom:24%;font-size:23px}.barrel1{left:28%}.barrel2{right:28%}
+.camp{z-index:7;bottom:36%;left:53%;font-size:23px;text-align:center}.camp .fire{filter:drop-shadow(0 0 8px #eaa85c)}.camp span{font-size:7px}
+.walker{z-index:9;bottom:25%;font-size:20px;filter:drop-shadow(0 5px 3px #0008)}.walker i{display:none}
+.scene-time{z-index:14;top:17px;right:69px;font-size:7px;padding:4px 6px}
+.side-actions{z-index:15;top:61px;right:7px;gap:4px}.side-actions button{width:48px;min-height:44px;border-radius:12px;font-size:18px}.side-actions span{font-size:7px}
+.world-top{z-index:15;top:12px;left:12px;right:12px}.world-top b{font-size:14px}
+.world-message{z-index:14;left:10px;bottom:29%;max-width:215px;font-size:9px;padding:6px 8px}
+.world-events{z-index:14;left:10px;right:63px;bottom:8px}.world-events span{font-size:7px;padding:4px 6px}
+/* foreground depth */
+.world:before{content:"";position:absolute;z-index:6;left:-10%;right:-10%;bottom:0;height:25%;background:linear-gradient(180deg,#39342e00,#171616d9 75%,#111111);clip-path:polygon(0 28%,18% 14%,36% 34%,54% 9%,73% 29%,100% 4%,100% 100%,0 100%);pointer-events:none}
+@media(max-height:760px){
+ .town{bottom:34%;height:155px}.house{height:76px;width:103px}.tower{height:132px}.hero{bottom:19%}.hero-svg{width:100px;height:136px}.npc{bottom:22%}.street-lamp{bottom:28%;height:82px}.barrel{bottom:23%}.camp{bottom:34%}.world-message{bottom:28%}
+}
