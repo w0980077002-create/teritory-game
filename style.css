@@ -772,3 +772,48 @@ body:has(#home.active) .bottom-nav{display:none}
   .bottom-nav button{font-size:17px!important;border-radius:9px!important}
   .bottom-nav button span{font-size:8px!important;line-height:10px!important}
 }
+
+/* Territory v21 — final mobile frame: real scene + native HUD/nav */
+body:has(#home.active) .hud{
+  position:absolute!important;left:0;right:0;top:0;height:78px!important;
+  display:flex!important;z-index:220!important;
+  padding:8px 12px!important;
+  background:linear-gradient(180deg,rgba(8,15,23,.97),rgba(10,17,25,.90))!important;
+  border-bottom:1px solid #465466!important;
+  box-shadow:0 6px 18px rgba(0,0,0,.28)!important;
+}
+body:has(#home.active) .hud .avatar{width:48px;height:48px;border-radius:13px;font-size:27px}
+body:has(#home.active) .hud .profile b{font-size:16px}
+body:has(#home.active) .hud .profile span{font-size:10px}
+body:has(#home.active) .hud .resources{gap:6px}
+body:has(#home.active) .hud .resources div{padding:8px 10px;border-radius:10px;font-size:12px;background:#16202bde;border-color:#415064}
+body:has(#home.active) main{height:100%!important;min-height:0!important}
+body:has(#home.active) .real-home{height:100%!important;padding:0!important}
+body:has(#home.active) .real-home-image{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  object-fit:cover!important;object-position:center!important;transform:none!important;animation:none!important;
+}
+body:has(#home.active) .bottom-nav{
+  height:64px!important;min-height:64px!important;padding:3px 4px!important;
+  background:rgba(8,14,21,.96)!important;backdrop-filter:blur(4px);
+}
+body:has(#home.active) .bottom-nav button{border-radius:8px!important;padding:2px!important;gap:1px!important}
+body:has(#home.active) .bottom-nav button span{font-size:8px!important;line-height:10px!important}
+body:has(#home.active) .bottom-nav button:first-child{border:1px solid #b17d2c!important;background:rgba(38,32,20,.65)!important;color:#f0bd65!important}
+/* Hotspots are mapped to the real scene; the visible artwork remains untouched. */
+body:has(#home.active) .hs-bottom-home,
+body:has(#home.active) .hs-bottom-arena,
+body:has(#home.active) .hs-bottom-districts,
+body:has(#home.active) .hs-bottom-profile,
+body:has(#home.active) .hs-bottom-shop{bottom:0;height:64px!important}
+@media(max-width:390px){
+  body:has(#home.active) .hud{height:72px!important;padding:7px 9px!important}
+  body:has(#home.active) .hud .avatar{width:44px;height:44px}
+  body:has(#home.active) .hud .resources div{padding:7px 8px;font-size:11px}
+  body:has(#home.active) .bottom-nav{height:60px!important;min-height:60px!important}
+  body:has(#home.active) .hs-bottom-home,
+  body:has(#home.active) .hs-bottom-arena,
+  body:has(#home.active) .hs-bottom-districts,
+  body:has(#home.active) .hs-bottom-profile,
+  body:has(#home.active) .hs-bottom-shop{height:60px!important}
+}
