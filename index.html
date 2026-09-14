@@ -30,14 +30,42 @@
           <div><small>ГОРОД</small><b>SDOLARS</b></div>
           <button class="icon-btn" data-screen="districts">⌖</button>
         </div>
-        <div class="sky"></div>
+        <div class="sky">
+          <div class="cloud c1"></div><div class="cloud c2"></div>
+          <div class="bird b1">⌁</div><div class="bird b2">⌁</div>
+        </div>
         <div class="mountain m1"></div><div class="mountain m2"></div>
         <div class="pine p1">🌲</div><div class="pine p2">🌲</div><div class="pine p3">🌲</div>
+        <div class="town">
+          <div class="tower"><i></i><i></i><i></i></div>
+          <div class="house h1"><b>SD</b></div><div class="house h2"><b>OL</b></div>
+          <div class="roadline"></div>
+        </div>
         <div class="camp">🔥 <span>ЛАГЕРЬ</span></div>
         <div class="hero">
-          <div class="hero-glow"></div><div class="hero-body">🧔‍♂️</div>
+          <div class="hero-glow"></div>
+          <div class="hero-shadow"></div>
+          <svg class="hero-svg" viewBox="0 0 220 300" aria-label="Взрослый воин">
+            <defs>
+              <linearGradient id="armor" x1="0" x2="1"><stop offset="0"/><stop offset=".5" stop-color="#4b5563"/><stop offset="1"/></linearGradient>
+              <linearGradient id="skin" x1="0" x2="1"><stop offset="0" stop-color="#9a5b3d"/><stop offset=".5" stop-color="#d28a5a"/><stop offset="1" stop-color="#81462f"/></linearGradient>
+            </defs>
+            <circle cx="110" cy="61" r="43" fill="url(#skin)" stroke="#39241c" stroke-width="5"/>
+            <path d="M69 56Q74 15 112 14Q151 15 158 55L143 43Q125 54 98 48Q82 44 69 56Z" fill="#2a201d"/>
+            <path d="M80 74Q110 104 141 74Q137 116 110 121Q83 115 80 74Z" fill="#493029"/>
+            <circle cx="94" cy="61" r="5" fill="#171313"/><circle cx="128" cy="61" r="5" fill="#171313"/>
+            <path d="M99 80Q110 86 122 80" fill="none" stroke="#3a211b" stroke-width="4" stroke-linecap="round"/>
+            <path d="M72 119L45 151L61 235Q110 258 159 235L175 151L148 119Z" fill="url(#armor)" stroke="#171b20" stroke-width="6"/>
+            <path d="M76 132L110 170L144 132L139 218L110 232L81 218Z" fill="#252d36"/>
+            <path d="M48 148L24 205L47 215L73 169Z" fill="#343d47" stroke="#171b20" stroke-width="5"/>
+            <path d="M172 148L196 205L173 215L147 169Z" fill="#343d47" stroke="#171b20" stroke-width="5"/>
+            <path d="M77 230L64 286L92 286L110 239L128 286L156 286L143 230Z" fill="#171c22" stroke="#101317" stroke-width="5"/>
+            <path d="M52 151L27 123" stroke="#b7bdc4" stroke-width="8" stroke-linecap="round"/>
+          </svg>
           <div class="nameplate">SSS <i>LV.1</i></div>
         </div>
+        <div class="npc n1"><span>👤</span><b>Страж</b></div>
+        <div class="npc n2"><span>👤</span><b>Торговец</b></div>
         <div class="side-actions">
           <button data-screen="arena">⚔️<span>Арена</span></button>
           <button data-screen="market">🛒<span>Рынок</span></button>
@@ -45,7 +73,7 @@
           <button data-screen="districts">🗺️<span>Районы</span></button>
           <button data-screen="casino">🎰<span>Казино</span></button>
         </div>
-        <div class="world-message" id="worldMessage">Sdolars живёт своей жизнью.</div>
+        <div class="world-message" id="worldMessage">Sdolars живёт своей жизнью.</div><div class="world-events"><span>● Событие</span><span>● Город</span><span>● Ночь</span></div>
       </div>
 
       <div class="quickbar">
