@@ -139,3 +139,56 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
 @media(max-height:760px){
  .street-depth{height:36%}.district-sign{bottom:45%}.hero{bottom:17%}.hero-svg{width:88px;height:120px}.npc{bottom:20%}.walker{bottom:22%}.world-message{bottom:26%}.shop-sign{bottom:36%}.window-light{bottom:37%}.crate{bottom:21%}
 }
+
+
+/* Territory v6 — взрослая улица Sdolars */
+/* Architectural pass: больше глубины, меньше ощущения плоского фона */
+.house{overflow:visible;position:absolute;border-radius:1px}
+.house-window{position:absolute;z-index:2;top:30px;width:16px;height:19px;background:linear-gradient(135deg,#d9c17b,#8f7748);border:2px solid #252628;box-shadow:0 0 14px #e0bd6650,inset 0 0 0 2px #514532}
+.house-window:after{content:"";position:absolute;left:6px;top:0;bottom:0;width:2px;background:#332f2a}
+.house-window:before{content:"";position:absolute;top:8px;left:0;right:0;height:2px;background:#332f2a}
+.house .wleft{left:16px}.house .wright{right:16px}
+.house .door{position:absolute;z-index:2;bottom:0;left:50%;transform:translateX(-50%);width:22px;height:38px;background:linear-gradient(90deg,#242426,#47392d);border:2px solid #272727;border-bottom:0;border-radius:2px 2px 0 0}
+.house .door:after{content:"";position:absolute;right:4px;top:20px;width:3px;height:3px;border-radius:50%;background:#d3b16d}
+.h1:after,.h2:after{content:"";position:absolute;left:-4px;right:-4px;bottom:-4px;height:5px;background:#292725;box-shadow:0 5px 9px #0007}
+/* stone base and side silhouettes */
+.house{box-shadow:inset 0 13px #80634a,0 8px 14px #0007,0 15px 0 #302b28}
+.tower:after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:25px;height:43px;background:#222528;border:2px solid #17191b}
+.tower i{position:relative;z-index:2;box-shadow:inset 0 0 0 2px #111519}
+/* road is layered: far pavement -> central street -> foreground */
+.street-depth{background:linear-gradient(180deg,#625748 0%,#4b443b 40%,#2d2a27 100%);filter:drop-shadow(0 -5px 7px #0004)}
+.street-depth:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 0 22%,#81715b22 22% 23%,transparent 23% 77%,#81715b22 77% 78%,transparent 78%);pointer-events:none}
+/* third lamp sits farther away, establishing scale */
+.lamp3{left:50%;bottom:40%;height:58px;width:4px;transform:scale(.55);opacity:.55;z-index:4}
+.lamp3:before{width:27px;height:5px;left:-11px;top:-3px}
+.lamp3 i{width:8px;height:10px;top:-10px;left:-2px;box-shadow:0 0 15px 6px #f1cf8644}
+/* warm window glow and evening haze */
+.window-light{background:linear-gradient(#ffe4a0,#b38b4e);box-shadow:0 0 20px 7px #e7c77a40}
+.world:after{background:linear-gradient(180deg,#625647 0%,#493e34 42%,#211f1d 100%)}
+.world:before{background:linear-gradient(180deg,#39342e00 0%,#24211fd9 72%,#0e0e0e 100%)}
+/* replace emoji people with adult-looking silhouettes */
+.person{position:relative;display:block;width:20px;height:40px;margin:0 auto 1px;filter:drop-shadow(0 5px 3px #0009)}
+.person:before{content:"";position:absolute;top:0;left:6px;width:10px;height:10px;border-radius:50%;background:#5a3428;border:1px solid #241b18}
+.person:after{content:"";position:absolute;left:3px;top:10px;width:15px;height:19px;border-radius:5px 5px 3px 3px;background:linear-gradient(90deg,#242d36,#46515d,#20272f);box-shadow:-4px 11px 0 -2px #1a2026,4px 11px 0 -2px #1a2026}
+.person-trader:after{background:linear-gradient(90deg,#5b4938,#92734f,#4b3a2e)}
+.npc{font-size:0;min-width:62px}
+.npc b{font-size:7px}
+.walker{font-size:0;min-width:24px}
+.walker i{display:none}
+.walker .person{transform:scale(.82)}
+/* props that sit in the world, not in the interface */
+.street-shadow{position:absolute;z-index:8;bottom:21%;width:110px;height:17px;background:#09090988;border-radius:50%;filter:blur(4px)}
+.ss-left{left:4%}.ss-right{right:5%}
+.street-prop{position:absolute;z-index:9;color:#bca274;text-shadow:0 2px 2px #000;font-size:14px}
+.signpost{left:22%;bottom:25%;width:18px;height:44px;border-left:3px solid #282828;border-bottom:3px solid #282828;text-align:center;padding-top:2px;background:#3b3329;border:1px solid #80694e}
+.bench{right:20%;bottom:24%;width:45px;height:13px;background:#3e3128;border:2px solid #241f1c;transform:skewX(-8deg);font-size:10px;color:#6d5139}
+/* small moving light in the street */
+.world:after{pointer-events:none}
+@keyframes lampFlicker{0%,100%{opacity:.9}48%{opacity:1}52%{opacity:.72}55%{opacity:.95}}
+.street-lamp i{animation:lampFlicker 4s ease-in-out infinite}
+.walker{animation-duration:19s}
+.walker2{animation-duration:23s}
+@media(max-height:760px){
+ .house-window{top:24px;width:13px;height:16px}.house .wleft{left:12px}.house .wright{right:12px}.house .door{width:19px;height:31px}
+ .lamp3{bottom:39%}.street-shadow{bottom:20%}.signpost{bottom:23%}.bench{bottom:22%}
+}
