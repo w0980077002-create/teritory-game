@@ -817,3 +817,112 @@ body:has(#home.active) .hs-bottom-shop{bottom:0;height:64px!important}
   body:has(#home.active) .hs-bottom-profile,
   body:has(#home.active) .hs-bottom-shop{height:60px!important}
 }
+
+/* Territory v22 — final mobile composition: HUD, scene and nav are separate blocks */
+body:has(#home.active) .hud{
+  position:absolute!important;
+  top:0!important;left:0!important;right:0!important;
+  height:78px!important;
+  min-height:78px!important;
+  z-index:220!important;
+  padding:7px 12px!important;
+  display:flex!important;
+  align-items:center!important;
+  background:linear-gradient(180deg,rgba(7,14,22,.98),rgba(10,18,27,.94))!important;
+  border-bottom:1px solid rgba(86,103,122,.75)!important;
+  box-shadow:0 5px 16px rgba(0,0,0,.24)!important;
+}
+body:has(#home.active) .hud .avatar{width:48px!important;height:48px!important;border-radius:12px!important;font-size:25px!important}
+body:has(#home.active) .hud .profile{gap:8px!important}
+body:has(#home.active) .hud .profile b{font-size:16px!important;line-height:18px!important}
+body:has(#home.active) .hud .profile span{font-size:10px!important;line-height:13px!important}
+body:has(#home.active) .hud .resources{gap:6px!important}
+body:has(#home.active) .hud .resources div{padding:8px 10px!important;border-radius:10px!important;font-size:12px!important;background:rgba(22,31,42,.94)!important;border-color:#435366!important;white-space:nowrap!important}
+
+body:has(#home.active) main{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+body:has(#home.active) #home{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  padding:0!important;
+  overflow:hidden!important;
+}
+/* The artwork begins BELOW the HUD, so the city sign is never hidden by the HUD. */
+body:has(#home.active) .real-home{
+  position:absolute!important;
+  top:78px!important;
+  left:0!important;
+  right:0!important;
+  bottom:64px!important;
+  width:auto!important;
+  height:auto!important;
+  overflow:hidden!important;
+  background:#07101a!important;
+}
+body:has(#home.active) .real-home-image{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  transform:none!important;
+  animation:none!important;
+  image-rendering:auto!important;
+}
+
+/* Right-side controls are part of the artwork; keep them fully inside the scene. */
+body:has(#home.active) .hs-arena{right:1.5%!important;top:13%!important;width:18.5%!important;height:10.7%!important}
+body:has(#home.active) .hs-market{right:1.5%!important;top:22.7%!important;width:18.5%!important;height:10.7%!important}
+body:has(#home.active) .hs-inventory{right:1.5%!important;top:32.4%!important;width:18.5%!important;height:10.7%!important}
+body:has(#home.active) .hs-districts{right:1.5%!important;top:42.1%!important;width:18.5%!important;height:10.7%!important}
+body:has(#home.active) .hs-game{right:1.5%!important;top:51.8%!important;width:18.5%!important;height:10.7%!important}
+body:has(#home.active) .hs-weapon{left:1.5%!important;top:50.7%!important;width:28%!important;height:10.2%!important}
+body:has(#home.active) .hs-city{left:2%!important;top:6%!important;width:49%!important;height:10.5%!important}
+
+/* Bottom navigation is outside the artwork and never covers the scene. */
+body:has(#home.active) .bottom-nav{
+  position:absolute!important;
+  left:0!important;right:0!important;bottom:0!important;
+  height:64px!important;
+  min-height:64px!important;
+  z-index:230!important;
+  padding:3px 5px max(3px,env(safe-area-inset-bottom))!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:4px!important;
+  overflow:hidden!important;
+  background:rgba(8,14,21,.98)!important;
+  border-top:1px solid #465363!important;
+  box-shadow:0 -5px 16px rgba(0,0,0,.28)!important;
+}
+body:has(#home.active) .bottom-nav button{
+  width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  margin:0!important;padding:2px!important;border-radius:8px!important;
+  background:transparent!important;border:1px solid transparent!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:1px!important;transform:none!important;overflow:hidden!important;
+}
+body:has(#home.active) .bottom-nav button span{font-size:8px!important;line-height:10px!important;margin:0!important;white-space:nowrap!important}
+body:has(#home.active) .bottom-nav button:first-child{background:rgba(42,34,20,.72)!important;border-color:#b17d2c!important;color:#f0bd65!important}
+body:has(#home.active) .hs-bottom-home,
+body:has(#home.active) .hs-bottom-arena,
+body:has(#home.active) .hs-bottom-districts,
+body:has(#home.active) .hs-bottom-profile,
+body:has(#home.active) .hs-bottom-shop{display:none!important}
+
+@media(max-width:390px){
+  body:has(#home.active) .hud{height:72px!important;min-height:72px!important;padding:6px 9px!important}
+  body:has(#home.active) .hud .avatar{width:44px!important;height:44px!important}
+  body:has(#home.active) .hud .resources div{padding:7px 8px!important;font-size:11px!important}
+  body:has(#home.active) .real-home{top:72px!important;bottom:60px!important}
+  body:has(#home.active) .bottom-nav{height:60px!important;min-height:60px!important}
+}
