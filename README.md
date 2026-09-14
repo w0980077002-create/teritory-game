@@ -1,6 +1,7 @@
 # Territory S121 — Arena Visual
 
-Base: Territory-S120-Restore-Working-UI.
+Основа: Territory S120 Restore Working UI.
 
-Preserved S120 main UI, worker/server bridge, and server-authoritative arena logic.
-Updated only the Arena presentation and exposed live HP/level data from the worker for the Arena UI.
+Изменение S121: обновлена арена поверх S120 без отката главного экрана. Добавлена визуальная сцена боя и 5 зон тактического выбора: Голова, Грудь, Живот, Пояс, Ноги. Сохранён Cloudflare Worker, а встроенный INDEX_HTML в worker.js синхронизирован с index.html.
+
+Для GitHub Pages/Cloudflare Worker загружать `index.html` и `worker.js` из этого архива.
