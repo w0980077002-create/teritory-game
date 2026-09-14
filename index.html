@@ -1880,3 +1880,169 @@ setTimeout(()=>{const nav=[...document.querySelectorAll('button')].find(b=>(b.te
  window.nextBattle=()=>{const idx=Math.min(enemies.length-1,Math.floor((Number(state.level||1)-1)/2)+Math.min(2,stats.wins));startFight(idx)};
 })();
 </script>
+<style id="territory-s104-video-css">
+.s104v{font-family:Arial,sans-serif;color:#fff}
+.s104v .arena{position:relative;min-height:430px;border:1px solid #46515c;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#263542,#0b1219 68%,#070b10);box-shadow:inset 0 0 60px #0008}
+.s104v .arena:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#ffffff08,#0003 45%,#0009)}
+.s104v .fighters{position:absolute;inset:16px 10px 112px;display:flex;justify-content:space-between;align-items:flex-start;z-index:1}
+.s104v .fighter{width:43%;text-align:center}
+.s104v .avatar{width:92px;height:92px;margin:4px auto 6px;border-radius:50%;display:grid;place-items:center;font-size:52px;background:radial-gradient(circle,#394754,#111820);border:2px solid #8d7041;box-shadow:0 8px 25px #0009}
+.s104v .name{font-weight:900;font-size:13px}.s104v .lvl{font-size:10px;color:#aab4bd;margin:3px 0}
+.s104v .hp{height:13px;border-radius:99px;background:#202830;overflow:hidden;border:1px solid #000;box-shadow:inset 0 1px 3px #000}
+.s104v .hp i{display:block;height:100%;background:linear-gradient(90deg,#2e9a4b,#6bd276);transition:width .25s}
+.s104v .enemy .hp i{background:linear-gradient(90deg,#a62d35,#ec5c58)}
+.s104v .hptext{font-size:10px;color:#b9c2c9;margin-top:3px}
+.s104v .vs{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);font-size:25px;font-weight:1000;color:#e2bd72;text-shadow:0 3px 12px #000;z-index:2}
+.s104v .timer{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);font-size:25px;font-weight:1000;color:#f1d28e;z-index:2}
+.s104v .rage{position:absolute;left:12%;right:12%;bottom:66px;height:8px;border-radius:99px;background:#1c252d;overflow:hidden;z-index:2}
+.s104v .rage i{display:block;height:100%;background:linear-gradient(90deg,#7650a5,#d37aee);transition:width .2s}
+.s104v .fx{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.s104v .float{position:absolute;font-size:27px;font-weight:1000;text-shadow:0 2px 6px #000;animation:s104float .9s ease-out forwards}
+.s104v .float.crit{font-size:36px;color:#ffd46d}.s104v .float.heal{color:#7bf08d;font-size:23px}
+@keyframes s104float{0%{transform:translate(-50%,8px) scale(.65);opacity:0}15%{opacity:1}100%{transform:translate(-50%,-80px) scale(1.12);opacity:0}}
+.s104v .skills{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:7px}
+.s104v .skill{min-height:70px;border:1px solid #394651;border-radius:11px;background:linear-gradient(180deg,#202a33,#11171d);color:#fff;padding:6px 3px;font-size:10px;font-weight:800}
+.s104v .skill:disabled{opacity:.38}.s104v .skill b{display:block;font-size:12px;margin-top:2px}.s104v .skill small{display:block;color:#aab3bb;font-size:8px;margin-top:2px}
+.s104v .bottom{display:flex;gap:6px;margin-top:7px}.s104v .btn{flex:1;padding:10px;border-radius:10px;background:#33291c;border:1px solid #8e6a35;color:#f5d69a;font-weight:900}
+.s104v .log{height:74px;overflow:auto;margin-top:7px;padding:7px;background:#0c1217;border:1px solid #29323a;border-radius:10px;font-size:10px;color:#aeb8c0;line-height:1.4}
+.s104v .result{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:#03070bdc;backdrop-filter:blur(5px)}
+.s104v .resultBox{width:84%;padding:20px;text-align:center;border:1px solid #a17b3e;border-radius:16px;background:linear-gradient(180deg,#211a12,#0c1116);box-shadow:0 18px 55px #000}
+.s104v .resultBox .big{font-size:48px}.s104v .resultBox h2{margin:5px 0 10px;color:#f1d18c}
+.s104v .resultBox .reward{font-size:22px;font-weight:1000}.s104v .note{font-size:10px;color:#8f9aa3;text-align:center;margin-top:5px}
+</style>
+<script id="territory-s104-video-arena">
+(()=>{
+'use strict';
+const OLD_OPEN_BATTLE=window.openBattle;
+let vb=null,vTimer=null,vTick=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const zoneNames={head:'Голова',chest:'Грудь',stomach:'Живот',waist:'Пояс',legs:'Ноги'};
+const skills=[
+ {id:'hit',icon:'⚔️',name:'Удар',cost:0,cd:0,power:1},
+ {id:'power',icon:'💥',name:'Сокрушение',cost:20,cd:4,power:1.55},
+ {id:'precise',icon:'🎯',name:'Точный',cost:15,cd:3,power:1.2,crit:.15},
+ {id:'heal',icon:'💚',name:'Лечение',cost:30,cd:8,heal:true}
+];
+function profile(){
+ const lv=Number(state?.level||1), str=Number(state?.strength||5), ag=Number(state?.agility||5);
+ const max=Number(state?.maxHp||100)+lv*8;
+ return {name:currentPlayerName(),level:lv,maxHp:max,hp:Math.min(max,Number(state?.hp??max)),power:12+lv*4,strength:str,agility:ag};
+}
+function enemy(){
+ const lv=Number(state?.level||1)+Math.floor(Math.random()*3)-1;
+ const names=[['Громила','🥊'],['Наёмник','🗡️'],['Ветеран','🛡️'],['Охотник','🏹'],['Боец','⚔️']];
+ const x=names[Math.floor(Math.random()*names.length)];
+ const hp=105+Math.max(1,lv)*22;
+ return {name:x[0],ico:x[1],level:Math.max(1,lv),maxHp:hp,hp,power:12+lv*4,strength:8+lv*2,agility:8+lv*2};
+}
+function start(){
+ clearInterval(vTimer);clearInterval(vTick);
+ const p=profile(),e=enemy();
+ vb={p,e,time:30,rage:0,turn:0,cd:{},log:[],running:true,result:null,auto:true};
+ vb.log.push(`⚔️ ${esc(p.name)} вступает в бой против ${esc(e.name)}.`);
+ render();
+ vTimer=setInterval(()=>{if(!vb?.running)return;vb.time--;if(vb.time<=0){vb.time=0;finish(false)}render()},1000);
+ vTick=setInterval(autoRound,1050);
+}
+function addLog(x){if(!vb)return;vb.log.push(x);if(vb.log.length>18)vb.log.shift()}
+function floatNum(n,heal=false,crit=false,onEnemy=true){
+ const fx=document.querySelector('#s104fx');if(!fx)return;
+ const d=document.createElement('div');d.className='float'+(heal?' heal':'')+(crit?' crit':'');
+ d.textContent=(heal?'+':'-')+n;d.style.left=(onEnemy?70:30)+Math.random()*10+'%';d.style.top=(35+Math.random()*15)+'%';
+ fx.appendChild(d);setTimeout(()=>d.remove(),950)
+}
+function can(id){
+ const s=skills.find(x=>x.id===id);return s&&(!vb.cd[id]||vb.cd[id]<=0)&&vb.rage>=s.cost;
+}
+function playerAction(id){
+ if(!vb?.running)return;
+ const s=skills.find(x=>x.id===id);if(!s||!can(id))return;
+ const p=vb.p,e=vb.e;
+ vb.cd[id]=s.cd;vb.rage=Math.min(100,vb.rage+(s.cost?15:8));
+ if(s.heal){
+   const n=Math.round(16+p.power*.35+Math.random()*8),gain=Math.min(n,p.maxHp-p.hp);p.hp+=gain;
+   floatNum(gain,true,false,false);addLog(`💚 Восстановление: +${gain} HP`);
+ }else{
+   const miss=Math.random()<Math.max(.02,.13-e.agility*.006);
+   if(miss){addLog(`💨 ${e.name} уклонился от атаки.`)}
+   else{
+     const z=['head','chest','stomach','waist','legs'][Math.floor(Math.random()*5)];
+     let n=Math.max(3,Math.round((p.power+10+Math.random()*9)*s.power));
+     const crit=Math.random()<Math.min(.45,.08+p.strength*.007+(s.crit||0));
+     if(crit)n=Math.round(n*1.6);
+     e.hp=Math.max(0,e.hp-n);floatNum(n,false,crit,true);
+     addLog(`${s.icon} ${s.name} в «${zoneNames[z]}»: <b>${n}</b>${crit?' 💥 КРИТ!':''}`);
+   }
+ }
+ if(vb.e.hp<=0)return finish(true);
+ render();
+}
+function enemyAction(){
+ if(!vb?.running)return;
+ const p=vb.p,e=vb.e;
+ if(Math.random()<.16&&p.hp/p.maxHp<.4){ /* enemy does not heal; keep pressure */ }
+ const z=['head','chest','stomach','waist','legs'][Math.floor(Math.random()*5)];
+ const miss=Math.random()<Math.max(.02,.12-p.agility*.006);
+ if(miss){addLog(`💨 ${p.name} увернулся от атаки в «${zoneNames[z]}».`)}
+ else{
+   let n=Math.max(2,Math.round(e.power+7+Math.random()*7));
+   const crit=Math.random()<.08+e.strength*.005;if(crit)n=Math.round(n*1.55);
+   p.hp=Math.max(0,p.hp-n);floatNum(n,false,crit,false);
+   addLog(`☠️ ${e.name} атакует «${zoneNames[z]}»: <b>${n}</b>${crit?' 💥 КРИТ!':''}`);
+ }
+ if(p.hp<=0)finish(false);
+}
+function autoRound(){
+ if(!vb?.running)return;
+ Object.keys(vb.cd).forEach(k=>vb.cd[k]=Math.max(0,vb.cd[k]-1));
+ if(vb.p.hp/vb.p.maxHp<.35&&can('heal'))playerAction('heal');
+ else if(vb.rage>=20&&can('power'))playerAction('power');
+ else if(vb.rage>=15&&can('precise'))playerAction('precise');
+ else playerAction('hit');
+ if(vb?.running)enemyAction();
+ render();
+}
+function finish(win){
+ if(!vb?.running)return;
+ vb.running=false;vb.result=win?'win':'loss';clearInterval(vTimer);clearInterval(vTick);
+ const e=vb.e;
+ if(win){
+   const reward=Number(e.level)*25+50,xp=Number(e.level)*12;
+   state.coins=Number(state.coins||0)+reward;state.xp=Number(state.xp||0)+xp;state.hp=Number(state.maxHp||100);
+   let up=0,need=Number(state.level||1)*100;
+   while(state.xp>=need){state.xp-=need;state.level++;up++;need=Number(state.level)*100}
+   saveState();show('🏆 Победа! +'+reward+' 🟡');
+   vb.reward={reward,xp,up};
+ }else{
+   state.hp=1;state.energy=Math.max(0,Number(state.energy||0)-10);saveState();
+   vb.reward={reward:0,xp:0,up:0};
+ }
+ render();
+}
+function skillHtml(){
+ return skills.map(s=>`<button class="skill" data-vbskill="${s.id}" ${can(s.id)?'':'disabled'}><span style="font-size:22px">${s.icon}</span><b>${s.name}</b><small>${s.cost?'◆ '+s.cost:'БЕСПЛАТНО'} · CD ${s.cd}s</small></button>`).join('');
+}
+function render(){
+ const body=document.getElementById('sheetBody');if(!body||!vb)return;
+ const p=vb.p,e=vb.e,pct=(a,b)=>Math.max(0,Math.min(100,a/b*100));
+ const result=vb.reward?`<div class="result"><div class="resultBox"><div class="big">${vb.result==='win'?'🏆':'💀'}</div><h2>${vb.result==='win'?'ПОБЕДА':'ПОРАЖЕНИЕ'}</h2><p>${vb.result==='win'?esc(e.name)+' повержен.':'Время боя/HP закончились.'}</p><div class="reward">${vb.reward.xp?'+'+vb.reward.xp+' XP · ':''}${vb.reward.reward?'+'+vb.reward.reward+' 🟡':''}</div>${vb.reward.up?`<p>⬆️ Новый уровень: <b>${state.level}</b></p>`:''}<button class="btn" id="vbNext">⚔️ Следующий бой</button><button class="btn" id="vbBack">🏟️ В арену</button></div></div>`:'';
+ body.innerHTML=`<div class="s104v"><div class="arena">
+  <div class="fighters">
+   <div class="fighter"><div class="avatar">🧔</div><div class="name">${esc(p.name)}</div><div class="lvl">УР. ${p.level} · СИЛА ${p.strength}</div><div class="hp"><i style="width:${pct(p.hp,p.maxHp)}%"></i></div><div class="hptext">${Math.ceil(p.hp)} / ${p.maxHp} HP</div></div>
+   <div class="fighter enemy"><div class="avatar">${e.ico}</div><div class="name">${esc(e.name)}</div><div class="lvl">УР. ${e.level} · СИЛА ${e.strength}</div><div class="hp"><i style="width:${pct(e.hp,e.maxHp)}%"></i></div><div class="hptext">${Math.ceil(e.hp)} / ${e.maxHp} HP</div></div>
+  </div><div class="vs">VS</div><div class="fx" id="s104fx"></div><div class="timer">00:${String(Math.max(0,vb.time)).padStart(2,'0')}</div><div class="rage"><i style="width:${vb.rage}%"></i></div>${result}</div>
+  <div class="skills">${skillHtml()}</div>
+  <div class="bottom"><button class="btn" id="vbNew">↻ Новый бой</button><button class="btn" id="vbOld">⚔️ Тактический PvP</button></div>
+  <div class="log">${vb.log.slice().reverse().join('<br>')}</div>
+  <div class="note">S104 · автоматический бой · 30 секунд · навыки · крит · уклонение · плавающий урон · XP/награда</div></div>`;
+ body.querySelectorAll('[data-vbskill]').forEach(b=>b.onclick=()=>playerAction(b.dataset.vbskill));
+ body.querySelector('#vbNew')?.addEventListener('click',start);
+ body.querySelector('#vbNext')?.addEventListener('click',start);
+ body.querySelector('#vbBack')?.addEventListener('click',()=>{vb=null;arenaHome()});
+ body.querySelector('#vbOld')?.addEventListener('click',()=>{vb=null;clearInterval(vTimer);clearInterval(vTick);if(typeof OLD_OPEN_BATTLE==='function')OLD_OPEN_BATTLE();else arenaHome()});
+}
+window.openBattleVideo=()=>{modal('⚔️ Арена · автобой',`<div id="s104Start"><div class="s104v"><div class="s104v arena" style="padding:25px;text-align:center"><div style="font-size:54px">⚔️</div><h3>Арена Sdolars</h3><p>Автоматический бой в стиле референса: 30 секунд, навыки, энергия, критические удары, уклонение, плавающий урон и награды.</p><button class="btn" id="vbStart">⚔️ НАЧАТЬ БОЙ</button></div></div></div>`);document.getElementById('vbStart').onclick=start};
+window.openBattle=window.openBattleVideo;
+})();
+</script>
+
