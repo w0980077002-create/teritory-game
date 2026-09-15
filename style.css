@@ -1216,3 +1216,11 @@ body:has(#home.active) .city-event{top:25%!important;z-index:100!important}
 body:has(#home.active) .city-event-card{animation:cityEventIn .28s ease-out}
 @keyframes cityEventIn{from{transform:translateY(-8px);opacity:.2}to{transform:translateY(0);opacity:1}}
 body:has(#home.active) .city-event-actions button{transition:transform .12s ease,background .12s ease}
+
+/* Territory v38 — compact Alex quest indicator and dialogue */
+body:has(#home.active) .alex-quest-badge{position:absolute;top:14.8%;left:42%;z-index:32;padding:4px 8px;border:1px solid rgba(190,205,218,.22);border-radius:8px;background:rgba(5,13,21,.58);color:rgba(236,242,246,.62);font-size:7px;letter-spacing:.9px;pointer-events:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+body:has(#home.active) .alex-quest-badge.active{color:#f0d38a;border-color:rgba(220,180,80,.5);background:rgba(25,20,10,.72)}
+body:has(#home.active) .scene-action b{font-size:10px}
+body:has(#home.active) .alex-mini-btn{margin-top:5px;padding:4px 9px;border:1px solid rgba(220,180,80,.42);border-radius:7px;background:rgba(220,180,80,.12);color:#f2e1ae;font-size:8px}
+body:has(#home.active) .alex-mini-btn:active{transform:scale(.97)}
+@media(max-width:390px){body:has(#home.active) .alex-quest-badge{left:40%;font-size:6px;padding:3px 6px}}

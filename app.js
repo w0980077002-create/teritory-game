@@ -1,5 +1,6 @@
-const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"]};
+const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 let state=JSON.parse(localStorage.getItem("territory_save_v1")||"null")||structuredClone(defaultState);
+state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0);
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
 const weapons=[
@@ -15,6 +16,7 @@ function render(){
  $("#playerHp").textContent=`${state.hp}/${state.maxHp}`; $("#enemyHp").textContent=`${state.enemyHp}/100`;
  $("#playerHpBar").style.width=`${Math.max(0,state.hp/state.maxHp*100)}%`; $("#enemyHpBar").style.width=`${Math.max(0,state.enemyHp/100*100)}%`;
  $("#weaponName").textContent=state.weapon; $("#weaponStats").textContent=`Урон +${state.bonusDamage}`;
+ const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
  renderShop(); renderInventory();
 }
 function showScreen(id){
@@ -126,6 +128,29 @@ showScreen("home");
 })();
 
 
+/* Territory v38 — Alex becomes a real city NPC with a persistent quest */
+(function alexQuest(){
+  const home=document.querySelector('.real-home'); const guard=home&&home.querySelector('.guard-label'); const action=home&&home.querySelector('#sceneAction');
+  if(!home||!guard||!action)return;
+  function msg(text){ action.innerHTML=text; action.classList.add('show'); clearTimeout(action._alexTimer); action._alexTimer=setTimeout(()=>action.classList.remove('show'),5000); }
+  guard.addEventListener('click',function(ev){
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    if(state.alexQuest===0){
+      state.alexQuest=1; save();
+      msg('<b>Alex:</b> «Нужен патруль у ворот. Следи за городом и помогай, если начнётся тревога.»<br><button id="alexAccept" class="alex-mini-btn">Принято</button>');
+    }else if(state.alexQuest===1){
+      msg('<b>Alex:</b> «Патруль продолжается. Следи за событиями города.»');
+    }else{
+      msg('<b>Alex:</b> «Хорошая работа. Город может на тебя рассчитывать.»');
+    }
+  },true);
+  action.addEventListener('click',function(ev){
+    const b=ev.target.closest('#alexAccept'); if(!b)return;
+    b.textContent='Задание принято'; b.disabled=true; state.cityRep+=1; save();
+    setTimeout(()=>action.classList.remove('show'),900);
+  });
+})();
+
 /* Territory v36 — живой автоматический поток городских событий */
 (function cityEvents(){
   const home=document.querySelector('.real-home');
@@ -137,6 +162,7 @@ showScreen("home");
   let timer=null, nextTimer=null, opened=false, lastIndex=-1;
   const events=[
     {k:'СОБЫТИЕ ГОРОДА',t:'Вечерний караван',d:'У ворот Sdolars появился торговый караван.',help:'Караванщики отблагодарили тебя: +60 🪙',trade:'Удачный торг: +35 🪙',h:60,tr:35,xp:10},
+    {k:'ЗАДАНИЕ ALEX',t:'Сигнал у ворот',d:'Alex подал знак: у городских ворот нужна помощь.',help:'Ты помог Alex отбить нападение: +150 🪙 +25 XP',trade:'Alex: «Сейчас не до торговли.»',h:150,tr:0,xp:25,alex:true},
     {k:'ГОРОДСКАЯ СЛУЖБА',t:'Тревога у ворот',d:'Alex заметил подозрительное движение за стеной.',help:'Ты помог стражу. +45 🪙 +10 XP',trade:'Сейчас не до торговли.',h:45,tr:0,xp:10},
     {k:'СЛУЧАЙНАЯ ВСТРЕЧА',t:'Потерянный кошелёк',d:'На площади кто-то обронил кошелёк с монетами.',help:'Ты вернул кошелёк хозяину: +80 🪙',trade:'Ты оставил находку себе: +25 🪙',h:80,tr:25,xp:8},
     {k:'СЛУХИ ГОРОДА',t:'Странник у таверны',d:'Незнакомец шепчет о дороге, которая открылась за стеной.',help:'Ты выслушал странника: +30 🪙 +12 XP',trade:'Ты обменялся новостями: +20 🪙',h:30,tr:20,xp:12},
@@ -151,6 +177,9 @@ showScreen("home");
     scheduleNext(9000+Math.random()*10000);
   }
   function pickEvent(){
+    if(state.alexQuest===1 && Math.random()<0.42){
+      const ai=events.findIndex(x=>x.alex); if(ai>=0 && ai!==lastIndex){ lastIndex=ai; return events[ai]; }
+    }
     let i=Math.floor(Math.random()*events.length);
     if(events.length>1 && i===lastIndex) i=(i+1)%events.length;
     lastIndex=i; return events[i];
@@ -177,6 +206,7 @@ showScreen("home");
     if(reward){
       state.coins+=reward;
       state.exp+=cur.xp||10;
+      if(cur.alex && state.alexQuest===1){state.alexQuest=2; state.cityRep+=2;}
       while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp;}
       save();
     }
