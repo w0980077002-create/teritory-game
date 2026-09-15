@@ -598,3 +598,111 @@
   #game .game-bottom{height:80px!important;flex-basis:80px!important;grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr)!important;padding:4px 5px!important;gap:4px!important}
   #game .ancient-dice{width:70px!important;height:68px!important;min-height:68px!important}
 }
+
+
+/* Territory v72 — rebuild the 27-cell geometry instead of shrinking the broken layout. */
+#game .game-main{min-height:0!important;overflow:hidden!important}
+#game .game-board-wrap{position:relative!important;flex:1 1 auto!important;width:100%!important;height:auto!important;min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+#game .game-board-shell{position:relative!important;display:block!important;flex:0 0 auto!important;width:min(76vw,300px)!important;height:min(76vw,300px)!important;max-width:300px!important;max-height:300px!important;margin:0 auto!important;left:auto!important;top:auto!important}
+#game .game-board{position:absolute!important;left:0!important;top:0!important;right:0!important;bottom:0!important;width:100%!important;height:100%!important;margin:0!important;transform:none!important;overflow:visible!important}
+#game .board-cell{position:absolute!important;left:auto;top:auto;right:auto;bottom:auto;width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;margin:0!important;box-sizing:border-box!important;padding:0!important;border:1.5px solid #6d4a2d!important;border-radius:7px!important;overflow:hidden!important;display:flex!important;align-items:center!important;justify-content:center!important;transform:translate(-50%,-50%)!important}
+#game .board-cell .tile-content{width:100%!important;height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;padding:0!important;overflow:hidden!important}
+#game .board-cell .tile-icon{font-size:11px!important;line-height:11px!important}
+#game .board-cell b{font:800 7px/7px Georgia,serif!important;margin:1px 0 0!important}
+#game .board-cell.active{transform:translate(-50%,-50%) scale(1.12)!important}
+#game .game-center{position:absolute!important;left:50%!important;top:50%!important;width:40%!important;height:40%!important;transform:translate(-50%,-50%)!important;z-index:7!important}
+#game .game-ship-wrap{width:100%!important;height:100%!important}
+#game .game-ship-art{background:url('./ship_only.png') center/contain no-repeat!important}
+#game .game-center:after{display:none!important;content:none!important}
+#game .game-lap-plaque{bottom:-1px!important}
+
+@media(max-width:390px){
+  #game .game-board-shell{width:274px!important;height:274px!important;max-width:274px!important;max-height:274px!important}
+  #game .board-cell{width:26px!important;height:26px!important;min-width:26px!important;min-height:26px!important}
+  #game .board-cell .tile-icon{font-size:10px!important;line-height:10px!important}
+  #game .board-cell b{font-size:6.5px!important;line-height:6.5px!important}
+}
+
+/* v74 — final Game composition pass: compact 27-cell route, side tools, dark bottom */
+#game .game-tools{
+  position:absolute!important;
+  top:clamp(78px,13vh,126px)!important;
+  right:5px!important;
+  left:auto!important;
+  width:62px!important;
+  height:auto!important;
+  flex:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:5px!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  z-index:80!important;
+}
+#game .game-tools button{
+  width:62px!important;min-width:62px!important;height:45px!important;min-height:45px!important;max-height:45px!important;
+  padding:2px!important;border:1px solid #b98242!important;border-radius:8px!important;
+  background:linear-gradient(180deg,rgba(89,56,31,.94),rgba(35,25,19,.97))!important;
+  box-shadow:0 3px 7px #0009!important;display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;gap:0!important;box-sizing:border-box!important;
+}
+#game .game-tools button span{font-size:15px!important;line-height:15px!important}
+#game .game-tools button b{font-size:6px!important;line-height:7px!important;white-space:nowrap!important}
+#game .game-tools button small{font-size:4.5px!important;line-height:5px!important;white-space:nowrap!important}
+
+#game .game-main{padding:0 4px 2px!important}
+#game .game-board-wrap{padding:0!important}
+#game .game-board-wrap:before{display:none!important}
+#game .game-board-shell{
+  width:min(76vw,292px)!important;height:min(76vw,292px)!important;
+  max-width:292px!important;max-height:292px!important;
+  filter:drop-shadow(0 8px 10px #000b)!important;
+}
+#game .game-board-shell:before{inset:4%!important}
+#game .board-cell{
+  width:10.2%!important;height:10.2%!important;
+  border-width:1.5px!important;border-radius:6px!important;
+  box-shadow:0 2px 4px rgba(0,0,0,.28)!important;
+}
+#game .board-cell .tile-icon{font-size:9px!important;line-height:9px!important}
+#game .board-cell b{font-size:8px!important;line-height:8px!important}
+#game .board-cell small{display:none!important}
+#game .game-center{width:34%!important;height:34%!important;border-width:2px!important;border-radius:15px!important}
+#game .game-ship-wrap{width:91%!important;height:72%!important}
+#game .game-center b{font-size:8px!important;line-height:8px!important}
+#game .game-center small{display:none!important}
+#game .game-token{width:24px!important;height:24px!important;font-size:15px!important}
+#game .game-cell-info{flex-basis:34px!important;height:34px!important;margin-bottom:2px!important;padding:3px 8px!important}
+#game .game-cell-info b{font-size:8px!important;line-height:9px!important}
+#game .game-cell-info span{font-size:5.5px!important}
+
+#game .game-bottom{
+  flex:0 0 78px!important;height:78px!important;min-height:78px!important;
+  grid-template-columns:1fr 74px 1fr!important;gap:5px!important;padding:4px 7px!important;
+  background:linear-gradient(180deg,#071820,#091b22)!important;
+  border-top:1px solid #80603d!important;
+}
+#game .dice-count b{font-size:19px!important;color:#f0d9af!important}
+#game .dice-count span:not(.dice-icon){font-size:6.5px!important;color:#c7bba5!important}
+#game .dice-count small{font-size:5.5px!important;color:#9e9a8e!important}
+#game .multi-roll{padding:3px 4px!important;border-radius:7px!important;font-size:6px!important;line-height:7px!important}
+#game .multi-roll input{width:15px!important;height:15px!important}
+#game .multi-roll b{font-size:7px!important}
+#game .ancient-dice{width:68px!important;height:68px!important;border-radius:16px!important}
+#game .dice-face{font-size:31px!important;line-height:31px!important}
+#game .ancient-dice small{font-size:8px!important}
+#game .skip-roll{font-size:6px!important;line-height:8px!important}
+#game .skip-roll input{width:17px!important;height:17px!important}
+
+@media(max-width:390px){
+  #game .game-board-shell{width:min(72vw,270px)!important;height:min(72vw,270px)!important}
+  #game .board-cell{width:11%!important;height:11%!important}
+  #game .game-tools{width:58px!important;right:4px!important}
+  #game .game-tools button{width:58px!important;min-width:58px!important;height:43px!important;min-height:43px!important;max-height:43px!important}
+  #game .game-tools button span{font-size:14px!important}
+  #game .game-tools button b{font-size:5.7px!important}
+  #game .game-tools button small{font-size:4.2px!important}
+  #game .game-bottom{grid-template-columns:1fr 70px 1fr!important;height:74px!important;flex-basis:74px!important;min-height:74px!important}
+  #game .ancient-dice{width:64px!important;height:64px!important}
+}
