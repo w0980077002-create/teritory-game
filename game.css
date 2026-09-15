@@ -1,4 +1,4 @@
-/* Territory v56 — isolated Game screen. This file owns only #game. */
+/* Territory v58 — isolated Game screen. This file owns only #game. */
 #game.game-screen{position:absolute!important;inset:0!important;z-index:500!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important;display:none!important;flex-direction:column!important;background:#091820!important;color:#f4ead7!important}
 #game.game-screen.active{display:flex!important}
 #game .game-topbar{flex:0 0 62px!important;height:62px!important;display:grid!important;grid-template-columns:42px 1fr auto!important;align-items:center!important;gap:8px!important;padding:7px 9px!important;background:linear-gradient(180deg,#0b1720,#101d25)!important;border-bottom:1px solid rgba(221,181,113,.35)!important;z-index:30!important}
@@ -125,3 +125,99 @@
 #game .start-ribbon{position:absolute!important;top:-8px!important;left:50%!important;transform:translateX(-50%) rotate(calc(-1 * var(--tile-angle)))!important;padding:2px 5px!important;border-radius:5px!important;background:#18230f!important;color:#e9d27e!important;border:1px solid #d0a844!important;font-size:5px!important;font-weight:900!important;letter-spacing:.7px!important;white-space:nowrap!important;z-index:4!important}
 @media(max-width:390px){#game .game-tools{width:calc(100% - 12px)!important;gap:4px!important}#game .game-tools button{height:46px!important}#game .game-tools span{font-size:15px!important}#game .game-board{width:min(60vw,300px)!important;height:min(60vw,300px)!important;top:calc(50% + 24px)!important}}
 @media(max-height:700px){#game .game-board{top:calc(50% + 22px)!important;width:min(58vw,280px)!important;height:min(58vw,280px)!important}}
+
+/* v58 — mobile Telegram layout: board is the hero element, controls never overlap it. */
+#game .game-board-wrap{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  position:relative!important;
+  background:
+    radial-gradient(circle at 50% 48%,rgba(45,92,98,.52) 0 22%,transparent 48%),
+    linear-gradient(145deg,#07151c 0%,#0d2932 45%,#07161d 100%)!important;
+}
+#game .game-board-wrap:after{
+  content:''!important;position:absolute!important;inset:0!important;pointer-events:none!important;opacity:.5!important;
+  background:
+    radial-gradient(circle at 14% 72%,rgba(229,170,74,.14) 0 2px,transparent 3px),
+    radial-gradient(circle at 84% 36%,rgba(229,170,74,.12) 0 2px,transparent 3px),
+    linear-gradient(135deg,transparent 0 44%,rgba(184,145,83,.06) 45%,transparent 46% 54%,rgba(184,145,83,.05) 55%,transparent 56%);
+}
+#game .game-tools{
+  top:10px!important;left:50%!important;width:calc(100% - 18px)!important;max-width:none!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important;z-index:40!important;
+}
+#game .game-tools button{
+  height:56px!important;min-height:56px!important;border-radius:12px!important;
+  font-size:inherit!important;box-sizing:border-box!important;
+}
+#game .game-tools span{font-size:19px!important;line-height:19px!important}
+#game .game-tools b{font-size:8px!important;line-height:10px!important}
+#game .game-tools small{font-size:6px!important;line-height:8px!important}
+#game .game-board{
+  left:50%!important;top:53%!important;
+  width:min(82vw,540px)!important;height:min(82vw,540px)!important;
+  max-width:540px!important;max-height:540px!important;
+  transform:translate(-50%,-50%)!important;z-index:8!important;
+}
+#game .game-board:before{
+  border-radius:22px!important;
+  background:linear-gradient(145deg,#d8c398,#a77c4c 52%,#7d5937)!important;
+  box-shadow:inset 0 0 0 3px rgba(54,34,19,.58),inset 0 0 26px rgba(60,37,18,.24)!important;
+}
+#game .board-cell{
+  width:17.5%!important;height:13.5%!important;border-width:2px!important;border-radius:9px!important;
+  z-index:12!important;overflow:visible!important;
+}
+#game .board-cell .tile-content{
+  transform:none!important;
+  rotate:0deg!important;
+  width:100%!important;height:100%!important;
+  text-align:center!important;
+}
+#game .board-cell .tile-icon{font-size:18px!important;line-height:18px!important}
+#game .board-cell b{font-size:13px!important;line-height:14px!important}
+#game .board-cell small{font-size:5.5px!important;line-height:7px!important;white-space:nowrap!important}
+#game .start-ribbon{transform:translateX(-50%)!important;top:-11px!important;font-size:6px!important;padding:3px 7px!important}
+#game .game-center{
+  width:42%!important;height:42%!important;
+  background:radial-gradient(circle,#1e4c56,#102d35 67%,#091f27)!important;
+  border:3px solid rgba(229,196,130,.55)!important;z-index:14!important;
+}
+#game .game-center .game-ship{
+  font-size:64px!important;line-height:64px!important;
+}
+#game .game-center>b{font-size:10px!important;letter-spacing:1.4px!important}
+#game .game-center>small{font-size:6px!important}
+#game .game-lap-badge{font-size:7px!important;padding:4px 8px!important}
+#game .game-token{font-size:31px!important;z-index:25!important}
+#game .game-status{
+  bottom:10px!important;width:min(72%,330px)!important;padding:8px 10px!important;
+  font-size:8px!important;line-height:11px!important;z-index:35!important;
+}
+#game .game-bottom{
+  flex:0 0 128px!important;height:128px!important;min-height:128px!important;
+  gap:10px!important;padding:9px 10px!important;box-sizing:border-box!important;
+}
+#game .game-prize-badge{min-width:52px!important}
+#game .ancient-dice{width:78px!important;height:78px!important;flex-basis:78px!important;border-radius:18px!important}
+#game .dice-face{font-size:39px!important;line-height:42px!important}
+#game .dice-count{min-width:72px!important}
+#game .dice-count b{font-size:23px!important;line-height:24px!important}
+#game .skip-roll{min-width:82px!important;min-height:38px!important;font-size:7px!important}
+@media(max-width:390px){
+  #game .game-tools{gap:5px!important;width:calc(100% - 12px)!important}
+  #game .game-tools button{height:52px!important;min-height:52px!important}
+  #game .game-board{width:min(88vw,330px)!important;height:min(88vw,330px)!important;top:53%!important}
+  #game .board-cell{width:18%!important;height:14%!important}
+  #game .game-center .game-ship{font-size:50px!important;line-height:50px!important}
+  #game .game-bottom{flex-basis:118px!important;height:118px!important;min-height:118px!important;gap:6px!important}
+  #game .ancient-dice{width:70px!important;height:70px!important;flex-basis:70px!important}
+  #game .dice-count{min-width:58px!important}
+  #game .skip-roll{min-width:70px!important}
+}
+@media(max-height:700px){
+  #game .game-board{top:52%!important;width:min(76vw,300px)!important;height:min(76vw,300px)!important}
+  #game .game-bottom{flex-basis:106px!important;height:106px!important;min-height:106px!important}
+  #game .ancient-dice{width:64px!important;height:64px!important;flex-basis:64px!important}
+}

@@ -145,13 +145,18 @@ function gameBoardInit(){
   const c=GAME_CELLS[i];
   const startMark=c.type==='start' && i===0 ? '<span class="start-ribbon">СТАРТ</span>' : '';
   cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>${startMark}`; cell.dataset.index=i;
-  // Stable 20-cell diamond: 5 tiles per side, with generous corner spacing.
-  const side=Math.floor(i/5), k=i%5, t=[0.10,0.30,0.50,0.70,0.90][k];
-  const edges=[[[50,7],[93,50]],[[93,50],[50,93]],[[50,93],[7,50]],[[7,50],[50,7]]];
-  const a=edges[side][0], b=edges[side][1];
-  const x=a[0]+(b[0]-a[0])*t, y=a[1]+(b[1]-a[1])*t;
+  // 20-cell diamond path. START is a dedicated bottom cell; movement runs clockwise.
+  const points=[
+    [50,93],[36,86],[24,77],[15,65],[9,50],
+    [15,35],[24,23],[36,14],[50,7],[64,14],
+    [76,23],[85,35],[91,50],[85,65],[76,77],
+    [64,86],[50,93],[50,93],[50,93],[50,93]
+  ];
+  // Avoid duplicated bottom corner: the final four cells sit on the lower-right edge.
+  points[16]=[57,91]; points[17]=[68,84]; points[18]=[78,77]; points[19]=[86,68];
+  const [x,y]=points[i];
   cell.style.left=x+'%'; cell.style.top=y+'%';
-  cell.style.setProperty('--tile-angle',Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI+'deg');
+  cell.style.setProperty('--tile-angle','0deg');
   board.appendChild(cell);
  }
  if(center){ board.appendChild(center); }
