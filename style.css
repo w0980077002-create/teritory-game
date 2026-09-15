@@ -1156,3 +1156,11 @@ body:has(#home.active) .real-home-image{animation:cityBreath 8s ease-in-out infi
 /* интерактивные точки получают короткий отклик */
 body:has(#home.active) .hotspot:active{background:rgba(255,190,90,.08);box-shadow:inset 0 0 0 1px rgba(255,190,90,.35)}
 body:has(#home.active) .npc-label:active{transform:scale(.97)}
+
+/* Territory v33 — городские события: это игровой слой, а не изображение */
+body:has(#home.active) .city-event{position:absolute;inset:0;z-index:85;display:flex;align-items:flex-end;justify-content:center;padding:0 12px 9%;background:rgba(0,0,0,.18);backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);opacity:0;pointer-events:none;transition:opacity .22s ease}
+body:has(#home.active) .city-event.show{opacity:1;pointer-events:auto}
+body:has(#home.active) .city-event-card{width:min(360px,92%);padding:12px;border:1px solid rgba(195,207,220,.35);border-radius:14px;background:linear-gradient(180deg,rgba(10,19,29,.94),rgba(5,11,18,.96));box-shadow:0 12px 35px rgba(0,0,0,.45);color:#edf2f5}
+.city-event-card small{display:block;font-size:8px;letter-spacing:1.4px;opacity:.55;margin-bottom:4px}.city-event-card b{display:block;font-size:15px}.city-event-card p{margin:5px 0 10px;font-size:10px;line-height:14px;opacity:.78}.city-event-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.city-event-actions button{border:1px solid rgba(190,205,218,.2);border-radius:9px;background:rgba(255,255,255,.06);color:#edf2f5;padding:8px 4px;font-size:9px}.city-event-actions button:active{transform:scale(.97);background:rgba(255,255,255,.12)}
+body:has(#home.active) .real-home.city-event-active .hotspot,body:has(#home.active) .real-home.city-event-active .npc-label{filter:brightness(.75)}
+@media(max-width:390px){.city-event{padding-bottom:8%!important}.city-event-card{padding:10px!important}.city-event-card b{font-size:14px!important}}

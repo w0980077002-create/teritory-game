@@ -145,3 +145,39 @@ showScreen("home");
     });
   });
 })();
+
+
+/* Territory v33 — реальные городские события с наградой */
+(function cityEvents(){
+  const home=document.querySelector('.real-home');
+  const event=document.querySelector('#cityEvent');
+  if(!home||!event)return;
+  const title=document.querySelector('#cityEventTitle');
+  const text=document.querySelector('#cityEventText');
+  const kicker=document.querySelector('#cityEventKicker');
+  let timer=null, opened=false;
+  const events=[
+    {k:'СОБЫТИЕ ГОРОДА',t:'Вечерний караван',d:'У ворот Sdolars появился торговый караван.',help:'Караванщики отблагодарили тебя: +60 🪙',trade:'Удачный торг: +35 🪙',h:60,tr:35},
+    {k:'ГОРОДСКАЯ СЛУЖБА',t:'Тревога у ворот',d:'Страж заметил подозрительное движение за стеной.',help:'Ты помог стражу. Награда: +45 🪙 +10 XP',trade:'Сейчас не до торговли. Страж благодарит тебя.',h:45,tr:0},
+    {k:'СЛУЧАЙНАЯ ВСТРЕЧА',t:'Потерянный кошель',d:'На площади кто-то обронил кошель с монетами.',help:'Ты вернул кошель хозяину: +80 🪙',trade:'Ты оставил находку себе: +25 🪙',h:80,tr:25}
+  ];
+  function close(){event.classList.remove('show');home.classList.remove('city-event-active');opened=false;clearTimeout(timer)}
+  function open(){
+    if(opened)return; opened=true; home.classList.add('city-event-active');
+    const e=events[Math.floor(Math.random()*events.length)]; event._current=e;
+    kicker.textContent=e.k;title.textContent=e.t;text.textContent=e.d;event.classList.add('show');
+  }
+  event.addEventListener('click',e=>{
+    const b=e.target.closest('[data-event]'); if(!b)return;
+    const cur=event._current;
+    if(b.dataset.event==='close'){close();return}
+    const reward=b.dataset.event==='help'?cur.h:cur.tr;
+    if(reward){state.coins+=reward;state.exp+=10; if(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp} save();}
+    text.textContent=b.dataset.event==='help'?cur.help:cur.trade;
+    event.querySelector('.city-event-actions').innerHTML='<button data-event="close">Продолжить</button>';
+    timer=setTimeout(close,2600);
+  });
+  // Первое событие после входа и затем с паузой — не спамит игрока.
+  setTimeout(()=>{if(document.querySelector('#home.active'))open()},6500);
+  setInterval(()=>{if(document.querySelector('#home.active')&&!opened&&Math.random()<.72)open()},30000);
+})();
