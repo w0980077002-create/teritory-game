@@ -253,6 +253,11 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
           <div class="winter-dock"></div>
           <div class="winter-snow snow-a"></div><div class="winter-snow snow-b"></div><div class="winter-snow snow-c"></div>
         </div>
+        <div class="game-tools" aria-label="Инструменты события Монополия">
+          <button type="button" id="gameGiftBtn"><span>🎁</span><b>Подарок</b><small>Ежедневный</small></button>
+          <button type="button" id="gameTasksBtn"><span>📜</span><b>Задания</b><small>Монополия</small></button>
+          <button type="button" id="gameSpecialBtn"><span>🧰</span><b>Спецпредложение</b><small>Монополия</small></button>
+        </div>
         <div class="game-board" id="gameBoard" aria-label="Игровое поле"></div>
         <div class="game-center">
           <div class="game-ship">⛵</div>
@@ -260,11 +265,6 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
           <small>Sdolars Winter</small><div class="game-lap-badge" id="gameLapBadge">Круг 0</div>
         </div>
         <div class="game-token" id="gameToken">♟</div>
-      </div>
-      <div class="game-side-stack">
-        <button type="button" id="gameSpecialBtn"><span>🎁</span><b>Спецпредложение</b><small>Монополия</small></button>
-        <button type="button" id="gameGiftBtn"><span>🎁</span><b>Подарок</b><small>Монополия</small></button>
-        <button type="button" id="gameTasksBtn"><span>📜</span><b>Задания</b><small>Монополия</small></button>
       </div>
       <div class="game-status" id="gameStatus">Брось кубик и пройди клетки.</div>
       <div class="game-bottom">

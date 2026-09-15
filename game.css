@@ -19,7 +19,16 @@
 #game .game-board-wrap{flex:1 1 auto!important;min-height:0!important;position:relative!important;overflow:hidden!important;background:radial-gradient(circle at 50% 45%,#173f49 0,#0e2a34 42%,#081a21 100%)!important}
 #game .game-board-wrap:before{content:''!important;position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 50%,rgba(236,211,158,.08),transparent 38%),linear-gradient(135deg,rgba(255,255,255,.025),transparent 45%)!important;pointer-events:none!important}
 #game .game-scenery{position:absolute!important;inset:0!important;pointer-events:none!important;opacity:.75!important}
-#game .game-board{position:absolute!important;left:50%!important;top:50%!important;width:min(74vw,350px)!important;height:min(74vw,350px)!important;max-width:350px!important;max-height:350px!important;transform:translate(-50%,-50%)!important;z-index:4!important;filter:drop-shadow(0 9px 10px rgba(0,0,0,.28))!important}
+#game .game-board{position:absolute!important;left:50%!important;top:calc(50% + 28px)!important;width:min(64vw,320px)!important;height:min(64vw,320px)!important;max-width:320px!important;max-height:320px!important;transform:translate(-50%,-50%)!important;z-index:4!important;filter:drop-shadow(0 9px 10px rgba(0,0,0,.28))!important}
+#game .game-tools{position:absolute!important;left:50%!important;top:7px!important;transform:translateX(-50%)!important;width:min(94%,360px)!important;display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:6px!important;z-index:30!important}
+#game .game-tools button{min-width:0!important;height:49px!important;padding:4px 3px!important;border-radius:9px!important;border:1px solid #d6a15a!important;background:linear-gradient(180deg,rgba(91,54,29,.97),rgba(43,28,22,.97))!important;color:#ffe9bd!important;box-shadow:0 4px 9px rgba(0,0,0,.24)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important}
+#game .game-tools button:active{transform:scale(.97)!important}
+#game .game-tools span{font-size:17px!important;line-height:17px!important}
+#game .game-tools b{font-size:6px!important;line-height:8px!important}
+#game .game-tools small{font-size:5px!important;line-height:6px!important;opacity:.72!important}
+#game .game-tools button:nth-child(1){border-color:#e0b86b!important}
+#game .game-tools button:nth-child(2){border-color:#9b825a!important}
+#game .game-tools button:nth-child(3){border-color:#c18b45!important}
 #game .game-board:before{content:''!important;position:absolute!important;inset:0!important;border-radius:18px!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;background:linear-gradient(145deg,#e2cda2,#9c754b)!important;box-shadow:inset 0 0 0 2px rgba(73,45,24,.55)!important}
 #game .board-cell{position:absolute!important;transform:translate(-50%,-50%)!important;width:18%!important;height:13%!important;border:2px solid rgba(74,49,29,.72)!important;border-radius:8px!important;background:linear-gradient(145deg,#f4e8c9,#d6bd8e)!important;color:#382718!important;box-shadow:0 2px 4px rgba(44,29,16,.2)!important;z-index:5!important;padding:0!important;transition:filter .15s,transform .15s!important}
 #game .board-cell:active{transform:translate(-50%,-50%) scale(.96)!important}
@@ -82,7 +91,16 @@
  #game .game-topbar{flex-basis:58px!important;height:58px!important;padding:5px 7px!important}
  #game .game-title b{font-size:13px!important}
  #game .game-board{width:min(68vw,320px)!important;height:min(68vw,320px)!important}
- #game .game-board:before{border-radius:15px!important}
+ #game .game-tools{position:absolute!important;left:50%!important;top:7px!important;transform:translateX(-50%)!important;width:min(94%,360px)!important;display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:6px!important;z-index:30!important}
+#game .game-tools button{min-width:0!important;height:49px!important;padding:4px 3px!important;border-radius:9px!important;border:1px solid #d6a15a!important;background:linear-gradient(180deg,rgba(91,54,29,.97),rgba(43,28,22,.97))!important;color:#ffe9bd!important;box-shadow:0 4px 9px rgba(0,0,0,.24)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important}
+#game .game-tools button:active{transform:scale(.97)!important}
+#game .game-tools span{font-size:17px!important;line-height:17px!important}
+#game .game-tools b{font-size:6px!important;line-height:8px!important}
+#game .game-tools small{font-size:5px!important;line-height:6px!important;opacity:.72!important}
+#game .game-tools button:nth-child(1){border-color:#e0b86b!important}
+#game .game-tools button:nth-child(2){border-color:#9b825a!important}
+#game .game-tools button:nth-child(3){border-color:#c18b45!important}
+#game .game-board:before{border-radius:15px!important}
  #game .game-center .game-ship{font-size:53px!important;line-height:53px!important}
  #game .game-side-stack{right:4px!important;top:8%!important}
  #game .game-side-stack button{width:64px!important;min-height:49px!important}
@@ -99,3 +117,11 @@
  #game .ancient-dice{width:62px!important;height:62px!important;flex-basis:62px!important}
  #game .game-prize-badge{display:none!important}
 }
+
+#game .board-cell.start{background:linear-gradient(145deg,#e8d19a,#a97531)!important;border-color:#f1c65d!important;box-shadow:0 0 0 2px rgba(244,195,80,.45),0 4px 9px rgba(25,13,5,.4)!important}
+#game .board-cell.start .tile-icon{font-size:16px!important}
+#game .board-cell.start b{font-size:9px!important;letter-spacing:.5px!important}
+#game .board-cell.start small{font-size:4.5px!important}
+#game .start-ribbon{position:absolute!important;top:-8px!important;left:50%!important;transform:translateX(-50%) rotate(calc(-1 * var(--tile-angle)))!important;padding:2px 5px!important;border-radius:5px!important;background:#18230f!important;color:#e9d27e!important;border:1px solid #d0a844!important;font-size:5px!important;font-weight:900!important;letter-spacing:.7px!important;white-space:nowrap!important;z-index:4!important}
+@media(max-width:390px){#game .game-tools{width:calc(100% - 12px)!important;gap:4px!important}#game .game-tools button{height:46px!important}#game .game-tools span{font-size:15px!important}#game .game-board{width:min(60vw,300px)!important;height:min(60vw,300px)!important;top:calc(50% + 24px)!important}}
+@media(max-height:700px){#game .game-board{top:calc(50% + 22px)!important;width:min(58vw,280px)!important;height:min(58vw,280px)!important}}

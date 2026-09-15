@@ -99,7 +99,7 @@ function renderInventory(){
 }
 /* Territory v43 — Game: reference-inspired diamond event board */
 const GAME_CELLS=[
- {icon:'🎁',value:'1',type:'start',label:'ПОДАРОК'},
+ {icon:'🏁',value:'СТАРТ',type:'start',label:'НАЧАЛО ПУТЕШЕСТВИЯ'},
  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'💧',value:'50',type:'blue',label:'РЕСУРС'},
@@ -118,7 +118,7 @@ const GAME_CELLS=[
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'🪙',value:'300',label:'МОНЕТЫ'},
  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
- {icon:'🎁',value:'30',type:'start',label:'КРУГ'}
+ {icon:'🏁',value:'ФИНИШ',type:'start',label:'КОНЕЦ КРУГА'}
 ];
 const GAME_REWARDS=[
  {lap:15,icon:'💎',title:'Круг 15',items:[['💎','50','кристаллов'],['🧰','2','предмета'],['🪙','1050','монет']]},
@@ -142,7 +142,9 @@ function gameBoardInit(){
  const n=GAME_CELLS.length;
  for(let i=0;i<n;i++){
   const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'');
-  const c=GAME_CELLS[i]; cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>`; cell.dataset.index=i;
+  const c=GAME_CELLS[i];
+  const startMark=c.type==='start' && i===0 ? '<span class="start-ribbon">СТАРТ</span>' : '';
+  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>${startMark}`; cell.dataset.index=i;
   // Stable 20-cell diamond: 5 tiles per side, with generous corner spacing.
   const side=Math.floor(i/5), k=i%5, t=[0.10,0.30,0.50,0.70,0.90][k];
   const edges=[[[50,7],[93,50]],[[93,50],[50,93]],[[50,93],[7,50]],[[7,50],[50,7]]];
@@ -170,7 +172,7 @@ function gameUpdateStatus(){
  const badge=$("#gameLapBadge");
  const lap=Math.floor(state.gameSteps/GAME_TRACK_CELLS);
  const pos=((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
- if(s)s.textContent=`Круг ${lap} · клетка ${pos+1}/20 · ${state.gameMoving?'Идёт движение…':'Брось кубик.'}`;
+ if(s)s.textContent=`ХОД · Круг ${lap} · клетка ${pos+1}/20 · ${state.gameMoving?'идёт движение…':'брось кубик'}`;
  if(badge)badge.textContent=`Круг ${lap}`;
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
  const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show');
