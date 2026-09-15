@@ -252,18 +252,20 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
         <button type="button" id="gameSpecialBtn"><span>🧰</span><b>Спецпредложение</b><small>Монополия</small></button>
       </div>
       <div class="game-progress" aria-live="polite"><b id="gameTurnNo">Ход 0</b><span>Круг <b id="gameLapBadge">0</b></span><span>Клетка <b id="gameCellNo">1</b>/20</span></div>
-      <div class="game-board-wrap">
-        <div class="game-board-shell">
-          <div class="game-board" id="gameBoard" aria-label="Игровое поле"></div>
-          <div class="game-center">
-            <div class="game-ship-wrap"><div class="game-ship-art" aria-label="Старинный парусник S$S"></div></div>
-            <b>МОНОПОЛИЯ</b><small>Sdolars Winter</small>
+      <main class="game-main">
+        <div class="game-harbor" aria-hidden="true"></div>
+        <div class="game-board-wrap">
+          <div class="game-board-shell">
+            <div class="game-board" id="gameBoard" aria-label="Игровое поле"></div>
+            <div class="game-center">
+              <div class="game-ship-wrap"><div class="game-ship-art" aria-label="Старинный парусник S$S"></div></div>
+              <b>S$S</b><small>SDOLARS WINTER</small>
+            </div>
+            <div class="game-token" id="gameToken" aria-label="Ваша фишка">♟</div>
           </div>
-          <div class="game-token" id="gameToken" aria-label="Ваша фишка">♟</div>
         </div>
-      </div>
-      <div class="game-status" id="gameStatus">ХОД · Круг 0 · клетка 1/20 · брось кубик</div>
-      <div class="game-cell-info" id="gameCellInfo"><b>Клетка 1 · СТАРТ</b><span>Отправная точка · начни путешествие</span></div>
+        <div class="game-cell-info" id="gameCellInfo"><b>Клетка 1 · СТАРТ</b><span>Отправная точка · начни путешествие</span></div>
+      </main>
       <div class="game-bottom">
         <div class="dice-count"><span class="dice-icon">🎲</span><b id="diceCount">40</b><span>кубиков</span><small>1 бросок за ход</small></div>
         <button type="button" class="ancient-dice" id="spinBtn" aria-label="Бросить кубик"><span class="dice-face" id="diceFace">⚄</span><small>БРОСИТЬ</small></button>
