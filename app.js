@@ -1,6 +1,7 @@
 const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 let state=JSON.parse(localStorage.getItem("territory_save_v1")||"null")||structuredClone(defaultState);
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
+state.gameDice=Number(state.gameDice??47); state.gamePos=Number(state.gamePos??0); state.gameLap=Number(state.gameLap??0); state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[]; state.gameTaskProgress=Number(state.gameTaskProgress??0); state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?state.gameTaskClaims:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000;
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
 const weapons=[
@@ -18,6 +19,7 @@ function render(){
  $("#weaponName").textContent=state.weapon; $("#weaponStats").textContent=`Урон +${state.bonusDamage}`;
  const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
  renderShop(); renderInventory();
+  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
 }
 function showScreen(id){
  document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
@@ -95,13 +97,148 @@ if(sellBtn)sellBtn.onclick=()=>{
 function renderInventory(){
  $("#inventoryGrid").innerHTML=state.inventory.map((x,i)=>`<div class="item"><div class="pic">${x}</div><b>Предмет ${i+1}</b><span>Экипировка</span></div>`).join("");
 }
-$("#spinBtn").onclick=()=>{
- if(state.coins<100){$("#casinoMsg").textContent="Не хватает монет.";return}
- state.coins-=100; const win=Math.random()<.35;
- if(win){const prize=300+Math.floor(Math.random()*500);state.coins+=prize;$("#casinoMsg").textContent=`Удача! Вы выиграли ${prize} 🪙`; }
- else $("#casinoMsg").textContent="Не повезло. Попробуй ещё.";
- $("#wheel").style.transform=`rotate(${720+Math.random()*720}deg)`;save();
+/* Territory v41 — Game: Monopoly-style board event */
+const GAME_CELLS=[
+  {icon:'🎁',value:'20',type:'start',label:'СТАРТ'},
+  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
+  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
+  {icon:'🪙',value:'120',label:'МОНЕТЫ'},
+  {icon:'🧰',value:'1',type:'special',label:'ПРЕДМЕТ'},
+  {icon:'💎',value:'25',type:'purple',label:'КРИСТАЛЛЫ'},
+  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
+  {icon:'🪙',value:'160',label:'МОНЕТЫ'},
+  {icon:'📜',value:'1',type:'special',label:'СВИТОК'},
+  {icon:'💎',value:'30',type:'purple',label:'КРИСТАЛЛЫ'},
+  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
+  {icon:'🪙',value:'220',label:'МОНЕТЫ'},
+  {icon:'🧰',value:'1',type:'special',label:'ПРЕДМЕТ'},
+  {icon:'💎',value:'35',type:'purple',label:'КРИСТАЛЛЫ'},
+  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
+  {icon:'🪙',value:'300',label:'МОНЕТЫ'},
+  {icon:'🎁',value:'2',type:'start',label:'ПОДАРОК'},
+  {icon:'💎',value:'40',type:'purple',label:'КРИСТАЛЛЫ'},
+  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
+  {icon:'🪙',value:'450',label:'МОНЕТЫ'}
+];
+const GAME_REWARDS=[
+  {lap:5,icon:'🎁',title:'Круг 5',items:[['💎','20','кристаллов'],['🪙','500','монет'],['📜','1','свиток']]},
+  {lap:10,icon:'👑',title:'Круг 10',items:[['💎','35','кристаллов'],['🧰','2','предмета'],['🪙','750','монет']]},
+  {lap:15,icon:'🏆',title:'Круг 15',items:[['💎','50','кристаллов'],['📜','3','свитка'],['🪙','1000','монет']]},
+  {lap:20,icon:'⚔️',title:'Круг 20',items:[['💎','70','кристаллов'],['🧰','3','предмета'],['🪙','1500','монет']]},
+  {lap:25,icon:'👑',title:'Круг 25',items:[['💎','100','кристаллов'],['🏆','1','редкая награда'],['🪙','2500','монет']]}
+];
+let gameMoving=false, gameSkipRequested=false, gameTimerId=null;
+function gameEventTimer(){
+ const el=$("#gameTimer"); if(!el)return;
+ const tick=()=>{let left=Math.max(0,state.gameEndsAt-Date.now()); const d=Math.floor(left/86400000); left%=86400000; const h=Math.floor(left/3600000); left%=3600000; const m=Math.floor(left/60000); const sec=Math.floor((left%60000)/1000); el.textContent=`${d}д ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;};
+ tick(); clearInterval(gameTimerId); gameTimerId=setInterval(tick,1000);
+}
+function gameBoardInit(){
+ const board=$("#gameBoard"), track=$("#gameRewardTrack"); if(!board||!track)return;
+ board.innerHTML='';
+ const pts=[];
+ for(let i=0;i<20;i++){
+   const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'');
+   const c=GAME_CELLS[i]; cell.innerHTML=`<span>${c.icon}</span><b>${c.value}</b><small>${c.label}</small>`; cell.dataset.index=i;
+   // diamond-shaped perimeter: 5 cells per side
+   const side=Math.floor(i/5), idx=i%5;
+   const coords=[[8+idx*17,8],[76,8+idx*17],[76-idx*17,76],[8,76-idx*17]];
+   const [x,y]=coords[side]; cell.style.left=x+'%'; cell.style.top=y+'%';
+   board.appendChild(cell); pts.push({x:x+8,y:y+6.5});
+ }
+ track.innerHTML=GAME_REWARDS.map(r=>`<div class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}"><span class="reward-icon">${r.icon}</span><small>${r.title}</small></div>`).join('');
+ gamePlaceToken(false); gameTasksInit(); gameUpdateStatus();
+}
+function gamePlaceToken(animate=true){
+ const token=$("#gameToken"); if(!token)return;
+ const i=((state.gamePos%20)+20)%20, side=Math.floor(i/5), idx=i%5;
+ const coords=[[8+idx*17,8],[76,8+idx*17],[76-idx*17,76],[8,76-idx*17]];
+ const [x,y]=coords[side]; token.style.left=(x+8)+'%'; token.style.top=(y+6.5)+'%';
+ token.classList.toggle('moving',animate); document.querySelectorAll('.board-cell').forEach((c,n)=>c.classList.toggle('active',n===i));
+}
+function gameUpdateStatus(){
+ const s=$("#gameStatus"); if(s)s.textContent=`Круг ${Math.max(1,state.gameLap||1)} · клетка ${((state.gamePos%20)+20)%20+1}/20 · Брось кубик.`;
+ const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
+}
+function gameAddReward(item){
+ const [icon,amount,label]=item;
+ const n=Number(amount)||0;
+ if(label.includes('монет')) state.coins+=n;
+ else if(label.includes('кристалл')) state.gems+=n;
+ else state.inventory.push(icon);
+}
+function gameRandomReward(){
+ const pool=[['💎','10','кристаллов'],['🪙','80','монет'],['🪙','140','монет'],['📜','1','свиток'],['🧰','1','предмет']];
+ return pool[Math.floor(Math.random()*pool.length)];
+}
+function gameShowReward(reward,title='Поздравляем!'){
+ const modal=$("#gameRewardModal"), items=$("#rewardItems"); if(!modal||!items)return;
+ $("#rewardModalTitle").textContent=title; $("#rewardModalText").textContent='Получено';
+ items.innerHTML=reward.map(x=>`<div class="reward-item"><i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small></div>`).join('');
+ reward.forEach(gameAddReward); save(); modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+ let sec=3; $("#modalCloseHint").textContent=`Нажмите, чтобы закрыть (${sec}s)`; clearInterval(gameTimerId); gameTimerId=setInterval(()=>{sec--; const el=$("#modalCloseHint"); if(el)el.textContent=sec>0?`Нажмите, чтобы закрыть (${sec}s)`:'Нажмите, чтобы закрыть'; if(sec<=0)clearInterval(gameTimerId)},1000);
+}
+function gameResolveCell(){
+ const cell=GAME_CELLS[((state.gamePos%20)+20)%20]; let reward;
+ if(cell.value==='?') reward=gameRandomReward();
+ else reward=[[cell.icon,cell.value,cell.label.toLowerCase()]];
+ gameShowReward(reward,cell.value==='?'?'Сюрприз!':'Получено');
+ if(cell.value!=='?'){
+   // reward is already applied by gameShowReward; XP is awarded below
+ }
+ state.exp+=5; while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp}
+ state.gameTaskProgress+=1; save();
+ if(state.gameLap>0){const milestone=GAME_REWARDS.find(r=>r.lap===state.gameLap && !state.gameMilestones.includes(r.lap)); if(milestone){state.gameMilestones.push(milestone.lap); setTimeout(()=>gameShowReward(milestone.items,`Награда за ${milestone.title}`),3300)}}
+}
+async function gameRoll(){
+ if(gameMoving)return;
+ if(state.gameDice<=0){const s=$("#gameStatus");if(s)s.textContent='Кубики закончились. Получи новые в наградах.';return}
+ state.gameDice--; save(); gameMoving=true; gameSkipRequested=false; document.querySelector('#casino').classList.add('rolling');
+ const roll=1+Math.floor(Math.random()*6), face=['⚀','⚁','⚂','⚃','⚄','⚅'][roll-1]; $("#diceFace").textContent=face;
+ const skip=$("#skipRollBtn"); if(skip)skip.disabled=false;
+ for(let step=0;step<roll;step++){
+   if(!gameMoving)break;
+   state.gamePos=(state.gamePos+1)%20; if(state.gamePos===0)state.gameLap++;
+   gamePlaceToken(true); gameUpdateStatus();
+   if(!gameSkipRequested) await new Promise(r=>setTimeout(r,280));
+ }
+ gameMoving=false; document.querySelector('#casino').classList.remove('rolling');
+ gameResolveCell();
+}
+$("#spinBtn").onclick=gameRoll;
+$("#skipRollBtn").onclick=()=>{ if(gameMoving){ gameSkipRequested=true; } };
+$("#gameModalClose").onclick=()=>{$("#gameRewardModal").classList.remove('show');$("#gameRewardModal").setAttribute('aria-hidden','true');};
+$("#gameRewardModal").addEventListener('click',e=>{if(e.target.id==='gameRewardModal')$("#gameModalClose").click()});
+function gameTasksInit(){
+ const list=$("#gameTasksList"); if(!list)return;
+ const tasks=[
+  {id:'roll3',name:'Сделать 3 броска',goal:3,progress:()=>Math.min(state.gameTaskProgress,3),reward:['🎲','3','кубика']},
+  {id:'steps10',name:'Пройти 10 клеток',goal:10,progress:()=>Math.min(state.gameLap*20+state.gamePos,10),reward:['💎','10','кристаллов']},
+  {id:'lap5',name:'Дойти до круга 5',goal:5,progress:()=>Math.min(state.gameLap,5),reward:['🪙','750','монет']}
+ ];
+ list.innerHTML=tasks.map(t=>{const prog=t.progress(),done=prog>=t.goal,claimed=state.gameTaskClaims.includes(t.id);return `<div class="task-row ${claimed?'done':''}"><div><b>${t.name}</b><small>${prog}/${t.goal} · награда ${t.reward[0]} ${t.reward[1]}</small></div><button type="button" data-task-claim="${t.id}" ${!done||claimed?'disabled':''}>${claimed?'Получено':done?'Получить':'В процессе'}</button></div>`}).join('');
+}
+$("#gameTasksList").addEventListener('click',e=>{
+ const b=e.target.closest('[data-task-claim]'); if(!b)return; const id=b.dataset.taskClaim; if(state.gameTaskClaims.includes(id))return;
+ const rewards={roll3:['🎲','3','кубика'],steps10:['💎','10','кристаллов'],lap5:['🪙','750','монет']}; const r=rewards[id]; if(!r)return;
+ state.gameTaskClaims.push(id); if(r[2].includes('кубик'))state.gameDice+=Number(r[1]); else if(r[2].includes('кристалл'))state.gems+=Number(r[1]); else state.coins+=Number(r[1]); save(); gameTasksInit();
+});
+
+$("#gameTasksBtn").onclick=()=>{$("#gameTasksModal").classList.add('show');$("#gameTasksModal").setAttribute('aria-hidden','false');gameTasksInit()};
+$("#gameTasksClose").onclick=()=>{$("#gameTasksModal").classList.remove('show');$("#gameTasksModal").setAttribute('aria-hidden','true')};
+$("#gameGiftBtn").onclick=()=>{
+ const today=new Date().toISOString().slice(0,10);
+ const modal=$("#gameRewardModal"), items=$("#rewardItems"); if(!modal||!items)return;
+ const already=state.gameGiftDate===today;
+ $("#rewardModalTitle").textContent=already?'Подарок уже получен':'Монополия · Подарок'; $("#rewardModalText").textContent=already?'Возвращайся завтра':'Ежедневная награда';
+ const reward=already?[['🎁','✓','получено']]:[['💎','5','кристаллов'],['🎲','2','кубика'],['🪙','100','монет']];
+ items.innerHTML=reward.map(x=>`<div class="reward-item"><i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small></div>`).join('');
+ if(!already){state.gameGiftDate=today; reward.forEach(gameAddReward); save();}
+ modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
 };
+gameBoardInit();
+gameEventTimer();
+
 render();
 showScreen("home");
 /* Territory v35 — живой игровой город: без навязчивого автоспама */

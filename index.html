@@ -113,7 +113,7 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
       <button data-screen="arena"><span>⚔️</span><b>Арена</b><small>Бой</small></button>
       <button data-screen="market"><span>🛒</span><b>Рынок</b><small>Торговля</small></button>
       <button data-screen="districts"><span>🗺️</span><b>Районы</b><small>Город</small></button>
-      <button data-screen="casino"><span>🎮</span><b>Game</b><small>Удача</small></button>
+      <button data-screen="casino"><span class="game-icon-ancient">⚄⚂</span><b>Game</b><small>Кубики</small></button>
     </div>
     <button class="hotspot hs-arena" data-screen="arena" aria-label="Арена"></button>
     <button class="hotspot hs-market" data-screen="market" aria-label="Рынок"></button>
@@ -207,7 +207,7 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
         <div class="road r1"></div><div class="road r2"></div>
         <button class="map-point arena-point" data-screen="arena">⚔️<small>Арена</small></button>
         <button class="map-point market-point" data-screen="market">🛒<small>Рынок</small></button>
-        <button class="map-point casino-point" data-screen="casino">🎰<small>Game</small></button>
+        <button class="map-point casino-point" data-screen="casino"><span class="game-icon-ancient">⚄⚂</span><small>Game</small></button>
         <button class="map-point port-point" data-district="port">⚓<small>Порт</small></button>
         <button class="map-point ruins-point" data-district="ruins">🏚️<small>Руины</small></button>
         <button class="map-point center-point" data-district="center">🏙️<small>Центр</small></button>
@@ -237,13 +237,48 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
       <div class="inventory-grid" id="inventoryGrid"></div>
     </section>
 
-    <section id="casino" class="screen">
-      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>GAME</h2></div>
-      <div class="casino-scene">
-        <div class="neon">SDOLARS<br><strong>CASINO</strong></div>
-        <div class="wheel" id="wheel">🎰</div>
-        <p id="casinoMsg">Ставка 100 🪙</p>
-        <button id="spinBtn" class="fight-btn">ИГРАТЬ · 100 🪙</button>
+    <section id="casino" class="screen game-screen">
+      <div class="game-topbar">
+        <button class="game-close" data-screen="home" aria-label="Закрыть">×</button>
+        <div class="game-title"><b>Монополия</b><small>GAME · ЗИМНЕЕ СОБЫТИЕ</small></div>
+        <div class="game-timer"><span>Событие</span><b id="gameTimer">09:14:53</b></div>
+      </div>
+      <div class="game-reward-track" id="gameRewardTrack"></div>
+      <div class="game-board-wrap">
+        <div class="game-board" id="gameBoard" aria-label="Игровое поле"></div>
+        <div class="game-center">
+          <div class="game-ship">⛵</div>
+          <b>МОНОПОЛИЯ</b>
+          <small>Sdolars Winter</small>
+        </div>
+        <div class="game-token" id="gameToken">♟</div>
+      </div>
+      <div class="game-side-stack">
+        <button type="button" id="gameGiftBtn"><span>🎁</span><b>Подарок</b></button>
+        <button type="button" id="gameTasksBtn"><span>📜</span><b>Задания</b></button>
+      </div>
+      <div class="game-status" id="gameStatus">Брось кубик и пройди клетки.</div>
+      <div class="game-bottom">
+        <button type="button" class="ancient-dice" id="spinBtn" aria-label="Бросить кубик"><span class="dice-face" id="diceFace">⚄</span><small>БРОСИТЬ</small></button>
+        <div class="dice-count"><b id="diceCount">47</b><span>🎲 кубиков</span><small>1 бросок за ход</small></div>
+        <button type="button" class="skip-roll" id="skipRollBtn">Пропустить<br>анимацию</button>
+      </div>
+      <div class="game-modal" id="gameRewardModal" aria-hidden="true">
+        <div class="game-modal-card">
+          <button type="button" class="game-modal-close" id="gameModalClose">×</button>
+          <div class="modal-banner">МОНОПОЛИЯ</div>
+          <h3 id="rewardModalTitle">Поздравляем!</h3>
+          <p id="rewardModalText">Получено</p>
+          <div class="reward-items" id="rewardItems"></div>
+          <small class="modal-close-hint" id="modalCloseHint">Нажмите, чтобы закрыть</small>
+        </div>
+      </div>
+      <div class="game-tasks-modal" id="gameTasksModal" aria-hidden="true">
+        <div class="game-tasks-card">
+          <button type="button" class="game-modal-close" id="gameTasksClose">×</button>
+          <h3>Монополия: Задания</h3>
+          <div id="gameTasksList"></div>
+        </div>
       </div>
     </section>
   </main>
