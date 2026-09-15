@@ -179,28 +179,60 @@ function gameBoardInit(){
  const board=$("#gameBoard"), track=$("#gameRewardTrack"); if(!board||!track)return;
  board.innerHTML='';
  const n=GAME_CELLS.length;
- const cells=[];
  for(let i=0;i<n;i++){
-  const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'')+(i===GAME_CELLS.length-1?' finish':'');
   const c=GAME_CELLS[i];
-  const isStart=i===0, isFinish=i===n-1;
-  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>${isStart?'<span class="start-ribbon">СТАРТ</span>':''}`;
+  const cell=document.createElement('button');
+  cell.type='button';
+  cell.className='board-cell '+(c.type||'')+(i===0?' start':'')+(i===n-1?' finish':'');
   cell.dataset.index=i;
+  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>`;
   const pos=gameGridPosition(i,n);
-  cell.style.left=pos.x+'%'; cell.style.top=pos.y+'%'; cell.style.setProperty('--tile-rot',pos.rot+'deg');
-  cells.push(cell); board.appendChild(cell);
+  cell.style.left=pos.x+'%';
+  cell.style.top=pos.y+'%';
+  cell.style.setProperty('--tile-rot',pos.rot+'deg');
+  cell.addEventListener('click',()=>gameSelectCell(i));
+  board.appendChild(cell);
  }
- cells.forEach(cell=>cell.addEventListener('click',()=>gameSelectCell(Number(cell.dataset.index))));
- track.innerHTML=GAME_REWARDS.map(r=>{const first=r.items&&r.items[0]?r.items[0]:[r.icon,'','']; return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]||r.icon}</span><b class="reward-amount">${first[1]||''}</b><small>${r.title}</small></button>`}).join('');
- gamePlaceToken(false); gameTasksInit(); gameUpdateStatus(); gameSelectCell(state.gamePos);
+ track.innerHTML=GAME_REWARDS.map(r=>{
+   const first=r.items&&r.items[0]?r.items[0]:[r.icon,'',''];
+   return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]||r.icon}</span><b class="reward-amount">${first[1]||''}</b><small>${r.title}</small></button>`;
+ }).join('');
+ gamePlaceToken(false);
+ gameTasksInit();
+ gameUpdateStatus();
+ gameSelectCell(state.gamePos);
 }
 function gameGridPosition(i,n){
- const total=n, angle=(Math.PI/2)+(i/total)*Math.PI*2;
- const c=Math.cos(angle), s=Math.sin(angle);
- const r=1/(Math.abs(c)+Math.abs(s));
- const x=50+40*c*r, y=50+40*s*r;
- const deg=Math.atan2(c,-s)*180/Math.PI;
- return {x,y,rot:deg};
+ // One continuous perimeter. 27 fixed points are spaced by equal path distance
+ // around a diamond, so corners are never duplicated and tiles cannot stack.
+ const vertices=[{x:50,y:7},{x:93,y:50},{x:50,y:93},{x:7,y:50}];
+ const lengths=[]; let perimeter=0;
+ for(let k=0;k<4;k++){
+   const a=vertices[k],b=vertices[(k+1)%4];
+   const len=Math.hypot(b.x-a.x,b.y-a.y);
+   lengths.push(len); perimeter+=len;
+ }
+ const d=(i/n)*perimeter;
+ let acc=0;
+ for(let k=0;k<4;k++){
+   const a=vertices[k],b=vertices[(k+1)%4],len=lengths[k];
+   if(d<=acc+len || k===3){
+     const t=Math.max(0,Math.min(1,(d-acc)/len));
+     const x=a.x+(b.x-a.x)*t, y=a.y+(b.y-a.y)*t;
+     const nextD=((i+1)/n)*perimeter;
+     let nd=nextD;
+     if(nd>=acc+len && k<3){
+       const nb=vertices[k+1], nl=lengths[k+1];
+       const nt=Math.min(1,(nd-(acc+len))/nl);
+       return {x,y,rot:Math.atan2(nb.y-b.y,nb.x-b.x)*180/Math.PI+90};
+     }
+     const nt=Math.min(1,Math.max(0,(nextD-acc)/len));
+     const nx=a.x+(b.x-a.x)*nt, ny=a.y+(b.y-a.y)*nt;
+     return {x,y,rot:Math.atan2(ny-y,nx-x)*180/Math.PI+90};
+   }
+   acc+=len;
+ }
+ return {x:50,y:7,rot:45};
 }
 function gameSelectCell(index){
  const c=GAME_CELLS[index]; if(!c)return;
@@ -209,14 +241,15 @@ function gameSelectCell(index){
 }
 function gamePlaceToken(animate=true){
  const token=$("#gameToken"), board=$("#gameBoard"); if(!token||!board)return;
- const i=((state.gamePos%GAME_CELLS.length)+GAME_CELLS.length)%GAME_CELLS.length;
+ const i=((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
  const cell=board.querySelector(`.board-cell[data-index="${i}"]`); if(!cell)return;
- token.style.left=(cell.offsetLeft+cell.offsetWidth/2)+'px';
- token.style.top=(cell.offsetTop+cell.offsetHeight/2)+'px';
+ token.style.left=cell.offsetLeft+cell.offsetWidth/2+'px';
+ token.style.top=cell.offsetTop+cell.offsetHeight/2+'px';
  token.classList.toggle('moving',animate);
  board.querySelectorAll('.board-cell').forEach((c,n)=>{
+   const passed=state.gameLap>0 || n<i;
    c.classList.toggle('active',n===i);
-   c.classList.toggle('passed',state.gameLap>0 || n<i);
+   c.classList.toggle('passed',passed);
  });
  gameSelectCell(i);
 }
