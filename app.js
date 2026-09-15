@@ -240,3 +240,29 @@ showScreen("home");
   // Город начинает жить сам: первое событие — быстро, затем новые встречи появляются регулярно.
   scheduleNext(7000);
 })();
+
+/* Territory v40 — районы становятся игровыми локациями */
+(function livingDistricts(){
+  const screen=document.querySelector('#districts'); if(!screen)return;
+  const info=document.querySelector('#districtInfo'), kicker=document.querySelector('#districtKicker'), title=document.querySelector('#districtTitle'), text=document.querySelector('#districtText'), action=document.querySelector('#districtAction'), log=document.querySelector('#districtLog');
+  const data={
+    center:{k:'ЦЕНТРАЛЬНЫЙ КВАРТАЛ',t:'Центр Sdolars',d:'Главная площадь города. Здесь чаще всего происходят городские события и встречается Alex.',r:35,xp:8,msg:'Ты прошёл через центральную площадь. Город кипит жизнью.'},
+    port:{k:'ПОРТ',t:'Старый порт',d:'Причалы, грузчики и приезжие. Иногда здесь появляются выгодные сделки и редкие товары.',r:55,xp:12,msg:'У причала найден груз с наградой.'},
+    ruins:{k:'РУИНЫ',t:'Старые руины',d:'Опасный район за стеной. Здесь можно найти добычу, но иногда встречаются противники.',r:75,xp:18,msg:'В руинах найдена старая тайная кладка.'}
+  };
+  let current='center';
+  function select(id){
+    const d=data[id]; if(!d)return; current=id;
+    screen.querySelectorAll('.map-point[data-district]').forEach(b=>b.classList.toggle('selected',b.dataset.district===id));
+    kicker.textContent=d.k; title.textContent=d.t; text.textContent=d.d; action.textContent=`ОТПРАВИТЬСЯ · +${d.r} 🪙`;
+  }
+  screen.addEventListener('click',e=>{
+    const point=e.target.closest('.map-point[data-district]'); if(point){select(point.dataset.district);return;}
+    if(e.target.closest('#districtAction')){
+      const d=data[current]; state.coins+=d.r; state.exp+=d.xp; state.cityRep+=1;
+      while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp;}
+      save(); log.textContent=`${d.msg} +${d.r} 🪙 · +${d.xp} XP · +1 репутация города.`;
+    }
+  });
+  select('center');
+})();
