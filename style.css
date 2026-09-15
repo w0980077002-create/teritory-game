@@ -982,3 +982,42 @@ body:has(#home.active) .live-city-time b{font-size:11px!important;margin-left:3p
   body:has(#home.active) .live-city-time{right:66px!important;top:11px!important;padding:6px 8px!important;font-size:8px!important}
   body:has(#home.active) .live-city-time b{font-size:10px!important}
 }
+
+
+/* Territory v28 — правая колонка без дублирующего инвентаря + имена NPC */
+body:has(#home.active) .live-side-ui{
+  top:14%!important;
+  gap:7px!important;
+}
+body:has(#home.active) .live-side-ui button{
+  height:67px!important;
+  min-height:67px!important;
+  background:rgba(8,18,28,.34)!important;
+  border-color:rgba(174,191,207,.46)!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.18)!important;
+}
+body:has(#home.active) .live-side-ui button span{font-size:19px!important}
+body:has(#home.active) .live-side-ui button b{font-size:8px!important}
+body:has(#home.active) .live-side-ui button small{font-size:6px!important}
+.npc-label{
+  position:absolute!important;z-index:55!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  min-width:112px!important;height:43px!important;padding:5px 9px!important;box-sizing:border-box!important;
+  border:1px solid rgba(166,184,201,.75)!important;border-radius:11px!important;
+  background:rgba(7,17,27,.76)!important;color:#f0f3f5!important;
+  box-shadow:0 5px 14px rgba(0,0,0,.32)!important;
+  backdrop-filter:blur(2px)!important;-webkit-backdrop-filter:blur(2px)!important;
+}
+.npc-label b{font-size:10px!important;line-height:12px!important}
+.npc-label small{font-size:7px!important;line-height:9px!important;color:#aeb9c5!important}
+.guard-label{left:5.5%!important;bottom:10%!important}
+.trader-label{right:5.5%!important;bottom:10%!important}
+@media(max-width:390px){
+ body:has(#home.active) .live-side-ui{top:14%!important;right:6px!important;gap:5px!important}
+ body:has(#home.active) .live-side-ui button{width:52px!important;height:61px!important;min-height:61px!important}
+ .npc-label{min-width:96px!important;height:39px!important}
+ .npc-label b{font-size:9px!important}
+ .npc-label small{font-size:6px!important}
+ .guard-label{left:4%!important;bottom:9%!important}
+ .trader-label{right:4%!important;bottom:9%!important}
+}
