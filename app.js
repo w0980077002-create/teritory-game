@@ -140,11 +140,13 @@ function gameBoardInit(){
  for(let i=0;i<n;i++){
   const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'');
   const c=GAME_CELLS[i]; cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>`; cell.dataset.index=i;
-  // 20 cells: five on each side, corners are not duplicated. Start at the lower side and move clockwise.
+  // 20-cell closed diamond track: 5 cells on each side, evenly spaced with safe gaps.
   const side=Math.floor(i/5), k=i%5, t=[0.10,0.30,0.50,0.70,0.90][k];
-  const edges=[[[50,94],[94,50]],[[94,50],[50,6]],[[50,6],[6,50]],[[6,50],[50,94]]];
-  const a=edges[side][0], b=edges[side][1]; const x=a[0]+(b[0]-a[0])*t, y=a[1]+(b[1]-a[1])*t;
-  cell.style.left=x+'%'; cell.style.top=y+'%'; cell.style.setProperty('--tile-angle',Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI+'deg');
+  const edges=[[[50,8],[92,50]],[[92,50],[50,92]],[[50,92],[8,50]],[[8,50],[50,8]]];
+  const a=edges[side][0], b=edges[side][1];
+  const x=a[0]+(b[0]-a[0])*t, y=a[1]+(b[1]-a[1])*t;
+  cell.style.left=x+'%'; cell.style.top=y+'%';
+  cell.style.setProperty('--tile-angle',Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI+'deg');
   board.appendChild(cell);
  }
  if(token){ board.appendChild(token); }

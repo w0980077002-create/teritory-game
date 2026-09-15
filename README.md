@@ -1,4 +1,4 @@
-# Territory Sdolars v45 — Game / Monopoly Event
+# Territory Sdolars v46 — Game / Monopoly Event
 
 v41 продолжает v40 и добавляет полноценный игровой модуль **Game** по механике и визуальному принципу из предоставленного видео.
 
@@ -26,7 +26,7 @@ v41 продолжает v40 и добавляет полноценный игр
 - Улучшена мобильная компоновка Game для коротких экранов.
 
 
-## Territory v45
+## Territory v46
 - Game board converted to a 24-cell diamond track closer to the supplied reference video.
 - Player token is anchored to the actual board and moves cell-by-cell along the track.
 - Removed the old 20-cell corner overlap so every board position is unique.
@@ -38,4 +38,12 @@ v41 продолжает v40 и добавляет полноценный игр
 - Verified app.js with Node syntax check.
 
 
-Territory v45: финальная мобильная компоновка Game, восстановлены все игровые панели, 24-клеточная дорожка, движение фишки, награды и контрольные круги.
+Territory v46: финальная мобильная компоновка Game, восстановлены все игровые панели, 24-клеточная дорожка, движение фишки, награды и контрольные круги.
+
+
+## v46 — definitive Game layout
+- Stable 20-cell diamond track with non-overlapping cells.
+- Token is bound to the active cell and moves one cell at a time.
+- Game takes over the full game frame while active; base navigation cannot leak through.
+- Mobile composition tuned for narrow phones without stretching the board.
+- Dice, reward track, event panels, tasks, surprise cells and milestone rewards remain functional.
