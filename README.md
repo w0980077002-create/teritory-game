@@ -1,4 +1,4 @@
-Territory — Sdolars v29
+Territory — Sdolars v30
 
 Это ИГРА: HTML + CSS + JavaScript, а не картинка.
 

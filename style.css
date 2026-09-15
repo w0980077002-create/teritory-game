@@ -1022,7 +1022,7 @@ body:has(#home.active) .live-side-ui button small{font-size:6px!important}
  .trader-label{right:4%!important;bottom:9%!important}
 }
 
-/* Territory v29 — ЖИВАЯ ИГРА: анимации поверх реалистичной сцены без искажения фона */
+/* Territory v30 — ЖИВАЯ ИГРА: анимации поверх реалистичной сцены без искажения фона */
 body:has(#home.active) .real-home{isolation:isolate}
 body:has(#home.active) .real-home-image{z-index:1;transform:none!important;animation:none!important;object-fit:cover!important;object-position:center center!important}
 body:has(#home.active) .game-life-layer{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden}
@@ -1070,3 +1070,59 @@ body:has(#home.active) .scene-toast{position:absolute;left:14px;bottom:8%;max-wi
 body:has(#home.active) .scene-toast.show{opacity:1;transform:translateY(0)}
 @media(max-width:390px){body:has(#home.active) .game-person{width:9px;height:22px}.game-campfire{transform:translate(-50%,-50%) scale(.85)!important}.scene-toast{left:10px!important;bottom:7%!important;max-width:205px!important;font-size:8px!important}}
 @media(prefers-reduced-motion:reduce){body:has(#home.active) .game-person,body:has(#home.active) .game-campfire:before,body:has(#home.active) .game-campfire:after,body:has(#home.active) .game-ember,body:has(#home.active) .game-smoke i,body:has(#home.active) .game-smoke b,body:has(#home.active) .game-smoke em,body:has(#home.active) .game-bird,body:has(#home.active) .game-lantern{animation:none!important}}
+
+/* Territory v30 — игровые анимации, привязанные к реальной сцене */
+body:has(#home.active) .real-home{isolation:isolate}
+body:has(#home.active) .living-scene{position:absolute;inset:0;z-index:9;pointer-events:none;overflow:hidden}
+body:has(#home.active) .scene-vignette{position:absolute;inset:0;background:radial-gradient(circle at 50% 52%,transparent 48%,rgba(0,0,0,.18) 100%);opacity:.65}
+body:has(#home.active) .torch-glow{position:absolute;width:58px;height:58px;border-radius:50%;filter:blur(7px);background:radial-gradient(circle,rgba(255,191,86,.48) 0 12%,rgba(255,132,38,.18) 35%,transparent 72%);mix-blend-mode:screen;animation:torchFlicker 1.15s ease-in-out infinite}
+body:has(#home.active) .tg-left{left:35%;top:51.5%}
+body:has(#home.active) .tg-right{right:35%;top:51.5%;animation-delay:-.45s}
+@keyframes torchFlicker{0%,100%{opacity:.55;transform:scale(.94)}35%{opacity:.82;transform:scale(1.04)}65%{opacity:.62;transform:scale(.98)}}
+
+body:has(#home.active) .brazier-flame{position:absolute;left:50%;top:68.3%;width:48px;height:64px;transform:translate(-50%,-50%);filter:drop-shadow(0 0 9px rgba(255,126,30,.55));}
+body:has(#home.active) .brazier-flame i,body:has(#home.active) .brazier-flame b{position:absolute;left:50%;bottom:2px;display:block;border-radius:55% 45% 55% 45%;transform-origin:50% 100%;}
+body:has(#home.active) .brazier-flame i{width:22px;height:45px;transform:translateX(-50%);background:radial-gradient(ellipse at 50% 78%,#fffbd1 0 10%,#ffd85b 11% 31%,#ff852b 32% 64%,transparent 66%);animation:mainFire 1s ease-in-out infinite}
+body:has(#home.active) .brazier-flame b{width:11px;height:30px;transform:translateX(-35%);background:linear-gradient(#fff8c4,#ffbb38 55%,#f15a24);animation:mainFire .72s ease-in-out infinite reverse}
+@keyframes mainFire{0%,100%{transform:translateX(-50%) scaleY(1) rotate(-2deg)}50%{transform:translateX(-50%) scaleY(1.14) rotate(3deg)}}
+body:has(#home.active) .brazier-flame b{animation-name:sideFire}
+@keyframes sideFire{0%,100%{transform:translateX(-35%) scaleY(1) rotate(3deg)}50%{transform:translateX(-35%) scaleY(1.18) rotate(-6deg)}}
+
+body:has(#home.active) .brazier-smoke{position:absolute;left:50%;top:62.2%;width:48px;height:95px;transform:translateX(-50%);opacity:.22;filter:blur(3px)}
+body:has(#home.active) .brazier-smoke i,body:has(#home.active) .brazier-smoke b,body:has(#home.active) .brazier-smoke em{position:absolute;width:14px;height:14px;border-radius:50%;background:rgba(220,226,226,.7);display:block;animation:smokeRise 6.5s ease-out infinite}
+body:has(#home.active) .brazier-smoke i{left:16px;bottom:0}
+body:has(#home.active) .brazier-smoke b{left:24px;bottom:15px;animation-delay:2s}
+body:has(#home.active) .brazier-smoke em{left:10px;bottom:28px;animation-delay:3.8s}
+@keyframes smokeRise{0%{opacity:0;transform:translate(0,10px) scale(.55)}18%{opacity:.55}100%{opacity:0;transform:translate(12px,-62px) scale(1.7)}}
+
+body:has(#home.active) .ember-field i{position:absolute;width:3px;height:3px;border-radius:50%;background:#ffd47a;box-shadow:0 0 7px rgba(255,150,35,.85);opacity:0}
+body:has(#home.active) .ember-field i:nth-child(1){left:48.7%;top:67.6%;animation:ember 2.2s ease-out infinite}
+body:has(#home.active) .ember-field i:nth-child(2){left:50.2%;top:68%;animation:ember 2.8s ease-out infinite .7s}
+body:has(#home.active) .ember-field i:nth-child(3){left:51%;top:68.2%;animation:ember 2.4s ease-out infinite 1.4s}
+body:has(#home.active) .ember-field i:nth-child(4){left:49.7%;top:67.4%;animation:ember 3s ease-out infinite 1.9s}
+body:has(#home.active) .ember-field i:nth-child(5){left:50.7%;top:68.4%;animation:ember 2.6s ease-out infinite 2.4s}
+@keyframes ember{0%{opacity:0;transform:translate(0,0) scale(1)}15%{opacity:.9}100%{opacity:0;transform:translate(10px,-38px) scale(.15)}}
+
+body:has(#home.active) .banner-sway{position:absolute;width:74px;height:115px;opacity:.13;border-radius:0 0 50% 50%;transform-origin:50% 0;animation:bannerWave 4.5s ease-in-out infinite}
+body:has(#home.active) .bs-left{left:23%;top:28%;background:linear-gradient(90deg,transparent,rgba(20,32,43,.7),transparent)}
+body:has(#home.active) .bs-right{right:23%;top:28%;background:linear-gradient(90deg,transparent,rgba(20,32,43,.7),transparent);animation-delay:-2.1s}
+@keyframes bannerWave{0%,100%{transform:skewX(0) rotate(0)}50%{transform:skewX(-2deg) rotate(-1deg)}}
+
+body:has(#home.active) .bird-flight{position:absolute;width:18px;height:8px;opacity:.48}
+body:has(#home.active) .bird-flight:before,body:has(#home.active) .bird-flight:after{content:"";position:absolute;top:2px;width:8px;height:4px;border-top:2px solid rgba(4,12,20,.85);border-radius:100% 100% 0 0}
+body:has(#home.active) .bird-flight:before{left:0;transform:rotate(-13deg)}
+body:has(#home.active) .bird-flight:after{right:0;transform:rotate(13deg)}
+body:has(#home.active) .bf-one{left:-8%;top:25%;animation:birdOne 21s linear infinite}
+body:has(#home.active) .bf-two{left:32%;top:20%;transform:scale(.7);animation:birdTwo 27s linear infinite -8s}
+@keyframes birdOne{0%{left:-8%;transform:translateY(0) scale(.8)}50%{transform:translateY(-8px) scale(1)}100%{left:110%;transform:translateY(3px) scale(.65)}}
+@keyframes birdTwo{0%{left:25%;opacity:0}10%{opacity:.42}50%{transform:translateY(-7px) scale(.7)}100%{left:110%;transform:translateY(4px) scale(.55);opacity:0}}
+
+body:has(#home.active) .rain-dust i{position:absolute;width:2px;height:2px;border-radius:50%;background:rgba(230,226,203,.38);opacity:0;animation:floatDust 7s linear infinite}
+body:has(#home.active) .rain-dust i:nth-child(1){left:19%;top:58%;animation-delay:-1s}.rain-dust i:nth-child(2){left:29%;top:72%;animation-delay:-4s}.rain-dust i:nth-child(3){left:61%;top:64%;animation-delay:-2s}.rain-dust i:nth-child(4){left:72%;top:77%;animation-delay:-6s}.rain-dust i:nth-child(5){left:44%;top:55%;animation-delay:-5s}.rain-dust i:nth-child(6){left:84%;top:69%;animation-delay:-3s}
+@keyframes floatDust{0%{opacity:0;transform:translateY(10px)}30%{opacity:.6}100%{opacity:0;transform:translate(8px,-38px)}}
+
+body:has(#home.active) .scene-action{position:absolute;left:14px;bottom:6.5%;max-width:255px;padding:8px 11px;border:1px solid rgba(165,184,200,.55);border-radius:11px;background:rgba(6,14,22,.7);color:#edf1f4;font-size:10px;line-height:13px;opacity:0;transform:translateY(8px);transition:opacity .28s,transform .28s;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+body:has(#home.active) .scene-action.show{opacity:1;transform:translateY(0)}
+body:has(#home.active) .night-pulse .real-home-image{filter:brightness(.97) saturate(1.02)!important;transition:filter 1.8s ease}
+@media(max-width:390px){body:has(#home.active) .scene-action{left:9px;bottom:6%;max-width:210px;font-size:8px;line-height:11px}.torch-glow{transform:scale(.8)!important}}
+@media(prefers-reduced-motion:reduce){body:has(#home.active) .torch-glow,body:has(#home.active) .brazier-flame i,body:has(#home.active) .brazier-flame b,body:has(#home.active) .brazier-smoke i,body:has(#home.active) .brazier-smoke b,body:has(#home.active) .brazier-smoke em,body:has(#home.active) .ember-field i,body:has(#home.active) .banner-sway,body:has(#home.active) .bird-flight,body:has(#home.active) .rain-dust i{animation:none!important}}

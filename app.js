@@ -81,43 +81,47 @@ $("#spinBtn").onclick=()=>{
 };
 render();
 showScreen("home");
-/* Territory v29 — interactive living-city layer */
+/* Territory v30 — живой игровой город */
 (function initLivingCity(){
   const home=document.querySelector('.real-home');
   if(!home || home.dataset.lifeReady==='1') return;
   home.dataset.lifeReady='1';
-  const layer=document.createElement('div');
-  layer.className='game-life-layer';
-  layer.innerHTML=`
-    <div class="game-campfire" aria-hidden="true"></div>
-    <div class="game-ember e1" aria-hidden="true"></div><div class="game-ember e2" aria-hidden="true"></div><div class="game-ember e3" aria-hidden="true"></div>
-    <div class="game-smoke" aria-hidden="true"><i></i><b></b><em></em></div>
-    <div class="game-lantern l1" aria-hidden="true"></div><div class="game-lantern l2" aria-hidden="true"></div>
-    <div class="game-bird b1" aria-hidden="true"></div><div class="game-bird b2" aria-hidden="true"></div>
-    <div class="game-person p1 walk-a" aria-hidden="true"></div>
-    <div class="game-person p2 walk-b" aria-hidden="true"></div>
-    <div class="game-person p3 walk-c" aria-hidden="true"></div>
-    <div class="game-person p4 walk-d" aria-hidden="true"></div>
-    <div class="game-person p5 walk-e" aria-hidden="true"></div>
-    <div class="scene-toast" aria-live="polite"></div>`;
-  home.appendChild(layer);
-
-  const toast=layer.querySelector('.scene-toast');
-  const events=[
-    'Ворота Sdolars открыты. Город живёт своей жизнью.',
-    'К воротам прибыл новый караван.',
-    'Страж сменяет пост у городских ворот.',
-    'Торговец раскладывает свежий товар.',
-    'Вдали слышен шум вечернего рынка.'
+  const action=home.querySelector('#sceneAction');
+  const center=home.querySelector('.hs-city');
+  const weapon=home.querySelector('.hs-weapon');
+  const guard=home.querySelector('.guard-label');
+  const trader=home.querySelector('.trader-label');
+  const messages=[
+    'Ворота Sdolars охраняются. В городе спокойно.',
+    'К городским воротам прибыл вечерний караван.',
+    'На рынке продолжается торговля.',
+    'Страж проверяет прибывающих в город.',
+    'В центральном квартале становится оживлённее.'
   ];
-  let eventIndex=0;
-  function cityEvent(){
-    if(!document.querySelector('#home.active')) return;
-    toast.textContent=events[eventIndex++%events.length];
-    toast.classList.add('show');
-    clearTimeout(cityEvent.hideTimer);
-    cityEvent.hideTimer=setTimeout(()=>toast.classList.remove('show'),4200);
+  let msg=0, timer;
+  function notify(text){
+    if(!action) return;
+    action.textContent=text;
+    action.classList.remove('show');
+    void action.offsetWidth;
+    action.classList.add('show');
+    clearTimeout(timer);
+    timer=setTimeout(()=>action.classList.remove('show'),3600);
   }
-  setTimeout(cityEvent,1600);
-  setInterval(cityEvent,11000);
+  function ambient(){
+    if(document.querySelector('#home.active')) notify(messages[msg++%messages.length]);
+  }
+  setTimeout(ambient,1800);
+  setInterval(ambient,12000);
+
+  // Небольшой отклик на реальные игровые точки города.
+  [[center,'Центральный квартал Sdolars'],[weapon,'Оружейная: покупка и ремонт'],[guard,'Страж: охрана города'],[trader,'Торговец: покупка / продажа']]
+    .forEach(([el,text])=>el&&el.addEventListener('click',()=>notify(text)));
+
+  // Ночной цикл: лёгкое изменение яркости без "плавления" изображения.
+  let night=false;
+  setInterval(()=>{
+    night=!night;
+    home.classList.toggle('night-pulse',night);
+  },26000);
 })();
