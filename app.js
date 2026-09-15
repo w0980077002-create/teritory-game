@@ -59,6 +59,7 @@ function render(){
 function showScreen(id){
  document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));
+ document.body.classList.toggle("game-open",id==="game");
  if(id==="arena") resetTactical();
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b)showScreen(b.dataset.screen)});
