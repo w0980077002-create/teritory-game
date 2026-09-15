@@ -203,37 +203,29 @@ function gameBoardInit(){
  gameSelectCell(state.gamePos);
 }
 function gameGridPosition(i,n){
- // One continuous perimeter. 27 fixed points are spaced by equal path distance
- // around a diamond, so corners are never duplicated and tiles cannot stack.
- const vertices=[{x:50,y:7},{x:93,y:50},{x:50,y:93},{x:7,y:50}];
- const lengths=[]; let perimeter=0;
- for(let k=0;k<4;k++){
-   const a=vertices[k],b=vertices[(k+1)%4];
-   const len=Math.hypot(b.x-a.x,b.y-a.y);
-   lengths.push(len); perimeter+=len;
- }
- const d=(i/n)*perimeter;
- let acc=0;
- for(let k=0;k<4;k++){
-   const a=vertices[k],b=vertices[(k+1)%4],len=lengths[k];
-   if(d<=acc+len || k===3){
-     const t=Math.max(0,Math.min(1,(d-acc)/len));
-     const x=a.x+(b.x-a.x)*t, y=a.y+(b.y-a.y)*t;
-     const nextD=((i+1)/n)*perimeter;
-     let nd=nextD;
-     if(nd>=acc+len && k<3){
-       const nb=vertices[k+1], nl=lengths[k+1];
-       const nt=Math.min(1,(nd-(acc+len))/nl);
-       return {x,y,rot:Math.atan2(nb.y-b.y,nb.x-b.x)*180/Math.PI+90};
-     }
-     const nt=Math.min(1,Math.max(0,(nextD-acc)/len));
-     const nx=a.x+(b.x-a.x)*nt, ny=a.y+(b.y-a.y)*nt;
-     return {x,y,rot:Math.atan2(ny-y,nx-x)*180/Math.PI+90};
-   }
-   acc+=len;
- }
- return {x:50,y:7,rot:45};
+ // v105: 27 equally spaced points on a closed diamond perimeter.
+ // The route is measured by perimeter distance, so corners never duplicate
+ // and the tile spacing stays uniform on every phone width.
+ const count=Math.max(1,Number(n)||27);
+ const top=9, right=91, bottom=91, left=9;
+ const perimeter=2*((right-top)+(bottom-top));
+ const d=((Math.max(0,Number(i)||0)%count)/count)*perimeter;
+ const side=(right-top);
+ let x,y;
+ if(d<side){ x=top+d; y=top; }
+ else if(d<side+(bottom-top)){ x=right; y=top+(d-side); }
+ else if(d<2*side+(bottom-top)){ x=right-(d-side-(bottom-top)); y=bottom; }
+ else { x=left; y=bottom-(d-(2*side+(bottom-top))); }
+ return {x,y,rot:0};
 }
+function gameRelayoutBoard(){
+ const board=$("#gameBoard"); if(!board)return;
+ const cells=board.querySelectorAll('.board-cell');
+ cells.forEach((cell,i)=>{const p=gameGridPosition(i,cells.length);cell.style.left=p.x+'%';cell.style.top=p.y+'%';cell.style.setProperty('--tile-rot',p.rot+'deg');});
+ gamePlaceToken(false);
+}
+window.addEventListener('resize',()=>{if(document.querySelector('#game.active')) requestAnimationFrame(gameRelayoutBoard);});
+
 function gameSelectCell(index){
  const c=GAME_CELLS[index]; if(!c)return;
  const info=$("#gameCellInfo");
