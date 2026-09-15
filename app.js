@@ -618,7 +618,8 @@ function gameEnsureBatchModal(){
     <p id="gameBatchSummary">10 бросков · 10 наград</p>
     <div id="batchResults" style="display:grid;gap:8px"></div>
   </div>`;
-  document.body.appendChild(m);
+  const host=document.querySelector('#game') || document.body;
+  host.appendChild(m);
   const c=m.querySelector('#gameBatchClose');
   c.onclick=()=>{m.classList.remove('show');m.setAttribute('aria-hidden','true');gameUpdateStatus()};
   m.addEventListener('click',e=>{if(e.target===m)c.click()});
