@@ -108,7 +108,7 @@ const GAME_CELLS=[
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'🪙',value:'750',label:'МОНЕТЫ'},
  {icon:'💧',value:'30',type:'blue',label:'РЕСУРС'},
- {icon:'💜',value:'5',type:'purple',label:'КРИСТАЛЛЫ'},
+ {icon:'💜',value:'5',type:'purple',label:'РЕСУРС'},
  {icon:'🪙',value:'160',label:'МОНЕТЫ'},
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'📜',value:'10',type:'special',label:'СВИТОК'},
@@ -118,14 +118,14 @@ const GAME_CELLS=[
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'🪙',value:'300',label:'МОНЕТЫ'},
  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
+ {icon:'💧',value:'40',type:'blue',label:'РЕСУРС'},
+ {icon:'📜',value:'5',type:'special',label:'СВИТОК'},
  {icon:'🪙',value:'500',label:'МОНЕТЫ'},
- {icon:'🧰',value:'2',type:'special',label:'ПРЕДМЕТЫ'},
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
- {icon:'💧',value:'50',type:'blue',label:'РЕСУРС'},
- {icon:'📜',value:'15',type:'special',label:'СВИТОК'},
  {icon:'💎',value:'10',type:'purple',label:'КРИСТАЛЛЫ'},
- {icon:'🪙',value:'1000',label:'МОНЕТЫ'},
- {icon:'🏁',value:'ФИНИШ',type:'finish',label:'КОНЕЦ КРУГА'}
+ {icon:'🧰',value:'1',type:'special',label:'ПРЕДМЕТ'},
+ {icon:'💧',value:'60',type:'blue',label:'РЕСУРС'},
+ {icon:'🏁',value:'ФИНИШ',type:'start',label:'КОНЕЦ КРУГА'}
 ];
 const GAME_REWARDS=[
  {lap:15,icon:'💎',title:'Круг 15',items:[['💎','50','кристаллов'],['🧰','2','предмета'],['🪙','1050','монет']]},
@@ -134,53 +134,29 @@ const GAME_REWARDS=[
  {lap:30,icon:'🧰',title:'Круг 30',items:[['🧰','10','предметов'],['💎','80','кристаллов'],['🪙','2200','монет']]},
  {lap:35,icon:'📜',title:'Круг 35',items:[['📜','30','свитков'],['🏆','1','редкая награда'],['🪙','3000','монет']]}
 ];
-const JACKPOT_GROUPS=Array.from({length:47},(_,i)=>{
- const from=i*5+1, to=from+4;
- const patterns=[
-  [['🧰','1','предмет'],['💜','5','ресурса'],['🧰','10','предметов'],['📜','10','свитков'],['🪙','15000','монет']],
-  [['🧰','1','редкий предмет'],['💜','5','ресурса'],['💎','25','кристаллов'],['📜','10','свитков'],['🪙','15000','монет']],
-  [['❤️','1','особая награда'],['🧰','1','редкий предмет'],['💎','25','кристаллов'],['🧰','10','предметов'],['🪙','15000','монет']],
-  [['🎁','1','подарок'],['🧰','1','предмет'],['💎','25','кристаллов'],['📜','10','свитков'],['🪙','15000','монет']]
- ];
- return {from,to,items:patterns[i%patterns.length]};
-});
 let gameMoving=false, gameSkipRequested=false, gameTimerId=null, gameModalTimerId=null;
 function gameEventTimer(){
  const el=$("#gameTimer"); if(!el)return;
  const tick=()=>{const raw=state.gameEndsAt-Date.now(); const left=Math.max(0,raw); const d=Math.floor(left/86400000); const remD=left%86400000; const h=Math.floor(remD/3600000); const remH=remD%3600000; const m=Math.floor(remH/60000); const sec=Math.floor((remH%60000)/1000); el.textContent=raw<=0?'ЗАВЕРШЕНО':`${d}д ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; if(raw<=0){const r=$("#spinBtn");if(r)r.disabled=true;const st=$("#gameStatus");if(st&&!gameMoving)st.textContent='Событие завершено. Дождитесь следующего события.';}};
  tick(); clearInterval(gameTimerId); gameTimerId=setInterval(tick,1000);
 }
-function gameOpenJackpotPreview(){
- const modal=$('#gameJackpotModal'), list=$('#jackpotList'); if(!modal||!list)return;
- list.innerHTML=JACKPOT_GROUPS.map(g=>{
-   const cards=g.items.map((r,idx)=>{
-     const claimed=state.gameLap>=g.from+idx;
-     return `<div class="jackpot-reward ${claimed?'claimed':''}"><span>${claimed?'✓':r[0]}</span><b>${r[1]}</b><small>Осталось: ${claimed?'0':'1'}</small></div>`;
-   }).join('');
-   return `<section class="jackpot-group"><div class="jackpot-group-title">Круги ${g.from}–${g.to}</div><div class="jackpot-row">${cards}</div></section>`;
- }).join('');
- modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
-}
-function gameCloseJackpotPreview(){const modal=$('#gameJackpotModal');if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true')}}
-
 function gameBoardInit(){
  const board=$("#gameBoard"), track=$("#gameRewardTrack"); if(!board||!track)return;
  board.innerHTML='';
  const n=GAME_CELLS.length;
  const cells=[];
  for(let i=0;i<n;i++){
-  const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'')+(i===GAME_CELLS.length-1?' finish':'')+(i>0 && i<=state.gameSteps?' passed':'');
+  const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'')+(i===GAME_CELLS.length-1?' finish':'');
   const c=GAME_CELLS[i];
   const isStart=i===0, isFinish=i===n-1;
-  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b></span>${isStart?'<span class="start-ribbon">СТАРТ</span>':''}`;
+  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>${isStart?'<span class="start-ribbon">СТАРТ</span>':''}`;
   cell.dataset.index=i;
   const pos=gameGridPosition(i,n);
   cell.style.left=pos.x+'%'; cell.style.top=pos.y+'%'; cell.style.setProperty('--tile-rot',pos.rot+'deg');
   cells.push(cell); board.appendChild(cell);
  }
  cells.forEach(cell=>cell.addEventListener('click',()=>gameSelectCell(Number(cell.dataset.index))));
-  gamePaintPassedCells();
- track.innerHTML=GAME_REWARDS.map(r=>{const first=r.items[0]; return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]}</span><b class="reward-amount">${first[1]}</b><small>${r.title}</small></button>`}).join('');
+ track.innerHTML=GAME_REWARDS.map(r=>{const first=r.items&&r.items[0]?r.items[0]:[r.icon,'','']; return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]||r.icon}</span><b class="reward-amount">${first[1]||''}</b><small>${r.title}</small></button>`}).join('');
  gamePlaceToken(false); gameTasksInit(); gameUpdateStatus(); gameSelectCell(state.gamePos);
 }
 function gameGridPosition(i,n){
@@ -188,14 +164,8 @@ function gameGridPosition(i,n){
  const c=Math.cos(angle), s=Math.sin(angle);
  const r=1/(Math.abs(c)+Math.abs(s));
  const x=50+40*c*r, y=50+40*s*r;
- const deg=0;
+ const deg=Math.atan2(c,-s)*180/Math.PI;
  return {x,y,rot:deg};
-}
-function gamePaintPassedCells(){
- const board=$("#gameBoard"); if(!board)return;
- const lap=Math.max(0,Number(state.gameLap||0)), pos=Math.max(0,Number(state.gamePos||0));
- board.querySelectorAll('.board-cell').forEach((el,i)=>el.classList.toggle('passed',lap>0 || i<pos));
- const center=document.querySelector('#game .game-center'); if(center)center.dataset.lap=lap;
 }
 function gameSelectCell(index){
  const c=GAME_CELLS[index]; if(!c)return;
@@ -210,16 +180,16 @@ function gamePlaceToken(animate=true){
  token.style.top=(cell.offsetTop+cell.offsetHeight/2)+'px';
  token.classList.toggle('moving',animate);
  board.querySelectorAll('.board-cell').forEach((c,n)=>c.classList.toggle('active',n===i));
- gameSelectCell(i); gamePaintPassedCells();
+ gameSelectCell(i);
 }
 function gameUpdateStatus(){
- const s=$("#gameStatus"), badge=$("#gameLapBadge"), centerLap=$("#gameCenterLap"), turn=$("#gameTurnNo"), cellNo=$("#gameCellNo");
+ const s=$("#gameStatus"), badge=$("#gameLapBadge"), turn=$("#gameTurnNo"), cellNo=$("#gameCellNo");
  const lap=Math.floor(state.gameSteps/GAME_TRACK_CELLS);
  const pos=((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
- if(s)s.textContent=`ХОД · Круг ${lap} · клетка ${pos+1}/27 · ${state.gameMoving?'идёт движение…':'брось кубик'}`;
- if(badge)badge.textContent=lap; if(centerLap)centerLap.textContent=lap; if(turn)turn.textContent=`Ход ${state.gameRolls}`; if(cellNo)cellNo.textContent=pos+1;
+ if(s)s.textContent=`ХОД · Круг ${lap} · клетка ${pos+1}/${GAME_TRACK_CELLS} · ${state.gameMoving?'идёт движение…':'брось кубик'}`;
+ if(badge)badge.textContent=lap; if(turn)turn.textContent=`Ход ${state.gameRolls}`; if(cellNo)cellNo.textContent=pos+1;
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
- const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show') || document.querySelector('#gameBatchModal.show');
+ const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show');
 }
 function gameAddReward(item){
  const [icon,amount,label]=item;
@@ -259,71 +229,28 @@ function gameResolveCell(){
  gameTasksInit();
  gameBoardInit();
 }
-async function gameSingleRoll(animate=true){
- const roll=1+Math.floor(Math.random()*6);
- const face=['⚀','⚁','⚂','⚃','⚄','⚅'][roll-1];
- const faceEl=$("#diceFace"); if(faceEl)faceEl.textContent=face;
- for(let step=0;step<roll;step++){
-  state.gamePos=(state.gamePos+1)%GAME_TRACK_CELLS;
-  if(state.gamePos===0)state.gameLap++;
-  state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
-  gamePlaceToken(true); gameUpdateStatus();
-  if(animate) await new Promise(r=>setTimeout(r,260));
- }
- const cell=GAME_CELLS[((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS];
- return {roll, pos:state.gamePos, lap:state.gameLap, cell, reward:cell.value==='?'?gameRandomReward():[[cell.icon,cell.value,cell.label.toLowerCase()]]};
-}
-function gameShowBatchRewards(results){
- const modal=$("#gameBatchModal"), list=$("#batchResults"); if(!modal||!list)return;
- list.innerHTML=results.map((r,i)=>{
-  const x=r.reward[0];
-  return `<div class="batch-result"><span class="batch-n">${i+1}</span><span class="batch-die">${['⚀','⚁','⚂','⚃','⚄','⚅'][r.roll-1]}</span><span class="batch-reward-icon">${x[0]}</span><div><b>${x[1]}</b><small>${x[2]}</small><em>Клетка ${r.pos+1}</em></div></div>`;
- }).join('');
- $("#batchSubtitle").textContent=`10 бросков · ${results.length} наград`;
- modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
-}
-function gameCloseBatch(){const m=$("#gameBatchModal");if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');gameUpdateStatus();}}
-async function gameRoll10(){
- if(gameMoving || document.querySelector('#gameRewardModal.show') || document.querySelector('#gameBatchModal.show'))return;
- if(state.gameDice<10){const s=$("#gameStatus");if(s)s.textContent='Для броска ×10 нужно минимум 10 кубиков.';return;}
- if(state.gameEndsAt && Date.now()>=state.gameEndsAt){gameUpdateStatus();return;}
- gameMoving=true; state.gameMoving=true; document.querySelector('#game').classList.add('rolling');
- const skip=$("#skipRollBtn"), results=[];
- if(skip)skip.disabled=true;
- for(let i=0;i<10;i++){
-  if(state.gameDice<=0)break;
-  state.gameDice--; state.gameRolls++; state.gameTaskProgress=state.gameRolls;
-  const result=await gameSingleRoll(true);
-  results.push(result);
-  state.exp+=5;
-  while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp;}
-  gameUpdateStatus();
-  await new Promise(r=>setTimeout(r,120));
- }
- gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
- state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
- save(); gameBoardInit();
- results.forEach(r=>gameAddReward(r.reward[0]));
- const reached=GAME_REWARDS.filter(r=>state.gameLap>=r.lap && !state.gameMilestones.includes(r.lap));
- reached.forEach(r=>state.gameMilestones.push(r.lap));
- save();
- gameShowBatchRewards(results);
-}
 async function gameRoll(){
- if($('#roll10Btn')?.checked){await gameRoll10();return;}
- if(gameMoving || document.querySelector('#gameRewardModal.show') || document.querySelector('#gameBatchModal.show'))return;
- if(state.gameEndsAt && Date.now()>=state.gameEndsAt){ const st=$("#gameStatus"); if(st)st.textContent='Событие завершено. Дождитесь следующего события.'; gameUpdateStatus(); return; }
+ if(gameMoving || document.querySelector('#gameRewardModal.show'))return;
+ if(state.gameEndsAt && Date.now() >= state.gameEndsAt){ const st=$("#gameStatus"); if(st)st.textContent='Событие завершено. Дождитесь следующего события.'; gameUpdateStatus(); return; }
  if(state.gameDice<=0){const s=$("#gameStatus");if(s)s.textContent='Кубики закончились. Получи новые в наградах.';return}
  state.gameDice--; state.gameRolls++; state.gameTaskProgress=state.gameRolls; save();
- gameMoving=true; state.gameMoving=true; document.querySelector('#game').classList.add('rolling');
- const result=await gameSingleRoll(!$('#skipRollBtn')?.checked);
+ gameMoving=true; state.gameMoving=true; gameSkipRequested=false; document.querySelector('#game').classList.add('rolling');
+ const roll=1+Math.floor(Math.random()*6), face=['⚀','⚁','⚂','⚃','⚄','⚅'][roll-1]; $("#diceFace").textContent=face;
+ const skip=$("#skipRollBtn"); if(skip)skip.disabled=false;
+ gameUpdateStatus();
+ for(let step=0;step<roll;step++){
+   state.gamePos=(state.gamePos+1)%GAME_TRACK_CELLS;
+   if(state.gamePos===0)state.gameLap++;
+   state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
+   gamePlaceToken(true); gameUpdateStatus();
+   if(!gameSkipRequested) await new Promise(r=>setTimeout(r,300));
+ }
  gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
- save(); gameResolveCell();
+ if(skip)skip.disabled=true;
+ save();
+ gameResolveCell();
 }
-
 $("#spinBtn").onclick=gameRoll;
-$("#batchClose").onclick=gameCloseBatch;
-$("#gameBatchModal").addEventListener("click",e=>{if(e.target.id==="gameBatchModal")gameCloseBatch();});
 $("#skipRollBtn").onchange=()=>{ if($("#skipRollBtn").checked)gameSkipRequested=true; };
 $("#gameModalClose").onclick=()=>{clearInterval(gameModalTimerId);$("#gameRewardModal").classList.remove('show');$("#gameRewardModal").setAttribute('aria-hidden','true');gameUpdateStatus();};
 $("#gameRewardModal").addEventListener('click',e=>{if(e.target.id==='gameRewardModal')$("#gameModalClose").click()});
@@ -404,9 +331,6 @@ gameEventTimer();
     if(state.gameMilestones.includes(lap)) gameShowReward(r.items,`Круг ${lap} · награда получена`);
     else { const s=$('#gameStatus'); if(s)s.textContent=`Круг ${lap}: пройди ещё ${Math.max(0,lap-state.gameLap)} круг(а).`; }
   });
-  if(track) track.addEventListener('dblclick',gameOpenJackpotPreview);
-  const rewardPreviewBtn=$('#gameRewardPreviewBtn'); if(rewardPreviewBtn) rewardPreviewBtn.onclick=gameOpenJackpotPreview;
-  const jackpotClose=$('#jackpotClose'); if(jackpotClose) jackpotClose.onclick=gameCloseJackpotPreview;
   const prize=$('.game-prize-badge');
   if(prize){ prize.setAttribute('role','button'); prize.tabIndex=0; prize.addEventListener('click',()=>gameShowReward([['🎁','10','призовых попыток']], 'Призы x10')); }
   document.addEventListener('click',e=>{
@@ -415,7 +339,7 @@ gameEventTimer();
     const close=c.querySelector('.game-modal-close'); if(close)close.click();
   });
   const closeAll=()=>{
-    ['#gameRewardModal','#gameTasksModal','#gamePanelModal','#gameJackpotModal'].forEach(id=>{const el=$(id);if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true')}});
+    ['#gameRewardModal','#gameTasksModal','#gamePanelModal'].forEach(id=>{const el=$(id);if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true')}});
     gameUpdateStatus();
   };
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
@@ -585,3 +509,115 @@ showScreen("home");
   });
   select('center');
 })();
+
+
+/* Territory v78 — real x10 roll: 10 independent throws + 10-reward summary */
+function gameEnsureBatchModal(){
+  if(document.querySelector('#gameBatchModal')) return;
+  const m=document.createElement('div');
+  m.id='gameBatchModal'; m.className='game-modal'; m.setAttribute('aria-hidden','true');
+  m.innerHTML=`<div class="game-modal-card" style="max-height:82vh;overflow:auto">
+    <button type="button" id="gameBatchClose" aria-label="Закрыть">✕</button>
+    <h3>Результат · Бросок ×10</h3>
+    <p id="gameBatchSummary">10 бросков · 10 наград</p>
+    <div id="batchResults" style="display:grid;gap:8px"></div>
+  </div>`;
+  document.body.appendChild(m);
+  const c=m.querySelector('#gameBatchClose');
+  c.onclick=()=>{m.classList.remove('show');m.setAttribute('aria-hidden','true');gameUpdateStatus()};
+  m.addEventListener('click',e=>{if(e.target===m)c.click()});
+}
+function gameShowBatchResults(results){
+  gameEnsureBatchModal();
+  const m=$('#gameBatchModal'), list=$('#batchResults'), summary=$('#gameBatchSummary');
+  if(!m||!list)return;
+  if(summary)summary.textContent=`${results.length} бросков · ${results.length} наград`;
+  list.innerHTML=results.map((r,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.07)">
+    <span><b>Бросок ${i+1}</b> · ${r.face}</span><span>${r.icon} <b>${r.amount}</b> ${r.label}</span>
+  </div>`).join('');
+  m.classList.add('show'); m.setAttribute('aria-hidden','false');
+}
+function gameApplyCellRewardSilent(){
+  const cell=GAME_CELLS[((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS];
+  const reward=cell.value==='?'?gameRandomReward():[[cell.icon,cell.value,cell.label.toLowerCase()]];
+  reward.forEach(gameAddReward);
+  state.exp+=5;
+  while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp}
+  return {cell,reward};
+}
+async function gameRoll10(){
+  if(gameMoving || document.querySelector('#gameRewardModal.show') || document.querySelector('#gameBatchModal.show'))return;
+  if(state.gameEndsAt && Date.now()>=state.gameEndsAt){gameUpdateStatus();return}
+  if(state.gameDice<10){const s=$('#gameStatus');if(s)s.textContent='Нужно минимум 10 кубиков для режима ×10.';return}
+  gameEnsureBatchModal();
+  state.gameDice-=10;
+  gameMoving=true; state.gameMoving=true; gameSkipRequested=false;
+  document.querySelector('#game').classList.add('rolling');
+  const results=[];
+  const skip=$('#skipRollBtn'); if(skip)skip.disabled=false;
+  for(let i=0;i<10;i++){
+    const roll=1+Math.floor(Math.random()*6);
+    const face=['⚀','⚁','⚂','⚃','⚄','⚅'][roll-1];
+    const faceEl=$('#diceFace'); if(faceEl)faceEl.textContent=face;
+    for(let step=0;step<roll;step++){
+      state.gamePos=(state.gamePos+1)%GAME_TRACK_CELLS;
+      if(state.gamePos===0)state.gameLap++;
+      state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
+      gamePlaceToken(true); gameUpdateStatus();
+      if(!gameSkipRequested)await new Promise(r=>setTimeout(r,120));
+    }
+    const got=gameApplyCellRewardSilent();
+    const item=got.reward[0];
+    results.push({face,icon:item[0],amount:item[1],label:item[2]});
+    state.gameRolls++;
+    if(!gameSkipRequested)await new Promise(r=>setTimeout(r,120));
+  }
+  state.gameTaskProgress=state.gameRolls;
+  state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
+  state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[];
+  GAME_REWARDS.filter(r=>state.gameLap>=r.lap&&!state.gameMilestones.includes(r.lap)).forEach(r=>state.gameMilestones.push(r.lap));
+  gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
+  if(skip)skip.disabled=true;
+  save(); gameTasksInit(); gameBoardInit(); gameShowBatchResults(results); gameUpdateStatus();
+}
+function gameRollUnified(){
+  const x10=$('#roll10Btn');
+  if(x10&&x10.checked)return gameRoll10();
+  return gameRoll();
+}
+const unifiedRollButton=$('#spinBtn');
+if(unifiedRollButton)unifiedRollButton.onclick=gameRollUnified;
+
+/* Territory v79 — restore/finalize reward preview after x10 update */
+const JACKPOT_GROUPS_V79=Array.from({length:47},(_,i)=>{
+  const from=i*5+1, to=from+4;
+  const patterns=[
+    [['🧰','1','предмет'],['💜','5','ресурса'],['🧰','10','предметов'],['📜','10','свитков'],['🪙','15000','монет']],
+    [['🧰','1','редкий предмет'],['💜','5','ресурса'],['💎','25','кристаллов'],['📜','10','свитков'],['🪙','15000','монет']],
+    [['❤️','1','особая награда'],['🧰','1','редкий предмет'],['💎','25','кристаллов'],['🧰','10','предметов'],['🪙','15000','монет']],
+    [['🎁','1','подарок'],['🧰','1','предмет'],['💎','25','кристаллов'],['📜','10','свитков'],['🪙','15000','монет']]
+  ];
+  return {from,to,items:patterns[i%patterns.length]};
+});
+function gameOpenJackpotPreviewV79(){
+  const modal=$('#gameJackpotModal'), list=$('#jackpotList');
+  if(!modal||!list)return;
+  const current=Math.max(1,Math.min(235,state.gameLap+1));
+  list.innerHTML=JACKPOT_GROUPS_V79.map(g=>{
+    const active=current>=g.from&&current<=g.to;
+    const cards=g.items.map((r,idx)=>{
+      const round=g.from+idx;
+      const claimed=state.gameLap>=round;
+      const isCurrent=round===current;
+      return `<div class="jackpot-reward ${claimed?'claimed':''} ${isCurrent?'current':''}" data-round="${round}"><span>${claimed?'✓':r[0]}</span><b>${r[1]}</b><small>Осталось: ${claimed?'0':'1'}</small></div>`;
+    }).join('');
+    return `<section class="jackpot-group ${active?'current-group':''}"><div class="jackpot-group-title">Круги ${g.from}–${g.to}${active?' · СЕЙЧАС':''}</div><div class="jackpot-row">${cards}</div></section>`;
+  }).join('');
+  modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+  requestAnimationFrame(()=>{const el=list.querySelector('.jackpot-reward.current'); if(el)el.scrollIntoView({block:'center',behavior:'auto'});});
+}
+function gameCloseJackpotPreviewV79(){const modal=$('#gameJackpotModal');if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}}
+const rewardPreviewBtnV79=$('#gameRewardPreviewBtn');
+if(rewardPreviewBtnV79)rewardPreviewBtnV79.onclick=gameOpenJackpotPreviewV79;
+const jackpotCloseV79=$('#jackpotClose');
+if(jackpotCloseV79)jackpotCloseV79.onclick=gameCloseJackpotPreviewV79;
