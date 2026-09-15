@@ -1,7 +1,7 @@
 const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 let state=JSON.parse(localStorage.getItem("territory_save_v1")||"null")||structuredClone(defaultState);
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
-state.gameDice=Number(state.gameDice??47); state.gameRolls=Number(state.gameRolls??0); state.gameSteps=Number(state.gameSteps??0); state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?state.gameTaskClaims:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?state.gamePanelClaims:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=24; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
+state.gameDice=Number(state.gameDice??47); state.gameRolls=Number(state.gameRolls??0); state.gameSteps=Number(state.gameSteps??0); state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?state.gameTaskClaims:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?state.gamePanelClaims:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=20; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
 const weapons=[
@@ -99,12 +99,12 @@ function renderInventory(){
 }
 /* Territory v43 — Game: reference-inspired diamond event board */
 const GAME_CELLS=[
- {icon:'🎁',value:'30',type:'start',label:'СТАРТ'},
+ {icon:'🎁',value:'1',type:'start',label:'ПОДАРОК'},
  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'💧',value:'50',type:'blue',label:'РЕСУРС'},
  {icon:'📜',value:'7',type:'special',label:'СВИТОК'},
- {icon:'🪵',value:'1',type:'special',label:'ПРЕДМЕТ'},
+ {icon:'🧰',value:'1',type:'special',label:'ПРЕДМЕТ'},
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'🪙',value:'750',label:'МОНЕТЫ'},
  {icon:'💧',value:'30',type:'blue',label:'РЕСУРС'},
@@ -118,11 +118,7 @@ const GAME_CELLS=[
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'🪙',value:'300',label:'МОНЕТЫ'},
  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
- {icon:'🧰',value:'3',type:'special',label:'ПРЕДМЕТА'},
- {icon:'💧',value:'15',type:'blue',label:'РЕСУРС'},
- {icon:'🪙',value:'5',label:'МОНЕТЫ'},
- {icon:'💎',value:'10',type:'purple',label:'КРИСТАЛЛЫ'},
- {icon:'🎁',value:'1',type:'start',label:'ПОДАРОК'}
+ {icon:'🎁',value:'30',type:'start',label:'КРУГ'}
 ];
 const GAME_REWARDS=[
  {lap:5,icon:'📜',title:'Круг 5',items:[['📜','30','свиток'],['💎','10','кристаллов'],['🪙','500','монет']]},
@@ -144,9 +140,9 @@ function gameBoardInit(){
  for(let i=0;i<n;i++){
   const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'');
   const c=GAME_CELLS[i]; cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>`; cell.dataset.index=i;
-  // 24 cells around a diamond: 6 on each side, corners are not duplicated.
-  const side=Math.floor(i/6), k=i%6, t=[0.08,0.24,0.40,0.56,0.72,0.88][k];
-  const edges=[[[50,3],[97,50]],[[97,50],[50,97]],[[50,97],[3,50]],[[3,50],[50,3]]];
+  // 20 cells: five on each side, corners are not duplicated. Start at the lower side and move clockwise.
+  const side=Math.floor(i/5), k=i%5, t=[0.10,0.30,0.50,0.70,0.90][k];
+  const edges=[[[50,94],[94,50]],[[94,50],[50,6]],[[50,6],[6,50]],[[6,50],[50,94]]];
   const a=edges[side][0], b=edges[side][1]; const x=a[0]+(b[0]-a[0])*t, y=a[1]+(b[1]-a[1])*t;
   cell.style.left=x+'%'; cell.style.top=y+'%'; cell.style.setProperty('--tile-angle',Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI+'deg');
   board.appendChild(cell);
@@ -166,7 +162,7 @@ function gameUpdateStatus(){
  const s=$("#gameStatus");
  const lap=Math.floor(state.gameSteps/GAME_TRACK_CELLS);
  const pos=((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
- if(s)s.textContent=`Круг ${lap+1} · клетка ${pos+1}/20 · ${state.gameMoving?'Идёт движение…':'Брось кубик.'}`;
+ if(s)s.textContent=`Круг ${lap} · клетка ${pos+1}/20 · ${state.gameMoving?'Идёт движение…':'Брось кубик.'}`;
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
  const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show');
 }

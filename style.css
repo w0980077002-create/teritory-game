@@ -1427,3 +1427,49 @@ body:has(#home.active) .alex-mini-btn:active{transform:scale(.97)}
  .game-board{width:min(72%,280px)!important}
  .game-side-stack{top:9%!important}
 }
+
+/* Territory v45 — Game: compact 20-cell board, video-like layout, no stretch or leaks */
+#casino.game-screen.active{position:absolute!important;inset:0!important;z-index:500!important;width:100%!important;height:100%!important;background:#091820!important}
+#casino.game-screen.active .game-topbar{flex:0 0 66px!important;height:66px!important}
+#casino.game-screen.active .game-reward-track{flex:0 0 64px!important;height:64px!important}
+#casino.game-screen.active .game-board-wrap{flex:1 1 auto!important;min-height:0!important;height:auto!important;position:relative!important;overflow:hidden!important;background:
+ radial-gradient(circle at 18% 24%,rgba(255,255,255,.75) 0 2px,transparent 3px),
+ radial-gradient(circle at 82% 31%,rgba(255,255,255,.75) 0 2px,transparent 3px),
+ radial-gradient(circle at 70% 70%,rgba(255,255,255,.42) 0 1px,transparent 2px),
+ linear-gradient(180deg,#55c2df 0%,#71cfe1 48%,#c7edf2 100%)!important}
+#casino.game-screen.active .game-board-wrap:before{content:''!important;display:block!important;position:absolute!important;inset:0!important;background:
+ linear-gradient(135deg,transparent 0 35%,rgba(255,255,255,.08) 35.2% 35.5%,transparent 35.7%),
+ linear-gradient(45deg,transparent 0 63%,rgba(255,255,255,.08) 63.2% 63.5%,transparent 63.7%)!important;pointer-events:none!important}
+#casino.game-screen.active .game-board-wrap:after{width:360px!important;height:360px!important;max-width:78%!important;max-height:78%!important;background:linear-gradient(145deg,rgba(13,103,126,.12),rgba(255,255,255,.05))!important;box-shadow:0 12px 25px rgba(18,78,93,.16)!important}
+#casino.game-screen.active .game-board{width:min(72vw,360px)!important;height:min(72vw,360px)!important;max-width:360px!important;max-height:360px!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;filter:drop-shadow(0 9px 9px rgba(34,83,94,.28))!important}
+#casino.game-screen.active .game-board:before{inset:0!important;border-radius:18px!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;background:linear-gradient(145deg,rgba(226,207,163,.97),rgba(159,119,75,.96))!important;box-shadow:inset 0 0 0 2px rgba(89,57,30,.45)!important}
+#casino.game-screen.active .board-cell{width:17%!important;height:12.5%!important;border-width:2px!important;border-radius:8px!important}
+#casino.game-screen.active .board-cell .tile-content{transform:rotate(calc(-1 * var(--tile-angle)))!important}
+#casino.game-screen.active .board-cell .tile-icon{font-size:13px!important;line-height:13px!important}
+#casino.game-screen.active .board-cell b{font-size:13px!important;line-height:14px!important}
+#casino.game-screen.active .board-cell small{font-size:5.5px!important;line-height:6px!important}
+#casino.game-screen.active .game-center{width:39%!important;height:39%!important;z-index:4!important}
+#casino.game-screen.active .game-center .game-ship{font-size:68px!important}
+#casino.game-screen.active .game-token{font-size:27px!important;z-index:15!important}
+#casino.game-screen.active .game-side-stack{top:11%!important;right:6px!important;bottom:auto!important;gap:6px!important}
+#casino.game-screen.active .game-side-stack button{width:74px!important;min-height:57px!important}
+#casino.game-screen.active .game-status{left:50%!important;right:auto!important;bottom:6px!important;transform:translateX(-50%)!important;width:min(70%,260px)!important}
+#casino.game-screen.active .game-bottom{flex:0 0 122px!important;height:122px!important;min-height:122px!important;z-index:22!important}
+#casino.game-screen.active .game-prize-badge{min-width:62px!important}
+#casino.game-screen.active .ancient-dice{width:78px!important;height:78px!important;flex-basis:78px!important}
+#casino.game-screen.active .dice-count{min-width:78px!important}
+#casino.game-screen.active .skip-roll{min-width:82px!important}
+@media(max-width:430px){
+ #casino.game-screen.active .game-topbar{flex-basis:62px!important;height:62px!important}
+ #casino.game-screen.active .game-reward-track{flex-basis:58px!important;height:58px!important;padding:5px 7px!important}
+ #casino.game-screen.active .game-board{width:min(68vw,330px)!important;height:min(68vw,330px)!important;max-width:330px!important;max-height:330px!important}
+ #casino.game-screen.active .game-board-wrap:after{width:330px!important;height:330px!important}
+ #casino.game-screen.active .board-cell{width:18%!important;height:13%!important}
+ #casino.game-screen.active .game-center .game-ship{font-size:60px!important}
+ #casino.game-screen.active .game-side-stack{top:10%!important;right:4px!important}
+ #casino.game-screen.active .game-side-stack button{width:68px!important;min-height:52px!important}
+ #casino.game-screen.active .game-bottom{flex-basis:116px!important;height:116px!important;min-height:116px!important;gap:8px!important}
+ #casino.game-screen.active .ancient-dice{width:72px!important;height:72px!important;flex-basis:72px!important}
+ #casino.game-screen.active .dice-count{min-width:68px!important}
+ #casino.game-screen.active .skip-roll{min-width:72px!important;max-width:76px!important}
+}
