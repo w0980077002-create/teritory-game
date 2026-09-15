@@ -203,20 +203,32 @@ function gameBoardInit(){
  gameSelectCell(state.gamePos);
 }
 function gameGridPosition(i,n){
- // v105: 27 equally spaced points on a closed diamond perimeter.
- // The route is measured by perimeter distance, so corners never duplicate
- // and the tile spacing stays uniform on every phone width.
+ // v108: 27 unique points distributed by equal distance along the
+ // four sides of one fixed diamond. No duplicated corner tiles and no
+ // flex/grid sizing can stretch the cells.
  const count=Math.max(1,Number(n)||27);
- const top=9, right=91, bottom=91, left=9;
- const perimeter=2*((right-top)+(bottom-top));
- const d=((Math.max(0,Number(i)||0)%count)/count)*perimeter;
- const side=(right-top);
- let x,y;
- if(d<side){ x=top+d; y=top; }
- else if(d<side+(bottom-top)){ x=right; y=top+(d-side); }
- else if(d<2*side+(bottom-top)){ x=right-(d-side-(bottom-top)); y=bottom; }
- else { x=left; y=bottom-(d-(2*side+(bottom-top))); }
- return {x,y,rot:0};
+ const idx=((Math.floor(Number(i)||0)%count)+count)%count;
+ const cx=50, cy=50, r=37;
+ const verts=[
+   {x:cx,y:cy+r},
+   {x:cx+r,y:cy},
+   {x:cx,y:cy-r},
+   {x:cx-r,y:cy}
+ ];
+ const lens=verts.map((a,k)=>{const b=verts[(k+1)%4];return Math.hypot(b.x-a.x,b.y-a.y);});
+ const perimeter=lens.reduce((a,b)=>a+b,0);
+ const d=(idx/count)*perimeter;
+ let acc=0, side=0;
+ for(;side<4;side++){
+   if(d<=acc+lens[side] || side===3)break;
+   acc+=lens[side];
+ }
+ const a=verts[side], b=verts[(side+1)%4];
+ const t=Math.max(0,Math.min(1,(d-acc)/lens[side]));
+ const x=a.x+(b.x-a.x)*t;
+ const y=a.y+(b.y-a.y)*t;
+ const angle=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;
+ return {x,y,rot:angle};
 }
 function gameRelayoutBoard(){
  const board=$("#gameBoard"); if(!board)return;
@@ -239,7 +251,10 @@ function gamePlaceToken(animate=true){
  token.style.top=cell.offsetTop+cell.offsetHeight/2+'px';
  token.classList.toggle('moving',animate);
  board.querySelectorAll('.board-cell').forEach((c,n)=>{
-   const passed=state.gameLap>0 || n<i;
+   // A tile is passed only when its position in the current lap is
+   // behind the player. Previous laps do not make future tiles in the
+   // current lap look passed.
+   const passed=n!==i && n<i;
    c.classList.toggle('active',n===i);
    c.classList.toggle('passed',passed);
  });
