@@ -1,26 +1,13 @@
-# Territory Sdolars v56 — Game Core
+# Territory v61 — Game real working board
 
-v56 продолжает рабочую сборку v55 и завершает основной игровой блок Game без изменения города Sdolars и остальных экранов.
+Game was rebuilt as a real functional DOM board instead of hiding the previous board elements.
 
-## Что сделано
-- Экран Game переименован с внутреннего `casino` на `game`.
-- Game вынесен в отдельный `game.css`, чтобы стили больше не конфликтовали с историческими CSS-правилами проекта.
-- Сохраняется 20-клеточное поле, фишка, бросок 1–6, движение, клетки наград и награды за круги.
-- Добавлен клик по клетке: игрок получает краткое описание клетки в статусе.
-- Таймер события теперь действительно блокирует новые броски после окончания события.
-- Ежедневный подарок работает по календарной дате и не выдаётся повторно в один день.
-- Существующие задания, награды, сюрпризы, подарок, спецпредложения и сохранение состояния сохранены.
-- Старый визуальный город Sdolars не изменён.
-
-## Файлы
-- `index.html`
-- `app.js`
-- `game.css`
-- `README.md`
-- `style.css` остаётся без изменений относительно v55.
-
-## Проверка
-Открывать `index.html` в браузере. Состояние хранится в `localStorage` под ключом `territory_save_v1`.
-
-## v59 Game visual skin
-Game is rebuilt as a portrait mobile skin based on the approved Monopoly reference composition. The underlying buttons and roll logic remain functional while the visual layer is separated from the gameplay hit areas. `monopoly-reference.png` is the visual background asset.
+- 20 actual clickable cells in a non-overlapping 6×6 perimeter.
+- START is cell 1; FINISH is cell 20.
+- Token position is calculated from the real cell geometry.
+- Clicking a cell updates the cell information panel.
+- Dice roll/movement, rewards, tasks, gift and special-offer panels keep the existing game logic.
+- Gift / Tasks / Special Offer are separate controls and do not sit on the board.
+- Real S$S ship artwork is used in the center.
+- Mobile layout is isolated in `game.css`; old Game CSS is not used to position the board.
+- `style.css` is intentionally not included because it was not changed.

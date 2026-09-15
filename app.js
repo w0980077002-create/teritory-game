@@ -134,51 +134,53 @@ function gameEventTimer(){
  tick(); clearInterval(gameTimerId); gameTimerId=setInterval(tick,1000);
 }
 function gameBoardInit(){
- const board=$("#gameBoard"), track=$("#gameRewardTrack"), token=$("#gameToken"); if(!board||!track)return;
- const wrap=board.parentElement;
- const center=wrap&&wrap.querySelector('.game-center');
- if(center&&center.parentElement===board) wrap.appendChild(center);
+ const board=$("#gameBoard"), track=$("#gameRewardTrack"); if(!board||!track)return;
  board.innerHTML='';
  const n=GAME_CELLS.length;
+ const cells=[];
  for(let i=0;i<n;i++){
-  const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'');
+  const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'')+(i===GAME_CELLS.length-1?' finish':'');
   const c=GAME_CELLS[i];
-  const startMark=c.type==='start' && i===0 ? '<span class="start-ribbon">СТАРТ</span>' : '';
-  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>${startMark}`; cell.dataset.index=i;
-  // 20-cell diamond path. START is a dedicated bottom cell; movement runs clockwise.
-  const points=[
-    [50,93],[36,86],[24,77],[15,65],[9,50],
-    [15,35],[24,23],[36,14],[50,7],[64,14],
-    [76,23],[85,35],[91,50],[85,65],[76,77],
-    [64,86],[50,93],[50,93],[50,93],[50,93]
-  ];
-  // Avoid duplicated bottom corner: the final four cells sit on the lower-right edge.
-  points[16]=[57,91]; points[17]=[68,84]; points[18]=[78,77]; points[19]=[86,68];
-  const [x,y]=points[i];
-  cell.style.left=x+'%'; cell.style.top=y+'%';
-  cell.style.setProperty('--tile-angle','0deg');
-  board.appendChild(cell);
+  const isStart=i===0, isFinish=i===n-1;
+  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>${isStart?'<span class="start-ribbon">СТАРТ</span>':''}`;
+  cell.dataset.index=i;
+  const pos=gameGridPosition(i,n);
+  cell.style.gridRow=pos.row; cell.style.gridColumn=pos.col;
+  cells.push(cell); board.appendChild(cell);
  }
- if(center){ board.appendChild(center); }
- if(token){ board.appendChild(token); }
- board.querySelectorAll('.board-cell').forEach(cell=>{cell.addEventListener('click',()=>{const c=GAME_CELLS[Number(cell.dataset.index)];const st=$("#gameStatus");if(st&&!gameMoving)st.textContent=`${c.label}: ${c.value==='?'?'случайная награда':c.value+' · '+c.label.toLowerCase()}`;});});
+ cells.forEach(cell=>cell.addEventListener('click',()=>gameSelectCell(Number(cell.dataset.index))));
  track.innerHTML=GAME_REWARDS.map(r=>{const first=r.items&&r.items[0]?r.items[0]:[r.icon,'','']; return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]||r.icon}</span><b class="reward-amount">${first[1]||''}</b><small>${r.title}</small></button>`}).join('');
- gamePlaceToken(false); gameTasksInit(); gameUpdateStatus();
+ gamePlaceToken(false); gameTasksInit(); gameUpdateStatus(); gameSelectCell(state.gamePos);
+}
+function gameGridPosition(i,n){
+ const side=6; const p=[];
+ for(let c=1;c<=side;c++)p.push([1,c]);
+ for(let r=2;r<=side;r++)p.push([r,side]);
+ for(let c=side-1;c>=1;c--)p.push([side,c]);
+ for(let r=side-1;r>=2;r--)p.push([r,1]);
+ return {row:p[i][0],col:p[i][1]};
+}
+function gameSelectCell(index){
+ const c=GAME_CELLS[index]; if(!c)return;
+ const info=$("#gameCellInfo");
+ if(info){ const title=info.querySelector('b'), sub=info.querySelector('span'); if(title)title.textContent=`Клетка ${index+1}${index===0?' · СТАРТ':''}${index===GAME_CELLS.length-1?' · ФИНИШ':''}`; if(sub)sub.textContent=index===0?'Отправная точка · начни путешествие':(c.value==='?'?'Случайная награда · нажми после хода':`${c.label} · награда ${c.value}`); }
 }
 function gamePlaceToken(animate=true){
  const token=$("#gameToken"), board=$("#gameBoard"); if(!token||!board)return;
  const i=((state.gamePos%GAME_CELLS.length)+GAME_CELLS.length)%GAME_CELLS.length;
  const cell=board.querySelector(`.board-cell[data-index="${i}"]`); if(!cell)return;
- token.style.left=cell.style.left; token.style.top=cell.style.top;
- token.classList.toggle('moving',animate); board.querySelectorAll('.board-cell').forEach((c,n)=>c.classList.toggle('active',n===i));
+ token.style.left=(cell.offsetLeft+cell.offsetWidth/2)+'px';
+ token.style.top=(cell.offsetTop+cell.offsetHeight/2)+'px';
+ token.classList.toggle('moving',animate);
+ board.querySelectorAll('.board-cell').forEach((c,n)=>c.classList.toggle('active',n===i));
+ gameSelectCell(i);
 }
 function gameUpdateStatus(){
- const s=$("#gameStatus");
- const badge=$("#gameLapBadge");
+ const s=$("#gameStatus"), badge=$("#gameLapBadge"), turn=$("#gameTurnNo"), cellNo=$("#gameCellNo");
  const lap=Math.floor(state.gameSteps/GAME_TRACK_CELLS);
  const pos=((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
  if(s)s.textContent=`ХОД · Круг ${lap} · клетка ${pos+1}/20 · ${state.gameMoving?'идёт движение…':'брось кубик'}`;
- if(badge)badge.textContent=`Круг ${lap}`;
+ if(badge)badge.textContent=lap; if(turn)turn.textContent=`Ход ${state.gameRolls}`; if(cellNo)cellNo.textContent=pos+1;
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
  const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show');
 }
@@ -242,7 +244,7 @@ async function gameRoll(){
  gameResolveCell();
 }
 $("#spinBtn").onclick=gameRoll;
-$("#skipRollBtn").onclick=()=>{ if(gameMoving)gameSkipRequested=true; };
+$("#skipRollBtn").onchange=()=>{ if($("#skipRollBtn").checked)gameSkipRequested=true; };
 $("#gameModalClose").onclick=()=>{clearInterval(gameModalTimerId);$("#gameRewardModal").classList.remove('show');$("#gameRewardModal").setAttribute('aria-hidden','true');gameUpdateStatus();};
 $("#gameRewardModal").addEventListener('click',e=>{if(e.target.id==='gameRewardModal')$("#gameModalClose").click()});
 function gameOpenPanel(kind){
