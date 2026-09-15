@@ -1,4 +1,4 @@
-# Territory Sdolars v43 — Game / Monopoly Event
+# Territory Sdolars v44 — Game / Monopoly Event
 
 v41 продолжает v40 и добавляет полноценный игровой модуль **Game** по механике и визуальному принципу из предоставленного видео.
 
@@ -26,7 +26,7 @@ v41 продолжает v40 и добавляет полноценный игр
 - Улучшена мобильная компоновка Game для коротких экранов.
 
 
-## Territory v43
+## Territory v44
 - Game board converted to a 24-cell diamond track closer to the supplied reference video.
 - Player token is anchored to the actual board and moves cell-by-cell along the track.
 - Removed the old 20-cell corner overlap so every board position is unique.
@@ -36,3 +36,6 @@ v41 продолжает v40 и добавляет полноценный игр
 - Added the lower “Призы x10” indicator and preserved the ancient dice control.
 - Kept the existing Territory save, city, Arena, Market, Districts and Alex systems intact.
 - Verified app.js with Node syntax check.
+
+
+Territory v44: финальная мобильная компоновка Game, восстановлены все игровые панели, 24-клеточная дорожка, движение фишки, награды и контрольные круги.

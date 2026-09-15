@@ -254,11 +254,13 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
         <div class="game-token" id="gameToken">♟</div>
       </div>
       <div class="game-side-stack">
-        <button type="button" id="gameGiftBtn"><span>🎁</span><b>Подарок</b></button>
-        <button type="button" id="gameTasksBtn"><span>📜</span><b>Задания</b></button>
+        <button type="button" id="gameSpecialBtn"><span>🎁</span><b>Спецпредложение</b><small>Монополия</small></button>
+        <button type="button" id="gameGiftBtn"><span>🎁</span><b>Подарок</b><small>Монополия</small></button>
+        <button type="button" id="gameTasksBtn"><span>📜</span><b>Задания</b><small>Монополия</small></button>
       </div>
       <div class="game-status" id="gameStatus">Брось кубик и пройди клетки.</div>
       <div class="game-bottom">
+        <div class="game-prize-badge"><span>🎁</span><b>Призы x10</b></div>
         <button type="button" class="ancient-dice" id="spinBtn" aria-label="Бросить кубик"><span class="dice-face" id="diceFace">⚄</span><small>БРОСИТЬ</small></button>
         <div class="dice-count"><b id="diceCount">47</b><span>🎲 кубиков</span><small>1 бросок за ход</small></div>
         <button type="button" class="skip-roll" id="skipRollBtn">Пропустить<br>анимацию</button>

@@ -152,7 +152,7 @@ function gameBoardInit(){
   board.appendChild(cell);
  }
  if(token){ board.appendChild(token); }
- track.innerHTML=GAME_REWARDS.map(r=>`<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${r.icon}</span><small>${r.title}</small></button>`).join('');
+ track.innerHTML=GAME_REWARDS.map(r=>{const first=r.items&&r.items[0]?r.items[0]:[r.icon,'','']; return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]||r.icon}</span><b class="reward-amount">${first[1]||''}</b><small>${r.title}</small></button>`}).join('');
  gamePlaceToken(false); gameTasksInit(); gameUpdateStatus();
 }
 function gamePlaceToken(animate=true){
@@ -164,8 +164,8 @@ function gamePlaceToken(animate=true){
 }
 function gameUpdateStatus(){
  const s=$("#gameStatus");
- const lap=Math.floor(state.gameSteps/20);
- const pos=((state.gamePos%20)+20)%20;
+ const lap=Math.floor(state.gameSteps/GAME_TRACK_CELLS);
+ const pos=((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
  if(s)s.textContent=`Круг ${lap+1} · клетка ${pos+1}/20 · ${state.gameMoving?'Идёт движение…':'Брось кубик.'}`;
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
  const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show');
@@ -191,12 +191,11 @@ function gameShowReward(reward,title='Поздравляем!'){
  gameUpdateStatus();
 }
 function gameResolveCell(){
- const cell=GAME_CELLS[((state.gamePos%20)+20)%20];
+ const cell=GAME_CELLS[((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS];
  const reward=cell.value==='?'?gameRandomReward():[[cell.icon,cell.value,cell.label.toLowerCase()]];
  state.exp+=5;
  while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp}
- state.gameSteps=state.gameLap*GAME_CELLS.length+state.gamePos;
- const oldMilestones=state.gameMilestones.slice();
+ state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
  const reached=GAME_REWARDS.filter(r=>state.gameLap>=r.lap && !state.gameMilestones.includes(r.lap));
  state.gameTaskProgress=state.gameRolls;
  save();
@@ -217,9 +216,9 @@ async function gameRoll(){
  const skip=$("#skipRollBtn"); if(skip)skip.disabled=false;
  gameUpdateStatus();
  for(let step=0;step<roll;step++){
-   state.gamePos=(state.gamePos+1)%20;
+   state.gamePos=(state.gamePos+1)%GAME_TRACK_CELLS;
    if(state.gamePos===0)state.gameLap++;
-   state.gameSteps=state.gameLap*GAME_CELLS.length+state.gamePos;
+   state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
    gamePlaceToken(true); gameUpdateStatus();
    if(!gameSkipRequested) await new Promise(r=>setTimeout(r,300));
  }
@@ -279,7 +278,7 @@ function gameTasksInit(){
  const tasks=[
   {id:'roll3',name:'Сделать 3 броска',goal:3,progress:()=>Math.min(state.gameRolls,3),reward:['🎲','3','кубика']},
   {id:'steps10',name:'Пройти 10 клеток',goal:10,progress:()=>Math.min(state.gameSteps,10),reward:['💎','10','кристаллов']},
-  {id:'lap5',name:'Дойти до круга 5',goal:5,progress:()=>Math.min(state.gameLap,5),reward:['🪙','750','монет']}
+  {id:'lap5',name:'Дойти до 5-го круга',goal:5,progress:()=>Math.min(state.gameLap,5),reward:['🪙','750','монет']}
  ];
  list.innerHTML=tasks.map(t=>{const prog=t.progress(),done=prog>=t.goal,claimed=state.gameTaskClaims.includes(t.id);return `<div class="task-row ${claimed?'done':''}"><div><b>${t.name}</b><small>${prog}/${t.goal} · награда ${t.reward[0]} ${t.reward[1]}</small></div><button type="button" data-task-claim="${t.id}" ${!done||claimed?'disabled':''}>${claimed?'Получено':done?'Получить':'В процессе'}</button></div>`}).join('');
 }
@@ -292,10 +291,10 @@ $("#gameTasksList").addEventListener('click',e=>{
 $("#gameTasksBtn").onclick=()=>{$("#gameTasksModal").classList.add('show');$("#gameTasksModal").setAttribute('aria-hidden','false');gameTasksInit()};
 $("#gameTasksClose").onclick=()=>{$("#gameTasksModal").classList.remove('show');$("#gameTasksModal").setAttribute('aria-hidden','true')};
 
-$("#gameSpecialBtn").onclick=()=>gameOpenPanel('special');
-$("#gameGiftBtn").onclick=()=>gameOpenPanel('gift');
-$("#gamePanelClose").onclick=()=>{$("#gamePanelModal").classList.remove('show');$("#gamePanelModal").setAttribute('aria-hidden','true');};
-$("#gamePanelList").addEventListener('click',e=>{const b=e.target.closest('[data-panel-buy]');if(b)gamePanelBuy(b);});
+const gameSpecialBtn=$("#gameSpecialBtn"); if(gameSpecialBtn)gameSpecialBtn.onclick=()=>gameOpenPanel('special');
+const gameGiftBtn=$("#gameGiftBtn"); if(gameGiftBtn)gameGiftBtn.onclick=()=>gameOpenPanel('gift');
+const gamePanelClose=$("#gamePanelClose"); if(gamePanelClose)gamePanelClose.onclick=()=>{$("#gamePanelModal").classList.remove('show');$("#gamePanelModal").setAttribute('aria-hidden','true');};
+const gamePanelList=$("#gamePanelList"); if(gamePanelList)gamePanelList.addEventListener('click',e=>{const b=e.target.closest('[data-panel-buy]');if(b)gamePanelBuy(b);});
 gameBoardInit();
 gameEventTimer();
 

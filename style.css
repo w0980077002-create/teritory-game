@@ -1323,3 +1323,107 @@ body:has(#home.active) .alex-mini-btn:active{transform:scale(.97)}
 @media(max-width:390px){
  .game-topbar{height:58px!important}.game-reward-track{height:54px!important;padding:5px!important}.game-board{width:91%!important}.game-board-wrap{min-height:0!important}.board-cell{width:15%!important;height:11.2%!important}.board-cell .tile-icon{font-size:12px!important}.board-cell b{font-size:13px!important}.board-cell small{font-size:5.5px!important}.game-center .game-ship{font-size:62px!important}.game-side-stack{right:5px!important;bottom:15px!important}.game-side-stack button{width:68px!important;min-height:49px!important}.game-bottom{height:116px!important;flex-basis:116px!important;gap:9px!important}.game-prize-badge{min-width:52px}.game-prize-badge span{font-size:23px}.ancient-dice{width:72px!important;height:72px!important}.dice-face{font-size:35px!important}.game-status{bottom:5px!important}}
 @media(max-height:700px){.game-board{width:min(78%,340px)!important}.game-side-stack{bottom:10px!important}.game-bottom{height:108px!important;flex-basis:108px!important}.ancient-dice{width:68px!important;height:68px!important}.game-prize-badge{display:none}.game-status{bottom:5px!important}}
+
+/* Territory v44 — Game final mobile composition: no stretching, all controls present */
+.game-screen{display:none;min-height:0!important;height:100%!important;overflow:hidden!important}
+.game-screen.active{display:flex!important;flex-direction:column!important}
+.game-topbar{flex:0 0 58px!important;height:58px!important}
+.game-reward-track{flex:0 0 58px!important;height:58px!important;display:grid!important}
+.game-board-wrap{flex:1 1 auto!important;height:auto!important;min-height:0!important;position:relative!important;overflow:hidden!important}
+.game-board{width:min(84%,390px)!important;max-width:390px!important;aspect-ratio:1!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important}
+.game-board:before{inset:0!important}
+.board-cell{width:14.5%!important;height:11.5%!important}
+.game-center{width:37%!important;height:37%!important}
+.game-center .game-ship{font-size:68px!important}
+.game-token{font-size:27px!important}
+.game-side-stack{top:14%!important;right:7px!important;bottom:auto!important;gap:5px!important}
+.game-side-stack button{width:74px!important;min-height:54px!important;height:auto!important;padding:5px 3px!important}
+.game-side-stack b{font-size:6px!important;line-height:8px!important}
+.game-side-stack small{display:block!important;font-size:5px!important;line-height:6px!important;opacity:.72}
+.game-status{bottom:7px!important}
+.game-bottom{flex:0 0 118px!important;height:118px!important;min-height:118px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:12px!important;padding:7px 8px!important}
+.game-prize-badge{display:flex!important;min-width:58px!important;max-width:72px!important}
+.game-prize-badge span{font-size:25px!important}
+.game-prize-badge b{font-size:7px!important}
+.ancient-dice{width:76px!important;height:76px!important;flex:0 0 76px!important}
+.dice-count{min-width:74px!important}
+.dice-count b{font-size:25px!important}
+.skip-roll{min-width:76px!important;max-width:82px!important}
+.reward-step{overflow:hidden!important}
+.reward-step .reward-icon{font-size:18px!important}
+.reward-step small{font-size:6.5px!important}
+@media(max-width:390px){
+ .game-topbar{flex-basis:56px!important;height:56px!important}
+ .game-reward-track{flex-basis:54px!important;height:54px!important;padding:5px 6px!important}
+ .game-board{width:min(82%,330px)!important}
+ .board-cell{width:15%!important;height:11.5%!important}
+ .board-cell .tile-icon{font-size:12px!important}.board-cell b{font-size:12px!important}.board-cell small{font-size:5.5px!important}
+ .game-center .game-ship{font-size:58px!important}
+ .game-side-stack{right:4px!important;top:12%!important}
+ .game-side-stack button{width:66px!important;min-height:48px!important}
+ .game-bottom{flex-basis:112px!important;height:112px!important;min-height:112px!important;gap:7px!important}
+ .game-prize-badge{min-width:48px!important}.game-prize-badge span{font-size:22px!important}.game-prize-badge b{font-size:6px!important}
+ .ancient-dice{width:70px!important;height:70px!important;flex-basis:70px!important}.dice-face{font-size:34px!important}
+ .dice-count{min-width:65px!important}.dice-count b{font-size:23px!important}.dice-count span{font-size:7px!important}.dice-count small{font-size:5.5px!important}
+ .skip-roll{min-width:68px!important;max-width:72px!important;font-size:6.5px!important}
+ .game-status{width:min(68%,235px)!important}
+}
+@media(max-height:700px){
+ .game-topbar{flex-basis:52px!important;height:52px!important}
+ .game-reward-track{flex-basis:49px!important;height:49px!important}
+ .game-board{width:min(76%,300px)!important}
+ .game-side-stack{top:10%!important}
+ .game-bottom{flex-basis:100px!important;height:100px!important;min-height:100px!important}
+ .game-prize-badge{display:flex!important}
+ .ancient-dice{width:64px!important;height:64px!important;flex-basis:64px!important}.dice-face{font-size:30px!important}
+}
+
+
+/* Territory v44 — final Game pass: video-like hierarchy, no stretched board */
+.game-reward-track{align-items:stretch!important}
+.reward-step{gap:0!important;padding:2px 2px!important;position:relative!important}
+.reward-step .reward-icon{display:block!important;font-size:17px!important;line-height:17px!important}
+.reward-step .reward-amount{display:block!important;font-family:Georgia,serif!important;font-size:10px!important;line-height:10px!important;color:#fff0bf!important}
+.reward-step small{display:block!important;font-size:6px!important;line-height:7px!important;color:#f6ddb0!important}
+.reward-step.done .reward-amount,.reward-step.done small{color:#e5f6d7!important}
+.game-board-wrap{background:
+ radial-gradient(ellipse at 50% 74%,rgba(255,255,255,.32) 0 4%,transparent 22%),
+ radial-gradient(circle at 13% 22%,rgba(255,255,255,.72) 0 2px,transparent 3px),
+ radial-gradient(circle at 87% 26%,rgba(255,255,255,.62) 0 2px,transparent 3px),
+ radial-gradient(circle at 22% 44%,rgba(255,255,255,.42) 0 1px,transparent 2px),
+ radial-gradient(circle at 78% 49%,rgba(255,255,255,.45) 0 1px,transparent 2px),
+ linear-gradient(180deg,#55bfdc 0%,#70d0e1 46%,#bdebf2 82%,#dff7f8 100%)!important}
+.game-board-wrap:before{background:
+ linear-gradient(135deg,transparent 0 32%,rgba(255,255,255,.08) 32.2% 32.5%,transparent 32.7%),
+ linear-gradient(45deg,transparent 0 66%,rgba(255,255,255,.07) 66.2% 66.5%,transparent 66.7%)!important}
+.game-board-wrap:after{width:min(78%,350px)!important;background:linear-gradient(145deg,rgba(12,109,135,.12),rgba(255,255,255,.05))!important;box-shadow:0 14px 26px rgba(20,83,99,.18)!important}
+.game-board{width:min(82%,370px)!important}
+.game-board:before{background:linear-gradient(145deg,rgba(220,205,164,.96),rgba(157,116,72,.94))!important;inset:1.5%!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;filter:drop-shadow(0 2px 2px rgba(63,45,26,.18))}
+.board-cell{background:linear-gradient(180deg,#fff7dc,#dfc995)!important;border-color:#8b6738!important;box-shadow:0 3px 0 rgba(91,59,28,.35),0 4px 7px rgba(57,47,30,.18)!important}
+.board-cell.purple{background:linear-gradient(180deg,#f0ddfb,#b77dcc)!important;border-color:#74458d!important}
+.board-cell.quest{background:linear-gradient(180deg,#f8dfb1,#d89e61)!important}
+.board-cell.special{background:linear-gradient(180deg,#c8f3ff,#65c1df)!important}
+.board-cell.start{background:linear-gradient(180deg,#fff5c5,#e8b54e)!important}
+.board-cell.active{outline:2px solid rgba(255,231,130,.95)!important;outline-offset:1px!important}
+.game-center{width:36%!important;height:36%!important}
+.game-center .game-ship{font-size:65px!important}
+.game-token{font-size:29px!important;text-shadow:0 2px 0 rgba(255,224,159,.35)!important}
+.game-side-stack{top:12%!important;right:6px!important}
+.game-side-stack button{background:linear-gradient(180deg,rgba(92,51,25,.90),rgba(45,29,22,.92))!important;border-color:#d6a15a!important;box-shadow:0 3px 0 rgba(47,27,16,.55),0 6px 12px rgba(15,50,60,.24)!important;color:#ffe9bd!important}
+.game-side-stack button:first-child:before{content:'!';position:absolute;right:-3px;top:-5px;width:15px;height:15px;border-radius:50%;background:#c83b2f;color:#fff;border:2px solid #ffe2a5;font-size:9px;font-weight:900;line-height:11px}
+.game-side-stack button{position:relative}
+.game-status{background:rgba(38,68,77,.72)!important;border-color:rgba(238,242,232,.48)!important}
+.game-bottom{background:linear-gradient(180deg,#d9f4f4 0%,#b4e4eb 100%)!important}
+.game-prize-badge{color:#51351f!important;text-shadow:none!important}
+.game-prize-badge span{filter:none!important}
+@media(max-width:390px){
+ .game-board{width:min(80%,310px)!important}
+ .game-side-stack{right:4px!important;top:11%!important}
+ .game-side-stack button{width:68px!important;min-height:49px!important}
+ .game-reward-track{height:54px!important;flex-basis:54px!important}
+ .reward-step .reward-icon{font-size:15px!important}.reward-step .reward-amount{font-size:9px!important}.reward-step small{font-size:5.5px!important}
+}
+@media(max-height:700px){
+ .game-board{width:min(72%,280px)!important}
+ .game-side-stack{top:9%!important}
+}
