@@ -391,7 +391,7 @@
 @media(max-height:760px){#game .game-board-shell{width:min(78vw,310px)!important;height:min(78vw,310px)!important}#game .game-bottom{height:82px!important;flex-basis:82px!important}#game .ancient-dice{height:68px!important}}
 
 
-/* Territory v67 — 27-cell route + Jackpot reward preview */
+/* Territory v69 — 27-cell route + Jackpot reward preview */
 #game .game-reward-head{height:28px;flex:0 0 28px;display:flex;align-items:center;justify-content:space-between;padding:2px 9px;background:#07151c;border-bottom:1px solid #715d40;color:#e9d7b3;font-size:8px}
 #game .game-reward-head b{font-family:Georgia,serif;font-size:9px}
 #game .game-reward-head button{border:1px solid #b98a4b;border-radius:7px;background:#4a2f20;color:#f5d9a3;font-size:7px;font-weight:800;padding:4px 8px}
@@ -441,3 +441,98 @@
 #game .batch-result b{font-size:9px}.batch-result small{font-size:6px;color:#5e513f;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.batch-result em{font-size:5.5px;color:#947247;font-style:normal;margin-top:3px}
 #game .game-batch-card #batchClose{right:6px;top:4px;width:28px;height:28px;border-radius:50%;background:#e52272;color:#fff;border:1px solid #ff9abf;font-size:20px;z-index:2}
 @media(max-width:390px){#game .game-bottom{grid-template-columns:1fr 70px 1fr!important}#game .dice-controls-left{gap:4px}#game .multi-roll{padding:5px 4px;font-size:6px}#game .multi-roll input{width:17px;height:17px}#game .batch-results{grid-template-columns:1fr}.batch-result{min-height:44px}}
+
+/* Territory v69 — final mobile placement of event tools.
+   The source harbor artwork is kept untouched: its sign reads exactly
+   «ИГРАЙ / ПУТЕШЕСТВУЙ / ПОЛУЧАЙ НАГРАДЫ». */
+#game .game-tools{
+  position:absolute!important;
+  top:clamp(132px,22vh,178px)!important;
+  right:5px!important;
+  left:auto!important;
+  z-index:80!important;
+  width:72px!important;
+  height:auto!important;
+  flex:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:6px!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+}
+#game .game-tools button{
+  width:72px!important;
+  min-width:72px!important;
+  height:52px!important;
+  min-height:52px!important;
+  max-height:52px!important;
+  padding:3px 2px!important;
+  border:1px solid #b98242!important;
+  border-radius:9px!important;
+  background:linear-gradient(180deg,rgba(89,56,31,.94),rgba(37,27,20,.96))!important;
+  box-shadow:0 3px 7px #0009!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:1px!important;
+  text-align:center!important;
+}
+#game .game-tools button span{
+  display:block!important;
+  font-size:18px!important;
+  line-height:18px!important;
+}
+#game .game-tools button b{
+  display:block!important;
+  font-size:7px!important;
+  line-height:8px!important;
+  white-space:nowrap!important;
+}
+#game .game-tools button small{
+  display:block!important;
+  font-size:5.5px!important;
+  line-height:6px!important;
+  white-space:nowrap!important;
+  color:#d8c7a8!important;
+}
+
+/* Keep the real source wording visible; never replace it with generated text. */
+#game .game-harbor{background-image:linear-gradient(180deg,rgba(1,8,13,.05),rgba(1,9,14,.12) 58%,rgba(1,8,12,.5)),url('./harbor_top.jpg')!important;background-size:auto 100%!important;background-position:center center!important;background-repeat:no-repeat!important}
+
+@media(max-width:390px){
+  #game .game-tools{right:4px!important;width:66px!important;top:clamp(128px,21vh,165px)!important;gap:5px!important}
+  #game .game-tools button{width:66px!important;min-width:66px!important;height:49px!important;min-height:49px!important;max-height:49px!important}
+  #game .game-tools button span{font-size:17px!important}
+  #game .game-tools button b{font-size:6.5px!important}
+  #game .game-tools button small{font-size:5px!important}
+}
+
+
+/* Territory v70 — jackpot preview entry is always visible directly under the event header. */
+#game .game-reward-head{
+  position:relative!important; z-index:95!important;
+  flex:0 0 30px!important; height:30px!important; min-height:30px!important;
+  display:flex!important; align-items:center!important; justify-content:space-between!important;
+  box-sizing:border-box!important; padding:2px 9px!important;
+  background:linear-gradient(180deg,#091a21,#07141a)!important;
+  border-bottom:1px solid #8a683f!important;
+  color:#ead8b7!important;
+}
+#game .game-reward-head b{font:800 10px Georgia,serif!important; white-space:nowrap!important}
+#game .game-reward-head button{
+  position:relative!important; z-index:96!important;
+  display:flex!important; align-items:center!important; justify-content:center!important;
+  min-width:68px!important; height:23px!important; padding:2px 9px!important;
+  border:1px solid #d09a4e!important; border-radius:8px!important;
+  background:linear-gradient(180deg,#704a29,#3b281c)!important;
+  color:#f6dca7!important; font:800 8px Georgia,serif!important;
+  box-shadow:0 2px 5px #0008!important; cursor:pointer!important;
+}
+#game .game-reward-head button:active{transform:translateY(1px);}
+@media(max-width:390px){
+  #game .game-reward-head{flex-basis:29px!important;height:29px!important;min-height:29px!important;padding-left:8px!important;padding-right:8px!important}
+  #game .game-reward-head b{font-size:9px!important}
+  #game .game-reward-head button{min-width:64px!important;height:22px!important;font-size:7px!important}
+}

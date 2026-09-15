@@ -10,3 +10,6 @@ Sdolars Winter event rebuild based on the provided gameplay references.
 - winter harbor / Sdolars scene
 
 Files: `index.html`, `style.css`, `game.css`, `app.js`, `harbor_top.jpg`, `ship_only.png`.
+
+
+В v70 кнопка «ОТКРЫТЬ» предпросмотра наград/джекпота закреплена отдельной строкой сразу под шапкой события и подключена к окну предпросмотра.
