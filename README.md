@@ -1,13 +1,16 @@
-# Territory v61 — Game real working board
+# Territory v62 — Game rebuilt as a real working mobile field
 
-Game was rebuilt as a real functional DOM board instead of hiding the previous board elements.
+Game is rebuilt as a self-contained functional Monopoly-style event screen.
 
-- 20 actual clickable cells in a non-overlapping 6×6 perimeter.
-- START is cell 1; FINISH is cell 20.
-- Token position is calculated from the real cell geometry.
-- Clicking a cell updates the cell information panel.
-- Dice roll/movement, rewards, tasks, gift and special-offer panels keep the existing game logic.
-- Gift / Tasks / Special Offer are separate controls and do not sit on the board.
-- Real S$S ship artwork is used in the center.
-- Mobile layout is isolated in `game.css`; old Game CSS is not used to position the board.
-- `style.css` is intentionally not included because it was not changed.
+- Real 20-cell DOM board, not a static board image.
+- Cell 1 is START; cell 20 is FINISH.
+- The token moves between actual cells after a dice roll.
+- Cell labels stay readable while the path follows a diamond.
+- Tapping a cell updates the cell information panel.
+- Gift, Tasks and Special Offer are separate controls above the board.
+- Ancient winter harbor visual background with S$S / SDOLARS branding.
+- S$S sailing ship is the center artwork.
+- Existing rewards, tasks, gift and offer logic remain functional.
+- Event countdown and dice count remain functional.
+
+The Game layout is isolated in `game.css` so legacy styles do not overlay the rebuilt board.

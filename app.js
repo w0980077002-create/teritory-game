@@ -145,7 +145,7 @@ function gameBoardInit(){
   cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>${isStart?'<span class="start-ribbon">СТАРТ</span>':''}`;
   cell.dataset.index=i;
   const pos=gameGridPosition(i,n);
-  cell.style.gridRow=pos.row; cell.style.gridColumn=pos.col;
+  cell.style.left=pos.x+'%'; cell.style.top=pos.y+'%'; cell.style.setProperty('--tile-rot',pos.rot+'deg');
   cells.push(cell); board.appendChild(cell);
  }
  cells.forEach(cell=>cell.addEventListener('click',()=>gameSelectCell(Number(cell.dataset.index))));
@@ -153,12 +153,12 @@ function gameBoardInit(){
  gamePlaceToken(false); gameTasksInit(); gameUpdateStatus(); gameSelectCell(state.gamePos);
 }
 function gameGridPosition(i,n){
- const side=6; const p=[];
- for(let c=1;c<=side;c++)p.push([1,c]);
- for(let r=2;r<=side;r++)p.push([r,side]);
- for(let c=side-1;c>=1;c--)p.push([side,c]);
- for(let r=side-1;r>=2;r--)p.push([r,1]);
- return {row:p[i][0],col:p[i][1]};
+ const total=n, angle=(Math.PI/2)+(i/total)*Math.PI*2;
+ const c=Math.cos(angle), s=Math.sin(angle);
+ const r=1/(Math.abs(c)+Math.abs(s));
+ const x=50+40*c*r, y=50+40*s*r;
+ const deg=Math.atan2(c,-s)*180/Math.PI;
+ return {x,y,rot:deg};
 }
 function gameSelectCell(index){
  const c=GAME_CELLS[index]; if(!c)return;
