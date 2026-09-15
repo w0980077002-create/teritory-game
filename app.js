@@ -135,20 +135,24 @@ function gameEventTimer(){
 }
 function gameBoardInit(){
  const board=$("#gameBoard"), track=$("#gameRewardTrack"), token=$("#gameToken"); if(!board||!track)return;
+ const wrap=board.parentElement;
+ const center=wrap&&wrap.querySelector('.game-center');
+ if(center&&center.parentElement===board) wrap.appendChild(center);
  board.innerHTML='';
  const n=GAME_CELLS.length;
  for(let i=0;i<n;i++){
   const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'');
   const c=GAME_CELLS[i]; cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>`; cell.dataset.index=i;
-  // 20-cell closed diamond track: 5 cells on each side, evenly spaced with safe gaps.
+  // Stable 20-cell diamond: 5 tiles per side, with generous corner spacing.
   const side=Math.floor(i/5), k=i%5, t=[0.10,0.30,0.50,0.70,0.90][k];
-  const edges=[[[50,8],[92,50]],[[92,50],[50,92]],[[50,92],[8,50]],[[8,50],[50,8]]];
+  const edges=[[[50,7],[93,50]],[[93,50],[50,93]],[[50,93],[7,50]],[[7,50],[50,7]]];
   const a=edges[side][0], b=edges[side][1];
   const x=a[0]+(b[0]-a[0])*t, y=a[1]+(b[1]-a[1])*t;
   cell.style.left=x+'%'; cell.style.top=y+'%';
   cell.style.setProperty('--tile-angle',Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI+'deg');
   board.appendChild(cell);
  }
+ if(center){ board.appendChild(center); }
  if(token){ board.appendChild(token); }
  track.innerHTML=GAME_REWARDS.map(r=>{const first=r.items&&r.items[0]?r.items[0]:[r.icon,'','']; return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]||r.icon}</span><b class="reward-amount">${first[1]||''}</b><small>${r.title}</small></button>`}).join('');
  gamePlaceToken(false); gameTasksInit(); gameUpdateStatus();
