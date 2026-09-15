@@ -1,7 +1,18 @@
 const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
-let state=JSON.parse(localStorage.getItem("territory_save_v1")||"null")||structuredClone(defaultState);
+function gameLoadState(){
+  try{
+    const raw=localStorage.getItem("territory_save_v1");
+    if(!raw)return structuredClone(defaultState);
+    const parsed=JSON.parse(raw);
+    return parsed&&typeof parsed==="object"?parsed:structuredClone(defaultState);
+  }catch(e){
+    console.warn("Territory save is damaged; using safe defaults",e);
+    return structuredClone(defaultState);
+  }
+}
+let state=gameLoadState();
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
-state.gameDice=Number(state.gameDice??47); state.gameRolls=Number(state.gameRolls??0); state.gameSteps=Number(state.gameSteps??0); state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?state.gameTaskClaims:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?state.gamePanelClaims:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
+state.gameDice=Math.max(0,Number(state.gameDice??47)||0); state.gameRolls=Math.max(0,Number(state.gameRolls??0)||0); state.gameSteps=Math.max(0,Number(state.gameSteps??0)||0); state.gameEventVersion=Number(state.gameEventVersion??1)||1; state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0); state.gameMilestones=Array.isArray(state.gameMilestones)?[...new Set(state.gameMilestones.map(Number).filter(Number.isFinite))]:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?[...new Set(state.gameTaskClaims.map(String))]:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?[...new Set(state.gamePanelClaims.map(String))]:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS; state.gameSaveVersion=2;
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
 const weapons=[
@@ -11,7 +22,30 @@ const weapons=[
  {name:"Арбалет",icon:"🏹",damage:31,cost:1500}
 ];
 const $=s=>document.querySelector(s);
-function save(){localStorage.setItem("territory_save_v1",JSON.stringify(state));render();}
+function save(){
+  state.gameSteps=Math.max(0,Math.floor(state.gameLap*GAME_TRACK_CELLS+state.gamePos));
+  state.gamePos=((Math.floor(state.gamePos)%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
+  state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
+  state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0);
+  state.gameSaveVersion=2;
+  try{ localStorage.setItem("territory_save_v1",JSON.stringify(state)); }catch(e){ console.warn("Territory save failed",e); }
+  render();
+}
+window.addEventListener("pagehide",()=>{try{state.gameMoving=false; save();}catch(e){}});
+window.addEventListener("beforeunload",()=>{try{state.gameMoving=false; save();}catch(e){}});
+window.addEventListener("storage",e=>{
+  if(e.key!=="territory_save_v1"||state.gameMoving||!e.newValue)return;
+  try{
+    const incoming=JSON.parse(e.newValue);
+    if(incoming&&typeof incoming==="object"){
+      state={...state,...incoming};
+      state.gameSteps=Math.max(0,Number(state.gameSteps)||0);
+      state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
+      state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
+      render(); gameBoardInit?.(); gameUpdateStatus?.();
+    }
+  }catch(err){console.warn("Territory external save ignored",err);}
+});
 function render(){
  $("#coins").textContent=state.coins; $("#gems").textContent=state.gems; $("#level").textContent=state.level;
  $("#playerHp").textContent=`${state.hp}/${state.maxHp}`; $("#enemyHp").textContent=`${state.enemyHp}/100`;
@@ -213,6 +247,7 @@ function gameShowReward(reward,title='Поздравляем!'){
  gameUpdateStatus();
 }
 function gameClaimNewMilestones(){
+ state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[];
  const reached=GAME_REWARDS.filter(r=>state.gameLap>=r.lap && !state.gameMilestones.includes(r.lap));
  reached.forEach(r=>state.gameMilestones.push(r.lap));
  return reached;
@@ -255,6 +290,7 @@ async function gameRoll(){
    state.gamePos=(state.gamePos+1)%GAME_TRACK_CELLS;
    if(state.gamePos===0)state.gameLap++;
    state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
+   save();
    gamePlaceToken(true); gameUpdateStatus();
    if(!gameSkipRequested) await new Promise(r=>setTimeout(r,300));
  }
@@ -341,7 +377,7 @@ gameEventTimer();
   if(track) track.addEventListener('click',e=>{
     const b=e.target.closest('[data-lap]'); if(!b)return;
     const lap=Number(b.dataset.lap), r=GAME_REWARDS.find(x=>x.lap===lap); if(!r)return;
-    if(state.gameMilestones.includes(lap)) gameShowReward(r.items,`Круг ${lap} · награда получена`);
+    if(state.gameMilestones.includes(lap)) gameShowReward(r.items,`Круг ${lap} · награда получена`,false);
     else { const s=$('#gameStatus'); if(s)s.textContent=`Круг ${lap}: пройди ещё ${Math.max(0,lap-state.gameLap)} круг(а).`; }
   });
   const prize=$('.game-prize-badge');
@@ -576,6 +612,7 @@ async function gameRoll10(){
       state.gamePos=(state.gamePos+1)%GAME_TRACK_CELLS;
       if(state.gamePos===0)state.gameLap++;
       state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
+      save();
       gamePlaceToken(true); gameUpdateStatus();
       if(!gameSkipRequested)await new Promise(r=>setTimeout(r,120));
     }
@@ -583,6 +620,7 @@ async function gameRoll10(){
     const item=got.reward[0];
     results.push({face,icon:item[0],amount:item[1],label:item[2]});
     state.gameRolls++;
+    save();
     state.gameTaskProgress=state.gameRolls;
     if(!gameSkipRequested)await new Promise(r=>setTimeout(r,120));
   }
