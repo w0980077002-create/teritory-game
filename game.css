@@ -221,3 +221,44 @@
   #game .game-bottom{flex-basis:106px!important;height:106px!important;min-height:106px!important}
   #game .ancient-dice{width:64px!important;height:64px!important;flex-basis:64px!important}
 }
+
+/* v59: real mobile Game skin based on approved reference composition. */
+#game.game-screen{
+  background:#07141b url('monopoly-reference.png') center top / 100% 100% no-repeat!important;
+  color:#f4ead7!important;
+}
+#game .game-reference-layer{position:absolute!important;inset:0!important;background:transparent!important;pointer-events:none!important;z-index:0!important}
+#game .game-topbar,#game .game-reward-track,#game .game-board-wrap,#game .game-bottom,#game .game-status{background:transparent!important;border:0!important;box-shadow:none!important}
+#game .game-topbar{position:absolute!important;left:0!important;right:0!important;top:0!important;height:11%!important;z-index:40!important;display:block!important}
+#game .game-close{position:absolute!important;left:3%!important;top:1.1%!important;width:8.5%!important;height:5%!important;background:transparent!important;border:0!important;color:transparent!important;font-size:0!important}
+#game .game-title,#game .game-timer{display:none!important}
+#game .game-reward-track{position:absolute!important;left:0!important;right:0!important;top:10%!important;height:8%!important;padding:0!important;gap:0!important;overflow:visible!important;z-index:35!important}
+#game .reward-step{background:transparent!important;border:0!important;color:transparent!important;box-shadow:none!important;width:14.28%!important;height:100%!important;padding:0!important}
+#game .reward-step *{visibility:hidden!important}
+#game .game-board-wrap{position:absolute!important;inset:18% 0 17%!important;z-index:5!important;overflow:visible!important}
+#game .game-scenery{display:none!important}
+#game .game-tools{position:absolute!important;left:0!important;right:0!important;top:0!important;width:100%!important;height:0!important;display:block!important;z-index:50!important}
+#game .game-tools button{position:absolute!important;width:30%!important;height:7%!important;top:0!important;background:transparent!important;border:0!important;box-shadow:none!important;color:transparent!important;font-size:0!important}
+#game .game-tools button:nth-child(1){left:4%!important}
+#game .game-tools button:nth-child(2){left:35%!important}
+#game .game-tools button:nth-child(3){left:66%!important}
+#game .game-tools button *{visibility:hidden!important}
+#game .game-board{left:0!important;top:0!important;width:100%!important;height:100%!important;transform:none!important;filter:none!important;z-index:20!important;background:transparent!important}
+#game .game-board:before{display:none!important}
+#game .board-cell{background:transparent!important;border:0!important;box-shadow:none!important;color:transparent!important;width:14%!important;height:9%!important;z-index:25!important}
+#game .board-cell .tile-content,#game .board-cell .start-ribbon{visibility:hidden!important}
+#game .game-center{left:50%!important;top:50%!important;width:36%!important;height:28%!important;background:transparent!important;border:0!important;box-shadow:none!important;z-index:10!important;color:transparent!important}
+#game .game-center .game-ship{visibility:hidden!important}
+#game .game-center>b,#game .game-center>small,#game .game-lap-badge{visibility:hidden!important}
+#game .game-token{z-index:60!important;color:#c7b08a!important;font-size:29px!important;text-shadow:0 2px 4px #000!important}
+#game .game-status{position:absolute!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;height:0!important;padding:0!important;color:transparent!important;background:transparent!important;border:0!important}
+#game .game-bottom{position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:17%!important;z-index:70!important;padding:0!important;display:block!important}
+#game .game-prize-badge{position:absolute!important;left:3%!important;top:20%!important;width:28%!important;height:65%!important;min-width:0!important;color:transparent!important;background:transparent!important}
+#game .game-prize-badge *{visibility:hidden!important}
+#game .ancient-dice{position:absolute!important;left:39%!important;top:8%!important;width:22%!important;height:76%!important;background:transparent!important;border:0!important;box-shadow:none!important;color:transparent!important}
+#game .ancient-dice *{visibility:hidden!important}
+#game .dice-count{position:absolute!important;left:23%!important;top:18%!important;width:18%!important;height:60%!important;color:transparent!important;min-width:0!important}
+#game .dice-count *{visibility:hidden!important}
+#game .skip-roll{position:absolute!important;right:3%!important;top:25%!important;width:28%!important;height:52%!important;background:transparent!important;border:0!important;box-shadow:none!important;color:transparent!important;min-width:0!important}
+#game .game-modal,#game .game-tasks-modal,#game .game-panel-modal{z-index:200!important}
+@media(max-width:390px){#game.game-screen{background-size:100% 100%!important}}

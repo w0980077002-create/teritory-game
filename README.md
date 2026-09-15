@@ -21,3 +21,6 @@ v56 продолжает рабочую сборку v55 и завершает �
 
 ## Проверка
 Открывать `index.html` в браузере. Состояние хранится в `localStorage` под ключом `territory_save_v1`.
+
+## v59 Game visual skin
+Game is rebuilt as a portrait mobile skin based on the approved Monopoly reference composition. The underlying buttons and roll logic remain functional while the visual layer is separated from the gameplay hit areas. `monopoly-reference.png` is the visual background asset.
