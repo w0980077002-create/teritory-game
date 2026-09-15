@@ -14,3 +14,7 @@ Territory — Sdolars v30
 
 Для запуска просто открой index.html.
 Для GitHub Pages загрузи содержимое этой папки в корень репозитория.
+
+
+## v31 — fire layering fix
+Central fire/smoke/embers overlay disabled because the base scene already contains the brazier and hero; this prevents fire from appearing on the player. Soft environmental lighting, birds and dust remain.

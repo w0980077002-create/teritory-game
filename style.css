@@ -1126,3 +1126,15 @@ body:has(#home.active) .scene-action.show{opacity:1;transform:translateY(0)}
 body:has(#home.active) .night-pulse .real-home-image{filter:brightness(.97) saturate(1.02)!important;transition:filter 1.8s ease}
 @media(max-width:390px){body:has(#home.active) .scene-action{left:9px;bottom:6%;max-width:210px;font-size:8px;line-height:11px}.torch-glow{transform:scale(.8)!important}}
 @media(prefers-reduced-motion:reduce){body:has(#home.active) .torch-glow,body:has(#home.active) .brazier-flame i,body:has(#home.active) .brazier-flame b,body:has(#home.active) .brazier-smoke i,body:has(#home.active) .brazier-smoke b,body:has(#home.active) .brazier-smoke em,body:has(#home.active) .ember-field i,body:has(#home.active) .banner-sway,body:has(#home.active) .bird-flight,body:has(#home.active) .rain-dust i{animation:none!important}}
+
+/* v31 — огонь только из самой сцены: никаких накладных языков пламени на персонаже */
+body:has(#home.active) .living-scene .brazier-flame,
+body:has(#home.active) .living-scene .brazier-smoke,
+body:has(#home.active) .living-scene .ember-field{display:none!important}
+/* Свет от костра остаётся очень мягким и не рисует огонь поверх героя. */
+body:has(#home.active) .living-scene .torch-glow{opacity:.22!important;filter:blur(10px)!important;mix-blend-mode:screen}
+/* Анимация сцены не должна создавать ложные объекты поверх персонажа. */
+body:has(#home.active) .living-scene{z-index:3!important}
+body:has(#home.active) .scene-vignette{z-index:1!important}
+body:has(#home.active) .bird-flight,
+body:has(#home.active) .rain-dust{z-index:2!important}
