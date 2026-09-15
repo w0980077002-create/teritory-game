@@ -125,3 +125,23 @@ showScreen("home");
     home.classList.toggle('night-pulse',night);
   },26000);
 })();
+
+/* Territory v32 — scene interactions */
+(function sceneInteractions(){
+  const home=document.querySelector('.real-home'); if(!home)return;
+  const action=document.querySelector('#sceneAction');
+  const notes={
+    '.hs-city':'Центральный квартал: город открыт для исследования.',
+    '.hs-weapon':'Оружейная готова: выбирай оружие и улучшай снаряжение.',
+    '.guard-label':'Страж: «В городе спокойно. Будь внимателен.»',
+    '.trader-label':'Торговец: «Посмотри товары, странник.»'
+  };
+  Object.entries(notes).forEach(([sel,text])=>{
+    const el=home.querySelector(sel); if(!el)return;
+    el.addEventListener('click',()=>{
+      if(!action)return;
+      action.textContent=text; action.classList.add('show');
+      clearTimeout(el._t); el._t=setTimeout(()=>action.classList.remove('show'),3000);
+    });
+  });
+})();

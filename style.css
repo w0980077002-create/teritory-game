@@ -1138,3 +1138,21 @@ body:has(#home.active) .living-scene{z-index:3!important}
 body:has(#home.active) .scene-vignette{z-index:1!important}
 body:has(#home.active) .bird-flight,
 body:has(#home.active) .rain-dust{z-index:2!important}
+
+/* Territory v32 — safe live layer: no effect can cross the player */
+body:has(#home.active) .living-scene .brazier-flame,
+body:has(#home.active) .living-scene .brazier-smoke,
+body:has(#home.active) .living-scene .ember-field,
+body:has(#home.active) .living-scene .banner-sway,
+body:has(#home.active) .living-scene .rain-dust{display:none!important}
+body:has(#home.active) .living-scene{z-index:4;pointer-events:none}
+body:has(#home.active) .scene-vignette{z-index:1}
+body:has(#home.active) .torch-glow{z-index:2;width:38px;height:38px;opacity:.18!important;filter:blur(12px)!important}
+body:has(#home.active) .tg-left{left:34%;top:54%}
+body:has(#home.active) .tg-right{right:34%;top:54%}
+/* живой свет только вокруг фонарей, без наложения на героя */
+body:has(#home.active) .real-home-image{animation:cityBreath 8s ease-in-out infinite}
+@keyframes cityBreath{0%,100%{filter:brightness(1) saturate(1)}50%{filter:brightness(1.025) saturate(1.015)}}
+/* интерактивные точки получают короткий отклик */
+body:has(#home.active) .hotspot:active{background:rgba(255,190,90,.08);box-shadow:inset 0 0 0 1px rgba(255,190,90,.35)}
+body:has(#home.active) .npc-label:active{transform:scale(.97)}

@@ -1,20 +1,11 @@
-Territory — Sdolars v30
+# Territory — Sdolars v32 LIVE GAME
 
-Это ИГРА: HTML + CSS + JavaScript, а не картинка.
+Главный экран — игровая сцена, а не фото-страница.
 
-Главный экран сохраняет реалистичную сцену Sdolars и добавляет живой игровой слой:
-- ходящие жители;
-- анимированное пламя, угли и дым;
-- мерцание фонарей;
-- пролетающие птицы;
-- события города, которые появляются во время игры;
-- рабочие кнопки Арена / Рынок / Районы / Game;
-- нижняя навигация;
-- Arena с тактическими зонами: атака 1 зона, защита 2 зоны.
-
-Для запуска просто открой index.html.
-Для GitHub Pages загрузи содержимое этой папки в корень репозитория.
-
-
-## v31 — fire layering fix
-Central fire/smoke/embers overlay disabled because the base scene already contains the brazier and hero; this prevents fire from appearing on the player. Soft environmental lighting, birds and dust remain.
+- фон Sdolars сохраняется без растяжения;
+- интерактивные точки города работают;
+- Страж и Торговец вызывают игровые сообщения;
+- лёгкое живое изменение освещения сцены;
+- безопасный слой эффектов: огонь/дым/искры не накладываются на персонажа;
+- Arena сохраняет тактические зоны: 1 атака + 2 защиты;
+- Market, Districts, Inventory и Game остаются рабочими.
