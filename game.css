@@ -536,3 +536,65 @@
   #game .game-reward-head b{font-size:9px!important}
   #game .game-reward-head button{min-width:64px!important;height:22px!important;font-size:7px!important}
 }
+
+/* Territory v71 — compact 27-cell route, continuous harbor scene, correct bottom controls. */
+#game.game-screen{background:#07151b!important}
+#game .game-main{position:relative!important;isolation:isolate!important;background:transparent!important;padding:0 6px 2px!important}
+#game .game-harbor{position:absolute!important;inset:0!important;z-index:-2!important;background-image:linear-gradient(180deg,rgba(2,12,18,.05),rgba(2,12,18,.08) 45%,rgba(2,12,18,.48)),url('./harbor_top.jpg')!important;background-size:auto 100%!important;background-position:center center!important;background-repeat:no-repeat!important}
+#game .game-board-wrap{position:relative!important;z-index:3!important;width:100%!important;max-width:none!important;min-height:0!important;flex:1 1 auto!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;padding:0!important}
+#game .game-board-shell{position:relative!important;flex:0 0 auto!important;width:min(74vw,318px)!important;height:min(74vw,318px)!important;max-width:318px!important;max-height:318px!important;aspect-ratio:1!important;margin:0 auto!important;filter:drop-shadow(0 7px 10px #000b)!important}
+#game .game-board-shell:before{display:none!important;content:none!important}
+#game .game-board{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:visible!important}
+#game .board-cell{width:31px!important;height:31px!important;min-width:31px!important;min-height:31px!important;border:1.5px solid #6d4a2d!important;border-radius:7px!important;padding:1px!important;box-sizing:border-box!important;background:linear-gradient(145deg,#f1dfb6,#bd9255)!important;box-shadow:inset 0 1px #fff8,0 2px 4px #0009!important;transform:translate(-50%,-50%)!important}
+#game .board-cell .tile-content{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;width:100%!important;height:100%!important;overflow:hidden!important;padding:0!important}
+#game .board-cell .tile-icon{font-size:13px!important;line-height:13px!important}
+#game .board-cell b{font:800 8px/8px Georgia,serif!important;color:#49301d!important;margin:1px 0 0!important}
+#game .board-cell small{display:none!important}
+#game .board-cell.passed{background:linear-gradient(145deg,#9b68c8,#5a397d)!important;border-color:#dcb8ef!important}
+#game .board-cell.passed b{color:#fff3d4!important}
+#game .board-cell.active{transform:translate(-50%,-50%) scale(1.14)!important;outline:1.5px solid #ffe39a!important;box-shadow:0 0 0 2px #d79b42,0 0 12px #ffd45f,0 3px 5px #0009!important;z-index:15!important}
+#game .game-center{width:42%!important;height:42%!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important}
+#game .game-ship-wrap{width:100%!important;height:100%!important;margin:0!important;border-radius:0!important;overflow:visible!important}
+#game .game-ship-art{width:100%!important;height:100%!important;background:url('./ship_only.png') center/contain no-repeat!important;filter:drop-shadow(0 5px 5px #0009)!important}
+#game .game-lap-plaque{bottom:0!important;min-width:58px!important;padding:3px 8px!important;border:1px solid #d2a15d!important;border-radius:9px!important;background:rgba(48,29,18,.92)!important;color:#ffe2a8!important;font:700 8px Georgia,serif!important}
+#game .game-cell-info{flex:0 0 44px!important;height:44px!important;min-height:44px!important;width:calc(100% - 24px)!important;margin:0 12px 3px!important;padding:4px 8px!important;box-sizing:border-box!important;background:rgba(20,14,10,.92)!important;border:1px solid #a67b45!important}
+#game .game-cell-info b{font:800 10px Georgia,serif!important;color:#f0d29a!important}
+#game .game-cell-info span{font-size:7px!important;color:#d3c3a7!important}
+
+/* Small vertical event tools, matching the video placement. */
+#game .game-tools{position:absolute!important;top:clamp(78px,13vh,128px)!important;right:5px!important;left:auto!important;width:68px!important;height:auto!important;z-index:70!important;display:flex!important;flex-direction:column!important;gap:5px!important;padding:0!important;background:transparent!important;border:0!important}
+#game .game-tools button{width:68px!important;min-width:68px!important;height:50px!important;min-height:50px!important;max-height:50px!important;padding:2px!important;border:1px solid #b98242!important;border-radius:9px!important;background:linear-gradient(180deg,rgba(89,56,31,.94),rgba(35,25,19,.97))!important;box-shadow:0 3px 7px #0009!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0!important}
+#game .game-tools button span{font-size:17px!important;line-height:17px!important}
+#game .game-tools button b{font-size:6.5px!important;line-height:8px!important}
+#game .game-tools button small{font-size:5px!important;line-height:6px!important;color:#d8c7a8!important}
+
+/* One visual background: no turquoise block at the bottom. */
+#game .game-bottom{position:relative!important;z-index:60!important;height:82px!important;flex:0 0 82px!important;grid-template-columns:minmax(0,1fr) 76px minmax(0,1fr)!important;gap:6px!important;padding:4px 8px!important;box-sizing:border-box!important;background:linear-gradient(180deg,rgba(7,22,29,.96),rgba(5,17,23,.98))!important;border-top:1px solid #8b683f!important;color:#ead9bb!important}
+#game .dice-controls-left{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important;min-width:0!important}
+#game .dice-count{display:grid!important;grid-template-columns:22px auto!important;grid-template-rows:auto auto auto!important;align-items:center!important}
+#game .dice-count .dice-icon{font-size:16px!important;grid-row:1/3!important}
+#game .dice-count b{font-size:20px!important;line-height:20px!important;color:#f0dfbd!important}
+#game .dice-count span:not(.dice-icon){font-size:7px!important;line-height:8px!important;color:#e0d0b4!important}
+#game .dice-count small{grid-column:1/3!important;font-size:5.5px!important;color:#aaa294!important;white-space:nowrap!important}
+#game .multi-roll{display:flex!important;align-items:center!important;gap:3px!important;padding:4px 5px!important;border:1px solid #a47b43!important;border-radius:7px!important;background:rgba(38,29,21,.9)!important;color:#e8d5b0!important;font-size:6px!important;line-height:8px!important;white-space:nowrap!important}
+#game .multi-roll input{width:16px!important;height:16px!important;margin:0!important}
+#game .multi-roll b{font-size:7px!important;color:#f2c96e!important}
+#game .ancient-dice{width:76px!important;height:72px!important;min-height:72px!important;border:2px solid #b97d2e!important;border-radius:16px!important;background:linear-gradient(145deg,#f4d47e,#bd7b2d 58%,#713b1b)!important;color:#f7dfae!important;box-shadow:0 5px 0 #573016,0 7px 10px #0009!important}
+#game .dice-face{font-size:27px!important;line-height:28px!important}
+#game .ancient-dice small{font-size:9px!important;letter-spacing:.5px!important}
+#game .skip-roll{justify-self:start!important;display:flex!important;align-items:center!important;gap:4px!important;color:#d9d2c6!important;font-size:6px!important;line-height:8px!important}
+#game .skip-roll input{width:17px!important;height:17px!important;margin:0!important}
+
+@media(max-width:390px){
+  #game .game-board-shell{width:282px!important;height:282px!important;max-width:282px!important;max-height:282px!important}
+  #game .board-cell{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important}
+  #game .board-cell .tile-icon{font-size:12px!important;line-height:12px!important}
+  #game .board-cell b{font-size:7px!important;line-height:7px!important}
+  #game .game-tools{width:62px!important;right:4px!important}
+  #game .game-tools button{width:62px!important;min-width:62px!important;height:47px!important;min-height:47px!important;max-height:47px!important}
+  #game .game-tools button span{font-size:16px!important}
+  #game .game-tools button b{font-size:6px!important}
+  #game .game-tools button small{font-size:4.7px!important}
+  #game .game-bottom{height:80px!important;flex-basis:80px!important;grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr)!important;padding:4px 5px!important;gap:4px!important}
+  #game .ancient-dice{width:70px!important;height:68px!important;min-height:68px!important}
+}
