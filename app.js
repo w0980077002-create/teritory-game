@@ -130,7 +130,7 @@ const GAME_REWARDS=[
 let gameMoving=false, gameSkipRequested=false, gameTimerId=null, gameModalTimerId=null;
 function gameEventTimer(){
  const el=$("#gameTimer"); if(!el)return;
- const tick=()=>{let left=Math.max(0,state.gameEndsAt-Date.now()); const d=Math.floor(left/86400000); left%=86400000; const h=Math.floor(left/3600000); left%=3600000; const m=Math.floor(left/60000); const sec=Math.floor((left%60000)/1000); el.textContent=`${d}д ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;};
+ const tick=()=>{const raw=state.gameEndsAt-Date.now(); const left=Math.max(0,raw); const d=Math.floor(left/86400000); const remD=left%86400000; const h=Math.floor(remD/3600000); const remH=remD%3600000; const m=Math.floor(remH/60000); const sec=Math.floor((remH%60000)/1000); el.textContent=raw<=0?'ЗАВЕРШЕНО':`${d}д ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; if(raw<=0){const r=$("#spinBtn");if(r)r.disabled=true;const st=$("#gameStatus");if(st&&!gameMoving)st.textContent='Событие завершено. Дождитесь следующего события.';}};
  tick(); clearInterval(gameTimerId); gameTimerId=setInterval(tick,1000);
 }
 function gameBoardInit(){
@@ -154,6 +154,7 @@ function gameBoardInit(){
  }
  if(center){ board.appendChild(center); }
  if(token){ board.appendChild(token); }
+ board.querySelectorAll('.board-cell').forEach(cell=>{cell.addEventListener('click',()=>{const c=GAME_CELLS[Number(cell.dataset.index)];const st=$("#gameStatus");if(st&&!gameMoving)st.textContent=`${c.label}: ${c.value==='?'?'случайная награда':c.value+' · '+c.label.toLowerCase()}`;});});
  track.innerHTML=GAME_REWARDS.map(r=>{const first=r.items&&r.items[0]?r.items[0]:[r.icon,'','']; return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]||r.icon}</span><b class="reward-amount">${first[1]||''}</b><small>${r.title}</small></button>`}).join('');
  gamePlaceToken(false); gameTasksInit(); gameUpdateStatus();
 }
@@ -214,9 +215,10 @@ function gameResolveCell(){
 }
 async function gameRoll(){
  if(gameMoving || document.querySelector('#gameRewardModal.show'))return;
+ if(state.gameEndsAt && Date.now() >= state.gameEndsAt){ const st=$("#gameStatus"); if(st)st.textContent='Событие завершено. Дождитесь следующего события.'; gameUpdateStatus(); return; }
  if(state.gameDice<=0){const s=$("#gameStatus");if(s)s.textContent='Кубики закончились. Получи новые в наградах.';return}
  state.gameDice--; state.gameRolls++; state.gameTaskProgress=state.gameRolls; save();
- gameMoving=true; state.gameMoving=true; gameSkipRequested=false; document.querySelector('#casino').classList.add('rolling');
+ gameMoving=true; state.gameMoving=true; gameSkipRequested=false; document.querySelector('#game').classList.add('rolling');
  const roll=1+Math.floor(Math.random()*6), face=['⚀','⚁','⚂','⚃','⚄','⚅'][roll-1]; $("#diceFace").textContent=face;
  const skip=$("#skipRollBtn"); if(skip)skip.disabled=false;
  gameUpdateStatus();
@@ -227,7 +229,7 @@ async function gameRoll(){
    gamePlaceToken(true); gameUpdateStatus();
    if(!gameSkipRequested) await new Promise(r=>setTimeout(r,300));
  }
- gameMoving=false; state.gameMoving=false; document.querySelector('#casino').classList.remove('rolling');
+ gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
  if(skip)skip.disabled=true;
  save();
  gameResolveCell();
@@ -253,7 +255,7 @@ function gameOpenPanel(kind){
  }else{
   title.textContent='Монополия'; sub.textContent='Подарок'; icon.textContent='🎁';
   rows=[
-   {name:'Подарочный набор 1',items:[['💎','10']],button:'Бесплатно',free:true,id:'gift1'},
+   {name:'Ежедневный подарок',items:[['💎','10'],['🎲','1']],button:(state.gameGiftDate===new Date().toISOString().slice(0,10)?'Получено сегодня':'Бесплатно'),free:true,id:'giftDaily'},
    {name:'Подарочный набор 2',items:[['💎','10'],['🎲','2']],button:'3/3',free:true,id:'gift2'},
    {name:'Подарочный набор 3',items:[['🎲','3']],button:'💎 288',price:288,currency:'gems',id:'gift3'},
    {name:'Подарочный набор 4',items:[['💎','100'],['🎲','5']],button:'$1',price:1,id:'gift4'}
@@ -265,9 +267,10 @@ function gameOpenPanel(kind){
 function gamePanelBuy(b){
  if(b.dataset.free==='1'){
   const id=b.dataset.panelBuy||''; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?state.gamePanelClaims:[];
-  if(state.gamePanelClaims.includes(id)){b.disabled=true;b.textContent='Получено';return;}
+  if(state.gamePanelClaims.includes(id) && id!=='giftDaily'){b.disabled=true;b.textContent='Получено';return;}
+  if(id==='giftDaily' && state.gameGiftDate===new Date().toISOString().slice(0,10)){b.disabled=true;b.textContent='Получено сегодня';return;}
   state.gamePanelClaims.push(id); const txt=b.textContent; b.textContent='Получено';
-  if(id==='gift1'){state.gems+=10;} else if(id==='gift2'){state.gems+=10;state.gameDice+=2;} else if(id==='sp1'){state.gameDice+=10;} else if(id==='sp2'){state.inventory.push('🎟️');state.gameDice+=10;}
+  if(id==='giftDaily'){state.gems+=10;state.gameDice+=1;state.gameGiftDate=new Date().toISOString().slice(0,10);} else if(id==='gift2'){state.gems+=10;state.gameDice+=2;} else if(id==='sp1'){state.gameDice+=10;} else if(id==='sp2'){state.inventory.push('🎟️');state.gameDice+=10;}
   save(); return;
  }
  const price=Number(b.dataset.price||0), currency=b.dataset.currency||'money';
