@@ -1697,3 +1697,21 @@ body:has(#home.active) .alex-mini-btn:active{transform:scale(.97)}
  #casino.game-screen.active .dice-count{min-width:62px!important}
  #casino.game-screen.active .skip-roll{min-width:68px!important;max-width:73px!important}
 }
+
+/* Territory v49 — Game clean composition: controls never overlap */
+body:has(#casino.active) .bottom-nav{display:none!important}
+body:has(#casino.active) .game-side-stack{right:8px!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-18%)!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;z-index:40!important;width:78px!important}
+body:has(#casino.active) .game-side-stack button{width:78px!important;min-width:78px!important;height:58px!important;min-height:58px!important;max-height:58px!important;padding:5px 3px!important;margin:0!important;border-radius:12px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important;position:relative!important;transform:none!important}
+body:has(#casino.active) .game-side-stack button span{font-size:20px!important;line-height:21px!important;height:21px!important}
+body:has(#casino.active) .game-side-stack button b{font-size:8px!important;line-height:10px!important;white-space:nowrap!important}
+body:has(#casino.active) .game-side-stack button small{font-size:6px!important;line-height:8px!important;white-space:nowrap!important;opacity:.8!important}
+body:has(#casino.active) .game-status{left:12px!important;right:96px!important;bottom:8px!important;z-index:41!important}
+body:has(#casino.active) .game-board-wrap{overflow:hidden!important}
+@media(max-width:390px){
+  body:has(#casino.active) .game-side-stack{width:68px!important;right:6px!important;gap:6px!important}
+  body:has(#casino.active) .game-side-stack button{width:68px!important;min-width:68px!important;height:52px!important;min-height:52px!important;max-height:52px!important}
+  body:has(#casino.active) .game-side-stack button span{font-size:18px!important}
+  body:has(#casino.active) .game-side-stack button b{font-size:7px!important}
+  body:has(#casino.active) .game-side-stack button small{font-size:5.5px!important}
+  body:has(#casino.active) .game-status{right:82px!important}
+}
