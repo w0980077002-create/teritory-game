@@ -132,7 +132,7 @@ if(sellBtn)sellBtn.onclick=()=>{
 function renderInventory(){
  $("#inventoryGrid").innerHTML=state.inventory.map((x,i)=>`<div class="item"><div class="pic">${x}</div><b>Предмет ${i+1}</b><span>Экипировка</span></div>`).join("");
 }
-/* Territory v43 — Game: reference-inspired diamond event board */
+/* Territory v112 — Game: reference-inspired diamond event board */
 const GAME_CELLS=[
  {icon:'🏁',value:'СТАРТ',type:'start',label:'НАЧАЛО ПУТЕШЕСТВИЯ'},
  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
@@ -289,7 +289,7 @@ function gameShowReward(reward,title='Поздравляем!',grant=true){
  const modal=$("#gameRewardModal"), items=$("#rewardItems"); if(!modal||!items||!Array.isArray(reward)||!reward.length)return;
  const alreadyOpen=modal.classList.contains('show');
  const batch=document.querySelector('#gameBatchModal.show');
- if(grant){ reward.forEach(gameAddReward); save(); }
+ if(grant===true){ reward.forEach(gameAddReward); save(); }
  if(alreadyOpen){ gameRewardQueue.push({reward,title,grant:false}); return; }
  if(batch){ batch.classList.remove('show'); batch.setAttribute('aria-hidden','true'); }
  $("#rewardModalTitle").textContent=title; $("#rewardModalText").textContent=grant?'Получено':'Предпросмотр';
@@ -468,7 +468,12 @@ gameEventTimer();
     else { const s=$('#gameStatus'); if(s)s.textContent=`Круг ${lap}: пройди ещё ${Math.max(0,lap-state.gameLap)} круг(а).`; }
   });
   const prize=$('.game-prize-badge');
-  if(prize){ prize.setAttribute('role','button'); prize.tabIndex=0; prize.addEventListener('click',()=>gameShowReward([['🎁','10','призовых попыток']], 'Призы x10', false)); }
+  if(prize){
+    prize.setAttribute('role','button'); prize.tabIndex=0;
+    const openPrizePreview=()=>gameShowReward([['🎁','10','призовых попыток']], 'Призы x10', false);
+    prize.addEventListener('click',openPrizePreview);
+    prize.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPrizePreview();}});
+  }
   document.addEventListener('click',e=>{
     const c=e.target.closest('.game-modal,.game-panel-modal,.game-tasks-modal');
     if(!c || e.target!==c)return;
