@@ -189,6 +189,7 @@ function gameUpdateStatus(){
  if(s)s.textContent=`ХОД · Круг ${lap} · клетка ${pos+1}/${GAME_TRACK_CELLS} · ${state.gameMoving?'идёт движение…':'брось кубик'}`;
  if(badge)badge.textContent=lap; if(turn)turn.textContent=`Ход ${state.gameRolls}`; if(cellNo)cellNo.textContent=pos+1;
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
+ const center=document.querySelector('#game .game-center'); if(center)center.dataset.lap=lap;
  const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show');
 }
 function gameAddReward(item){
