@@ -1,7 +1,7 @@
 const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 let state=JSON.parse(localStorage.getItem("territory_save_v1")||"null")||structuredClone(defaultState);
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
-state.gameDice=Number(state.gameDice??47); state.gameRolls=Number(state.gameRolls??0); state.gameSteps=Number(state.gameSteps??0); state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?state.gameTaskClaims:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?state.gamePanelClaims:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=20; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
+state.gameDice=Number(state.gameDice??47); state.gameRolls=Number(state.gameRolls??0); state.gameSteps=Number(state.gameSteps??0); state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?state.gameTaskClaims:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?state.gamePanelClaims:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
 const weapons=[
@@ -108,7 +108,7 @@ const GAME_CELLS=[
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'🪙',value:'750',label:'МОНЕТЫ'},
  {icon:'💧',value:'30',type:'blue',label:'РЕСУРС'},
- {icon:'💜',value:'5',type:'purple',label:'РЕСУРС'},
+ {icon:'💜',value:'5',type:'purple',label:'КРИСТАЛЛЫ'},
  {icon:'🪙',value:'160',label:'МОНЕТЫ'},
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'📜',value:'10',type:'special',label:'СВИТОК'},
@@ -118,7 +118,14 @@ const GAME_CELLS=[
  {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
  {icon:'🪙',value:'300',label:'МОНЕТЫ'},
  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
- {icon:'🏁',value:'ФИНИШ',type:'start',label:'КОНЕЦ КРУГА'}
+ {icon:'🪙',value:'500',label:'МОНЕТЫ'},
+ {icon:'🧰',value:'2',type:'special',label:'ПРЕДМЕТЫ'},
+ {icon:'❓',value:'?',type:'quest',label:'СЮРПРИЗ'},
+ {icon:'💧',value:'50',type:'blue',label:'РЕСУРС'},
+ {icon:'📜',value:'15',type:'special',label:'СВИТОК'},
+ {icon:'💎',value:'10',type:'purple',label:'КРИСТАЛЛЫ'},
+ {icon:'🪙',value:'1000',label:'МОНЕТЫ'},
+ {icon:'🏁',value:'ФИНИШ',type:'finish',label:'КОНЕЦ КРУГА'}
 ];
 const GAME_REWARDS=[
  {lap:15,icon:'💎',title:'Круг 15',items:[['💎','50','кристаллов'],['🧰','2','предмета'],['🪙','1050','монет']]},
@@ -127,29 +134,53 @@ const GAME_REWARDS=[
  {lap:30,icon:'🧰',title:'Круг 30',items:[['🧰','10','предметов'],['💎','80','кристаллов'],['🪙','2200','монет']]},
  {lap:35,icon:'📜',title:'Круг 35',items:[['📜','30','свитков'],['🏆','1','редкая награда'],['🪙','3000','монет']]}
 ];
+const JACKPOT_GROUPS=Array.from({length:47},(_,i)=>{
+ const from=i*5+1, to=from+4;
+ const patterns=[
+  [['🧰','1','предмет'],['💜','5','ресурса'],['🧰','10','предметов'],['📜','10','свитков'],['🪙','15000','монет']],
+  [['🧰','1','редкий предмет'],['💜','5','ресурса'],['💎','25','кристаллов'],['📜','10','свитков'],['🪙','15000','монет']],
+  [['❤️','1','особая награда'],['🧰','1','редкий предмет'],['💎','25','кристаллов'],['🧰','10','предметов'],['🪙','15000','монет']],
+  [['🎁','1','подарок'],['🧰','1','предмет'],['💎','25','кристаллов'],['📜','10','свитков'],['🪙','15000','монет']]
+ ];
+ return {from,to,items:patterns[i%patterns.length]};
+});
 let gameMoving=false, gameSkipRequested=false, gameTimerId=null, gameModalTimerId=null;
 function gameEventTimer(){
  const el=$("#gameTimer"); if(!el)return;
  const tick=()=>{const raw=state.gameEndsAt-Date.now(); const left=Math.max(0,raw); const d=Math.floor(left/86400000); const remD=left%86400000; const h=Math.floor(remD/3600000); const remH=remD%3600000; const m=Math.floor(remH/60000); const sec=Math.floor((remH%60000)/1000); el.textContent=raw<=0?'ЗАВЕРШЕНО':`${d}д ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; if(raw<=0){const r=$("#spinBtn");if(r)r.disabled=true;const st=$("#gameStatus");if(st&&!gameMoving)st.textContent='Событие завершено. Дождитесь следующего события.';}};
  tick(); clearInterval(gameTimerId); gameTimerId=setInterval(tick,1000);
 }
+function gameOpenJackpotPreview(){
+ const modal=$('#gameJackpotModal'), list=$('#jackpotList'); if(!modal||!list)return;
+ list.innerHTML=JACKPOT_GROUPS.map(g=>{
+   const cards=g.items.map((r,idx)=>{
+     const claimed=state.gameLap>=g.from+idx;
+     return `<div class="jackpot-reward ${claimed?'claimed':''}"><span>${claimed?'✓':r[0]}</span><b>${r[1]}</b><small>Осталось: ${claimed?'0':'1'}</small></div>`;
+   }).join('');
+   return `<section class="jackpot-group"><div class="jackpot-group-title">Круги ${g.from}–${g.to}</div><div class="jackpot-row">${cards}</div></section>`;
+ }).join('');
+ modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+}
+function gameCloseJackpotPreview(){const modal=$('#gameJackpotModal');if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true')}}
+
 function gameBoardInit(){
  const board=$("#gameBoard"), track=$("#gameRewardTrack"); if(!board||!track)return;
  board.innerHTML='';
  const n=GAME_CELLS.length;
  const cells=[];
  for(let i=0;i<n;i++){
-  const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'')+(i===GAME_CELLS.length-1?' finish':'');
+  const cell=document.createElement('button'); cell.type='button'; cell.className='board-cell '+(GAME_CELLS[i].type||'')+(i===GAME_CELLS.length-1?' finish':'')+(i>0 && i<=state.gameSteps?' passed':'');
   const c=GAME_CELLS[i];
   const isStart=i===0, isFinish=i===n-1;
-  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>${isStart?'<span class="start-ribbon">СТАРТ</span>':''}`;
+  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b></span>${isStart?'<span class="start-ribbon">СТАРТ</span>':''}`;
   cell.dataset.index=i;
   const pos=gameGridPosition(i,n);
   cell.style.left=pos.x+'%'; cell.style.top=pos.y+'%'; cell.style.setProperty('--tile-rot',pos.rot+'deg');
   cells.push(cell); board.appendChild(cell);
  }
  cells.forEach(cell=>cell.addEventListener('click',()=>gameSelectCell(Number(cell.dataset.index))));
- track.innerHTML=GAME_REWARDS.map(r=>{const first=r.items&&r.items[0]?r.items[0]:[r.icon,'','']; return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]||r.icon}</span><b class="reward-amount">${first[1]||''}</b><small>${r.title}</small></button>`}).join('');
+  gamePaintPassedCells();
+ track.innerHTML=GAME_REWARDS.map(r=>{const first=r.items[0]; return `<button type="button" class="reward-step ${state.gameMilestones.includes(r.lap)?'done':''}" data-lap="${r.lap}"><span class="reward-icon">${first[0]}</span><b class="reward-amount">${first[1]}</b><small>${r.title}</small></button>`}).join('');
  gamePlaceToken(false); gameTasksInit(); gameUpdateStatus(); gameSelectCell(state.gamePos);
 }
 function gameGridPosition(i,n){
@@ -157,8 +188,14 @@ function gameGridPosition(i,n){
  const c=Math.cos(angle), s=Math.sin(angle);
  const r=1/(Math.abs(c)+Math.abs(s));
  const x=50+40*c*r, y=50+40*s*r;
- const deg=Math.atan2(c,-s)*180/Math.PI;
+ const deg=0;
  return {x,y,rot:deg};
+}
+function gamePaintPassedCells(){
+ const board=$("#gameBoard"); if(!board)return;
+ const lap=Math.max(0,Number(state.gameLap||0)), pos=Math.max(0,Number(state.gamePos||0));
+ board.querySelectorAll('.board-cell').forEach((el,i)=>el.classList.toggle('passed',lap>0 || i<pos));
+ const center=document.querySelector('#game .game-center'); if(center)center.dataset.lap=lap;
 }
 function gameSelectCell(index){
  const c=GAME_CELLS[index]; if(!c)return;
@@ -173,14 +210,14 @@ function gamePlaceToken(animate=true){
  token.style.top=(cell.offsetTop+cell.offsetHeight/2)+'px';
  token.classList.toggle('moving',animate);
  board.querySelectorAll('.board-cell').forEach((c,n)=>c.classList.toggle('active',n===i));
- gameSelectCell(i);
+ gameSelectCell(i); gamePaintPassedCells();
 }
 function gameUpdateStatus(){
- const s=$("#gameStatus"), badge=$("#gameLapBadge"), turn=$("#gameTurnNo"), cellNo=$("#gameCellNo");
+ const s=$("#gameStatus"), badge=$("#gameLapBadge"), centerLap=$("#gameCenterLap"), turn=$("#gameTurnNo"), cellNo=$("#gameCellNo");
  const lap=Math.floor(state.gameSteps/GAME_TRACK_CELLS);
  const pos=((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
- if(s)s.textContent=`ХОД · Круг ${lap} · клетка ${pos+1}/20 · ${state.gameMoving?'идёт движение…':'брось кубик'}`;
- if(badge)badge.textContent=lap; if(turn)turn.textContent=`Ход ${state.gameRolls}`; if(cellNo)cellNo.textContent=pos+1;
+ if(s)s.textContent=`ХОД · Круг ${lap} · клетка ${pos+1}/27 · ${state.gameMoving?'идёт движение…':'брось кубик'}`;
+ if(badge)badge.textContent=lap; if(centerLap)centerLap.textContent=lap; if(turn)turn.textContent=`Ход ${state.gameRolls}`; if(cellNo)cellNo.textContent=pos+1;
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
  const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show');
 }
@@ -324,6 +361,9 @@ gameEventTimer();
     if(state.gameMilestones.includes(lap)) gameShowReward(r.items,`Круг ${lap} · награда получена`);
     else { const s=$('#gameStatus'); if(s)s.textContent=`Круг ${lap}: пройди ещё ${Math.max(0,lap-state.gameLap)} круг(а).`; }
   });
+  if(track) track.addEventListener('dblclick',gameOpenJackpotPreview);
+  const rewardPreviewBtn=$('#gameRewardPreviewBtn'); if(rewardPreviewBtn) rewardPreviewBtn.onclick=gameOpenJackpotPreview;
+  const jackpotClose=$('#jackpotClose'); if(jackpotClose) jackpotClose.onclick=gameCloseJackpotPreview;
   const prize=$('.game-prize-badge');
   if(prize){ prize.setAttribute('role','button'); prize.tabIndex=0; prize.addEventListener('click',()=>gameShowReward([['🎁','10','призовых попыток']], 'Призы x10')); }
   document.addEventListener('click',e=>{
@@ -332,7 +372,7 @@ gameEventTimer();
     const close=c.querySelector('.game-modal-close'); if(close)close.click();
   });
   const closeAll=()=>{
-    ['#gameRewardModal','#gameTasksModal','#gamePanelModal'].forEach(id=>{const el=$(id);if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true')}});
+    ['#gameRewardModal','#gameTasksModal','#gamePanelModal','#gameJackpotModal'].forEach(id=>{const el=$(id);if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true')}});
     gameUpdateStatus();
   };
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});

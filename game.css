@@ -260,3 +260,162 @@
   #game .game-bottom{height:80px;flex-basis:80px}
   #game .ancient-dice{height:64px}
 }
+
+
+/* Territory v65 — final cleanup after phone test.
+   Explicitly neutralize legacy generic .game-* rules from style.css. */
+#game .game-main{overflow:hidden!important;isolation:isolate!important}
+#game .game-harbor{
+  z-index:0!important;
+  background-image:
+    linear-gradient(180deg,rgba(2,10,15,.10),rgba(2,10,15,.18) 45%,rgba(1,8,12,.48) 100%),
+    url('./harbor_top.jpg')!important;
+  background-size:cover!important;
+  background-position:center 48%!important;
+  background-repeat:no-repeat!important;
+}
+#game .game-harbor:before{z-index:1!important;background:linear-gradient(180deg,rgba(2,10,15,0) 0 45%,rgba(2,10,15,.22) 70%,rgba(1,7,10,.52) 100%)!important}
+#game .game-harbor:after{z-index:2!important;background:radial-gradient(ellipse at 50% 48%,rgba(255,184,86,.10),transparent 52%),linear-gradient(180deg,transparent 55%,rgba(0,7,10,.34))!important}
+#game .game-board-wrap{z-index:4!important;background:transparent!important}
+#game .game-board-wrap:before,
+#game .game-board-wrap:after{display:none!important;content:none!important}
+#game .game-board-shell{
+  width:min(76vw,306px)!important;height:min(76vw,306px)!important;
+  max-width:306px!important;max-height:306px!important;
+  filter:drop-shadow(0 10px 15px rgba(0,0,0,.58))!important;
+}
+#game .game-board-shell:before{
+  inset:0!important;
+  background:linear-gradient(145deg,rgba(239,218,174,.94),rgba(190,151,94,.94) 56%,rgba(126,83,47,.96))!important;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;
+  box-shadow:inset 0 0 0 2px rgba(67,39,20,.65),inset 0 0 0 7px rgba(255,241,197,.20)!important;
+}
+/* Kill the old diamond pseudo-element that lived on .game-board itself. */
+#game .game-board:before,#game .game-board:after{display:none!important;content:none!important}
+#game .game-board{width:100%!important;height:100%!important;inset:0!important;overflow:visible!important}
+#game .board-cell{
+  width:14.2%!important;height:10.2%!important;
+  overflow:hidden!important;
+  border-width:2px!important;
+  border-radius:8px!important;
+  box-sizing:border-box!important;
+}
+#game .board-cell .tile-content{overflow:hidden!important;padding:2px!important;box-sizing:border-box!important}
+#game .board-cell small{display:none!important}
+#game .board-cell .tile-icon{font-size:13px!important;line-height:13px!important}
+#game .board-cell b{font-size:12px!important;line-height:12px!important}
+#game .board-cell.active{transform:translate(-50%,-50%) rotate(var(--tile-rot,0deg)) scale(1.12)!important}
+#game .game-center{
+  width:34%!important;height:34%!important;
+  border:3px solid #5b3720!important;border-radius:16px!important;
+  background:linear-gradient(145deg,#c79250,#8b592f 55%,#683f24)!important;
+  box-shadow:inset 0 0 0 3px #e0b36c,inset 0 0 0 7px rgba(75,43,22,.4),0 8px 14px rgba(0,0,0,.46)!important;
+  overflow:hidden!important;
+}
+#game .game-ship-wrap{width:82%!important;height:76%!important;border-radius:9px!important;overflow:hidden!important}
+#game .game-ship-art{
+  width:100%!important;height:100%!important;
+  background:url('./ship_only.png') center/cover no-repeat!important;
+  filter:none!important;animation:none!important;
+}
+#game .game-center b{font-size:8px!important;line-height:9px!important}
+#game .game-center small{font-size:5px!important;line-height:6px!important}
+#game .game-token{z-index:20!important}
+@media(max-width:430px){
+  #game .game-board-shell{width:min(78vw,306px)!important;height:min(78vw,306px)!important}
+}
+@media(max-width:360px){
+  #game .game-board-shell{width:274px!important;height:274px!important}
+  #game .board-cell{width:14%!important;height:10%!important}
+  #game .board-cell .tile-icon{font-size:11px!important}
+  #game .board-cell b{font-size:10px!important}
+  #game .game-center{width:35%!important;height:35%!important}
+}
+
+/* Territory Game v66 — video-reference gameplay composition */
+#game .game-main{background:#071820!important;padding:0 8px 4px!important}
+#game .game-harbor{display:block!important;inset:0!important;background-image:linear-gradient(180deg,rgba(4,14,21,.08),rgba(3,11,17,.38)),url('./harbor_top.jpg')!important;background-size:auto 100%!important;background-position:center center!important;background-repeat:no-repeat!important}
+#game .game-board-wrap{width:100%!important;max-width:430px!important;margin:auto!important}
+#game .game-board-shell{width:min(91vw,405px)!important;height:min(91vw,405px)!important;aspect-ratio:1!important;filter:drop-shadow(0 8px 11px #000a)!important}
+#game .game-board-shell:before{content:''!important;display:block!important;position:absolute!important;inset:10%!important;border-radius:22px!important;transform:rotate(45deg)!important;background:linear-gradient(145deg,rgba(217,188,137,.82),rgba(143,101,58,.80))!important;border:1px solid rgba(239,207,145,.75)!important;box-shadow:inset 0 0 24px #3d241888,0 7px 14px #0008!important;z-index:0!important}
+#game .board-cell{width:clamp(36px,10.7vw,47px)!important;height:clamp(36px,10.7vw,47px)!important;border-radius:9px!important;padding:1px!important;border:1.5px solid #6d4a2d!important;background:linear-gradient(145deg,#f4dfad,#c79755)!important;box-shadow:0 3px 5px #0008,inset 0 1px #fff9!important}
+#game .board-cell .tile-icon{font-size:15px!important;line-height:15px!important}
+#game .board-cell .tile-content b{font-size:8px!important;line-height:9px!important;margin:1px 0 0!important}
+#game .board-cell .tile-content small{display:none!important}
+#game .board-cell.passed:not(.start):not(.finish){background:linear-gradient(145deg,#bd79cf,#69437f)!important;color:#fff3d8!important;border-color:#dfb2ed!important}
+#game .board-cell.active{transform:translate(-50%,-50%) scale(1.12)!important;box-shadow:0 0 0 2px #ffe38a,0 0 15px #ffd35e,0 4px 7px #0009!important}
+#game .game-center{width:45%!important;height:45%!important;border-radius:18px!important;background:linear-gradient(180deg,rgba(20,27,27,.72),rgba(7,18,22,.9))!important;border:2px solid #b68b4c!important;box-shadow:inset 0 0 18px #000b,0 5px 12px #000b!important;overflow:visible!important}
+#game .game-ship-wrap{width:116%!important;height:82%!important;overflow:visible!important;margin-top:-10%!important}
+#game .game-ship-art{background-size:contain!important;filter:drop-shadow(0 6px 5px #0009) contrast(1.05) brightness(.95)!important}
+#game .game-center b{margin-top:-5px!important;font-size:12px!important}.game-center small{font-size:6px!important}
+#game .game-center:after{content:'КРУГ ' attr(data-lap);position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:10px;background:#3c291c;border:1px solid #c49a5c;color:#f5dca7;font:700 8px Georgia,serif;white-space:nowrap}
+#game .game-token{font-size:25px!important;filter:drop-shadow(0 2px 2px #000)!important}
+#game .game-token.moving{animation:tokenHop .3s ease!important}@keyframes tokenHop{50%{transform:translateY(-10px) scale(1.18)}}
+#game .game-cell-info{background:rgba(19,14,10,.94)!important;border-color:#a97a42!important}
+#game .ancient-dice:not(:disabled){animation:diceGlow 2.4s ease-in-out infinite}@keyframes diceGlow{50%{box-shadow:inset 0 1px 0 #fff5,0 4px 8px #0009,0 0 15px #d49a3f88}}
+#game.rolling .ancient-dice{animation:diceRoll .3s linear infinite!important}@keyframes diceRoll{to{transform:rotate(8deg) scale(.96)}}
+#game .reward-item{display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto auto;align-items:center;padding:9px;border:1px solid #6c5135;border-radius:10px;background:#201a16}.reward-item i{grid-row:1/3;font-size:28px;font-style:normal}.reward-item b{font-size:18px;color:#f0cc84}.reward-item small{font-size:9px;color:#c9baa0}
+@media(max-height:760px){#game .game-board-shell{width:min(82vw,345px)!important;height:min(82vw,345px)!important}#game .board-cell{width:38px!important;height:38px!important}.game-board-shell .tile-icon{font-size:13px!important}}
+
+/* Territory v66 — rebuilt from the supplied gameplay video.
+   Compact route over the Sdolars harbor, central ship, progressive cells. */
+#game .game-main{padding:0 0 2px!important;background:#06151b!important}
+#game .game-harbor{
+  inset:0!important;
+  background-image:linear-gradient(180deg,rgba(1,8,13,.05),rgba(1,9,14,.12) 58%,rgba(1,8,12,.5)),url('./harbor_top.jpg')!important;
+  background-size:auto 100%!important;background-position:center center!important;background-repeat:no-repeat!important;
+}
+#game .game-board-wrap{align-items:center!important;padding:4px 0!important}
+#game .game-board-shell{width:min(88vw,354px)!important;height:min(88vw,354px)!important;max-width:354px!important;max-height:354px!important;filter:drop-shadow(0 8px 10px #0009)!important}
+#game .game-board-shell:before{inset:8%!important;background:rgba(8,28,35,.24)!important;border:1px solid rgba(226,185,116,.28)!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;box-shadow:inset 0 0 26px #00151dcc!important}
+#game .board-cell{width:12.8%!important;height:10.5%!important;border:1.5px solid #684526!important;border-radius:7px!important;background:linear-gradient(145deg,#f2dfb5,#c79b5e)!important;box-shadow:inset 0 1px #fff8,0 2px 4px #0008!important;transform:translate(-50%,-50%)!important}
+#game .board-cell .tile-content{transform:none!important}
+#game .board-cell .tile-icon{font-size:14px!important;line-height:14px!important}
+#game .board-cell b{font-size:10px!important;line-height:10px!important;color:#49301d!important}
+#game .board-cell.passed{background:linear-gradient(145deg,#9c6bd2,#56347d)!important;border-color:#d8b8ff!important;filter:saturate(1.05)!important}
+#game .board-cell.passed b{color:#fff3d4!important}
+#game .board-cell.active{transform:translate(-50%,-50%) scale(1.15)!important;outline:2px solid #fff0a3!important;z-index:12!important}
+#game .game-center{width:48%!important;height:48%!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+#game .game-ship-wrap{width:100%!important;height:100%!important;border-radius:0!important;overflow:visible!important;margin:0!important}
+#game .game-ship-art{background:url('./ship_only.png') center/contain no-repeat!important;filter:drop-shadow(0 7px 5px #0008)!important}
+#game .game-lap-plaque{position:absolute;left:50%;bottom:2%;transform:translateX(-50%);min-width:62px;padding:3px 10px;border:1px solid #d5a25e;border-radius:10px;background:rgba(55,33,20,.9);font:700 8px Georgia,serif;color:#ffe2a5;text-align:center;box-shadow:0 2px 5px #0008}
+#game .game-lap-plaque b{font-size:9px!important;color:#fff0bd!important}
+#game .game-token{font-size:24px!important;filter:drop-shadow(0 2px 2px #000)!important}
+#game .game-cell-info{flex-basis:39px!important;min-height:39px!important;margin:0 12px 2px!important;background:rgba(18,14,11,.92)!important}
+#game .game-bottom{height:92px!important;flex-basis:92px!important;background:linear-gradient(180deg,#d5f2f1,#a9dfe5)!important;color:#3b3026!important;border-top:1px solid #779ba0!important}
+#game .dice-count b{color:#3c2c20!important}.dice-count small{color:#6f7e7f!important}
+#game .skip-roll{color:#4c5556!important}
+#game .ancient-dice{height:76px!important;border:3px solid #71441e!important;background:linear-gradient(145deg,#f7d987,#c88937 55%,#79431d)!important;color:#4a2b17!important;box-shadow:0 6px 0 #613717,0 8px 12px #0005!important}
+#game.rolling .ancient-dice{animation:v66Dice .28s linear infinite}
+@keyframes v66Dice{50%{transform:rotate(8deg) scale(.94)}}
+@media(max-height:760px){#game .game-board-shell{width:min(78vw,310px)!important;height:min(78vw,310px)!important}#game .game-bottom{height:82px!important;flex-basis:82px!important}#game .ancient-dice{height:68px!important}}
+
+
+/* Territory v67 — 27-cell route + Jackpot reward preview */
+#game .game-reward-head{height:28px;flex:0 0 28px;display:flex;align-items:center;justify-content:space-between;padding:2px 9px;background:#07151c;border-bottom:1px solid #715d40;color:#e9d7b3;font-size:8px}
+#game .game-reward-head b{font-family:Georgia,serif;font-size:9px}
+#game .game-reward-head button{border:1px solid #b98a4b;border-radius:7px;background:#4a2f20;color:#f5d9a3;font-size:7px;font-weight:800;padding:4px 8px}
+#game .game-reward-track{height:55px!important;flex-basis:55px!important}
+#game .reward-step{min-width:76px!important;height:46px!important}
+#game .game-board-shell{width:min(92vw,410px)!important;height:min(92vw,410px)!important}
+#game .board-cell{width:clamp(38px,11.5vw,54px)!important;height:clamp(38px,11.5vw,54px)!important;border-radius:9px!important}
+#game .tile-icon{font-size:15px!important}
+#game .tile-content b{font-size:8px!important}
+#game .game-center{width:42%!important;height:42%!important}
+#game .game-ship-wrap{width:92%!important;height:74%!important}
+#game .game-jackpot-modal{position:absolute;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:48px 13px 24px}
+#game .game-jackpot-modal.show{display:flex}
+#game .game-jackpot-card{position:relative;width:min(94%,430px);height:min(82%,650px);border:2px solid #9b7441;border-radius:12px;background:#f7f0df;color:#3a2b20;box-shadow:0 12px 30px #000b;overflow:hidden;display:flex;flex-direction:column}
+#game .jackpot-title{flex:0 0 42px;background:linear-gradient(180deg,#56321f,#352018);color:#f7dba6;font:800 13px Georgia,serif;text-align:center;padding:12px 40px 8px;border-bottom:2px solid #b98543}
+#game #jackpotClose{z-index:3;right:7px;top:6px;width:29px;height:29px;border-radius:50%;background:#e52272;border:1px solid #ff9abf;color:#fff;font-size:21px}
+#game .jackpot-list{overflow:auto;padding:7px 6px 16px;background:#f2ead7;scrollbar-width:thin}
+#game .jackpot-group{margin:0 0 7px;border:1px solid #c8b78e;border-radius:7px;background:#fffaf0;box-shadow:0 2px 4px rgba(58,43,32,.15);overflow:hidden}
+#game .jackpot-group-title{height:21px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#7650a7,#563579);color:#fff6e9;font:800 9px Georgia,serif;letter-spacing:.2px}
+#game .jackpot-row{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:4px}
+#game .jackpot-reward{min-width:0;height:57px;border:1px solid #b9aa88;border-radius:4px;background:#fffdf7;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;position:relative}
+#game .jackpot-reward span{font-size:20px;line-height:21px}
+#game .jackpot-reward b{font-size:8px;margin-top:2px}
+#game .jackpot-reward small{font-size:5.5px;color:#3b9349;margin-top:4px;white-space:nowrap}
+#game .jackpot-reward.claimed{background:#eef7e9;border-color:#9acb8c}
+#game .jackpot-reward.claimed span{color:#17952b;font-size:25px;font-weight:900;text-shadow:0 1px 0 #fff}
+@media(max-width:390px){#game .game-reward-head{height:26px;flex-basis:26px}#game .game-board-shell{width:min(88vw,370px)!important;height:min(88vw,370px)!important}#game .board-cell{width:clamp(35px,10.8vw,48px)!important;height:clamp(35px,10.8vw,48px)!important}#game .tile-icon{font-size:13px!important}#game .tile-content b{font-size:7px!important}#game .jackpot-reward{height:53px}#game .jackpot-reward span{font-size:18px}}
