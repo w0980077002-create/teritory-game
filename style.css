@@ -1193,3 +1193,26 @@ body:has(#home.active) .real-home.city-event-active .npc-label{filter:none!impor
  body:has(#home.active) .city-event-card p{font-size:7px!important;line-height:10px!important;margin:2px 0 5px!important}
  body:has(#home.active) .city-event-actions button{font-size:7px!important;padding:4px 3px!important}
 }
+
+
+/* Territory v35 — city events become a compact game HUD, not a screen-covering card */
+body:has(#home.active) .scene-action{z-index:95!important;bottom:78px!important;max-width:72%!important;min-height:0!important;padding:7px 10px!important;font-size:9px!important;border-radius:10px!important;transform:none!important}
+body:has(#home.active) .city-event{inset:auto 0 auto 0!important;top:25%!important;bottom:auto!important;height:auto!important;padding:0!important;background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;z-index:100!important;align-items:flex-start!important}
+body:has(#home.active) .city-event-card{width:min(300px,72%)!important;max-height:none!important;padding:7px 8px!important;border-radius:11px!important;background:linear-gradient(180deg,rgba(8,16,25,.90),rgba(5,11,18,.92))!important;box-shadow:0 7px 20px rgba(0,0,0,.32)!important}
+body:has(#home.active) .city-event-card small{font-size:6px!important;letter-spacing:1.1px!important;margin-bottom:1px!important}
+body:has(#home.active) .city-event-card b{font-size:11px!important;line-height:13px!important}
+body:has(#home.active) .city-event-card p{margin:1px 0 5px!important;font-size:7px!important;line-height:9px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body:has(#home.active) .city-event-actions{gap:4px!important}
+body:has(#home.active) .city-event-actions button{padding:4px 3px!important;min-height:21px!important;font-size:7px!important;border-radius:7px!important}
+body:has(#home.active) .real-home.city-event-active .scene-action{display:none!important}
+@media(max-width:390px){
+ body:has(#home.active) .city-event-card{width:68%!important;padding:6px 7px!important}
+ body:has(#home.active) .city-event-card p{font-size:6.5px!important}
+}
+
+
+/* Territory v36 — автоматический поток событий остаётся компактным */
+body:has(#home.active) .city-event{top:25%!important;z-index:100!important}
+body:has(#home.active) .city-event-card{animation:cityEventIn .28s ease-out}
+@keyframes cityEventIn{from{transform:translateY(-8px);opacity:.2}to{transform:translateY(0);opacity:1}}
+body:has(#home.active) .city-event-actions button{transition:transform .12s ease,background .12s ease}

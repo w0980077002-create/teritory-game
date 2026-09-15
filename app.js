@@ -81,7 +81,7 @@ $("#spinBtn").onclick=()=>{
 };
 render();
 showScreen("home");
-/* Territory v30 — живой игровой город */
+/* Territory v35 — живой игровой город: без навязчивого автоспама */
 (function initLivingCity(){
   const home=document.querySelector('.real-home');
   if(!home || home.dataset.lifeReady==='1') return;
@@ -91,39 +91,18 @@ showScreen("home");
   const weapon=home.querySelector('.hs-weapon');
   const guard=home.querySelector('.guard-label');
   const trader=home.querySelector('.trader-label');
-  const messages=[
-    'Ворота Sdolars охраняются. В городе спокойно.',
-    'К городским воротам прибыл вечерний караван.',
-    'На рынке продолжается торговля.',
-    'Страж проверяет прибывающих в город.',
-    'В центральном квартале становится оживлённее.'
-  ];
-  let msg=0, timer;
+  let timer;
   function notify(text){
-    if(!action) return;
+    if(!action)return;
     action.textContent=text;
     action.classList.remove('show');
     void action.offsetWidth;
     action.classList.add('show');
     clearTimeout(timer);
-    timer=setTimeout(()=>action.classList.remove('show'),3600);
+    timer=setTimeout(()=>action.classList.remove('show'),3000);
   }
-  function ambient(){
-    if(document.querySelector('#home.active')) notify(messages[msg++%messages.length]);
-  }
-  setTimeout(ambient,1800);
-  setInterval(ambient,12000);
-
-  // Небольшой отклик на реальные игровые точки города.
-  [[center,'Центральный квартал Sdolars'],[weapon,'Оружейная: покупка и ремонт'],[guard,'Страж: охрана города'],[trader,'Торговец: покупка / продажа']]
+  [[center,'Центральный квартал Sdolars'],[weapon,'Оружейная: покупка и ремонт'],[guard,'Страж: «В городе спокойно. Будь внимателен.»'],[trader,'Торговец: «Посмотри товары, странник.»']]
     .forEach(([el,text])=>el&&el.addEventListener('click',()=>notify(text)));
-
-  // Ночной цикл: лёгкое изменение яркости без "плавления" изображения.
-  let night=false;
-  setInterval(()=>{
-    night=!night;
-    home.classList.toggle('night-pulse',night);
-  },26000);
 })();
 
 /* Territory v32 — scene interactions */
@@ -147,7 +126,7 @@ showScreen("home");
 })();
 
 
-/* Territory v33 — реальные городские события с наградой */
+/* Territory v36 — живой автоматический поток городских событий */
 (function cityEvents(){
   const home=document.querySelector('.real-home');
   const event=document.querySelector('#cityEvent');
@@ -155,29 +134,56 @@ showScreen("home");
   const title=document.querySelector('#cityEventTitle');
   const text=document.querySelector('#cityEventText');
   const kicker=document.querySelector('#cityEventKicker');
-  let timer=null, opened=false;
+  let timer=null, nextTimer=null, opened=false, lastIndex=-1;
   const events=[
-    {k:'СОБЫТИЕ ГОРОДА',t:'Вечерний караван',d:'У ворот Sdolars появился торговый караван.',help:'Караванщики отблагодарили тебя: +60 🪙',trade:'Удачный торг: +35 🪙',h:60,tr:35},
-    {k:'ГОРОДСКАЯ СЛУЖБА',t:'Тревога у ворот',d:'Страж заметил подозрительное движение за стеной.',help:'Ты помог стражу. Награда: +45 🪙 +10 XP',trade:'Сейчас не до торговли. Страж благодарит тебя.',h:45,tr:0},
-    {k:'СЛУЧАЙНАЯ ВСТРЕЧА',t:'Потерянный кошель',d:'На площади кто-то обронил кошель с монетами.',help:'Ты вернул кошель хозяину: +80 🪙',trade:'Ты оставил находку себе: +25 🪙',h:80,tr:25}
+    {k:'СОБЫТИЕ ГОРОДА',t:'Вечерний караван',d:'У ворот Sdolars появился торговый караван.',help:'Караванщики отблагодарили тебя: +60 🪙',trade:'Удачный торг: +35 🪙',h:60,tr:35,xp:10},
+    {k:'ГОРОДСКАЯ СЛУЖБА',t:'Тревога у ворот',d:'Страж заметил подозрительное движение за стеной.',help:'Ты помог стражу. +45 🪙 +10 XP',trade:'Сейчас не до торговли.',h:45,tr:0,xp:10},
+    {k:'СЛУЧАЙНАЯ ВСТРЕЧА',t:'Потерянный кошелёк',d:'На площади кто-то обронил кошелёк с монетами.',help:'Ты вернул кошелёк хозяину: +80 🪙',trade:'Ты оставил находку себе: +25 🪙',h:80,tr:25,xp:8},
+    {k:'СЛУХИ ГОРОДА',t:'Странник у таверны',d:'Незнакомец шепчет о дороге, которая открылась за стеной.',help:'Ты выслушал странника: +30 🪙 +12 XP',trade:'Ты обменялся новостями: +20 🪙',h:30,tr:20,xp:12},
+    {k:'ГОРОДСКАЯ ЖИЗНЬ',t:'Ссора на рынке',d:'Двое торговцев спорят прямо посреди площади.',help:'Ты помог уладить спор: +50 🪙 +10 XP',trade:'Ты сделал ставку на исход: +40 🪙',h:50,tr:40,xp:10},
+    {k:'РЕДКОЕ СОБЫТИЕ',t:'Посыльный из-за стен',d:'В город прибыл раненый посыльный с важной вестью.',help:'Ты помог посыльному: +120 🪙 +20 XP',trade:'Ты получил плату за доставку: +70 🪙',h:120,tr:70,xp:20}
   ];
-  function close(){event.classList.remove('show');home.classList.remove('city-event-active');opened=false;clearTimeout(timer)}
+  function close(){
+    event.classList.remove('show');
+    home.classList.remove('city-event-active');
+    opened=false;
+    clearTimeout(timer);
+    scheduleNext(9000+Math.random()*10000);
+  }
+  function pickEvent(){
+    let i=Math.floor(Math.random()*events.length);
+    if(events.length>1 && i===lastIndex) i=(i+1)%events.length;
+    lastIndex=i; return events[i];
+  }
   function open(){
-    if(opened)return; opened=true; home.classList.add('city-event-active');
-    const e=events[Math.floor(Math.random()*events.length)]; event._current=e;
-    kicker.textContent=e.k;title.textContent=e.t;text.textContent=e.d;event.classList.add('show');
+    if(opened || !document.querySelector('#home.active')) return;
+    opened=true; home.classList.add('city-event-active');
+    const e=pickEvent(); event._current=e;
+    kicker.textContent=e.k; title.textContent=e.t; text.textContent=e.d;
+    event.querySelector('.city-event-actions').innerHTML='<button data-event="help">Помочь</button><button data-event="trade">Торговать</button><button data-event="close">Позже</button>';
+    event.classList.add('show');
+    clearTimeout(timer);
+    timer=setTimeout(()=>close(),15000);
+  }
+  function scheduleNext(ms){
+    clearTimeout(nextTimer);
+    nextTimer=setTimeout(open,ms);
   }
   event.addEventListener('click',e=>{
     const b=e.target.closest('[data-event]'); if(!b)return;
     const cur=event._current;
-    if(b.dataset.event==='close'){close();return}
+    if(b.dataset.event==='close'){close();return;}
     const reward=b.dataset.event==='help'?cur.h:cur.tr;
-    if(reward){state.coins+=reward;state.exp+=10; if(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp} save();}
+    if(reward){
+      state.coins+=reward;
+      state.exp+=cur.xp||10;
+      while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp;}
+      save();
+    }
     text.textContent=b.dataset.event==='help'?cur.help:cur.trade;
     event.querySelector('.city-event-actions').innerHTML='<button data-event="close">Продолжить</button>';
-    timer=setTimeout(close,2600);
+    clearTimeout(timer); timer=setTimeout(close,2600);
   });
-  // Первое событие после входа и затем с паузой — не спамит игрока.
-  setTimeout(()=>{if(document.querySelector('#home.active'))open()},6500);
-  setInterval(()=>{if(document.querySelector('#home.active')&&!opened&&Math.random()<.72)open()},30000);
+  // Город начинает жить сам: первое событие — быстро, затем новые встречи появляются регулярно.
+  scheduleNext(7000);
 })();
