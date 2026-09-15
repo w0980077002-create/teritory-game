@@ -1280,3 +1280,46 @@ body:has(#home.active) .alex-mini-btn:active{transform:scale(.97)}
  .game-side-stack{display:none;}
  .game-status{bottom:7px;left:6px;right:6px;}
 }
+
+
+/* Territory v43 — Game: diamond board, true token path, compact mobile composition */
+.game-screen{background:linear-gradient(180deg,#5dc6df 0%,#aee8f0 58%,#d8f3f4 100%)!important;color:#4a2b18}
+.game-board-wrap{background:
+ radial-gradient(circle at 50% 54%,rgba(255,255,255,.10),transparent 34%),
+ radial-gradient(circle at 12% 22%,rgba(255,255,255,.55) 0 2px,transparent 3px),
+ radial-gradient(circle at 86% 28%,rgba(255,255,255,.5) 0 2px,transparent 3px),
+ linear-gradient(180deg,#62c8e0 0%,#78d2e2 48%,#d7f4f6 100%)!important;
+ height:auto!important;min-height:0!important;position:relative;overflow:hidden}
+.game-board-wrap:after{content:'';position:absolute;left:50%;top:50%;width:min(82%,370px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(45deg);border-radius:20px;background:linear-gradient(145deg,rgba(17,105,127,.18),rgba(255,255,255,.05));box-shadow:0 12px 24px rgba(20,83,99,.20);pointer-events:none;z-index:0}
+.game-board{z-index:2;width:min(88%,390px)!important;aspect-ratio:1/1!important;filter:drop-shadow(0 10px 10px rgba(24,82,97,.30))!important;transform:translate(-50%,-50%)!important}
+.game-board:before{inset:0!important;border-radius:0!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;background:linear-gradient(145deg,rgba(22,118,142,.10),rgba(255,255,255,.03))!important;box-shadow:none!important}
+.board-cell{width:14.2%!important;height:10.8%!important;border-radius:7px!important;border:2px solid #8b6738!important;transform:translate(-50%,-50%) rotate(var(--tile-angle))!important;transform-origin:center!important;z-index:3!important;padding:0!important;overflow:visible!important}
+.board-cell .tile-content{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;transform:rotate(calc(-1 * var(--tile-angle)))!important;line-height:1!important}
+.board-cell .tile-icon{font-size:14px!important;line-height:14px!important}
+.board-cell b{font-size:14px!important;line-height:16px!important}
+.board-cell small{font-size:6px!important;line-height:7px!important;white-space:nowrap!important}
+.board-cell.active{transform:translate(-50%,-50%) rotate(var(--tile-angle)) scale(1.10)!important;filter:brightness(1.16)!important;box-shadow:0 0 0 2px rgba(255,232,142,.95),0 5px 12px rgba(73,50,22,.35)!important}
+.game-center{width:39%!important;height:39%!important;border:0!important;border-radius:50%!important;background:radial-gradient(circle,rgba(25,130,151,.08),rgba(14,89,110,.02) 70%,transparent 71%)!important;box-shadow:none!important;z-index:4!important}
+.game-center .game-ship{font-size:72px!important;filter:drop-shadow(0 5px 3px rgba(25,48,55,.45))!important;animation:shipSway 3.2s ease-in-out infinite}
+.game-center b{font-size:10px!important;text-shadow:0 2px 2px rgba(0,40,55,.55)!important}
+.game-center small{font-size:7px!important}
+@keyframes shipSway{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+.game-token{left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;font-size:27px!important;z-index:14!important;pointer-events:none!important;transition:left .28s cubic-bezier(.2,.8,.25,1),top .28s cubic-bezier(.2,.8,.25,1),transform .18s ease!important}
+.game-token.moving{animation:tokenStep .28s ease-in-out!important}
+@keyframes tokenStep{50%{transform:translate(-50%,-70%) scale(1.10)!important}}
+.game-side-stack{right:7px!important;bottom:18px!important;top:auto!important;gap:5px!important;z-index:20!important}
+.game-side-stack button{width:74px!important;min-height:54px!important;padding:4px!important;background:rgba(13,55,70,.72)!important;border:1px solid rgba(223,239,230,.78)!important;border-radius:9px!important;box-shadow:0 4px 10px rgba(10,60,75,.30)!important}
+.game-side-stack span{font-size:18px!important;line-height:18px!important}.game-side-stack b{font-size:6px!important;line-height:8px!important}
+.game-status{left:50%!important;right:auto!important;bottom:8px!important;transform:translateX(-50%)!important;width:min(70%,260px)!important;padding:5px 8px!important;background:rgba(12,58,72,.68)!important;border:1px solid rgba(225,241,242,.55)!important;font-size:7px!important;z-index:21!important}
+.game-bottom{height:126px!important;flex-basis:126px!important;justify-content:center!important;gap:13px!important;background:linear-gradient(180deg,#d8f4f4,#a8dfe8)!important;position:relative!important}
+.game-prize-badge{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:66px;color:#fff7d7;text-shadow:0 2px 2px rgba(29,71,79,.8);font-size:7px}
+.game-prize-badge span{font-size:27px;line-height:25px;filter:drop-shadow(0 2px 2px rgba(30,77,87,.35))}.game-prize-badge b{font-size:7px;white-space:nowrap}
+.ancient-dice{width:82px!important;height:82px!important;border-radius:20px!important;border:3px solid #704318!important;background:linear-gradient(145deg,#fff0ad 0%,#e1a44d 55%,#a95d22 100%)!important;box-shadow:0 8px 0 #633716,0 12px 18px rgba(31,75,84,.28)!important;position:relative;overflow:hidden}
+.ancient-dice:before{content:'';position:absolute;inset:5px;border-radius:14px;border:1px solid rgba(92,51,18,.28);pointer-events:none}.dice-face{font-size:41px!important;line-height:42px!important;color:#4c2a12!important;text-shadow:0 2px 0 rgba(255,235,165,.45)!important}.ancient-dice small{font-size:7px!important;letter-spacing:1px!important}
+.game-screen.rolling .game-board:after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,245,182,.22),transparent 38%);animation:rollGlow .55s ease-in-out infinite alternate;pointer-events:none;z-index:20}@keyframes rollGlow{to{opacity:.3;transform:scale(1.03)}}
+.game-reward-track{height:61px!important;padding:6px 9px!important;gap:6px!important;background:linear-gradient(#8a5028,#a96a32)!important}
+.reward-step{border-radius:9px!important}.reward-step .reward-icon{font-size:19px!important}.reward-step small{font-size:7px!important}.reward-step.done{background:linear-gradient(#4f8248,#29552f)!important}
+.game-modal-card{border-radius:17px!important}
+@media(max-width:390px){
+ .game-topbar{height:58px!important}.game-reward-track{height:54px!important;padding:5px!important}.game-board{width:91%!important}.game-board-wrap{min-height:0!important}.board-cell{width:15%!important;height:11.2%!important}.board-cell .tile-icon{font-size:12px!important}.board-cell b{font-size:13px!important}.board-cell small{font-size:5.5px!important}.game-center .game-ship{font-size:62px!important}.game-side-stack{right:5px!important;bottom:15px!important}.game-side-stack button{width:68px!important;min-height:49px!important}.game-bottom{height:116px!important;flex-basis:116px!important;gap:9px!important}.game-prize-badge{min-width:52px}.game-prize-badge span{font-size:23px}.ancient-dice{width:72px!important;height:72px!important}.dice-face{font-size:35px!important}.game-status{bottom:5px!important}}
+@media(max-height:700px){.game-board{width:min(78%,340px)!important}.game-side-stack{bottom:10px!important}.game-bottom{height:108px!important;flex-basis:108px!important}.ancient-dice{width:68px!important;height:68px!important}.game-prize-badge{display:none}.game-status{bottom:5px!important}}
