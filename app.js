@@ -2,8 +2,8 @@ const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:10
 let state=JSON.parse(localStorage.getItem("territory_save_v1")||"null")||structuredClone(defaultState);
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
 state.gameDice=Number(state.gameDice??47); state.gameRolls=Number(state.gameRolls??0); state.gameSteps=Number(state.gameSteps??0); state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?state.gameTaskClaims:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?state.gamePanelClaims:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=20; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
-const zones=["head","chest","stomach","waist","legs"];
-const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
+const zones=["head","chest","stomach","legs"];
+const names={head:"Голова",chest:"Грудь",stomach:"Живот",legs:"Ноги"};
 const weapons=[
  {name:"Боевой топор",icon:"🪓",damage:12,cost:300},
  {name:"Стальной меч",icon:"⚔️",damage:18,cost:650},
@@ -27,44 +27,52 @@ function showScreen(id){
  if(id==="arena") resetTactical();
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b)showScreen(b.dataset.screen)});
+let arenaMode="duel", arenaStarted=false, arenaSeconds=180, arenaTimerId=null, arenaTeam=1;
+function arenaJournal(text){ const j=$("#combatJournal"); if(!j)return; const line=document.createElement("span"); line.textContent=text; j.prepend(line); while(j.children.length>5)j.lastElementChild.remove(); }
+function arenaModeInfo(mode){
+ const data={duel:["БОЙ 1×1","Найди противника и начни бой","Один против одного. Создатель запускает отсчёт на 3 минуты.","1/2"],chaos:["ХАОТИЧЕСКИЙ БОЙ","Входи в общий бой","Игроки входят в одно окно, а команды распределяются случайно.","1/20"],group:["ГРУППОВОЙ БОЙ","Выбери команду","До 20 участников. Можно выбрать команду 1 или 2 до старта.","1/20"]}; return data[mode]||data.duel;
+}
+function renderArenaMode(){
+ const d=arenaModeInfo(arenaMode); ["#arenaModeKicker","#arenaModeTitle","#arenaModeText","#arenaPlayers"].forEach((sel,i)=>{const el=$(sel);if(el)el.textContent=d[i]});
+ const picker=$("#teamPicker"); if(picker)picker.hidden=arenaMode!=="group";
+ document.querySelectorAll(".arena-mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===arenaMode));
+}
 function resetTactical(){
  document.querySelectorAll(".zones button").forEach(b=>b.classList.remove("selected"));
- $("#fightBtn").disabled=true; $("#combatLog").textContent="Выберите зону атаки и две зоны защиты.";
+ const f=$("#fightBtn"); if(f)f.disabled=true;
+ const log=$("#combatLog"); if(log)log.textContent=arenaStarted?"Выберите зону удара и две зоны защиты.":"Создай бой. После старта выбери удар и две зоны защиты.";
 }
-$("#attackZones").addEventListener("click",e=>{
- const b=e.target.closest("button"); if(!b)return;
- document.querySelectorAll("#attackZones button").forEach(x=>x.classList.remove("selected")); b.classList.add("selected"); updateFight();
-});
-$("#defenseZones").addEventListener("click",e=>{
- const b=e.target.closest("button"); if(!b)return;
- b.classList.toggle("selected");
- const selected=[...document.querySelectorAll("#defenseZones button.selected")];
- if(selected.length>2) selected[0].classList.remove("selected");
- updateFight();
-});
-function updateFight(){
- const a=$("#attackZones button.selected"); const d=document.querySelectorAll("#defenseZones button.selected");
- $("#fightBtn").disabled=!(a&&d.length===2);
+function startArena(){
+ if(arenaStarted)return;
+ arenaStarted=true; arenaSeconds=180; const btn=$("#arenaJoinBtn"); if(btn)btn.textContent="Бой создан · ждём игроков";
+ if(arenaMode==="group"){$("#arenaPlayers").textContent="1/20";} else if(arenaMode==="chaos"){$("#arenaPlayers").textContent="1/20";} else {$("#arenaPlayers").textContent="1/2";}
+ const f=$("#fightBtn"); if(f)f.disabled=true;
+ if(arenaTimerId)clearInterval(arenaTimerId);
+ arenaTimerId=setInterval(()=>{arenaSeconds=Math.max(0,arenaSeconds-1); const m=String(Math.floor(arenaSeconds/60)).padStart(2,"0"),s=String(arenaSeconds%60).padStart(2,"0"); [$("#arenaTimer"),$("#arenaCountdown")].forEach(e=>{if(e)e.textContent=`${m}:${s}`}); if(arenaSeconds===0){clearInterval(arenaTimerId); const l=$("#combatLog");if(l)l.textContent="Бой начался автоматически. Выбирайте удар и защиту."; const fb=$("#fightBtn");if(fb)fb.disabled=false; arenaJournal("Система: отсчёт завершён — бой начался.");}} ,1000);
+ arenaJournal(`Система: создан ${arenaModeInfo(arenaMode)[0]}. Команда ${arenaTeam}.`); const l=$("#combatLog");if(l)l.textContent="Ожидаем старт боя…";
 }
-$("#fightBtn").onclick=()=>{
- const attack=$("#attackZones button.selected").dataset.zone;
- const defense=[...document.querySelectorAll("#defenseZones button.selected")].map(x=>x.dataset.zone);
- const enemyDefense=zones[Math.floor(Math.random()*5)];
- const damage=state.bonusDamage+10+(attack==="head"?4:attack==="legs"?2:0);
- let dealt=enemyDefense===attack?Math.max(3,Math.floor(damage*.35)):damage;
- state.enemyHp=Math.max(0,state.enemyHp-dealt);
- const enemyAttack=zones[Math.floor(Math.random()*5)];
- const enemyDamage=10;
- const blocked=defense.includes(enemyAttack);
- const taken=blocked?0:enemyDamage;
- state.hp=Math.max(0,state.hp-taken);
- $("#combatLog").textContent=`Вы: ${names[attack]} → −${dealt} HP. Враг атакует: ${names[enemyAttack]}${blocked?" — БЛОК!":" — −"+taken+" HP."}`;
- $("#turnLabel").textContent="ХОД "+(Number($("#turnLabel").textContent.replace(/\D/g,""))+1);
- if(state.enemyHp<=0){state.coins+=150;state.exp+=40;$("#combatLog").textContent+=" Победа! +150 🪙 +40 XP.";state.enemyHp=100;}
- if(state.hp<=0){state.hp=state.maxHp;state.coins=Math.max(0,state.coins-100);$("#combatLog").textContent+=" Вы проиграли. Восстановление −100 🪙.";}
- if(state.exp>=100){state.level++;state.exp-=100;state.maxHp+=10;state.hp=state.maxHp;$("#combatLog").textContent+=" Новый уровень!";}
- save(); resetTactical();
-};
+function leaveArena(){ arenaStarted=false; if(arenaTimerId)clearInterval(arenaTimerId); arenaSeconds=180; const b=$("#arenaJoinBtn");if(b)b.textContent="Создать бой"; const f=$("#fightBtn");if(f)f.disabled=true; const l=$("#combatLog");if(l)l.textContent="Создай бой. После старта выбери удар и две зоны защиты."; arenaJournal("Система: бой закрыт."); }
+$("#arenaModes")?.addEventListener("click",e=>{const b=e.target.closest(".arena-mode");if(!b||arenaStarted)return;arenaMode=b.dataset.mode;renderArenaMode();resetTactical();});
+$("#arenaJoinBtn")?.addEventListener("click",startArena);
+$("#arenaLeaveBtn")?.addEventListener("click",leaveArena);
+$("#teamPicker")?.addEventListener("click",e=>{const b=e.target.closest("button[data-team]");if(!b)return;arenaTeam=Number(b.dataset.team);document.querySelectorAll("#teamPicker button").forEach(x=>x.classList.toggle("selected",x===b));});
+$("#attackZones")?.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(!arenaStarted){return;}document.querySelectorAll("#attackZones button").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");updateFight();});
+$("#defenseZones")?.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||!arenaStarted)return;b.classList.toggle("selected");const selected=[...document.querySelectorAll("#defenseZones button.selected")];if(selected.length>2)selected[0].classList.remove("selected");updateFight();});
+function updateFight(){const a=$("#attackZones button.selected"),d=document.querySelectorAll("#defenseZones button.selected"),f=$("#fightBtn");if(f)f.disabled=!(arenaStarted&&a&&d.length===2);}
+$("#fightBtn")?.addEventListener("click",()=>{
+ const a=$("#attackZones button.selected");const ds=[...document.querySelectorAll("#defenseZones button.selected")];if(!a||ds.length!==2||!arenaStarted)return;
+ const attack=a.dataset.zone, defense=ds.map(x=>x.dataset.zone), enemyDefense=zones[Math.floor(Math.random()*zones.length)];
+ const damage=state.bonusDamage+10+(attack==="head"?4:attack==="legs"?2:0); const dealt=enemyDefense===attack?Math.max(3,Math.floor(damage*.35)):damage;
+ state.enemyHp=Math.max(0,state.enemyHp-dealt);const enemyAttack=zones[Math.floor(Math.random()*zones.length)],blocked=defense.includes(enemyAttack),taken=blocked?0:10;state.hp=Math.max(0,state.hp-taken);
+ const text=`Удар: ${names[attack]} → −${dealt} HP · Защита: ${defense.map(x=>names[x]).join(" + ")} · Враг: ${names[enemyAttack]}${blocked?" — БЛОК":" — −"+taken+" HP"}`;
+ $("#combatLog").textContent=text;arenaJournal(text);$("#turnLabel").textContent="УДАР "+(Number($("#turnLabel").textContent.replace(/\D/g,""))+1);
+ if(state.enemyHp<=0){state.coins+=150;state.exp+=40;state.enemyHp=100;$("#combatLog").textContent+=" Победа! +150 🪙 +40 XP.";arenaJournal("Победа: +150 🪙 +40 XP.");}
+ if(state.hp<=0){state.hp=state.maxHp;state.coins=Math.max(0,state.coins-100);$("#combatLog").textContent+=" Поражение. −100 🪙.";arenaJournal("Поражение: −100 🪙.");}
+ if(state.exp>=100){state.level++;state.exp-=100;state.maxHp+=10;state.hp=state.maxHp;arenaJournal("Новый уровень!");}
+ save();resetTactical();
+});
+renderArenaMode();
+
 function renderShop(){
  const day=Math.floor(Date.now()/86400000);
  if(state.marketDay!==day){ state.marketDay=day; }
@@ -288,7 +296,7 @@ function gameTasksInit(){
 }
 $("#gameTasksList").addEventListener('click',e=>{
  const b=e.target.closest('[data-task-claim]'); if(!b)return; const id=b.dataset.taskClaim; if(state.gameTaskClaims.includes(id))return;
- const rewards={roll3:['🎲','3','кубика'],steps10:['💎','10','кристаллов'],lap5:['🪙','750','монет']}; const r=rewards[id]; if(!r)return;
+ const rewards={roll3:['🎲','3','кубика'],steps10:['💎','10','кристаллов'],lap15:['🪙','750','монет']}; const r=rewards[id]; if(!r)return;
  state.gameTaskClaims.push(id); if(r[2].includes('кубик'))state.gameDice+=Number(r[1]); else if(r[2].includes('кристалл'))state.gems+=Number(r[1]); else state.coins+=Number(r[1]); save(); gameTasksInit();
 });
 
