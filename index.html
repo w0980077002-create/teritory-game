@@ -162,7 +162,7 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
         <div class="arena-head">
           <button class="back" data-screen="home">‹</button>
           <div><small>АРЕНА SDOLARS</small><b>БОЕВОЙ КРУГ</b></div>
-          <div class="arena-status"><span>LIVE</span><b id="arenaTimer">03:00</b></div>
+          <div class="arena-status"><span id="arenaStatusText">ЛОББИ</span><b id="arenaTimer">03:00</b></div>
         </div>
         <div class="arena-modes" id="arenaModes">
           <button class="arena-mode active" data-mode="duel"><strong>⚔</strong><b>Бой 1×1</b><small>Один против одного</small></button>
@@ -173,19 +173,19 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
 
       <div class="arena-lobby" id="arenaLobby">
         <div class="lobby-copy"><small id="arenaModeKicker">БОЙ 1×1</small><b id="arenaModeTitle">Найди противника и начни бой</b><span id="arenaModeText">Создатель боя запускает отсчёт. Через 3 минуты бой стартует автоматически.</span></div>
-        <div class="lobby-meta"><span>Участники <b id="arenaPlayers">1/2</b></span><span>Старт через <b id="arenaCountdown">03:00</b></span></div>
-        <div class="lobby-actions"><button id="arenaJoinBtn">Создать бой</button><button id="arenaLeaveBtn" class="ghost">Выйти</button></div>
+        <div class="lobby-meta"><span>Участники <b id="arenaPlayers">1/2</b></span><span>Старт через <b id="arenaCountdown">03:00</b></span><span>Продление <b id="arenaExtensions">2</b></span></div>
+        <div class="lobby-actions"><button id="arenaJoinBtn">Создать бой</button><button id="arenaExtendBtn" class="ghost" disabled>Продлить</button><button id="arenaLeaveBtn" class="ghost">Выйти</button></div>
         <div class="team-picker" id="teamPicker" hidden><span>Команда</span><button data-team="1" class="selected">1</button><button data-team="2">2</button></div>
       </div>
 
       <div class="battle-scene">
-        <div class="battle-head"><div><small>АРЕНА</small><b>ТАКТИЧЕСКИЙ БОЙ</b></div><div class="turn" id="turnLabel">УДАР 1</div></div>
+        <div class="battle-head"><div><small>АРЕНА</small><b>ТАКТИЧЕСКИЙ БОЙ</b></div><div class="turn"><span id="battlePhase">ОЖИДАНИЕ</span><b id="turnLabel">УДАР 1</b></div></div>
         <div class="fighters-row">
           <div class="fighter enemy"><div class="hp"><span>ВАРГ</span><i id="enemyHp">100/100</i><em><u id="enemyHpBar"></u></em></div><div class="fighter-art enemy-art">🧔</div></div>
           <div class="vs">VS</div>
           <div class="fighter player"><div class="fighter-art player-art">⚔️</div><div class="hp"><span>SSS</span><i id="playerHp">120/120</i><em><u id="playerHpBar"></u></em></div></div>
         </div>
-        <div id="combatLog" class="combat-log">Создай бой. После старта выбери удар и две зоны защиты.</div>
+        <div class="battle-timer"><span>ВРЕМЯ БОЯ</span><b id="fightTimer">10:00</b></div><div id="combatLog" class="combat-log">Создай бой. После старта выбери удар и две зоны защиты.</div>
       </div>
 
       <div class="tactical">
@@ -195,7 +195,7 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
         <div class="panel"><div class="panel-title">🛡️ ЗАЩИТА <small>2 зоны</small></div><div class="zones defense-zones" id="defenseZones">
           <button data-zone="head"><b>Голова</b><small>◈</small></button><button data-zone="chest"><b>Грудь</b><small>◈</small></button><button data-zone="stomach"><b>Живот</b><small>◈</small></button><button data-zone="legs"><b>Ноги</b><small>◈</small></button>
         </div></div>
-        <button id="fightBtn" class="fight-btn" disabled>НАНЕСТИ УДАР</button>
+        <button id="fightBtn" class="fight-btn" disabled>НАНЕСТИ УДАР</button><div class="selection-note" id="selectionNote">Выбери 1 удар и 2 зоны защиты</div>
       </div>
       <div class="combat-journal"><div><b>БОЕВОЙ ЖУРНАЛ</b><small>Последние действия боя</small></div><div id="combatJournal" class="journal-lines"><span>Бой ещё не начат.</span></div></div>
     </section>
