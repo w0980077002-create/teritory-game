@@ -1,9 +1,12 @@
-# Territory v67 — Sdolars Winter
+# Territory — v68
 
-Rebuild based on the supplied gameplay videos.
+Sdolars Winter event rebuild based on the provided gameplay references.
 
-- 27-cell circular/diamond route; cells are separate from reward milestones.
-- Sequential dice movement and persistent progress.
-- Reward preview modal with 5 rewards per 5-round group, claimed/unclaimed state, and long scroll.
-- Current Sdolars winter art retained.
-- Main gameplay and existing Arena/shop/profile systems retained.
+- 27-cell board route
+- single roll: 1 die, sequential movement, one landing reward
+- x10 roll: 10 independent random rolls, automatic sequential movement, one final window with 10 landing rewards
+- x10 control is separate from the normal roll and requires at least 10 dice
+- jackpot/reward preview remains a long scrollable milestone list
+- winter harbor / Sdolars scene
+
+Files: `index.html`, `style.css`, `game.css`, `app.js`, `harbor_top.jpg`, `ship_only.png`.

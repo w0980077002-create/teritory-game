@@ -419,3 +419,25 @@
 #game .jackpot-reward.claimed{background:#eef7e9;border-color:#9acb8c}
 #game .jackpot-reward.claimed span{color:#17952b;font-size:25px;font-weight:900;text-shadow:0 1px 0 #fff}
 @media(max-width:390px){#game .game-reward-head{height:26px;flex-basis:26px}#game .game-board-shell{width:min(88vw,370px)!important;height:min(88vw,370px)!important}#game .board-cell{width:clamp(35px,10.8vw,48px)!important;height:clamp(35px,10.8vw,48px)!important}#game .tile-icon{font-size:13px!important}#game .tile-content b{font-size:7px!important}#game .jackpot-reward{height:53px}#game .jackpot-reward span{font-size:18px}}
+
+/* v68 — mass roll x10, separate from the normal single roll */
+#game .game-bottom{grid-template-columns:1fr 86px 1fr!important}
+#game .dice-controls-left{display:flex;align-items:center;justify-content:center;gap:9px;min-width:0}
+#game .dice-count{flex:0 0 auto}
+#game .multi-roll{display:flex;align-items:center;gap:4px;padding:7px 6px;border:1px solid #a47b43;border-radius:9px;background:rgba(30,25,20,.78);color:#e9d5af;font-size:7px;line-height:9px;white-space:nowrap;cursor:pointer}
+#game .multi-roll input{width:18px;height:18px;margin:0;accent-color:#c8913e}
+#game .multi-roll b{color:#f2c96e;font-size:8px}
+#game .game-batch-modal{position:absolute;inset:0;z-index:230;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.74);padding:35px 12px 20px}
+#game .game-batch-modal.show{display:flex}
+#game .game-batch-card{position:relative;width:min(94%,400px);max-height:82%;overflow:auto;border:2px solid #b78645;border-radius:14px;background:#f5eddb;color:#3a2b20;box-shadow:0 12px 30px #000c;padding:0 8px 12px}
+#game .batch-title{text-align:center;background:linear-gradient(180deg,#5c3722,#332018);color:#f5d59d;margin:0 -8px;padding:13px 42px 7px;font:800 14px Georgia,serif;border-bottom:1px solid #bb8948}
+#game .batch-subtitle{text-align:center;font:700 8px Georgia,serif;color:#705337;padding:7px}
+#game .batch-results{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+#game .batch-result{display:grid;grid-template-columns:18px 20px 30px 1fr;align-items:center;gap:4px;min-height:48px;padding:5px;border:1px solid #c5b28e;border-radius:7px;background:#fffaf0;box-shadow:0 2px 3px #4b382314}
+#game .batch-n{font:800 9px Georgia,serif;color:#876b45;text-align:center}
+#game .batch-die{font-size:14px;text-align:center}
+#game .batch-reward-icon{font-size:23px;text-align:center}
+#game .batch-result div{display:flex;flex-direction:column;min-width:0;line-height:1.05}
+#game .batch-result b{font-size:9px}.batch-result small{font-size:6px;color:#5e513f;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.batch-result em{font-size:5.5px;color:#947247;font-style:normal;margin-top:3px}
+#game .game-batch-card #batchClose{right:6px;top:4px;width:28px;height:28px;border-radius:50%;background:#e52272;color:#fff;border:1px solid #ff9abf;font-size:20px;z-index:2}
+@media(max-width:390px){#game .game-bottom{grid-template-columns:1fr 70px 1fr!important}#game .dice-controls-left{gap:4px}#game .multi-roll{padding:5px 4px;font-size:6px}#game .multi-roll input{width:17px;height:17px}#game .batch-results{grid-template-columns:1fr}.batch-result{min-height:44px}}

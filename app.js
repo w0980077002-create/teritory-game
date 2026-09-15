@@ -219,7 +219,7 @@ function gameUpdateStatus(){
  if(s)s.textContent=`ХОД · Круг ${lap} · клетка ${pos+1}/27 · ${state.gameMoving?'идёт движение…':'брось кубик'}`;
  if(badge)badge.textContent=lap; if(centerLap)centerLap.textContent=lap; if(turn)turn.textContent=`Ход ${state.gameRolls}`; if(cellNo)cellNo.textContent=pos+1;
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
- const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show');
+ const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show') || document.querySelector('#gameBatchModal.show');
 }
 function gameAddReward(item){
  const [icon,amount,label]=item;
@@ -259,28 +259,71 @@ function gameResolveCell(){
  gameTasksInit();
  gameBoardInit();
 }
-async function gameRoll(){
- if(gameMoving || document.querySelector('#gameRewardModal.show'))return;
- if(state.gameEndsAt && Date.now() >= state.gameEndsAt){ const st=$("#gameStatus"); if(st)st.textContent='Событие завершено. Дождитесь следующего события.'; gameUpdateStatus(); return; }
- if(state.gameDice<=0){const s=$("#gameStatus");if(s)s.textContent='Кубики закончились. Получи новые в наградах.';return}
- state.gameDice--; state.gameRolls++; state.gameTaskProgress=state.gameRolls; save();
- gameMoving=true; state.gameMoving=true; gameSkipRequested=false; document.querySelector('#game').classList.add('rolling');
- const roll=1+Math.floor(Math.random()*6), face=['⚀','⚁','⚂','⚃','⚄','⚅'][roll-1]; $("#diceFace").textContent=face;
- const skip=$("#skipRollBtn"); if(skip)skip.disabled=false;
- gameUpdateStatus();
+async function gameSingleRoll(animate=true){
+ const roll=1+Math.floor(Math.random()*6);
+ const face=['⚀','⚁','⚂','⚃','⚄','⚅'][roll-1];
+ const faceEl=$("#diceFace"); if(faceEl)faceEl.textContent=face;
  for(let step=0;step<roll;step++){
-   state.gamePos=(state.gamePos+1)%GAME_TRACK_CELLS;
-   if(state.gamePos===0)state.gameLap++;
-   state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
-   gamePlaceToken(true); gameUpdateStatus();
-   if(!gameSkipRequested) await new Promise(r=>setTimeout(r,300));
+  state.gamePos=(state.gamePos+1)%GAME_TRACK_CELLS;
+  if(state.gamePos===0)state.gameLap++;
+  state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
+  gamePlaceToken(true); gameUpdateStatus();
+  if(animate) await new Promise(r=>setTimeout(r,260));
+ }
+ const cell=GAME_CELLS[((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS];
+ return {roll, pos:state.gamePos, lap:state.gameLap, cell, reward:cell.value==='?'?gameRandomReward():[[cell.icon,cell.value,cell.label.toLowerCase()]]};
+}
+function gameShowBatchRewards(results){
+ const modal=$("#gameBatchModal"), list=$("#batchResults"); if(!modal||!list)return;
+ list.innerHTML=results.map((r,i)=>{
+  const x=r.reward[0];
+  return `<div class="batch-result"><span class="batch-n">${i+1}</span><span class="batch-die">${['⚀','⚁','⚂','⚃','⚄','⚅'][r.roll-1]}</span><span class="batch-reward-icon">${x[0]}</span><div><b>${x[1]}</b><small>${x[2]}</small><em>Клетка ${r.pos+1}</em></div></div>`;
+ }).join('');
+ $("#batchSubtitle").textContent=`10 бросков · ${results.length} наград`;
+ modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+}
+function gameCloseBatch(){const m=$("#gameBatchModal");if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');gameUpdateStatus();}}
+async function gameRoll10(){
+ if(gameMoving || document.querySelector('#gameRewardModal.show') || document.querySelector('#gameBatchModal.show'))return;
+ if(state.gameDice<10){const s=$("#gameStatus");if(s)s.textContent='Для броска ×10 нужно минимум 10 кубиков.';return;}
+ if(state.gameEndsAt && Date.now()>=state.gameEndsAt){gameUpdateStatus();return;}
+ gameMoving=true; state.gameMoving=true; document.querySelector('#game').classList.add('rolling');
+ const skip=$("#skipRollBtn"), results=[];
+ if(skip)skip.disabled=true;
+ for(let i=0;i<10;i++){
+  if(state.gameDice<=0)break;
+  state.gameDice--; state.gameRolls++; state.gameTaskProgress=state.gameRolls;
+  const result=await gameSingleRoll(true);
+  results.push(result);
+  state.exp+=5;
+  while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp;}
+  gameUpdateStatus();
+  await new Promise(r=>setTimeout(r,120));
  }
  gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
- if(skip)skip.disabled=true;
+ state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
+ save(); gameBoardInit();
+ results.forEach(r=>gameAddReward(r.reward[0]));
+ const reached=GAME_REWARDS.filter(r=>state.gameLap>=r.lap && !state.gameMilestones.includes(r.lap));
+ reached.forEach(r=>state.gameMilestones.push(r.lap));
  save();
- gameResolveCell();
+ gameShowBatchRewards(results);
 }
+async function gameRoll(){
+ if($('#roll10Btn')?.checked){await gameRoll10();return;}
+ if(gameMoving || document.querySelector('#gameRewardModal.show') || document.querySelector('#gameBatchModal.show'))return;
+ if(state.gameEndsAt && Date.now()>=state.gameEndsAt){ const st=$("#gameStatus"); if(st)st.textContent='Событие завершено. Дождитесь следующего события.'; gameUpdateStatus(); return; }
+ if(state.gameDice<=0){const s=$("#gameStatus");if(s)s.textContent='Кубики закончились. Получи новые в наградах.';return}
+ state.gameDice--; state.gameRolls++; state.gameTaskProgress=state.gameRolls; save();
+ gameMoving=true; state.gameMoving=true; document.querySelector('#game').classList.add('rolling');
+ const result=await gameSingleRoll(!$('#skipRollBtn')?.checked);
+ gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
+ save(); gameResolveCell();
+}
+
 $("#spinBtn").onclick=gameRoll;
+$("#batchClose").onclick=gameCloseBatch;
+$("#gameBatchModal").addEventListener("click",e=>{if(e.target.id==="gameBatchModal")gameCloseBatch();});
 $("#skipRollBtn").onchange=()=>{ if($("#skipRollBtn").checked)gameSkipRequested=true; };
 $("#gameModalClose").onclick=()=>{clearInterval(gameModalTimerId);$("#gameRewardModal").classList.remove('show');$("#gameRewardModal").setAttribute('aria-hidden','true');gameUpdateStatus();};
 $("#gameRewardModal").addEventListener('click',e=>{if(e.target.id==='gameRewardModal')$("#gameModalClose").click()});
