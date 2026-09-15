@@ -2,8 +2,8 @@ const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:10
 let state=JSON.parse(localStorage.getItem("territory_save_v1")||"null")||structuredClone(defaultState);
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
 state.gameDice=Number(state.gameDice??47); state.gameRolls=Number(state.gameRolls??0); state.gameSteps=Number(state.gameSteps??0); state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?state.gameTaskClaims:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?state.gamePanelClaims:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=20; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
-const zones=["head","chest","stomach","legs"];
-const names={head:"Голова",chest:"Грудь",stomach:"Живот",legs:"Ноги"};
+const zones=["head","chest","stomach","waist","legs"];
+const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
 const weapons=[
  {name:"Боевой топор",icon:"🪓",damage:12,cost:300},
  {name:"Стальной меч",icon:"⚔️",damage:18,cost:650},
@@ -27,91 +27,44 @@ function showScreen(id){
  if(id==="arena") resetTactical();
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b)showScreen(b.dataset.screen)});
-let arenaMode="duel", arenaStarted=false, arenaPhase="lobby", arenaSeconds=180, arenaTimerId=null, arenaFightSeconds=600, arenaFightTimerId=null, arenaTeam=1, arenaExtensions=2;
-function arenaJournal(text){ const j=$("#combatJournal"); if(!j)return; const line=document.createElement("span"); line.textContent=text; j.prepend(line); while(j.children.length>6)j.lastElementChild.remove(); }
-function arenaModeInfo(mode){
- const data={duel:["БОЙ 1×1","Найди противника и начни бой","Один против одного. Создатель запускает отсчёт на 3 минуты.","1/2"],chaos:["ХАОТИЧЕСКИЙ БОЙ","Входи в общий бой","Все входят в одно окно. После старта система случайно распределяет игроков по командам.","1/20"],group:["ГРУППОВОЙ БОЙ","Выбери команду","До 20 участников. До старта можно выбрать команду 1 или 2.","1/20"]}; return data[mode]||data.duel;
-}
-function fmtTime(sec){const m=String(Math.floor(Math.max(0,sec)/60)).padStart(2,"0"),s=String(Math.max(0,sec)%60).padStart(2,"0");return `${m}:${s}`;}
-function renderArenaMode(){
- const d=arenaModeInfo(arenaMode); ["#arenaModeKicker","#arenaModeTitle","#arenaModeText","#arenaPlayers"].forEach((sel,i)=>{const el=$(sel);if(el)el.textContent=d[i]});
- const picker=$("#teamPicker"); if(picker)picker.hidden=arenaMode!=="group";
- document.querySelectorAll(".arena-mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===arenaMode));
- const ext=$("#arenaExtensions");if(ext)ext.textContent=arenaExtensions;
-}
-function setArenaPhase(phase){
- arenaPhase=phase; const status=$("#arenaStatusText"), phaseEl=$("#battlePhase"), join=$("#arenaJoinBtn"), ext=$("#arenaExtendBtn"), fight=$("#fightBtn"), lobby=$("#arenaLobby");
- const labels={lobby:["ЛОББИ","ОЖИДАНИЕ"],countdown:["СБОР","ПОДГОТОВКА"],fight:["БОЙ","БОЙ ИДЁТ"],ended:["ЗАВЕРШЁН","БОЙ ОКОНЧЕН"]};
- if(status)status.textContent=labels[phase]?.[0]||"АРЕНА"; if(phaseEl)phaseEl.textContent=labels[phase]?.[1]||"ОЖИДАНИЕ";
- if(join)join.disabled=phase!=="lobby"; if(ext)ext.disabled=!(phase==="countdown"&&arenaExtensions>0); if(lobby)lobby.classList.toggle("ended",phase==="ended");
- if(fight && phase!=="fight")fight.disabled=true;
-}
 function resetTactical(){
  document.querySelectorAll(".zones button").forEach(b=>b.classList.remove("selected"));
- const f=$("#fightBtn"); if(f) {f.disabled=arenaPhase!=="fight";f.classList.remove("ready");}
- const note=$("#selectionNote");if(note)note.textContent="Выбери 1 удар и 2 зоны защиты";
- const log=$("#combatLog"); if(log)log.textContent=arenaPhase==="fight"?"Выбери зону удара и две зоны защиты.":arenaPhase==="ended"?"Бой завершён.":"Создай бой. После старта выбери удар и две зоны защиты.";
+ $("#fightBtn").disabled=true; $("#combatLog").textContent="Выберите зону атаки и две зоны защиты.";
 }
-function startArena(){
- if(arenaPhase!=="lobby")return;
- arenaStarted=true; arenaSeconds=180; arenaExtensions=2; setArenaPhase("countdown");
- const btn=$("#arenaJoinBtn");if(btn)btn.textContent="Бой создан";
- if(arenaMode==="group"||arenaMode==="chaos"){const n=$("#arenaPlayers");if(n)n.textContent=arenaMode==="group"?"1/20":"1/20";}else {const n=$("#arenaPlayers");if(n)n.textContent="1/2";}
- [$("#arenaTimer"),$("#arenaCountdown")].forEach(e=>{if(e)e.textContent=fmtTime(arenaSeconds)});
- arenaJournal(`Система: создан ${arenaModeInfo(arenaMode)[0]}. ${arenaMode==="group"?`Команда ${arenaTeam}.`:arenaMode==="chaos"?"Команды будут распределены случайно.":"Ожидается противник."}`);
- const l=$("#combatLog");if(l)l.textContent="Ожидаем завершения 3-минутного набора игроков…";
- if(arenaTimerId)clearInterval(arenaTimerId);
- arenaTimerId=setInterval(()=>{
-   arenaSeconds=Math.max(0,arenaSeconds-1); [$("#arenaTimer"),$("#arenaCountdown")].forEach(e=>{if(e)e.textContent=fmtTime(arenaSeconds)});
-   if(arenaSeconds===0){clearInterval(arenaTimerId);beginArenaFight();}
- },1000);
-}
-function beginArenaFight(){
- arenaPhase="fight"; arenaFightSeconds=600; setArenaPhase("fight"); resetTactical();
- if(arenaMode==="chaos")arenaTeam=Math.random()<.5?1:2;
- const log=$("#combatLog");if(log)log.textContent=arenaMode==="chaos"?`Команды распределены. Вы в команде ${arenaTeam}. Выберите удар и две защиты.`:"Бой начался. Выберите удар и две защиты.";
- arenaJournal(`Система: бой начался. ${arenaMode==="chaos"?`Ваша команда: ${arenaTeam}.`:""}`);
- [$("#arenaTimer"),$("#arenaCountdown")].forEach(e=>{if(e)e.textContent=fmtTime(arenaFightSeconds)});
- if(arenaFightTimerId)clearInterval(arenaFightTimerId);
- arenaFightTimerId=setInterval(()=>{arenaFightSeconds=Math.max(0,arenaFightSeconds-1);const t=$("#fightTimer"),a=$("#arenaTimer");if(t)t.textContent=fmtTime(arenaFightSeconds);if(a)a.textContent=fmtTime(arenaFightSeconds);if(arenaFightSeconds===0){clearInterval(arenaFightTimerId);finishArena("Время боя истекло.");}},1000);
-}
-function extendArena(){
- if(arenaPhase!=="countdown"||arenaExtensions<=0)return;
- arenaExtensions--; arenaSeconds+=180; const ext=$("#arenaExtensions");if(ext)ext.textContent=arenaExtensions; [$("#arenaTimer"),$("#arenaCountdown")].forEach(e=>{if(e)e.textContent=fmtTime(arenaSeconds)});
- arenaJournal(`Система: бой продлён на 3 минуты. Осталось бесплатных продлений: ${arenaExtensions}.`);
- const b=$("#arenaExtendBtn");if(b)b.disabled=arenaExtensions<=0;
-}
-function leaveArena(){
- if(arenaTimerId)clearInterval(arenaTimerId);if(arenaFightTimerId)clearInterval(arenaFightTimerId);
- arenaStarted=false;arenaPhase="lobby";arenaSeconds=180;arenaFightSeconds=600;arenaExtensions=2;setArenaPhase("lobby");
- const b=$("#arenaJoinBtn");if(b)b.textContent="Создать бой"; const c=$("#arenaCountdown");if(c)c.textContent="03:00";const t=$("#arenaTimer");if(t)t.textContent="03:00";const ft=$("#fightTimer");if(ft)ft.textContent="10:00";resetTactical();arenaJournal("Система: бой закрыт.");
-}
-function finishArena(reason){
- if(arenaTimerId)clearInterval(arenaTimerId);if(arenaFightTimerId)clearInterval(arenaFightTimerId);arenaStarted=false;setArenaPhase("ended");
- const l=$("#combatLog");if(l)l.textContent=reason;arenaJournal(`Система: ${reason}`);const f=$("#fightBtn");if(f)f.disabled=true;
-}
-$("#arenaModes")?.addEventListener("click",e=>{const b=e.target.closest(".arena-mode");if(!b||arenaPhase!=="lobby")return;arenaMode=b.dataset.mode;renderArenaMode();resetTactical();});
-$("#arenaJoinBtn")?.addEventListener("click",startArena);
-$("#arenaExtendBtn")?.addEventListener("click",extendArena);
-$("#arenaLeaveBtn")?.addEventListener("click",leaveArena);
-$("#teamPicker")?.addEventListener("click",e=>{const b=e.target.closest("button[data-team]");if(!b||arenaPhase!=="lobby")return;arenaTeam=Number(b.dataset.team);document.querySelectorAll("#teamPicker button").forEach(x=>x.classList.toggle("selected",x===b));});
-$("#attackZones")?.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||arenaPhase!=="fight")return;document.querySelectorAll("#attackZones button").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");updateFight();});
-$("#defenseZones")?.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||arenaPhase!=="fight")return;b.classList.toggle("selected");const selected=[...document.querySelectorAll("#defenseZones button.selected")];if(selected.length>2)selected[0].classList.remove("selected");updateFight();});
-function updateFight(){const a=$("#attackZones button.selected"),d=document.querySelectorAll("#defenseZones button.selected"),f=$("#fightBtn"),n=$("#selectionNote");if(f){f.disabled=!(arenaPhase==="fight"&&a&&d.length===2);f.classList.toggle("ready",!f.disabled);}if(n)n.textContent=!a?"Выбери 1 зону удара и 2 зоны защиты":d.length<2?`Выбери ещё ${2-d.length} зону${2-d.length===1?"у":"ы"} защиты`:"Готово к удару";}
-$("#fightBtn")?.addEventListener("click",()=>{
- const a=$("#attackZones button.selected"),ds=[...document.querySelectorAll("#defenseZones button.selected")];if(!a||ds.length!==2||arenaPhase!=="fight")return;
- const attack=a.dataset.zone, defense=ds.map(x=>x.dataset.zone), enemyDefense=zones[Math.floor(Math.random()*zones.length)];
- const damage=state.bonusDamage+10+(attack==="head"?4:attack==="legs"?2:0); const dealt=enemyDefense===attack?Math.max(3,Math.floor(damage*.35)):damage;
- state.enemyHp=Math.max(0,state.enemyHp-dealt);const enemyAttack=zones[Math.floor(Math.random()*zones.length)],blocked=defense.includes(enemyAttack),taken=blocked?0:10;state.hp=Math.max(0,state.hp-taken);
- const text=`Удар: ${names[attack]} → −${dealt} HP · Защита: ${defense.map(x=>names[x]).join(" + ")} · Враг: ${names[enemyAttack]}${blocked?" — БЛОК":" — −"+taken+" HP"}`;
- $("#combatLog").textContent=text;arenaJournal(text);$("#turnLabel").textContent="УДАР "+(Number($("#turnLabel").textContent.replace(/\D/g,""))+1);
- if(state.enemyHp<=0){state.coins+=150;state.exp+=40;state.enemyHp=100;finishArena("Победа! +150 🪙 +40 XP.");arenaJournal("Победа: +150 🪙 +40 XP.");}
- else if(state.hp<=0){state.hp=state.maxHp;state.coins=Math.max(0,state.coins-100);finishArena("Поражение. −100 🪙.");arenaJournal("Поражение: −100 🪙.");}
- if(state.exp>=100){state.level++;state.exp-=100;state.maxHp+=10;state.hp=state.maxHp;arenaJournal("Новый уровень!");}
- save();if(arenaPhase==="fight")resetTactical();
+$("#attackZones").addEventListener("click",e=>{
+ const b=e.target.closest("button"); if(!b)return;
+ document.querySelectorAll("#attackZones button").forEach(x=>x.classList.remove("selected")); b.classList.add("selected"); updateFight();
 });
-renderArenaMode();setArenaPhase("lobby");
-
+$("#defenseZones").addEventListener("click",e=>{
+ const b=e.target.closest("button"); if(!b)return;
+ b.classList.toggle("selected");
+ const selected=[...document.querySelectorAll("#defenseZones button.selected")];
+ if(selected.length>2) selected[0].classList.remove("selected");
+ updateFight();
+});
+function updateFight(){
+ const a=$("#attackZones button.selected"); const d=document.querySelectorAll("#defenseZones button.selected");
+ $("#fightBtn").disabled=!(a&&d.length===2);
+}
+$("#fightBtn").onclick=()=>{
+ const attack=$("#attackZones button.selected").dataset.zone;
+ const defense=[...document.querySelectorAll("#defenseZones button.selected")].map(x=>x.dataset.zone);
+ const enemyDefense=zones[Math.floor(Math.random()*5)];
+ const damage=state.bonusDamage+10+(attack==="head"?4:attack==="legs"?2:0);
+ let dealt=enemyDefense===attack?Math.max(3,Math.floor(damage*.35)):damage;
+ state.enemyHp=Math.max(0,state.enemyHp-dealt);
+ const enemyAttack=zones[Math.floor(Math.random()*5)];
+ const enemyDamage=10;
+ const blocked=defense.includes(enemyAttack);
+ const taken=blocked?0:enemyDamage;
+ state.hp=Math.max(0,state.hp-taken);
+ $("#combatLog").textContent=`Вы: ${names[attack]} → −${dealt} HP. Враг атакует: ${names[enemyAttack]}${blocked?" — БЛОК!":" — −"+taken+" HP."}`;
+ $("#turnLabel").textContent="ХОД "+(Number($("#turnLabel").textContent.replace(/\D/g,""))+1);
+ if(state.enemyHp<=0){state.coins+=150;state.exp+=40;$("#combatLog").textContent+=" Победа! +150 🪙 +40 XP.";state.enemyHp=100;}
+ if(state.hp<=0){state.hp=state.maxHp;state.coins=Math.max(0,state.coins-100);$("#combatLog").textContent+=" Вы проиграли. Восстановление −100 🪙.";}
+ if(state.exp>=100){state.level++;state.exp-=100;state.maxHp+=10;state.hp=state.maxHp;$("#combatLog").textContent+=" Новый уровень!";}
+ save(); resetTactical();
+};
 function renderShop(){
  const day=Math.floor(Date.now()/86400000);
  if(state.marketDay!==day){ state.marketDay=day; }
@@ -247,16 +200,17 @@ function gameResolveCell(){
  state.exp+=5;
  while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp}
  state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
- const reached=GAME_REWARDS.filter(r=>state.gameLap>=r.lap && !state.gameMilestones.includes(r.lap));
  state.gameTaskProgress=state.gameRolls;
+ const reached=GAME_REWARDS.filter(r=>state.gameLap>=r.lap && !state.gameMilestones.includes(r.lap));
+ reached.forEach(r=>state.gameMilestones.push(r.lap));
  save();
- gameShowReward(reward,cell.value==='?'?'Сюрприз!':'Получено');
+ gameShowReward(reward,cell.value==='?'?'Сюрприз!':'Клетка пройдена');
  if(reached.length){
-   reached.forEach(r=>state.gameMilestones.push(r.lap));
-   save();
-   setTimeout(()=>gameShowReward(reached.map(r=>r.items).flat(),`Поздравляем! Круг ${reached[reached.length-1].lap}`),3400);
+   const milestoneItems=reached.flatMap(r=>r.items||[]);
+   setTimeout(()=>gameShowReward(milestoneItems,`Награда за круг ${reached[reached.length-1].lap}`),3600);
  }
  gameTasksInit();
+ gameBoardInit();
 }
 async function gameRoll(){
  if(gameMoving || document.querySelector('#gameRewardModal.show'))return;
@@ -348,6 +302,29 @@ const gamePanelClose=$("#gamePanelClose"); if(gamePanelClose)gamePanelClose.oncl
 const gamePanelList=$("#gamePanelList"); if(gamePanelList)gamePanelList.addEventListener('click',e=>{const b=e.target.closest('[data-panel-buy]');if(b)gamePanelBuy(b);});
 gameBoardInit();
 gameEventTimer();
+
+/* Territory v54 — Game finished interactions */
+(function finishGameBlock(){
+  const track=$('#gameRewardTrack');
+  if(track) track.addEventListener('click',e=>{
+    const b=e.target.closest('[data-lap]'); if(!b)return;
+    const lap=Number(b.dataset.lap), r=GAME_REWARDS.find(x=>x.lap===lap); if(!r)return;
+    if(state.gameMilestones.includes(lap)) gameShowReward(r.items,`Круг ${lap} · награда получена`);
+    else { const s=$('#gameStatus'); if(s)s.textContent=`Круг ${lap}: пройди ещё ${Math.max(0,lap-state.gameLap)} круг(а).`; }
+  });
+  const prize=$('.game-prize-badge');
+  if(prize){ prize.setAttribute('role','button'); prize.tabIndex=0; prize.addEventListener('click',()=>gameShowReward([['🎁','10','призовых попыток']], 'Призы x10')); }
+  document.addEventListener('click',e=>{
+    const c=e.target.closest('.game-modal,.game-panel-modal,.game-tasks-modal');
+    if(!c || e.target!==c)return;
+    const close=c.querySelector('.game-modal-close'); if(close)close.click();
+  });
+  const closeAll=()=>{
+    ['#gameRewardModal','#gameTasksModal','#gamePanelModal'].forEach(id=>{const el=$(id);if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true')}});
+    gameUpdateStatus();
+  };
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+})();
 
 render();
 showScreen("home");
