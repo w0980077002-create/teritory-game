@@ -121,11 +121,11 @@ const GAME_CELLS=[
  {icon:'🎁',value:'30',type:'start',label:'КРУГ'}
 ];
 const GAME_REWARDS=[
- {lap:5,icon:'📜',title:'Круг 5',items:[['📜','30','свиток'],['💎','10','кристаллов'],['🪙','500','монет']]},
- {lap:10,icon:'🎒',title:'Круг 10',items:[['🎒','1','особый предмет'],['💎','20','кристаллов'],['🪙','750','монет']]},
- {lap:15,icon:'🟣',title:'Круг 15',items:[['💎','50','кристаллов'],['🧰','2','предмета'],['🪙','1000','монет']]},
+ {lap:15,icon:'💎',title:'Круг 15',items:[['💎','50','кристаллов'],['🧰','2','предмета'],['🪙','1050','монет']]},
  {lap:20,icon:'🧰',title:'Круг 20',items:[['🧰','10','предметов'],['💎','70','кристаллов'],['🪙','1500','монет']]},
- {lap:25,icon:'💎',title:'Круг 25',items:[['💎','30','кристаллов'],['🏆','1','редкая награда'],['🪙','2500','монет']]}
+ {lap:25,icon:'📜',title:'Круг 25',items:[['📜','30','свитков'],['💎','30','кристаллов'],['🪙','2000','монет']]},
+ {lap:30,icon:'🧰',title:'Круг 30',items:[['🧰','10','предметов'],['💎','80','кристаллов'],['🪙','2200','монет']]},
+ {lap:35,icon:'📜',title:'Круг 35',items:[['📜','30','свитков'],['🏆','1','редкая награда'],['🪙','3000','монет']]}
 ];
 let gameMoving=false, gameSkipRequested=false, gameTimerId=null, gameModalTimerId=null;
 function gameEventTimer(){
@@ -166,9 +166,11 @@ function gamePlaceToken(animate=true){
 }
 function gameUpdateStatus(){
  const s=$("#gameStatus");
+ const badge=$("#gameLapBadge");
  const lap=Math.floor(state.gameSteps/GAME_TRACK_CELLS);
  const pos=((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
  if(s)s.textContent=`Круг ${lap} · клетка ${pos+1}/20 · ${state.gameMoving?'Идёт движение…':'Брось кубик.'}`;
+ if(badge)badge.textContent=`Круг ${lap}`;
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
  const roll=$("#spinBtn"); if(roll)roll.disabled=gameMoving || state.gameDice<=0 || document.querySelector('#gameRewardModal.show');
 }
@@ -280,7 +282,7 @@ function gameTasksInit(){
  const tasks=[
   {id:'roll3',name:'Сделать 3 броска',goal:3,progress:()=>Math.min(state.gameRolls,3),reward:['🎲','3','кубика']},
   {id:'steps10',name:'Пройти 10 клеток',goal:10,progress:()=>Math.min(state.gameSteps,10),reward:['💎','10','кристаллов']},
-  {id:'lap5',name:'Дойти до 5-го круга',goal:5,progress:()=>Math.min(state.gameLap,5),reward:['🪙','750','монет']}
+  {id:'lap15',name:'Дойти до 15-го круга',goal:15,progress:()=>Math.min(state.gameLap,15),reward:['🪙','750','монет']}
  ];
  list.innerHTML=tasks.map(t=>{const prog=t.progress(),done=prog>=t.goal,claimed=state.gameTaskClaims.includes(t.id);return `<div class="task-row ${claimed?'done':''}"><div><b>${t.name}</b><small>${prog}/${t.goal} · награда ${t.reward[0]} ${t.reward[1]}</small></div><button type="button" data-task-claim="${t.id}" ${!done||claimed?'disabled':''}>${claimed?'Получено':done?'Получить':'В процессе'}</button></div>`}).join('');
 }

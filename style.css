@@ -1715,3 +1715,64 @@ body:has(#casino.active) .game-board-wrap{overflow:hidden!important}
   body:has(#casino.active) .game-side-stack button small{font-size:5.5px!important}
   body:has(#casino.active) .game-status{right:82px!important}
 }
+
+
+/* Territory v50 — Game: цельная зимняя сцена, взрослый event-board, без налепленных элементов */
+#casino.game-screen.active .game-board-wrap{
+  background:
+    radial-gradient(circle at 11% 16%,rgba(255,255,255,.92) 0 2px,transparent 3px),
+    radial-gradient(circle at 87% 20%,rgba(255,255,255,.82) 0 2px,transparent 3px),
+    radial-gradient(circle at 72% 38%,rgba(255,255,255,.52) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 19% 52%,rgba(255,255,255,.55) 0 1.5px,transparent 2.5px),
+    linear-gradient(180deg,#2aa8cf 0%,#50c3dc 34%,#72d2e0 58%,#c9eef2 86%,#e6f8f7 100%)!important;
+}
+#casino.game-screen.active .game-scenery{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+#casino.game-screen.active .winter-mountains{position:absolute;left:5%;right:5%;top:1%;height:32%;opacity:.78;background:
+  linear-gradient(135deg,transparent 0 20%,#e9f6f5 20.3% 24%,transparent 24.4%),
+  linear-gradient(35deg,transparent 0 34%,#d9eff1 34.3% 39%,transparent 39.4%),
+  linear-gradient(145deg,transparent 0 56%,#eef8f6 56.2% 61%,transparent 61.4%),
+  linear-gradient(40deg,transparent 0 72%,#d4edf0 72.2% 77%,transparent 77.4%);
+  filter:drop-shadow(0 10px 7px rgba(18,95,115,.14));}
+#casino.game-screen.active .winter-mountains:after{content:'';position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,transparent,#59bdd3aa)}
+#casino.game-screen.active .winter-pines{position:absolute;bottom:18%;width:92px;height:250px;opacity:.7;filter:drop-shadow(0 7px 5px rgba(22,72,81,.18))}
+#casino.game-screen.active .pine-left{left:-18px;background:linear-gradient(90deg,transparent 42%,#214f50 43% 56%,transparent 57%),linear-gradient(150deg,transparent 0 30%,#1c6264 30% 38%,transparent 39%),linear-gradient(30deg,transparent 0 43%,#245d60 43% 51%,transparent 52%),linear-gradient(150deg,transparent 0 56%,#1c575b 56% 64%,transparent 65%),linear-gradient(30deg,transparent 0 69%,#285f62 69% 77%,transparent 78%)}
+#casino.game-screen.active .pine-right{right:-18px;transform:scaleX(-1);background:linear-gradient(90deg,transparent 42%,#214f50 43% 56%,transparent 57%),linear-gradient(150deg,transparent 0 30%,#1c6264 30% 38%,transparent 39%),linear-gradient(30deg,transparent 0 43%,#245d60 43% 51%,transparent 52%),linear-gradient(150deg,transparent 0 56%,#1c575b 56% 64%,transparent 65%),linear-gradient(30deg,transparent 0 69%,#285f62 69% 77%,transparent 78%)}
+#casino.game-screen.active .winter-ice{position:absolute;bottom:4%;width:120px;height:135px;background:linear-gradient(155deg,#e9fbfb 0 30%,#7dd8ea 31% 48%,#b9f0f5 49% 65%,#4cb9d5 66% 78%,transparent 79%);clip-path:polygon(8% 100%,0 58%,22% 70%,34% 8%,48% 62%,64% 0,73% 65%,100% 48%,92% 100%);opacity:.92;filter:drop-shadow(0 5px 5px rgba(23,102,120,.2))}
+#casino.game-screen.active .ice-left{left:0}.ice-right{right:0;transform:scaleX(-1)}
+#casino.game-screen.active .winter-dock{position:absolute;left:7%;bottom:11%;width:115px;height:48px;transform:rotate(-8deg);border-radius:8px;background:repeating-linear-gradient(0deg,#795333 0 9px,#9a7047 10px 16px);border:3px solid #55351f;box-shadow:0 7px 9px rgba(45,53,49,.28);opacity:.88}
+#casino.game-screen.active .winter-dock:before,#casino.game-screen.active .winter-dock:after{content:'';position:absolute;top:-11px;width:10px;height:28px;background:#5a3a24;border:2px solid #3d291b;border-radius:4px}
+#casino.game-screen.active .winter-dock:before{left:10px}.winter-dock:after{right:10px}
+#casino.game-screen.active .winter-snow{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;opacity:.65;box-shadow:0 0 0 7px rgba(255,255,255,.08)}
+#casino.game-screen.active .snow-a{left:15%;top:28%}.snow-b{left:82%;top:43%}.snow-c{left:25%;top:65%}
+#casino.game-screen.active .game-board{z-index:6;width:min(74vw,350px)!important;height:min(74vw,350px)!important;top:48%!important;filter:drop-shadow(0 13px 10px rgba(32,78,88,.28))!important}
+#casino.game-screen.active .game-board:before{background:linear-gradient(145deg,#ead9b3,#c3a06b 55%,#8f653c)!important;box-shadow:inset 0 0 0 3px rgba(74,45,25,.6),inset 0 0 0 9px rgba(255,236,190,.22)!important}
+#casino.game-screen.active .board-cell{width:12.4%!important;height:9.4%!important;border-radius:9px!important;border-width:2px!important;box-shadow:0 3px 0 rgba(76,48,26,.45),0 5px 8px rgba(29,58,62,.18)!important}
+#casino.game-screen.active .board-cell .tile-icon{font-size:13px!important;line-height:13px!important}
+#casino.game-screen.active .board-cell b{font-size:12px!important;line-height:12px!important}
+#casino.game-screen.active .board-cell small{font-size:5px!important;line-height:6px!important}
+#casino.game-screen.active .board-cell.active{outline:2px solid #fff0a1!important;box-shadow:0 0 0 3px rgba(255,223,111,.22),0 4px 10px rgba(43,47,31,.3)!important}
+#casino.game-screen.active .game-center{z-index:8!important;width:39%!important;height:39%!important;background:linear-gradient(145deg,#c79558,#8c592f 58%,#674020)!important}
+#casino.game-screen.active .game-center .game-ship{font-size:66px!important;line-height:63px!important}
+#casino.game-screen.active .game-lap-badge{margin-top:4px;padding:3px 14px;border-radius:10px;background:rgba(75,44,23,.78);border:1px solid #d6a05a;color:#ffe7b0;font:800 8px Georgia,serif;box-shadow:0 2px 4px rgba(36,22,12,.25)}
+#casino.game-screen.active .game-token{z-index:18!important;width:31px!important;height:31px!important;background:radial-gradient(circle at 35% 30%,#fff2af,#d2912c 58%,#6b3d18)!important;border:2px solid #fff0ad!important}
+#casino.game-screen.active .game-side-stack{top:auto!important;bottom:102px!important;right:7px!important;transform:none!important;gap:7px!important;z-index:24!important;width:88px!important}
+#casino.game-screen.active .game-side-stack button{width:88px!important;min-width:88px!important;height:55px!important;min-height:55px!important;max-height:55px!important;border-radius:10px!important;background:linear-gradient(180deg,#75451f,#3b2418)!important;border:1px solid #d9a15a!important;box-shadow:0 4px 0 rgba(50,28,16,.5),0 6px 10px rgba(15,52,63,.25),inset 0 1px rgba(255,231,177,.24)!important}
+#casino.game-screen.active .game-side-stack button span{font-size:20px!important;line-height:19px!important}
+#casino.game-screen.active .game-side-stack button b{font-size:7px!important;line-height:8px!important}
+#casino.game-screen.active .game-side-stack button small{font-size:5.5px!important;line-height:7px!important}
+#casino.game-screen.active .game-status{bottom:7px!important;width:min(58%,240px)!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;padding:5px 8px!important;font-size:6.5px!important;background:rgba(10,49,59,.68)!important}
+#casino.game-screen.active .game-bottom{flex:0 0 112px!important;height:112px!important;min-height:112px!important;background:linear-gradient(180deg,#d8f4f4,#9dd9e3)!important;gap:11px!important}
+#casino.game-screen.active .game-prize-badge{min-width:60px!important}.game-prize-badge b{font-size:7px!important}
+#casino.game-screen.active .ancient-dice{width:78px!important;height:78px!important;flex-basis:78px!important;border-radius:20px!important;background:linear-gradient(145deg,#fff0b1,#dba34c 48%,#8c511d)!important;box-shadow:0 7px 0 #613617,0 11px 15px rgba(45,72,76,.3),inset 0 0 0 2px rgba(255,247,198,.48)!important}
+#casino.game-screen.active .dice-face{font-size:41px!important}
+@media(max-width:390px){
+ #casino.game-screen.active .game-board{width:min(70vw,292px)!important;height:min(70vw,292px)!important;top:47%!important}
+ #casino.game-screen.active .board-cell{width:12%!important;height:9.2%!important}
+ #casino.game-screen.active .game-center{width:39%!important;height:39%!important}
+ #casino.game-screen.active .game-center .game-ship{font-size:53px!important;line-height:51px!important}
+ #casino.game-screen.active .game-side-stack{width:76px!important;right:5px!important;bottom:100px!important;gap:6px!important}
+ #casino.game-screen.active .game-side-stack button{width:76px!important;min-width:76px!important;height:50px!important;min-height:50px!important;max-height:50px!important}
+ #casino.game-screen.active .game-side-stack button span{font-size:18px!important}.game-side-stack button b{font-size:6.5px!important}.game-side-stack button small{font-size:5px!important}
+ #casino.game-screen.active .ancient-dice{width:70px!important;height:70px!important;flex-basis:70px!important}
+ #casino.game-screen.active .dice-face{font-size:36px!important}
+}

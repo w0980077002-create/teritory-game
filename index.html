@@ -245,11 +245,18 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
       </div>
       <div class="game-reward-track" id="gameRewardTrack"></div>
       <div class="game-board-wrap">
+        <div class="game-scenery" aria-hidden="true">
+          <div class="winter-mountains"></div>
+          <div class="winter-pines pine-left"></div><div class="winter-pines pine-right"></div>
+          <div class="winter-ice ice-left"></div><div class="winter-ice ice-right"></div>
+          <div class="winter-dock"></div>
+          <div class="winter-snow snow-a"></div><div class="winter-snow snow-b"></div><div class="winter-snow snow-c"></div>
+        </div>
         <div class="game-board" id="gameBoard" aria-label="Игровое поле"></div>
         <div class="game-center">
           <div class="game-ship">⛵</div>
           <b>МОНОПОЛИЯ</b>
-          <small>Sdolars Winter</small>
+          <small>Sdolars Winter</small><div class="game-lap-badge" id="gameLapBadge">Круг 0</div>
         </div>
         <div class="game-token" id="gameToken">♟</div>
       </div>
