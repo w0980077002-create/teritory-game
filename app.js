@@ -1,3 +1,4 @@
+/* Territory v93 — item rewards now grant their full quantity */
 const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 function gameLoadState(){
   try{
@@ -12,7 +13,7 @@ function gameLoadState(){
 }
 let state=gameLoadState();
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
-state.gameDice=Math.max(0,Number(state.gameDice??47)||0); state.gameRolls=Math.max(0,Number(state.gameRolls??0)||0); state.gameSteps=Math.max(0,Number(state.gameSteps??0)||0); state.gameEventVersion=Number(state.gameEventVersion??1)||1; state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0); state.gameMilestones=Array.isArray(state.gameMilestones)?[...new Set(state.gameMilestones.map(Number).filter(Number.isFinite))]:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?[...new Set(state.gameTaskClaims.map(String))]:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?[...new Set(state.gamePanelClaims.map(String))]:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS; state.gameSaveVersion=2;
+state.gameDice=Math.max(0,Number(state.gameDice??47)||0); state.gameRolls=Math.max(0,Number(state.gameRolls??0)||0); state.gameSteps=Math.max(0,Number(state.gameSteps??0)||0); state.gameEventVersion=Number(state.gameEventVersion??1)||1; state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0); state.gameMilestones=Array.isArray(state.gameMilestones)?[...new Set(state.gameMilestones.map(Number).filter(Number.isFinite))]:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?[...new Set(state.gameTaskClaims.map(String))]:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?[...new Set(state.gamePanelClaims.map(String))]:[]; state.gameJackpotClaims=Array.isArray(state.gameJackpotClaims)?[...new Set(state.gameJackpotClaims.map(Number).filter(Number.isFinite))]:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS; state.gameSaveVersion=2;
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
 const weapons=[
@@ -213,7 +214,10 @@ function gamePlaceToken(animate=true){
  token.style.left=(cell.offsetLeft+cell.offsetWidth/2)+'px';
  token.style.top=(cell.offsetTop+cell.offsetHeight/2)+'px';
  token.classList.toggle('moving',animate);
- board.querySelectorAll('.board-cell').forEach((c,n)=>c.classList.toggle('active',n===i));
+ board.querySelectorAll('.board-cell').forEach((c,n)=>{
+   c.classList.toggle('active',n===i);
+   c.classList.toggle('passed',state.gameLap>0 || n<i);
+ });
  gameSelectCell(i);
 }
 function gameUpdateStatus(){
@@ -231,20 +235,35 @@ function gameAddReward(item){
  const n=Number(amount)||0;
  if(label.includes('монет')) state.coins+=n;
  else if(label.includes('кристалл')) state.gems+=n;
- else state.inventory.push(icon);
+ else {
+   const count=Math.max(1,Math.floor(n));
+   for(let i=0;i<count;i++) state.inventory.push(icon);
+ }
 }
 function gameRandomReward(){
  const pool=[['💎','10','кристаллов'],['🪙','80','монет'],['🪙','140','монет'],['📜','1','свиток'],['🧰','1','предмет']];
  return pool[Math.floor(Math.random()*pool.length)];
 }
-function gameShowReward(reward,title='Поздравляем!'){
- const modal=$("#gameRewardModal"), items=$("#rewardItems"); if(!modal||!items)return;
- $("#rewardModalTitle").textContent=title; $("#rewardModalText").textContent='Получено';
+let gameRewardQueue=[];
+function gameShowReward(reward,title='Поздравляем!',grant=true){
+ const modal=$("#gameRewardModal"), items=$("#rewardItems"); if(!modal||!items||!Array.isArray(reward)||!reward.length)return;
+ const alreadyOpen=modal.classList.contains('show');
+ const batch=document.querySelector('#gameBatchModal.show');
+ if(grant){ reward.forEach(gameAddReward); save(); }
+ if(alreadyOpen){ gameRewardQueue.push({reward,title,grant:false}); return; }
+ if(batch){ batch.classList.remove('show'); batch.setAttribute('aria-hidden','true'); }
+ $("#rewardModalTitle").textContent=title; $("#rewardModalText").textContent=grant?'Получено':'Предпросмотр';
  items.innerHTML=reward.map(x=>`<div class="reward-item"><i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small></div>`).join('');
- reward.forEach(gameAddReward); save(); modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+ modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
  let sec=3; $("#modalCloseHint").textContent=`Нажмите, чтобы закрыть (${sec}s)`;
  clearInterval(gameModalTimerId); gameModalTimerId=setInterval(()=>{sec--; const el=$("#modalCloseHint"); if(el)el.textContent=sec>0?`Нажмите, чтобы закрыть (${sec}s)`:'Нажмите, чтобы закрыть'; if(sec<=0)clearInterval(gameModalTimerId)},1000);
  gameUpdateStatus();
+}
+function gameShowNextQueuedReward(){
+ const modal=$("#gameRewardModal");
+ if(modal&&modal.classList.contains('show'))return;
+ const next=gameRewardQueue.shift();
+ if(next)gameShowReward(next.reward,next.title,false);
 }
 function gameClaimNewMilestones(){
  state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[];
@@ -268,15 +287,43 @@ function gameResolveCell(){
  state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
  state.gameTaskProgress=state.gameRolls;
  const reached=gameClaimNewMilestones();
+ const jackpotReached=gameClaimJackpotRounds();
  save();
  gameShowReward(reward,cell.value==='?'?'Сюрприз!':'Клетка пройдена');
  if(reached.length){
    const milestoneItems=reached.flatMap(r=>r.items||[]);
    setTimeout(()=>gameShowReward(milestoneItems,`Награда за круг ${reached[reached.length-1].lap}`),3600);
  }
+ if(jackpotReached.length){
+   const last=jackpotReached[jackpotReached.length-1];
+   const items=last.reward?[last.reward]:[];
+   const delay=reached.length?7200:3600;
+   setTimeout(()=>{if(items.length)gameShowReward(items,`Награда за круг ${last.round}`)},delay);
+ }
  gameTasksInit();
  gameBoardInit();
 }
+function gameClaimJackpotRounds(){
+  state.gameJackpotClaims=Array.isArray(state.gameJackpotClaims)?state.gameJackpotClaims:[];
+  const maxRound=Math.min(235,Math.max(0,Math.floor(state.gameLap)));
+  const newly=[];
+  for(let round=1;round<=maxRound;round++){
+    if(state.gameJackpotClaims.includes(round))continue;
+    const group=JACKPOT_GROUPS_V79.find(g=>round>=g.from&&round<=g.to);
+    if(!group)continue;
+    const reward=group.items[round-group.from];
+    if(reward){
+      // Mark the jackpot round as claimed here, but do NOT grant the item yet.
+      // gameRoll/gameRoll10 will pass the newly claimed rewards to gameShowReward(),
+      // which is the single place responsible for actually adding the reward.
+      state.gameJackpotClaims.push(round);
+      newly.push({round,reward});
+    }
+  }
+  if(newly.length) state.gameJackpotClaims.sort((a,b)=>a-b);
+  return newly;
+}
+
 async function gameRoll(){
  if(gameMoving || document.querySelector('#gameRewardModal.show'))return;
  if(state.gameEndsAt && Date.now() >= state.gameEndsAt){ const st=$("#gameStatus"); if(st)st.textContent='Событие завершено. Дождитесь следующего события.'; gameUpdateStatus(); return; }
@@ -301,7 +348,7 @@ async function gameRoll(){
 }
 $("#spinBtn").onclick=gameRoll;
 $("#skipRollBtn").onchange=()=>{ if($("#skipRollBtn").checked)gameSkipRequested=true; };
-$("#gameModalClose").onclick=()=>{clearInterval(gameModalTimerId);$("#gameRewardModal").classList.remove('show');$("#gameRewardModal").setAttribute('aria-hidden','true');gameUpdateStatus();};
+$("#gameModalClose").onclick=()=>{clearInterval(gameModalTimerId);$("#gameRewardModal").classList.remove('show');$("#gameRewardModal").setAttribute('aria-hidden','true');gameUpdateStatus();setTimeout(gameShowNextQueuedReward,80);};
 $("#gameRewardModal").addEventListener('click',e=>{if(e.target.id==='gameRewardModal')$("#gameModalClose").click()});
 function gameOpenPanel(kind){
  const modal=$("#gamePanelModal"), list=$("#gamePanelList"); if(!modal||!list)return;
@@ -381,7 +428,7 @@ gameEventTimer();
     else { const s=$('#gameStatus'); if(s)s.textContent=`Круг ${lap}: пройди ещё ${Math.max(0,lap-state.gameLap)} круг(а).`; }
   });
   const prize=$('.game-prize-badge');
-  if(prize){ prize.setAttribute('role','button'); prize.tabIndex=0; prize.addEventListener('click',()=>gameShowReward([['🎁','10','призовых попыток']], 'Призы x10')); }
+  if(prize){ prize.setAttribute('role','button'); prize.tabIndex=0; prize.addEventListener('click',()=>gameShowReward([['🎁','10','призовых попыток']], 'Призы x10', false)); }
   document.addEventListener('click',e=>{
     const c=e.target.closest('.game-modal,.game-panel-modal,.game-tasks-modal');
     if(!c || e.target!==c)return;
@@ -581,9 +628,12 @@ function gameShowBatchResults(results){
   const m=$('#gameBatchModal'), list=$('#batchResults'), summary=$('#gameBatchSummary');
   if(!m||!list)return;
   if(summary)summary.textContent=`${results.length} бросков · ${results.length} наград`;
-  list.innerHTML=results.map((r,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.07)">
+  const rows=results.map((r,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.07)">
     <span><b>Бросок ${i+1}</b> · ${r.face}</span><span>${r.icon} <b>${r.amount}</b> ${r.label}</span>
   </div>`).join('');
+  const totals={}; results.forEach(r=>{const k=`${r.icon}|${r.label}`; totals[k]=(totals[k]||0)+(Number(r.amount)||0)});
+  const totalRows=Object.entries(totals).map(([k,n])=>{const [icon,label]=k.split('|');return `<div style="padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.12);font-weight:700">Итого: ${icon} ${n} ${label}</div>`}).join('');
+  list.innerHTML=totalRows+rows;
   m.classList.add('show'); m.setAttribute('aria-hidden','false');
 }
 function gameApplyCellRewardSilent(){
@@ -603,6 +653,7 @@ async function gameRoll10(){
   gameMoving=true; state.gameMoving=true; gameSkipRequested=false;
   document.querySelector('#game').classList.add('rolling');
   const results=[];
+  const jackpotResults=[];
   const skip=$('#skipRollBtn'); if(skip)skip.disabled=false;
   for(let i=0;i<10;i++){
     const roll=1+Math.floor(Math.random()*6);
@@ -617,6 +668,8 @@ async function gameRoll10(){
       if(!gameSkipRequested)await new Promise(r=>setTimeout(r,120));
     }
       const got=gameApplyCellRewardSilent();
+    const newJackpots=gameClaimJackpotRounds();
+    if(newJackpots.length)jackpotResults.push(...newJackpots);
     const item=got.reward[0];
     results.push({face,icon:item[0],amount:item[1],label:item[2]});
     state.gameRolls++;
@@ -628,12 +681,22 @@ async function gameRoll10(){
   state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
   state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[];
   const newlyReached=gameClaimNewMilestones();
+  const finalJackpots=gameClaimJackpotRounds();
+  if(finalJackpots.length)jackpotResults.push(...finalJackpots);
   gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
   if(skip)skip.disabled=true;
   save(); gameTasksInit(); gameBoardInit(); gameShowBatchResults(results); gameUpdateStatus();
   if(newlyReached.length){
     const bonusItems=newlyReached.flatMap(r=>r.items||[]);
     setTimeout(()=>gameShowReward(bonusItems,`Награда за круг ${newlyReached[newlyReached.length-1].lap}`),900);
+  }
+  if(jackpotResults.length){
+    const jackpotItems=jackpotResults.map(x=>x.reward).filter(Boolean);
+    const first=jackpotResults[0], last=jackpotResults[jackpotResults.length-1];
+    const title=jackpotResults.length===1
+      ? `Награда за круг ${last.round}`
+      : `Награды за круги ${first.round}–${last.round}`;
+    setTimeout(()=>gameShowReward(jackpotItems,title),newlyReached.length?4500:900);
   }
 }
 function gameRollUnified(){
@@ -658,12 +721,18 @@ const JACKPOT_GROUPS_V79=Array.from({length:47},(_,i)=>{
 function gameOpenJackpotPreviewV79(){
   const modal=$('#gameJackpotModal'), list=$('#jackpotList');
   if(!modal||!list)return;
-  const current=Math.max(1,Math.min(235,state.gameLap||1));
+  // v95: focus the next unclaimed jackpot round. If every round up to the
+  // current lap is already claimed, keep the current lap centered.
+  const claims=Array.isArray(state.gameJackpotClaims)?state.gameJackpotClaims:[];
+  const lap=Math.max(1,Math.min(235,state.gameLap||1));
+  const nextUnclaimed=JACKPOT_GROUPS_V79.flatMap(g=>g.items.map((_,idx)=>g.from+idx))
+    .find(round=>round<=Math.min(235,lap+1)&&!claims.includes(round));
+  const current=nextUnclaimed||lap;
   list.innerHTML=JACKPOT_GROUPS_V79.map(g=>{
     const active=current>=g.from&&current<=g.to;
     const cards=g.items.map((r,idx)=>{
       const round=g.from+idx;
-      const claimed=state.gameLap>=round;
+      const claimed=Array.isArray(state.gameJackpotClaims)&&state.gameJackpotClaims.includes(round);
       const isCurrent=round===current;
       return `<div class="jackpot-reward ${claimed?'claimed':''} ${isCurrent?'current':''}" data-round="${round}"><span>${claimed?'✓':r[0]}</span><b>${r[1]}</b><small>Осталось: ${claimed?'0':'1'}</small></div>`;
     }).join('');
