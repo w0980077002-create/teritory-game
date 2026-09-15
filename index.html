@@ -216,8 +216,11 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
 
     <section id="market" class="screen">
       <div class="subhead"><button class="back" data-screen="home">‹</button><h2>РЫНОК СНАРЯЖЕНИЯ</h2></div>
-      <div class="merchant">🧔‍♂️ <span>ТОРГОВЕЦ</span></div>
+      <div class="merchant merchant-live"><div class="merchant-face">🧔‍♂️</div><div><b>ТОРГОВЕЦ</b><span id="merchantMood">«Сегодня хороший товар.»</span></div><em id="merchantRep">Репутация 0</em></div>
+      <div class="merchant-stock-head"><b>ТОВАРЫ ДНЯ</b><small id="marketReset">Ассортимент обновится позже</small></div>
       <div class="shop-grid" id="shopGrid"></div>
+      <div class="sell-panel"><div><b>Продать предмет</b><small>Торговец покупает найденные предметы</small></div><button id="sellItemBtn">Продать случайный предмет · 40 🪙</button></div>
+      <div class="merchant-log" id="merchantLog">Торговец ждёт сделки.</div>
     </section>
 
     <section id="inventory" class="screen">

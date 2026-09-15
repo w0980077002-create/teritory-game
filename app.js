@@ -1,6 +1,6 @@
 const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 let state=JSON.parse(localStorage.getItem("territory_save_v1")||"null")||structuredClone(defaultState);
-state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0);
+state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
 const weapons=[
@@ -64,13 +64,34 @@ $("#fightBtn").onclick=()=>{
  save(); resetTactical();
 };
 function renderShop(){
- $("#shopGrid").innerHTML=weapons.map(w=>`<div class="item"><div class="pic">${w.icon}</div><b>${w.name}</b><span>Урон +${w.damage}</span><button data-buy="${w.name}">${w.cost} 🪙 · КУПИТЬ</button></div>`).join("");
+ const day=Math.floor(Date.now()/86400000);
+ if(state.marketDay!==day){ state.marketDay=day; }
+ const shift=day%weapons.length;
+ const stock=[0,1,2,3].map((_,i)=>weapons[(i+shift)%weapons.length]).map((w,i)=>({...w,cost:Math.max(180,w.cost+(i%2?50:-30))}));
+ const mood=state.merchantRep>=5?'«Для тебя цена будет лучше.»':state.merchantRep>=2?'«Мы уже знаем друг друга.»':'«Сегодня хороший товар.»';
+ const moodEl=$("#merchantMood"); if(moodEl)moodEl.textContent=mood;
+ const repEl=$("#merchantRep"); if(repEl)repEl.textContent=`Репутация ${state.merchantRep}`;
+ const resetEl=$("#marketReset"); if(resetEl){const left=86400000-(Date.now()%86400000);resetEl.textContent=`Новый ассортимент примерно через ${Math.max(1,Math.ceil(left/3600000))} ч.`;}
+ $("#shopGrid").innerHTML=stock.map(w=>{const finalCost=state.merchantRep>=5?Math.floor(w.cost*.9):state.merchantRep>=2?Math.floor(w.cost*.95):w.cost;return `<div class="item"><div class="pic">${w.icon}</div><b>${w.name}</b><span>Урон +${w.damage}</span><button data-buy="${w.name}" data-cost="${finalCost}">${finalCost} 🪙 · КУПИТЬ</button></div>`}).join('');
 }
+
 $("#shopGrid").addEventListener("click",e=>{
- const b=e.target.closest("[data-buy]");if(!b)return;const w=weapons.find(x=>x.name===b.dataset.buy);
- if(state.coins<w.cost){$("#worldMessage").textContent="Не хватает монет.";return}
- state.coins-=w.cost;state.weapon=w.name;state.bonusDamage=w.damage;state.inventory.push(w.icon);save();
+ const b=e.target.closest("[data-buy]"); if(!b)return;
+ const w=weapons.find(x=>x.name===b.dataset.buy); const cost=Number(b.dataset.cost||w.cost);
+ if(state.coins<cost){const l=$("#merchantLog");if(l)l.textContent="Торговец: «Не хватает монет.»";return;}
+ state.coins-=cost;state.weapon=w.name;state.bonusDamage=w.damage;state.inventory.push(w.icon);state.merchantRep+=1;
+ const l=$("#merchantLog");if(l)l.textContent=`Торговец: «Хорошая покупка. ${w.name} теперь твой.» +1 репутация`;
+ save();
 });
+const sellBtn=$("#sellItemBtn");
+if(sellBtn)sellBtn.onclick=()=>{
+ if(!state.inventory.length){$("#merchantLog").textContent='Торговец: «У тебя пока нечего продавать.»';return;}
+ const icon=state.inventory.pop(); const price=40+Math.floor(Math.random()*41)+(state.merchantRep>=5?15:0);
+ state.coins+=price;state.merchantRep+=1;
+ $("#merchantLog").textContent=`Торговец купил предмет ${icon}: +${price} 🪙 · +1 репутация`;
+ save();
+};
+
 function renderInventory(){
  $("#inventoryGrid").innerHTML=state.inventory.map((x,i)=>`<div class="item"><div class="pic">${x}</div><b>Предмет ${i+1}</b><span>Экипировка</span></div>`).join("");
 }
@@ -167,6 +188,7 @@ showScreen("home");
     {k:'СЛУЧАЙНАЯ ВСТРЕЧА',t:'Потерянный кошелёк',d:'На площади кто-то обронил кошелёк с монетами.',help:'Ты вернул кошелёк хозяину: +80 🪙',trade:'Ты оставил находку себе: +25 🪙',h:80,tr:25,xp:8},
     {k:'СЛУХИ ГОРОДА',t:'Странник у таверны',d:'Незнакомец шепчет о дороге, которая открылась за стеной.',help:'Ты выслушал странника: +30 🪙 +12 XP',trade:'Ты обменялся новостями: +20 🪙',h:30,tr:20,xp:12},
     {k:'ГОРОДСКАЯ ЖИЗНЬ',t:'Ссора на рынке',d:'Двое торговцев спорят прямо посреди площади.',help:'Ты помог уладить спор: +50 🪙 +10 XP',trade:'Ты сделал ставку на исход: +40 🪙',h:50,tr:40,xp:10},
+    {k:'ТОРГОВЫЙ СЛУЧАЙ',t:'Срочный заказ торговца',d:'Торговец ищет покупателя на редкое оружие до закрытия рынка.',help:'Ты помог с заказом: +70 🪙 +12 XP',trade:'Ты поторговался жёстко: +55 🪙',h:70,tr:55,xp:12,trader:true},
     {k:'РЕДКОЕ СОБЫТИЕ',t:'Посыльный из-за стен',d:'В город прибыл раненый посыльный с важной вестью.',help:'Ты помог посыльному: +120 🪙 +20 XP',trade:'Ты получил плату за доставку: +70 🪙',h:120,tr:70,xp:20}
   ];
   function close(){
@@ -207,6 +229,7 @@ showScreen("home");
       state.coins+=reward;
       state.exp+=cur.xp||10;
       if(cur.alex && state.alexQuest===1){state.alexQuest=2; state.cityRep+=2;}
+      if(cur.trader){state.merchantRep+=1;}
       while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp;}
       save();
     }
