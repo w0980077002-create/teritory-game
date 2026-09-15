@@ -28,3 +28,50 @@
 @media(max-width:430px){#game .game-topbar{height:70px;grid-template-columns:45px 1fr 108px;padding:5px 7px}.game-close{width:41px!important;height:41px!important;font-size:28px!important}.game-title b{font-size:21px}.game-title strong{font-size:16px}.game-title small{font-size:6px}.game-timer{min-width:96px!important;padding:6px 5px!important}.game-timer span{font-size:6px}.game-timer b{font-size:11px}.game-reward-track{top:74px!important;left:7px!important;right:7px!important;height:60px!important}.reward-step{flex-basis:78px;min-width:78px;height:50px}.reward-icon{font-size:18px}.reward-amount{font-size:10px}.reward-step small{font-size:5px}.game-reward-preview{top:139px!important;right:8px!important;width:122px!important;min-height:43px!important;font-size:8px!important}.game-reward-preview span{font-size:20px}.game-progress{top:140px!important;height:31px!important;min-width:190px!important;font-size:8px!important;padding:4px 9px!important;gap:9px!important}.game-board-wrap{width:94vw!important;height:94vw!important;max-height:410px!important;max-width:410px!important;margin-top:54px!important}.board-cell{width:clamp(34px,9.4vw,48px)!important;height:clamp(34px,9.4vw,48px)!important;min-width:34px!important;min-height:34px!important;max-width:48px!important;max-height:48px!important}.tile-icon{font-size:clamp(13px,3.8vw,19px)}.tile-content b{font-size:clamp(7px,2vw,10px)}.game-token{width:48px!important;height:77px!important;margin:-68px 0 0 -24px!important}.game-side-tools{right:6px!important;bottom:154px!important;width:126px!important;gap:5px!important}.game-side-tools button{min-height:43px!important;grid-template-columns:26px 1fr!important;padding:4px 6px!important}.game-side-tools button span{font-size:18px}.game-side-tools button b{font-size:8px}.game-side-tools button small{font-size:5px}.game-cell-info{left:8px!important;right:8px!important;bottom:99px!important;height:46px!important}.game-cell-info b{font-size:10px}.game-cell-info span{font-size:6px}.game-bottom{height:96px!important;grid-template-columns:1fr 94px 1fr!important;padding:5px 6px 8px!important}.ancient-dice{width:94px!important;height:77px!important;border-radius:16px!important}.dice-face{font-size:34px}.ancient-dice small{font-size:11px}.dice-count b{font-size:21px}.dice-count span:not(.dice-icon){font-size:8px}.multi-roll{font-size:8px}.skip-roll{max-width:118px!important;font-size:8px!important}.skip-roll input{width:22px!important;height:22px!important}}
 @media(max-width:360px){.game-board-wrap{width:92vw!important;height:92vw!important}.board-cell{width:31px!important;height:31px!important;min-width:31px!important;min-height:31px!important;max-width:31px!important;max-height:31px!important}.game-token{width:43px!important;height:70px!important;margin:-62px 0 0 -21px!important}.game-side-tools{width:113px!important}.game-side-tools button b{font-size:7px!important}.game-bottom{grid-template-columns:1fr 86px 1fr!important}.ancient-dice{width:86px!important;height:71px!important}.dice-face{font-size:31px!important}}
 body:has(#game.game-screen.active) .bottom-nav{display:none!important}
+
+/* v117 — compact, single-screen Game layout.  No element may force the board off-screen. */
+#game.game-screen{overflow:hidden!important;position:fixed!important;inset:0!important;height:100dvh!important;min-height:0!important}
+#game .game-topbar{height:76px!important;top:0!important}
+#game .game-reward-track{top:82px!important;height:64px!important;left:10px!important;right:10px!important}
+#game .game-reward-preview{top:154px!important;right:10px!important;width:126px!important;min-height:46px!important}
+#game .game-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;padding:0!important;display:block!important;overflow:hidden!important}
+#game .game-harbor{position:absolute!important;inset:0!important;background-position:center center!important;background-size:cover!important}
+#game .game-progress{top:154px!important;left:50%!important;transform:translateX(-50%)!important;height:34px!important;min-width:210px!important;white-space:nowrap!important}
+#game .game-board-wrap{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:min(76vw,510px)!important;height:min(76vw,510px)!important;margin:0!important;z-index:5!important}
+#game .game-board-shell{width:100%!important;height:100%!important}
+#game .game-center{width:39%!important;height:39%!important}
+#game .game-token{width:46px!important;height:74px!important;margin:-66px 0 0 -23px!important}
+#game .game-side-tools{right:9px!important;bottom:138px!important;width:130px!important;z-index:62!important}
+#game .game-side-tools button{min-height:46px!important}
+#game .game-cell-info{left:10px!important;right:10px!important;bottom:105px!important;height:48px!important;z-index:58!important}
+#game .game-bottom{height:102px!important;bottom:0!important;z-index:65!important}
+
+@media(max-width:430px){
+  #game .game-topbar{height:70px!important}
+  #game .game-reward-track{top:74px!important;height:60px!important;left:7px!important;right:7px!important}
+  #game .game-reward-preview{top:139px!important;right:7px!important;width:118px!important;min-height:42px!important}
+  #game .game-progress{top:139px!important;min-width:205px!important;height:31px!important}
+  #game .game-board-wrap{width:min(72vw,500px)!important;height:min(72vw,500px)!important;top:50.5%!important}
+  #game .game-center{width:37%!important;height:37%!important}
+  #game .game-token{width:43px!important;height:70px!important;margin:-62px 0 0 -21px!important}
+  #game .game-side-tools{right:6px!important;bottom:143px!important;width:122px!important;gap:5px!important}
+  #game .game-side-tools button{min-height:43px!important;padding:4px 6px!important}
+  #game .game-cell-info{bottom:98px!important;height:45px!important}
+  #game .game-bottom{height:96px!important;grid-template-columns:1fr 94px 1fr!important;padding:5px 6px 8px!important}
+  #game .ancient-dice{width:94px!important;height:77px!important}
+}
+
+@media(max-width:380px){
+  #game .game-board-wrap{width:70vw!important;height:70vw!important;top:49.5%!important}
+  #game .game-side-tools{width:112px!important;right:5px!important}
+  #game .game-side-tools button b{font-size:7px!important}
+  #game .game-bottom{grid-template-columns:1fr 86px 1fr!important}
+  #game .ancient-dice{width:86px!important;height:71px!important}
+}
+
+@media(max-height:720px){
+  #game .game-board-wrap{top:48%!important;width:min(66vw,440px)!important;height:min(66vw,440px)!important}
+  #game .game-side-tools{bottom:112px!important}
+  #game .game-cell-info{bottom:82px!important;height:42px!important}
+  #game .game-bottom{height:78px!important}
+}
