@@ -1,33 +1,262 @@
-/* Territory Game v63 — one clean, working Game surface. No legacy Game layout is used. */
-#game.game-screen{position:absolute!important;inset:0!important;display:none!important;flex-direction:column!important;overflow:hidden!important;padding:0!important;background:#07171d!important;color:#f3e4c4!important}
+/* Territory Game v64 — Sdolars Winter scene
+   Single isolated mobile Game surface. The playable board remains DOM-driven;
+   harbor_top.jpg is the scene and ship_only.png is the central S$S artwork. */
+
+#game.game-screen{
+  position:absolute!important;inset:0!important;z-index:1000!important;
+  display:none!important;flex-direction:column!important;overflow:hidden!important;
+  padding:0!important;background:#06131b!important;color:#f4e4c5!important;
+  isolation:isolate!important;overscroll-behavior:none!important;
+}
 #game.game-screen.active{display:flex!important}
 #game .game-bg{display:none!important}
-#game .game-topbar{position:relative;z-index:50;flex:0 0 66px;height:66px;display:grid;grid-template-columns:44px 1fr 118px;align-items:center;gap:7px;padding:5px 8px;background:linear-gradient(180deg,#06121a,#091a22);border-bottom:1px solid #9b7744}
-#game .game-close{width:42px;height:42px;border:1px solid #a27d49;border-radius:10px;background:#13242b;color:#f4ddb0;font-size:28px;line-height:1}
-#game .game-title{text-align:center;line-height:.95;display:flex;flex-direction:column;gap:2px}.game-title b{font-family:Georgia,serif;font-size:21px}.game-title strong{font-family:Georgia,serif;font-size:16px}.game-title small{font-size:7px;letter-spacing:1.4px;color:#b7a887}
-#game .game-timer{text-align:right}.game-timer span{display:block;font-size:7px;color:#b6ad9b}.game-timer b{display:block;font-size:12px;color:#f0ce84;margin-top:2px}
-#game .game-reward-track{position:relative;z-index:50;flex:0 0 58px;height:58px;display:flex;gap:5px;overflow-x:auto;padding:5px 7px;background:#0b1b22;border-bottom:1px solid #715d40;scrollbar-width:none}.game-reward-track::-webkit-scrollbar{display:none}
-#game .reward-step{flex:1 0 78px;min-width:78px;height:48px;border:1px solid #796341;border-radius:8px;background:linear-gradient(180deg,#16272e,#101b21);color:#eadcbd;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}.reward-step.done{border-color:#d5a852;background:#3b2a19}.reward-step .reward-icon{font-size:16px}.reward-step .reward-amount{font-size:9px;margin-top:2px}.reward-step small{font-size:7px;color:#b8b09e;margin-top:3px}
-#game .game-tools{position:relative;z-index:50;flex:0 0 53px;height:53px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px 8px;background:#0b1a21;border-bottom:1px solid #765d3c}
-#game .game-tools button{height:45px;border:1px solid #ae8148;border-radius:9px;background:linear-gradient(180deg,#5c3925,#2c211b);color:#f3dfbb;display:grid;grid-template-columns:24px 1fr;grid-template-rows:1fr 1fr;align-items:center;text-align:left;padding:3px 6px;box-shadow:0 2px 5px #0007}.game-tools button span{grid-row:1/3;font-size:20px;text-align:center}.game-tools button b{font-size:8px}.game-tools button small{font-size:6px;color:#c7baa1}
-#game .game-progress{position:relative;z-index:45;align-self:center;margin:4px 0 -1px;padding:5px 12px;border:1px solid #987548;border-radius:14px;background:#071820eF;font-size:9px;display:flex;gap:14px;align-items:center;justify-content:center;width:max-content;max-width:94%}.game-progress b{color:#f0ce87}
-#game .game-main{position:relative;z-index:10;flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 6px 3px}
-#game .game-harbor{position:absolute;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(3,15,22,.05),rgba(4,16,22,.15) 45%,rgba(3,12,17,.7)),url('./harbor_top.jpg') center/cover no-repeat}
-#game .game-harbor:after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 54%,rgba(16,47,51,.08),rgba(2,14,20,.48) 78%)}
-#game .game-board-wrap{position:relative;z-index:2;flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#game .game-board-shell{position:relative;width:min(94vw,430px);height:min(94vw,430px);max-height:100%;aspect-ratio:1/1;filter:drop-shadow(0 10px 13px #000b)}
-#game .game-board-shell:before{content:'';position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle at 50% 44%,rgba(20,54,57,.9),rgba(3,22,28,.97) 72%);border:2px solid #987647;box-shadow:inset 0 0 30px #000d,0 0 0 5px rgba(8,22,27,.72);z-index:0}
+
+/* Header */
+#game .game-topbar{
+  position:relative;z-index:60;flex:0 0 62px;height:62px;
+  display:grid;grid-template-columns:42px 1fr 102px;align-items:center;gap:6px;
+  padding:5px 8px;background:linear-gradient(180deg,#07141b,#10242b 55%,#07141b);
+  border-bottom:1px solid #a77a42;box-sizing:border-box;
+}
+#game .game-close{
+  width:40px;height:40px;border:1px solid #b18a52;border-radius:10px;
+  background:rgba(9,22,28,.9);color:#f4ddb0;font-size:27px;line-height:1;
+  box-shadow:0 3px 7px #0008;
+}
+#game .game-title{text-align:center;line-height:.95;display:flex;flex-direction:column;gap:2px;min-width:0}
+#game .game-title b{font:700 19px Georgia,serif;color:#f5d697;letter-spacing:.3px}
+#game .game-title strong{font:800 14px Georgia,serif;color:#fff0c4}
+#game .game-title small{font-size:6px;letter-spacing:1.4px;color:#b9ad91;white-space:nowrap}
+#game .game-timer{text-align:right;min-width:0}
+#game .game-timer span{display:block;font-size:6px;color:#aaa18e;white-space:nowrap}
+#game .game-timer b{display:block;font-size:10px;color:#f1ca79;margin-top:2px;white-space:nowrap}
+
+/* Reward rail */
+#game .game-reward-track{
+  position:relative;z-index:60;flex:0 0 55px;height:55px;display:flex;gap:5px;
+  overflow-x:auto;padding:5px 7px;background:linear-gradient(180deg,#101f25,#0a171d);
+  border-bottom:1px solid #765b39;scrollbar-width:none;box-sizing:border-box;
+}
+#game .game-reward-track::-webkit-scrollbar{display:none}
+#game .reward-step{
+  flex:0 0 76px;min-width:76px;height:45px;border:1px solid #80633f;border-radius:8px;
+  background:linear-gradient(180deg,#1a2a2e,#0d181d);color:#eadbbb;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;
+  box-shadow:inset 0 1px #fff2,0 2px 4px #0006;
+}
+#game .reward-step.done{border-color:#d3a54f;background:linear-gradient(180deg,#405d3a,#233724)}
+#game .reward-step .reward-icon{font-size:15px}
+#game .reward-step .reward-amount{font-size:8px;margin-top:2px}
+#game .reward-step small{font-size:6px;color:#bdb39d;margin-top:3px;white-space:nowrap}
+
+/* Tools */
+#game .game-tools{
+  position:relative;z-index:60;flex:0 0 49px;height:49px;display:grid;
+  grid-template-columns:repeat(3,1fr);gap:5px;padding:3px 7px;
+  background:rgba(7,18,23,.94);border-bottom:1px solid #6e5436;box-sizing:border-box;
+}
+#game .game-tools button{
+  height:43px;border:1px solid #a9783f;border-radius:8px;
+  background:linear-gradient(180deg,#614126,#2d2119);color:#f4dfba;
+  display:grid;grid-template-columns:22px 1fr;grid-template-rows:1fr 1fr;
+  align-items:center;text-align:left;padding:2px 5px;box-shadow:0 2px 5px #0008;
+}
+#game .game-tools button span{grid-row:1/3;font-size:18px;text-align:center}
+#game .game-tools button b{font-size:7px;white-space:nowrap}
+#game .game-tools button small{font-size:5px;color:#c8baa0;white-space:nowrap}
+
+#game .game-progress{
+  position:relative;z-index:55;align-self:center;margin:3px 0 -1px;padding:4px 10px;
+  border:1px solid #947247;border-radius:12px;background:rgba(5,19,25,.9);
+  font-size:8px;display:flex;gap:10px;align-items:center;justify-content:center;
+  width:max-content;max-width:94%;box-shadow:0 3px 7px #0006;
+}
+#game .game-progress b{color:#f1ce85}
+
+/* Main scene: use the supplied panorama as a real scene, not a CSS imitation. */
+#game .game-main{
+  position:relative;z-index:10;flex:1;min-height:0;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0 6px 2px;box-sizing:border-box;
+}
+#game .game-harbor{
+  position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background-image:
+    linear-gradient(180deg,rgba(3,12,18,.08) 0%,rgba(3,15,21,.16) 45%,rgba(2,11,16,.66) 100%),
+    url('./harbor_top.jpg');
+  background-repeat:no-repeat,no-repeat;
+  /* The source is a wide 1536×588 panorama. Keep the complete scene visible
+     across the mobile viewport instead of letting cover destroy the composition. */
+  background-size:100% auto,100% auto;
+  background-position:center top,center top;
+  background-color:#0b3440;
+}
+#game .game-harbor:before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,16,23,0) 0 34%,rgba(4,18,25,.22) 60%,rgba(2,10,15,.72) 100%);
+}
+#game .game-harbor:after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:44%;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 20%,rgba(255,185,88,.10),transparent 48%),linear-gradient(180deg,transparent,rgba(1,10,15,.55));
+}
+
+/* A dark translucent play area lets the real panorama remain visible around the board. */
+#game .game-board-wrap{
+  position:relative;z-index:2;flex:1;min-height:0;width:100%;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+#game .game-board-wrap:before{
+  content:'';position:absolute;left:50%;top:50%;width:min(84vw,330px);height:min(84vw,330px);
+  transform:translate(-50%,-50%) rotate(45deg);border-radius:24px;
+  background:rgba(4,19,24,.26);border:1px solid rgba(225,190,121,.18);
+  box-shadow:0 14px 28px rgba(0,0,0,.25),inset 0 0 30px rgba(0,0,0,.14);
+  pointer-events:none;z-index:0;
+}
+#game .game-board-shell{
+  position:relative;width:min(74vw,318px);height:min(74vw,318px);
+  max-width:318px;max-height:100%;aspect-ratio:1/1;filter:drop-shadow(0 10px 13px #000b);z-index:3;
+}
+#game .game-board-shell:before{
+  content:'';position:absolute;inset:0;border-radius:22px;z-index:0;
+  background:linear-gradient(145deg,#ead9b0 0%,#c3a16b 52%,#8f653c 100%);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  box-shadow:inset 0 0 0 2px rgba(69,42,23,.62),inset 0 0 0 8px rgba(255,239,190,.2);
+}
 #game .game-board{position:absolute;inset:0;z-index:5}
-#game .board-cell{position:absolute!important;width:clamp(48px,14.5vw,64px)!important;height:clamp(48px,14.5vw,64px)!important;margin:0!important;border:2px solid #634b32!important;border-radius:11px!important;background:linear-gradient(145deg,#f2e3c0,#c5a66f)!important;color:#3c2a1c!important;box-shadow:inset 0 1px 0 #fff8,0 3px 6px #0009!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:3px!important;overflow:hidden!important;transform:translate(-50%,-50%)!important;z-index:5!important}
-#game .board-cell .tile-content{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;line-height:.88!important;text-align:center!important;width:100%!important;transform:none!important}.tile-icon{font-size:18px}.tile-content b{font-size:10px;margin-top:2px}.tile-content small{font-size:6px;margin-top:2px;white-space:nowrap}.board-cell.active{border-color:#f5d16f!important;box-shadow:0 0 0 2px #d79d3c,0 3px 8px #0009!important;z-index:9!important}.board-cell.start{background:linear-gradient(145deg,#a9df62,#328843)!important;color:#fff6d8!important;border-color:#e0f27f!important}.board-cell.finish{background:linear-gradient(145deg,#efc36b,#a6532c)!important;color:#fff1d3!important;border-color:#f0cf8c!important}.start-ribbon{display:none!important}
-#game .game-center{position:absolute;z-index:7;left:50%;top:50%;transform:translate(-50%,-50%);width:48%;height:48%;border-radius:50%;background:radial-gradient(circle,#183d42,#061b23 72%);border:2px solid #a17b4b;box-shadow:inset 0 0 25px #000d,0 4px 10px #000b;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden}.game-center b{font-family:Georgia,serif;font-size:13px;letter-spacing:2px;color:#f0cf91}.game-center small{font-size:7px;color:#c4b596;letter-spacing:1px}
-#game .game-ship-wrap{width:88%;height:70%;overflow:hidden;border-radius:50%;margin-top:1px}.game-ship-art{width:100%;height:100%;background:url('./ship_only.png') center/contain no-repeat!important;filter:contrast(1.1) brightness(.92);}
-#game .game-token{position:absolute;z-index:15;width:28px;height:34px;margin:-17px 0 0 -14px;color:#f4e4bc;font-size:28px;text-shadow:0 2px 4px #000;transition:left .28s ease,top .28s ease;pointer-events:none}
-#game .game-cell-info{position:relative;z-index:40;flex:0 0 43px;width:calc(100% - 24px);margin:0 12px 3px;padding:5px 10px;border:1px solid #a77f4d;border-radius:8px;background:rgba(30,22,15,.93);text-align:center;display:flex;flex-direction:column;justify-content:center;gap:1px}.game-cell-info b{font-family:Georgia,serif;font-size:10px;color:#f1d29a}.game-cell-info span{font-size:7px;color:#d0c2a6}
-#game .game-bottom{position:relative;z-index:50;flex:0 0 88px;height:88px;display:grid;grid-template-columns:1fr 96px 1fr;align-items:center;gap:7px;padding:4px 9px;background:linear-gradient(180deg,#071820,#091b22);border-top:1px solid #80603d}
-#game .dice-count{display:grid;grid-template-columns:29px 1fr;grid-template-rows:auto auto auto;align-items:center;justify-content:center}.dice-icon{grid-row:1/3;font-size:22px}.dice-count b{font-size:22px;color:#f4dfb8}.dice-count span:not(.dice-icon){font-size:8px}.dice-count small{grid-column:1/3;font-size:7px;color:#9e9a8e}
-#game .ancient-dice{height:74px;border:2px solid #c18a3e;border-radius:16px;background:linear-gradient(145deg,#8c5c25,#392416);color:#f9e2b2;box-shadow:inset 0 1px 0 #fff5,0 4px 8px #0009;display:flex;flex-direction:column;align-items:center;justify-content:center}.dice-face{font-size:32px;line-height:32px}.ancient-dice small{font-family:Georgia,serif;font-size:11px;letter-spacing:1px}.ancient-dice:disabled{opacity:.45}
-#game .skip-roll{justify-self:end;display:flex;align-items:center;gap:6px;color:#ded4c1;font-size:8px;line-height:1.1}.skip-roll input{width:22px;height:22px;accent-color:#d4a553}
-#game .game-modal,#game .game-tasks-modal,#game .game-panel-modal{position:absolute;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:#000b;padding:18px}.game-modal.show,.game-tasks-modal.show,.game-panel-modal.show{display:flex}.game-modal-card,.game-tasks-card,.game-panel-card{width:min(92%,390px);max-height:82%;overflow:auto;border:1px solid #bb8b4b;border-radius:14px;background:linear-gradient(180deg,#302319,#161b1c);padding:18px;color:#f5e5c8;position:relative;box-shadow:0 10px 30px #000c}.game-modal-close{position:absolute;right:10px;top:8px;border:0;background:transparent;color:#f3d49e;font-size:25px}.modal-banner,.panel-banner{font-family:Georgia,serif;color:#e7bd70}.reward-items,.game-panel-list{display:grid;gap:7px;margin-top:12px}.task-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px;border:1px solid #594735;border-radius:8px}.task-row button,.game-panel-list button{border:1px solid #a8793d;background:#4c321f;color:#f7ddb0;border-radius:7px;padding:7px 9px}
-@media(max-width:430px){#game .game-topbar{grid-template-columns:42px 1fr 106px;height:62px;flex-basis:62px}.game-title b{font-size:20px}.game-title strong{font-size:15px}#game .game-reward-track{height:56px;flex-basis:56px}#game .reward-step{min-width:76px;height:46px}#game .game-tools{height:51px;flex-basis:51px}#game .game-tools button{height:43px}#game .game-board-shell{width:min(96vw,420px);height:min(96vw,420px)}.tile-icon{font-size:17px}.tile-content b{font-size:9px}.tile-content small{font-size:5.5px}#game .game-center{width:46%;height:46%}#game .game-bottom{grid-template-columns:1fr 94px 1fr;height:84px;flex-basis:84px}}
-@media(max-height:760px){#game .game-cell-info{flex-basis:38px}#game .game-bottom{height:80px;flex-basis:80px}.ancient-dice{height:68px!important}}
+#game .board-cell{
+  position:absolute!important;width:12%!important;height:8.5%!important;min-width:0!important;min-height:0!important;
+  margin:0!important;border:2px solid #76542f!important;border-radius:8px!important;
+  background:linear-gradient(145deg,#fff4d4,#d5b77e)!important;color:#4a2d1b!important;
+  box-shadow:0 3px 0 rgba(74,45,23,.4),0 4px 8px rgba(0,0,0,.2)!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;overflow:visible!important;
+  transform:translate(-50%,-50%) rotate(var(--tile-rot,0deg))!important;transform-origin:center!important;z-index:5!important;
+}
+#game .board-cell .tile-content{
+  width:100%!important;height:100%!important;display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;line-height:1!important;text-align:center!important;
+  transform:rotate(calc(-1 * var(--tile-rot,0deg)))!important;
+}
+#game .board-cell .tile-icon{font-size:11px!important;line-height:11px!important}
+#game .board-cell b{font:800 11px/11px Georgia,serif!important;color:#4b2d1b!important}
+#game .board-cell small{font-size:4.5px!important;line-height:5px!important;white-space:nowrap!important;color:#6a4c31!important;font-weight:900!important}
+#game .board-cell.active{transform:translate(-50%,-50%) rotate(var(--tile-rot,0deg)) scale(1.1)!important;outline:2px solid #fff0a3!important;outline-offset:1px!important;filter:brightness(1.12)!important;z-index:9!important}
+#game .board-cell.start{background:linear-gradient(145deg,#b4df70,#4a944b)!important;color:#fff5d7!important;border-color:#e4ee8a!important}
+#game .board-cell.finish{background:linear-gradient(145deg,#f2c873,#a85a2e)!important;color:#fff0d0!important;border-color:#f1d08f!important}
+#game .start-ribbon{display:none!important}
+
+/* The supplied ship image is the center of the board. */
+#game .game-center{
+  position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;
+  width:38%!important;height:38%!important;box-sizing:border-box!important;z-index:7!important;
+  border:3px solid #5b3720!important;border-radius:18px!important;
+  background:linear-gradient(145deg,#c79250,#8b592f 55%,#683f24)!important;
+  box-shadow:inset 0 0 0 3px #e0b36c,inset 0 0 0 7px rgba(75,43,22,.4),0 7px 12px rgba(39,25,16,.35)!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;overflow:hidden!important;
+}
+#game .game-ship-wrap{width:88%!important;height:72%!important;overflow:hidden!important;border-radius:50%!important;margin-top:0!important}
+#game .game-ship-art{
+  width:100%!important;height:100%!important;background:url('./ship_only.png') center/contain no-repeat!important;
+  filter:contrast(1.08) brightness(.94) drop-shadow(0 5px 3px rgba(36,28,20,.42));
+  animation:territoryShipSway 3.8s ease-in-out infinite;
+}
+#game .game-center b{font:800 9px/10px Georgia,serif!important;color:#ffe9b3!important;letter-spacing:2px!important}
+#game .game-center small{font-size:5px!important;line-height:6px!important;color:#f0d09a!important;letter-spacing:1px!important}
+@keyframes territoryShipSway{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-3px) rotate(2deg)}}
+
+#game .game-token{
+  position:absolute!important;z-index:15!important;width:30px!important;height:30px!important;
+  margin:0!important;display:grid!important;place-items:center!important;transform:translate(-50%,-50%)!important;
+  border-radius:50%!important;background:radial-gradient(circle at 35% 30%,#fff0aa,#d28f2c 58%,#6d3d18)!important;
+  border:2px solid #fff0ae!important;color:#3b2415!important;font-size:18px!important;line-height:1!important;
+  filter:drop-shadow(0 3px 2px rgba(34,24,14,.6));pointer-events:none!important;
+  transition:left .26s cubic-bezier(.2,.78,.25,1),top .26s cubic-bezier(.2,.78,.25,1),transform .18s ease!important;
+}
+#game .game-token.moving{animation:territoryTokenStep .26s ease-in-out!important}
+@keyframes territoryTokenStep{50%{transform:translate(-50%,-68%) scale(1.1)!important}}
+
+#game .game-cell-info{
+  position:relative;z-index:40;flex:0 0 38px;width:calc(100% - 24px);margin:0 12px 2px;
+  padding:4px 9px;border:1px solid #a77f4d;border-radius:8px;background:rgba(25,18,12,.9);
+  text-align:center;display:flex;flex-direction:column;justify-content:center;gap:1px;box-sizing:border-box;
+}
+#game .game-cell-info b{font:800 9px/10px Georgia,serif;color:#f1d29a}
+#game .game-cell-info span{font-size:6px;color:#d0c2a6}
+
+/* Bottom controls */
+#game .game-bottom{
+  position:relative;z-index:60;flex:0 0 92px;height:92px;display:grid;
+  grid-template-columns:1fr 82px 1fr;align-items:center;gap:6px;padding:5px 8px;
+  background:linear-gradient(180deg,#d9f4f4,#a8dfe8);border-top:2px solid #789fa5;box-sizing:border-box;
+}
+#game .dice-count{display:grid;grid-template-columns:27px 1fr;grid-template-rows:auto auto auto;align-items:center;justify-content:center}
+#game .dice-icon{grid-row:1/3;font-size:20px}
+#game .dice-count b{font-size:21px;color:#3c2a1d}
+#game .dice-count span:not(.dice-icon){font-size:7px;color:#4d4031}
+#game .dice-count small{grid-column:1/3;font-size:6px;color:#655e51}
+#game .ancient-dice{
+  width:72px;height:72px;justify-self:center;border:3px solid #744416;border-radius:18px;
+  background:linear-gradient(145deg,#ffe8a7 0%,#d79742 48%,#98571e 100%);color:#fff0c4;
+  box-shadow:0 7px 0 #673817,0 10px 14px rgba(47,75,79,.28),inset 0 0 0 2px rgba(255,246,191,.42);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+#game .dice-face{font-size:37px;line-height:37px}
+#game .ancient-dice small{font:800 9px Georgia,serif;letter-spacing:1px}
+#game .ancient-dice:disabled{opacity:.45}
+#game .skip-roll{justify-self:end;display:flex;align-items:center;gap:5px;color:#3f3b34;font-size:7px;line-height:9px;max-width:75px}
+#game .skip-roll input{width:20px;height:20px;accent-color:#b47c2d}
+
+/* Legacy JS can address this status element in older builds; keep any existing status safe. */
+#game .game-status{position:absolute;left:50%;bottom:5px;transform:translateX(-50%);z-index:45;width:min(68%,250px);padding:5px 8px;border-radius:9px;background:rgba(10,48,58,.74);border:1px solid rgba(235,241,230,.45);color:#fff0c6;font-size:6.5px;text-align:center;pointer-events:none}
+
+/* Modals stay inside the Game screen. */
+#game .game-modal,#game .game-tasks-modal,#game .game-panel-modal{
+  position:absolute!important;inset:0!important;z-index:120!important;display:none;align-items:center;justify-content:center;
+  width:100%!important;height:100%!important;box-sizing:border-box!important;padding:14px!important;
+  background:rgba(4,14,19,.76)!important;backdrop-filter:blur(4px)!important;
+}
+#game .game-modal.show,#game .game-tasks-modal.show,#game .game-panel-modal.show{display:flex!important}
+#game .game-modal-card,#game .game-tasks-card,#game .game-panel-card{
+  width:min(92%,390px)!important;max-height:78%!important;overflow:auto!important;box-sizing:border-box!important;
+  border:2px solid #d3a15a!important;border-radius:16px!important;background:linear-gradient(180deg,#674020,#302016)!important;
+  padding:16px!important;color:#f5e5c8!important;position:relative!important;box-shadow:0 18px 45px #000b!important;
+}
+#game .game-modal-close{position:absolute;right:9px;top:7px;border:1px solid #b87f3c;background:#3c2418;border-radius:8px;color:#f3d49e;font-size:22px;width:30px;height:30px}
+#game .modal-banner,#game .panel-banner{font-family:Georgia,serif;color:#e7bd70}
+#game .reward-items,#game .game-panel-list{display:grid;gap:7px;margin-top:12px}
+#game .task-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px;border:1px solid #79532f;border-radius:8px;background:#3c2619}
+#game .task-row button,#game .game-panel-list button{border:1px solid #a8793d;background:#4c321f;color:#f7ddb0;border-radius:7px;padding:7px 9px}
+
+/* Small phones */
+@media(max-width:430px){
+  #game .game-topbar{grid-template-columns:40px 1fr 88px;height:60px;flex-basis:60px}
+  #game .game-close{width:38px;height:38px}
+  #game .game-title b{font-size:17px} #game .game-title strong{font-size:13px}
+  #game .game-reward-track{height:53px;flex-basis:53px}
+  #game .reward-step{min-width:72px;height:43px}
+  #game .game-tools{height:47px;flex-basis:47px}
+  #game .game-tools button{height:41px}
+  #game .game-board-shell{width:min(72vw,300px);height:min(72vw,300px)}
+  #game .game-board-wrap:before{width:min(80vw,300px);height:min(80vw,300px)}
+  #game .game-bottom{grid-template-columns:1fr 78px 1fr;height:88px;flex-basis:88px}
+  #game .ancient-dice{width:68px;height:68px}
+  #game .dice-face{font-size:34px}
+}
+@media(max-width:360px){
+  #game .game-board-shell{width:270px;height:270px}
+  #game .game-board-wrap:before{width:275px;height:275px}
+  #game .board-cell .tile-icon{font-size:9px!important}
+  #game .board-cell b{font-size:10px!important}
+  #game .board-cell small{font-size:4px!important}
+  #game .game-center .game-ship-art{filter:contrast(1.08) brightness(.9) drop-shadow(0 4px 2px rgba(36,28,20,.42))}
+  #game .game-bottom{grid-template-columns:1fr 70px 1fr;height:84px;flex-basis:84px;padding-left:5px;padding-right:5px}
+  #game .ancient-dice{width:64px;height:64px}
+}
+@media(max-height:700px){
+  #game .game-topbar{height:56px;flex-basis:56px}
+  #game .game-reward-track{height:49px;flex-basis:49px}
+  #game .game-tools{height:44px;flex-basis:44px}
+  #game .game-tools button{height:38px}
+  #game .game-cell-info{flex-basis:34px}
+  #game .game-bottom{height:80px;flex-basis:80px}
+  #game .ancient-dice{height:64px}
+}
