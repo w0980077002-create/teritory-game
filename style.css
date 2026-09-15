@@ -1021,3 +1021,52 @@ body:has(#home.active) .live-side-ui button small{font-size:6px!important}
  .guard-label{left:4%!important;bottom:9%!important}
  .trader-label{right:4%!important;bottom:9%!important}
 }
+
+/* Territory v29 — ЖИВАЯ ИГРА: анимации поверх реалистичной сцены без искажения фона */
+body:has(#home.active) .real-home{isolation:isolate}
+body:has(#home.active) .real-home-image{z-index:1;transform:none!important;animation:none!important;object-fit:cover!important;object-position:center center!important}
+body:has(#home.active) .game-life-layer{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden}
+body:has(#home.active) .game-person{position:absolute;width:10px;height:25px;transform-origin:50% 100%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.55));opacity:.78}
+body:has(#home.active) .game-person:before{content:"";position:absolute;left:3px;top:0;width:5px;height:5px;border-radius:50%;background:#9a684e;border:1px solid rgba(20,20,20,.65)}
+body:has(#home.active) .game-person:after{content:"";position:absolute;left:1px;top:6px;width:8px;height:12px;border-radius:3px 3px 2px 2px;background:linear-gradient(90deg,#1b2630,#56616a,#1a232b);box-shadow:-2px 10px 0 -1px #11181d,2px 10px 0 -1px #11181d}
+body:has(#home.active) .game-person.p2:after{background:linear-gradient(90deg,#4b362a,#87694d,#3a2b23)}
+body:has(#home.active) .game-person.p3:after{background:linear-gradient(90deg,#263e36,#61705e,#202e29)}
+body:has(#home.active) .game-person.p4:after{background:linear-gradient(90deg,#3c2732,#76515d,#2b1d25)}
+body:has(#home.active) .game-person.p5:after{background:linear-gradient(90deg,#34302a,#75674d,#27231e)}
+body:has(#home.active) .game-person.walk-a{left:-4%;top:67%;animation:gameWalkA 18s linear infinite}
+body:has(#home.active) .game-person.walk-b{left:22%;top:70%;transform:scale(.72);animation:gameWalkB 22s linear infinite -7s}
+body:has(#home.active) .game-person.walk-c{left:73%;top:69%;transform:scale(.78);animation:gameWalkC 20s linear infinite -11s}
+body:has(#home.active) .game-person.walk-d{left:104%;top:72%;transform:scale(.86);animation:gameWalkD 25s linear infinite -4s}
+body:has(#home.active) .game-person.walk-e{left:42%;top:64%;transform:scale(.55);opacity:.5;animation:gameWalkE 27s linear infinite -16s}
+@keyframes gameWalkA{0%{left:-5%;transform:translateY(0)}45%{transform:translateY(-1px)}100%{left:106%;transform:translateY(0)}}
+@keyframes gameWalkB{0%{left:15%}50%{left:55%;transform:translateY(-1px) scale(.72)}100%{left:105%}}
+@keyframes gameWalkC{0%{left:105%}50%{left:58%;transform:translateY(-1px) scale(.78)}100%{left:-5%}}
+@keyframes gameWalkD{0%{left:106%}100%{left:-6%}}
+@keyframes gameWalkE{0%{left:-8%}100%{left:108%}}
+body:has(#home.active) .game-campfire{position:absolute;left:50%;top:69.5%;width:42px;height:52px;transform:translate(-50%,-50%);filter:drop-shadow(0 0 7px rgba(255,150,45,.55))}
+body:has(#home.active) .game-campfire:before{content:"";position:absolute;left:50%;bottom:0;width:17px;height:34px;transform:translateX(-50%);border-radius:55% 45% 48% 48%;background:radial-gradient(circle at 50% 70%,#fff7b1 0 14%,#ffd15a 15% 36%,#f36d24 37% 68%,transparent 70%);transform-origin:50% 100%;animation:gameFlame 1.05s ease-in-out infinite}
+body:has(#home.active) .game-campfire:after{content:"";position:absolute;left:50%;bottom:4px;width:8px;height:20px;transform:translateX(-50%);border-radius:60% 40% 50% 50%;background:#fff8ce;animation:gameFlame .72s ease-in-out infinite reverse}
+@keyframes gameFlame{0%,100%{transform:translateX(-50%) scaleY(1) rotate(-2deg)}50%{transform:translateX(-50%) scaleY(1.13) rotate(3deg)}}
+body:has(#home.active) .game-ember{position:absolute;width:3px;height:3px;border-radius:50%;background:#ffd47c;box-shadow:0 0 6px rgba(255,155,55,.7);opacity:0}
+body:has(#home.active) .game-ember.e1{left:49.4%;top:69%;animation:gameEmber 2.2s ease-out infinite}
+body:has(#home.active) .game-ember.e2{left:51%;top:70%;animation:gameEmber 2.6s ease-out infinite .8s}
+body:has(#home.active) .game-ember.e3{left:50%;top:68.8%;animation:gameEmber 2.4s ease-out infinite 1.5s}
+@keyframes gameEmber{0%{opacity:0;transform:translate(0,0)}20%{opacity:.9}100%{opacity:0;transform:translate(7px,-30px) scale(.2)}}
+body:has(#home.active) .game-smoke{position:absolute;left:50%;top:62%;width:32px;height:70px;transform:translateX(-50%);opacity:.16;filter:blur(3px)}
+body:has(#home.active) .game-smoke i,body:has(#home.active) .game-smoke b,body:has(#home.active) .game-smoke em{position:absolute;width:10px;height:10px;border-radius:50%;background:rgba(205,215,215,.65);animation:gameSmoke 6s ease-out infinite}
+body:has(#home.active) .game-smoke i{left:9px;bottom:0}.game-smoke b{left:15px;bottom:10px;animation-delay:2s}.game-smoke em{left:4px;bottom:19px;animation-delay:3.7s}
+@keyframes gameSmoke{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:.55}100%{opacity:0;transform:translate(8px,-42px) scale(1.25)}}
+body:has(#home.active) .game-bird{position:absolute;width:13px;height:7px;opacity:.38}
+body:has(#home.active) .game-bird:before,body:has(#home.active) .game-bird:after{content:"";position:absolute;top:2px;width:6px;height:3px;border-top:1px solid rgba(8,18,28,.9);border-radius:80% 80% 0 0}
+body:has(#home.active) .game-bird:before{left:0;transform:rotate(-14deg)}body:has(#home.active) .game-bird:after{right:0;transform:rotate(14deg)}
+body:has(#home.active) .game-bird.b1{left:-6%;top:27%;animation:gameBird 20s linear infinite}
+body:has(#home.active) .game-bird.b2{left:20%;top:31%;transform:scale(.7);animation:gameBird2 25s linear infinite -9s}
+@keyframes gameBird{0%{left:-7%;transform:translateY(0) scale(.8)}50%{transform:translateY(-6px) scale(.95)}100%{left:108%;transform:translateY(3px) scale(.72)}}
+@keyframes gameBird2{0%{left:10%}100%{left:108%;transform:translateY(-8px) scale(.72)}}
+body:has(#home.active) .game-lantern{position:absolute;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,rgba(255,195,95,.28),rgba(255,160,45,.08) 35%,transparent 70%);filter:blur(2px);opacity:.58}
+body:has(#home.active) .game-lantern.l1{left:5%;top:59%;animation:gameLamp 2.8s ease-in-out infinite}.game-lantern.l2{right:5%;top:59%;animation:gameLamp 3.2s ease-in-out infinite reverse}
+@keyframes gameLamp{0%,100%{opacity:.45;transform:scale(.96)}50%{opacity:.8;transform:scale(1.06)}}
+body:has(#home.active) .scene-toast{position:absolute;left:14px;bottom:8%;max-width:235px;padding:7px 10px;border:1px solid rgba(176,191,207,.5);border-radius:10px;background:rgba(6,14,23,.62);color:#e8edf2;font-size:9px;line-height:12px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s;z-index:70}
+body:has(#home.active) .scene-toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:390px){body:has(#home.active) .game-person{width:9px;height:22px}.game-campfire{transform:translate(-50%,-50%) scale(.85)!important}.scene-toast{left:10px!important;bottom:7%!important;max-width:205px!important;font-size:8px!important}}
+@media(prefers-reduced-motion:reduce){body:has(#home.active) .game-person,body:has(#home.active) .game-campfire:before,body:has(#home.active) .game-campfire:after,body:has(#home.active) .game-ember,body:has(#home.active) .game-smoke i,body:has(#home.active) .game-smoke b,body:has(#home.active) .game-smoke em,body:has(#home.active) .game-bird,body:has(#home.active) .game-lantern{animation:none!important}}
