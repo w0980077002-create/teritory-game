@@ -238,6 +238,8 @@ function gameRelayoutBoard(){
  gamePlaceToken(false);
 }
 window.addEventListener('resize',()=>{if(document.querySelector('#game.active')) requestAnimationFrame(gameRelayoutBoard);});
+const gameVisibilityObserver=new MutationObserver(()=>{if(document.querySelector('#game.active')) requestAnimationFrame(()=>{gameRelayoutBoard();gameUpdateStatus();});});
+const gameRootForObserver=document.querySelector('#game'); if(gameRootForObserver) gameVisibilityObserver.observe(gameRootForObserver,{attributes:true,attributeFilter:['class']});
 
 function gameSelectCell(index){
  const c=GAME_CELLS[index]; if(!c)return;
