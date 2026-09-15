@@ -951,3 +951,34 @@ body:has(#home.active) .hs-game{display:none!important}
  body:has(#home.active) .live-side-ui button b{font-size:9px!important}
  body:has(#home.active) .live-side-ui button small{font-size:6px!important}
 }
+
+/* Territory v26 — компактный город и время без наложения */
+body:has(#home.active) .live-city-title{
+  left:12px!important;
+  top:12px!important;
+  width:185px!important;
+  padding:8px 11px 8px!important;
+  border-radius:12px!important;
+  background:rgba(7,15,24,.62)!important;
+  box-shadow:0 6px 16px rgba(0,0,0,.20)!important;
+}
+body:has(#home.active) .live-city-title small{font-size:7px!important;letter-spacing:1.6px!important;margin-bottom:3px!important}
+body:has(#home.active) .live-city-title strong{font-size:24px!important;letter-spacing:1.6px!important;line-height:25px!important}
+body:has(#home.active) .live-city-title em{font-size:6.5px!important;letter-spacing:.8px!important;margin-top:4px!important}
+body:has(#home.active) .live-city-time{
+  right:72px!important;
+  top:14px!important;
+  padding:7px 9px!important;
+  border-radius:10px!important;
+  background:rgba(7,15,24,.58)!important;
+  font-size:9px!important;
+  white-space:nowrap!important;
+}
+body:has(#home.active) .live-city-time b{font-size:11px!important;margin-left:3px!important}
+@media(max-width:390px){
+  body:has(#home.active) .live-city-title{left:9px!important;top:9px!important;width:170px!important;padding:7px 9px!important}
+  body:has(#home.active) .live-city-title strong{font-size:21px!important;line-height:22px!important}
+  body:has(#home.active) .live-city-title em{font-size:6px!important}
+  body:has(#home.active) .live-city-time{right:66px!important;top:11px!important;padding:6px 8px!important;font-size:8px!important}
+  body:has(#home.active) .live-city-time b{font-size:10px!important}
+}
