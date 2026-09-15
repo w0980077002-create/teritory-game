@@ -212,15 +212,27 @@ function gameShowReward(reward,title='Поздравляем!'){
  clearInterval(gameModalTimerId); gameModalTimerId=setInterval(()=>{sec--; const el=$("#modalCloseHint"); if(el)el.textContent=sec>0?`Нажмите, чтобы закрыть (${sec}s)`:'Нажмите, чтобы закрыть'; if(sec<=0)clearInterval(gameModalTimerId)},1000);
  gameUpdateStatus();
 }
+function gameClaimNewMilestones(){
+ const reached=GAME_REWARDS.filter(r=>state.gameLap>=r.lap && !state.gameMilestones.includes(r.lap));
+ reached.forEach(r=>state.gameMilestones.push(r.lap));
+ return reached;
+}
+function gameGrantExp(amount=5){
+ state.exp+=amount;
+ while(state.exp>=100){
+   state.exp-=100;
+   state.level++;
+   state.maxHp+=10;
+   state.hp=state.maxHp;
+ }
+}
 function gameResolveCell(){
  const cell=GAME_CELLS[((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS];
  const reward=cell.value==='?'?gameRandomReward():[[cell.icon,cell.value,cell.label.toLowerCase()]];
- state.exp+=5;
- while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp}
+ gameGrantExp(5);
  state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
  state.gameTaskProgress=state.gameRolls;
- const reached=GAME_REWARDS.filter(r=>state.gameLap>=r.lap && !state.gameMilestones.includes(r.lap));
- reached.forEach(r=>state.gameMilestones.push(r.lap));
+ const reached=gameClaimNewMilestones();
  save();
  gameShowReward(reward,cell.value==='?'?'Сюрприз!':'Клетка пройдена');
  if(reached.length){
@@ -567,19 +579,24 @@ async function gameRoll10(){
       gamePlaceToken(true); gameUpdateStatus();
       if(!gameSkipRequested)await new Promise(r=>setTimeout(r,120));
     }
-    const got=gameApplyCellRewardSilent();
+      const got=gameApplyCellRewardSilent();
     const item=got.reward[0];
     results.push({face,icon:item[0],amount:item[1],label:item[2]});
     state.gameRolls++;
+    state.gameTaskProgress=state.gameRolls;
     if(!gameSkipRequested)await new Promise(r=>setTimeout(r,120));
   }
   state.gameTaskProgress=state.gameRolls;
   state.gameSteps=state.gameLap*GAME_TRACK_CELLS+state.gamePos;
   state.gameMilestones=Array.isArray(state.gameMilestones)?state.gameMilestones:[];
-  GAME_REWARDS.filter(r=>state.gameLap>=r.lap&&!state.gameMilestones.includes(r.lap)).forEach(r=>state.gameMilestones.push(r.lap));
+  const newlyReached=gameClaimNewMilestones();
   gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
   if(skip)skip.disabled=true;
   save(); gameTasksInit(); gameBoardInit(); gameShowBatchResults(results); gameUpdateStatus();
+  if(newlyReached.length){
+    const bonusItems=newlyReached.flatMap(r=>r.items||[]);
+    setTimeout(()=>gameShowReward(bonusItems,`Награда за круг ${newlyReached[newlyReached.length-1].lap}`),900);
+  }
 }
 function gameRollUnified(){
   const x10=$('#roll10Btn');
@@ -603,7 +620,7 @@ const JACKPOT_GROUPS_V79=Array.from({length:47},(_,i)=>{
 function gameOpenJackpotPreviewV79(){
   const modal=$('#gameJackpotModal'), list=$('#jackpotList');
   if(!modal||!list)return;
-  const current=Math.max(1,Math.min(235,state.gameLap+1));
+  const current=Math.max(1,Math.min(235,state.gameLap||1));
   list.innerHTML=JACKPOT_GROUPS_V79.map(g=>{
     const active=current>=g.from&&current<=g.to;
     const cards=g.items.map((r,idx)=>{
@@ -622,3 +639,6 @@ const rewardPreviewBtnV79=$('#gameRewardPreviewBtn');
 if(rewardPreviewBtnV79)rewardPreviewBtnV79.onclick=gameOpenJackpotPreviewV79;
 const jackpotCloseV79=$('#jackpotClose');
 if(jackpotCloseV79)jackpotCloseV79.onclick=gameCloseJackpotPreviewV79;
+const jackpotModalV79=$('#gameJackpotModal');
+if(jackpotModalV79)jackpotModalV79.addEventListener('click',e=>{if(e.target===jackpotModalV79)gameCloseJackpotPreviewV79()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPreviewV79()});
