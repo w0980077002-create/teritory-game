@@ -16,14 +16,14 @@ let state=gameLoadState();
 (()=>{
   const tg=()=>window.Telegram?.WebApp||null;
   const user=()=>tg()?.initDataUnsafe?.user||{};
-  const displayName=()=>[user().first_name,user().last_name].filter(Boolean).join(' ').trim()||user().username||'Игрок';
+  const displayName=()=>[user().first_name,user().last_name].filter(Boolean).join(' ').trim()||user().username||String(state.name||'Игрок');
   const getInitData=()=>String(tg()?.initData||'');
-  const identity=()=>({id:user().id?String(user().id):String(state.telegramId||''),name:displayName()||String(state.name||'Игрок'),username:String(user().username||state.username||''),photoUrl:String(user().photo_url||state.photoUrl||'')});
+  const identity=()=>({id:user().id?String(user().id):String(state.telegramId||''),name:displayName(),username:String(user().username||state.username||''),photoUrl:String(user().photo_url||state.photoUrl||'')});
   const getHeaders=()=>{const h={};const d=getInitData();if(d)h['x-telegram-init-data']=d;return h};
   window.territoryAuth={identity,getInitData,getHeaders,get id(){return identity().id},get name(){return identity().name},get username(){return identity().username},get photoUrl(){return identity().photoUrl}};
   const sync=()=>{const x=identity();if(!x.id)return;state.telegramId=x.id;state.username=x.username;state.photoUrl=x.photoUrl;state.name=x.name;try{localStorage.setItem('territory_save_v1',JSON.stringify(state))}catch(e){}};
   sync();
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){sync();render?.()}});
 })();
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
 state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.name||"SSS");
@@ -112,9 +112,23 @@ window.addEventListener("storage",e=>{
   setInterval(updateUI,60000);window.globalProgressionRefresh=updateUI;setTimeout(updateUI,0);
 })();
 
+setTimeout(()=>render(),0);
 function render(){
- const coins=$("#coins"), gems=$("#gems"), level=$("#level");
+ const coins=$("#coins"), gems=$("#gems"), level=$("#level"), playerName=$("#playerName"), avatar=$(".hud .avatar");
  if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
+ /* Territory v156 — Telegram profile is shown in the global HUD. */
+ const identity=window.territoryAuth?.identity?.()||{};
+ const displayName=String(identity.name||state.name||'Игрок').trim()||'Игрок';
+ const photoUrl=String(identity.photoUrl||state.photoUrl||'').trim();
+ if(playerName)playerName.textContent=displayName;
+ if(avatar){
+   avatar.textContent=photoUrl?'':'⚔️';
+   avatar.style.backgroundImage=photoUrl?`url("${photoUrl.replace(/"/g,'\\"')}")`:'';
+   avatar.style.backgroundSize=photoUrl?'cover':'';
+   avatar.style.backgroundPosition=photoUrl?'center':'';
+   avatar.style.backgroundRepeat=photoUrl?'no-repeat':'';
+   avatar.setAttribute('aria-label',`Профиль ${displayName}`);
+ }
  $("#weaponName") && ($("#weaponName").textContent=state.weapon); $("#weaponStats") && ($("#weaponStats").textContent=`Урон +${state.bonusDamage}`);
  const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
  renderShop(); renderInventory();
