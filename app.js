@@ -61,7 +61,7 @@ window.addEventListener("storage",e=>{
     }
   }catch(err){console.warn("Territory external save ignored",err);}
 });
-/* Territory v154 — compact global progression layer: energy, daily reward and home status. */
+/* Territory v155 — global progression lives in a compact profile popup, not over the city scene. */
 (function globalProgression(){
   state.energyLastAt=Number(state.energyLastAt||Date.now());
   state.dailyRewardDate=String(state.dailyRewardDate||'');
@@ -73,40 +73,43 @@ window.addEventListener("storage",e=>{
     while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp;state.notifications.unshift(`Новый уровень: ${state.level}`)}
   }
   function regenEnergy(){
-    const now=Date.now(), last=Number(state.energyLastAt||now), mins=Math.floor(Math.max(0,now-last)/60000);
+    const now=Date.now(),last=Number(state.energyLastAt||now),mins=Math.floor(Math.max(0,now-last)/60000);
     if(mins>0){state.energy=Math.min(200,Number(state.energy||0)+mins);state.energyLastAt=last+mins*60000;save();}
   }
   function ensureUI(){
-    const home=document.querySelector('#home .real-home'); if(!home)return;
-    if(!document.querySelector('#globalStatus')){
-      const box=document.createElement('div'); box.id='globalStatus'; box.innerHTML=`<div class="gs-top"><b>Состояние</b><button type="button" id="dailyRewardBtn">🎁 Награда</button></div><div class="gs-bars"><span>❤️ <b id="gsHp"></b></span><span>⚡ <b id="gsEnergy"></b></span><span>⭐ <b id="gsXp"></b></span></div><small id="gsNote">Город Sdolars живёт своими событиями.</small>`;
-      home.appendChild(box);
-      const style=document.createElement('style'); style.textContent=`#globalStatus{position:absolute;left:10px;right:10px;bottom:72px;z-index:12;padding:10px 11px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(5,10,17,.76);backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.24);color:#fff;pointer-events:auto}.gs-top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}.gs-top button{border:0;border-radius:10px;padding:7px 10px;background:rgba(255,255,255,.13);color:#fff;font-weight:800}.gs-bars{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap}.gs-bars span{padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.07);font-size:11px}.gs-bars b{font-size:12px}.gs-top button:disabled{opacity:.55}.gs-top button.ready{box-shadow:0 0 0 1px rgba(255,215,90,.35) inset}#gsNote{display:block;margin-top:6px;opacity:.68;font-size:10px}`; document.head.appendChild(style);
-      box.querySelector('#dailyRewardBtn').addEventListener('click',claimDaily);
-    }
+    if(document.querySelector('#globalStatus'))return;
+    const box=document.createElement('div');
+    box.id='globalStatus';
+    box.innerHTML=`<div class="gs-modal"><div class="gs-head"><b>Состояние игрока</b><button type="button" id="gsClose">×</button></div><div class="gs-bars"><span>❤️ <b id="gsHp"></b></span><span>⚡ <b id="gsEnergy"></b></span><span>⭐ <b id="gsXp"></b></span></div><button type="button" id="dailyRewardBtn">🎁 Получить ежедневную награду</button><small id="gsNote"></small></div>`;
+    const style=document.createElement('style');
+    style.textContent=`#globalStatus{position:fixed;inset:0;z-index:999;display:none;align-items:flex-start;justify-content:center;padding:78px 14px 20px;background:rgba(0,0,0,.45);backdrop-filter:blur(3px)}#globalStatus.open{display:flex}.gs-modal{width:min(420px,100%);padding:14px;border:1px solid rgba(255,255,255,.16);border-radius:16px;background:rgba(8,14,22,.96);box-shadow:0 16px 40px rgba(0,0,0,.45);color:#fff}.gs-head{display:flex;align-items:center;justify-content:space-between;font-size:16px}.gs-head button{border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:9px;width:32px;height:32px;font-size:22px}.gs-bars{display:flex;gap:7px;margin:12px 0;flex-wrap:wrap}.gs-bars span{padding:7px 9px;border-radius:9px;background:rgba(255,255,255,.07);font-size:12px}.gs-bars b{font-size:13px}.gs-modal #dailyRewardBtn{width:100%;border:0;border-radius:11px;padding:10px;background:rgba(255,255,255,.12);color:#fff;font-weight:800}.gs-modal #dailyRewardBtn:disabled{opacity:.55}.gs-modal #dailyRewardBtn.ready{box-shadow:0 0 0 1px rgba(255,215,90,.45) inset}.gs-modal #gsNote{display:block;margin-top:9px;opacity:.68;font-size:11px}`;
+    document.head.appendChild(style);document.body.appendChild(box);
+    box.querySelector('#gsClose').onclick=()=>box.classList.remove('open');
+    box.addEventListener('click',e=>{if(e.target===box)box.classList.remove('open')});
+    box.querySelector('#dailyRewardBtn').addEventListener('click',claimDaily);
+    const profile=document.querySelector('.hud .profile');
+    if(profile){profile.style.cursor='pointer';profile.addEventListener('click',()=>{updateUI();box.classList.add('open')})}
   }
   function claimDaily(){
-    const b=document.querySelector('#dailyRewardBtn'); if(!b)return;
-    const today=dayKey(); if(state.dailyRewardDate===today){b.textContent='✓ Получено';b.disabled=true;return}
-    state.dailyRewardDate=today; state.dailyRewardStreak+=1;
-    const coins=100+Math.min(200,(state.dailyRewardStreak-1)*25); const gems=5+(state.dailyRewardStreak>=7?5:0);
-    state.coins+=coins; state.gems+=gems; gainXp(15); state.notifications.unshift(`Ежедневная награда: +${coins} 🪙 +${gems} 💎`); state.notifications=state.notifications.slice(0,5);
-    save(); updateUI();
+    const b=document.querySelector('#dailyRewardBtn');if(!b)return;
+    const today=dayKey();if(state.dailyRewardDate===today){b.textContent='✓ Уже получено сегодня';b.disabled=true;return}
+    state.dailyRewardDate=today;state.dailyRewardStreak+=1;
+    const coins=100+Math.min(200,(state.dailyRewardStreak-1)*25),gems=5+(state.dailyRewardStreak>=7?5:0);
+    state.coins+=coins;state.gems+=gems;gainXp(15);state.notifications.unshift(`Ежедневная награда: +${coins} 🪙 +${gems} 💎`);state.notifications=state.notifications.slice(0,5);
+    save();render();updateUI();
   }
   function updateUI(){
-    regenEnergy(); ensureUI();
-    const hp=document.querySelector('#gsHp'), en=document.querySelector('#gsEnergy'), xp=document.querySelector('#gsXp'), note=document.querySelector('#gsNote'), b=document.querySelector('#dailyRewardBtn');
+    regenEnergy();ensureUI();
+    const hp=document.querySelector('#gsHp'),en=document.querySelector('#gsEnergy'),xp=document.querySelector('#gsXp'),note=document.querySelector('#gsNote'),b=document.querySelector('#dailyRewardBtn');
     if(hp)hp.textContent=`${Math.max(0,state.hp)}/${Math.max(1,state.maxHp)}`;
     if(en)en.textContent=`${Math.max(0,Math.floor(state.energy||0))}/200`;
     if(xp)xp.textContent=`${Math.max(0,state.exp)}/100`;
     if(note)note.textContent=state.notifications[0]||`Серия ежедневных наград: ${state.dailyRewardStreak}`;
-    if(b){const ready=state.dailyRewardDate!==dayKey();b.disabled=!ready;b.classList.toggle('ready',ready);b.textContent=ready?'🎁 Награда':`✓ Получено · серия ${state.dailyRewardStreak}`;}
+    if(b){const ready=state.dailyRewardDate!==dayKey();b.disabled=!ready;b.classList.toggle('ready',ready);b.textContent=ready?'🎁 Получить ежедневную награду':`✓ Уже получено · серия ${state.dailyRewardStreak}`;}
   }
   window.addEventListener('focus',updateUI);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateUI()});
-  setInterval(updateUI,60000);
-  window.globalProgressionRefresh=updateUI;
-  setTimeout(updateUI,0);
+  setInterval(updateUI,60000);window.globalProgressionRefresh=updateUI;setTimeout(updateUI,0);
 })();
 
 function render(){
