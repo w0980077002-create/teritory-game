@@ -62,7 +62,7 @@ function showScreen(id){
  document.body.classList.toggle("game-open",id==="game");
  // Monopoly always opens on a clean base screen. Intentional overlays are opened only
  // by their own buttons after the screen is visible.
- if(id==="game" && typeof gameCloseAllOverlays==='function') gameCloseAllOverlays();
+ if(id==="game" && typeof gameCloseAllOverlays==='function'){ gameCloseAllOverlays(); requestAnimationFrame(gameCloseAllOverlays); setTimeout(gameCloseAllOverlays,0); }
  if(id==="arena") resetTactical();
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b)showScreen(b.dataset.screen)});
@@ -180,7 +180,14 @@ let gameMoving=false, gameSkipRequested=false, gameTimerId=null, gameModalTimerI
 function gameCloseAllOverlays(){
   ['#gameJackpotModal','#gameRewardModal','#gameTasksModal','#gamePanelModal','#gameBatchModal'].forEach(sel=>{
     const el=document.querySelector(sel);
-    if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true');}
+    if(el){
+      el.classList.remove('show');
+      el.setAttribute('aria-hidden','true');
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('opacity','0','important');
+      el.style.setProperty('pointer-events','none','important');
+    }
   });
 }
 
@@ -302,6 +309,15 @@ function gameRandomReward(){
  return pool[Math.floor(Math.random()*pool.length)];
 }
 let gameRewardQueue=[];
+function gameOpenOverlay(el){
+  if(!el)return;
+  el.style.removeProperty('display');
+  el.style.removeProperty('visibility');
+  el.style.removeProperty('opacity');
+  el.style.removeProperty('pointer-events');
+  el.classList.add('show');
+  el.setAttribute('aria-hidden','false');
+}
 function gameShowReward(reward,title='Поздравляем!',grant=true){
  const modal=$("#gameRewardModal"), items=$("#rewardItems"); if(!modal||!items||!Array.isArray(reward)||!reward.length)return;
  const alreadyOpen=modal.classList.contains('show');
@@ -310,7 +326,7 @@ function gameShowReward(reward,title='Поздравляем!',grant=true){
  if(alreadyOpen || batch){ gameRewardQueue.push({reward,title,grant:false}); return; }
  $("#rewardModalTitle").textContent=title; $("#rewardModalText").textContent=grant?'Получено':'Предпросмотр';
  items.innerHTML=reward.map(x=>`<div class="reward-item"><i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small></div>`).join('');
- modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+ gameOpenOverlay(modal);
  let sec=3; $("#modalCloseHint").textContent=`Нажмите, чтобы закрыть (${sec}s)`;
  clearInterval(gameModalTimerId); gameModalTimerId=setInterval(()=>{sec--; const el=$("#modalCloseHint"); if(el)el.textContent=sec>0?`Нажмите, чтобы закрыть (${sec}s)`:'Нажмите, чтобы закрыть'; if(sec<=0)clearInterval(gameModalTimerId)},1000);
  gameUpdateStatus();
@@ -430,7 +446,7 @@ function gameOpenPanel(kind){
   ];
  }
  list.innerHTML=rows.map((r,i)=>`<div class="panel-offer-row"><div class="panel-offer-name">${r.name||'Набор события '+(i+1)}</div><div class="panel-offer-body"><div class="panel-offer-items">${r.items.map(x=>`<span><i>${x[0]}</i><b>${x[1]}</b></span>`).join('')}</div><button type="button" data-panel-buy="${r.id||''}" data-free="${r.free?'1':'0'}" data-price="${r.price||0}" data-currency="${r.currency||'money'}">${r.button}</button></div></div>`).join('');
- modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+ gameOpenOverlay(modal);
 }
 function gamePanelBuy(b){
  if(b.dataset.free==='1'){
@@ -696,7 +712,7 @@ function gameShowBatchResults(results){
   const totals={}; results.forEach(r=>{const k=`${r.icon}|${r.label}`; totals[k]=(totals[k]||0)+(Number(r.amount)||0)});
   const totalRows=Object.entries(totals).map(([k,n])=>{const [icon,label]=k.split('|');return `<div style="padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.12);font-weight:700">Итого: ${icon} ${n} ${label}</div>`}).join('');
   list.innerHTML=totalRows+rows;
-  m.classList.add('show'); m.setAttribute('aria-hidden','false');
+  gameOpenOverlay(m);
 }
 function gameApplyCellRewardSilent(){
   const cell=GAME_CELLS[((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS];
@@ -802,7 +818,7 @@ function gameOpenJackpotPreviewV79(){
     }).join('');
     return `<section class="jackpot-group ${active?'current-group':''}"><div class="jackpot-group-title">Круги ${g.from}–${g.to}${active?' · СЕЙЧАС':''}</div><div class="jackpot-row">${cards}</div></section>`;
   }).join('');
-  modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+  gameOpenOverlay(modal);
   requestAnimationFrame(()=>{const el=list.querySelector('.jackpot-reward.current'); if(el)el.scrollIntoView({block:'center',behavior:'auto'});});
 }
 function gameCloseJackpotPreviewV79(){const modal=$('#gameJackpotModal');if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}}

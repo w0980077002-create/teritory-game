@@ -899,3 +899,18 @@
 #game.game-clean.active .game-panel-modal[aria-hidden="true"]{
   display:none!important;
 }
+
+/* Territory v133 — modal hard isolation. Hidden Monopoly overlays are physically removed
+   from rendering; intentional open functions remove these inline guards first. */
+#game.game-clean > .game-jackpot-modal,
+#game.game-clean > .game-modal,
+#game.game-clean > .game-tasks-modal,
+#game.game-clean > .game-panel-modal{
+  display:none!important; visibility:hidden!important; opacity:0!important; pointer-events:none!important;
+}
+#game.game-clean > .game-jackpot-modal.show[aria-hidden="false"],
+#game.game-clean > .game-modal.show[aria-hidden="false"],
+#game.game-clean > .game-tasks-modal.show[aria-hidden="false"],
+#game.game-clean > .game-panel-modal.show[aria-hidden="false"]{
+  display:flex!important; visibility:visible!important; opacity:1!important; pointer-events:auto!important;
+}
