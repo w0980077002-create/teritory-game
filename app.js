@@ -30,7 +30,7 @@ function save(){
   state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0);
   state.gameSaveVersion=2;
   try{ localStorage.setItem("territory_save_v1",JSON.stringify(state)); }catch(e){ console.warn("Territory save failed",e); }
-  renderUI();
+  render();
 }
 window.addEventListener("pagehide",()=>{try{state.gameMoving=false; save();}catch(e){}});
 window.addEventListener("beforeunload",()=>{try{state.gameMoving=false; save();}catch(e){}});
@@ -43,11 +43,11 @@ window.addEventListener("storage",e=>{
       state.gameSteps=Math.max(0,Number(state.gameSteps)||0);
       state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
       state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
-      renderUI(); gameBoardInit?.(); gameUpdateStatus?.();
+      render(); gameBoardInit?.(); gameUpdateStatus?.();
     }
   }catch(err){console.warn("Territory external save ignored",err);}
 });
-function renderUI(){
+function render(){
  $("#coins").textContent=state.coins; $("#gems").textContent=state.gems; $("#level").textContent=state.level;
  $("#playerHp").textContent=`${state.hp}/${state.maxHp}`; $("#enemyHp").textContent=`${state.enemyHp}/100`;
  $("#playerHpBar").style.width=`${Math.max(0,state.hp/state.maxHp*100)}%`; $("#enemyHpBar").style.width=`${Math.max(0,state.enemyHp/100*100)}%`;
@@ -59,10 +59,6 @@ function renderUI(){
 function showScreen(id){
  document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));
- document.body.classList.toggle("game-open",id==="game");
- // Monopoly always opens on a clean base screen. Intentional overlays are opened only
- // by their own buttons after the screen is visible.
- if(id==="game" && typeof gameCloseAllOverlays==='function'){ gameCloseAllOverlays(); requestAnimationFrame(gameCloseAllOverlays); setTimeout(gameCloseAllOverlays,0); }
  if(id==="arena") resetTactical();
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b)showScreen(b.dataset.screen)});
@@ -136,7 +132,7 @@ if(sellBtn)sellBtn.onclick=()=>{
 function renderInventory(){
  $("#inventoryGrid").innerHTML=state.inventory.map((x,i)=>`<div class="item"><div class="pic">${x}</div><b>Предмет ${i+1}</b><span>Экипировка</span></div>`).join("");
 }
-/* Territory v112 — Game: reference-inspired diamond event board */
+/* Territory v43 — Game: reference-inspired diamond event board */
 const GAME_CELLS=[
  {icon:'🏁',value:'СТАРТ',type:'start',label:'НАЧАЛО ПУТЕШЕСТВИЯ'},
  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
@@ -167,30 +163,13 @@ const GAME_CELLS=[
  {icon:'🏁',value:'ФИНИШ',type:'start',label:'КОНЕЦ КРУГА'}
 ];
 const GAME_REWARDS=[
- {lap:5,icon:'📜',title:'Круг 5',items:[['📜','30','свитков']]},
- {lap:10,icon:'🧰',title:'Круг 10',items:[['🧰','50','предметов']]},
- {lap:15,icon:'💎',title:'Круг 15',items:[['💎','100','кристаллов']]},
- {lap:20,icon:'🧰',title:'Круг 20',items:[['🧰','10','предметов']]},
- {lap:25,icon:'🪄',title:'Круг 25',items:[['🪄','30','особых наград']]}
+ {lap:15,icon:'💎',title:'Круг 15',items:[['💎','50','кристаллов'],['🧰','2','предмета'],['🪙','1050','монет']]},
+ {lap:20,icon:'🧰',title:'Круг 20',items:[['🧰','10','предметов'],['💎','70','кристаллов'],['🪙','1500','монет']]},
+ {lap:25,icon:'📜',title:'Круг 25',items:[['📜','30','свитков'],['💎','30','кристаллов'],['🪙','2000','монет']]},
+ {lap:30,icon:'🧰',title:'Круг 30',items:[['🧰','10','предметов'],['💎','80','кристаллов'],['🪙','2200','монет']]},
+ {lap:35,icon:'📜',title:'Круг 35',items:[['📜','30','свитков'],['🏆','1','редкая награда'],['🪙','3000','монет']]}
 ];
 let gameMoving=false, gameSkipRequested=false, gameTimerId=null, gameModalTimerId=null;
-
-// v131: close every Monopoly overlay on page/screen activation. The reference
-// artwork is the base screen and must never open dimmed after a reload.
-function gameCloseAllOverlays(){
-  ['#gameJackpotModal','#gameRewardModal','#gameTasksModal','#gamePanelModal','#gameBatchModal'].forEach(sel=>{
-    const el=document.querySelector(sel);
-    if(el){
-      el.classList.remove('show');
-      el.setAttribute('aria-hidden','true');
-      el.style.setProperty('display','none','important');
-      el.style.setProperty('visibility','hidden','important');
-      el.style.setProperty('opacity','0','important');
-      el.style.setProperty('pointer-events','none','important');
-    }
-  });
-}
-
 function gameEventTimer(){
  const el=$("#gameTimer"); if(!el)return;
  const tick=()=>{const raw=state.gameEndsAt-Date.now(); const left=Math.max(0,raw); const d=Math.floor(left/86400000); const remD=left%86400000; const h=Math.floor(remD/3600000); const remH=remD%3600000; const m=Math.floor(remH/60000); const sec=Math.floor((remH%60000)/1000); el.textContent=raw<=0?'ЗАВЕРШЕНО':`${d}д ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; if(raw<=0){const r=$("#spinBtn");if(r)r.disabled=true;const st=$("#gameStatus");if(st&&!gameMoving)st.textContent='Событие завершено. Дождитесь следующего события.';}};
@@ -206,8 +185,7 @@ function gameBoardInit(){
   cell.type='button';
   cell.className='board-cell '+(c.type||'')+(i===0?' start':'')+(i===n-1?' finish':'');
   cell.dataset.index=i;
-  cell.title=`Клетка ${i+1}: ${c.label}`;
-  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b></span>`;
+  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>`;
   const pos=gameGridPosition(i,n);
   cell.style.left=pos.x+'%';
   cell.style.top=pos.y+'%';
@@ -230,7 +208,7 @@ function gameGridPosition(i,n){
  // flex/grid sizing can stretch the cells.
  const count=Math.max(1,Number(n)||27);
  const idx=((Math.floor(Number(i)||0)%count)+count)%count;
- const cx=50, cy=50, r=42;
+ const cx=50, cy=50, r=37;
  const verts=[
    {x:cx,y:cy+r},
    {x:cx+r,y:cy},
@@ -259,8 +237,6 @@ function gameRelayoutBoard(){
  gamePlaceToken(false);
 }
 window.addEventListener('resize',()=>{if(document.querySelector('#game.active')) requestAnimationFrame(gameRelayoutBoard);});
-const gameVisibilityObserver=new MutationObserver(()=>{if(document.querySelector('#game.active')) requestAnimationFrame(()=>{gameRelayoutBoard();gameUpdateStatus();});});
-const gameRootForObserver=document.querySelector('#game'); if(gameRootForObserver) gameVisibilityObserver.observe(gameRootForObserver,{attributes:true,attributeFilter:['class']});
 
 function gameSelectCell(index){
  const c=GAME_CELLS[index]; if(!c)return;
@@ -309,24 +285,16 @@ function gameRandomReward(){
  return pool[Math.floor(Math.random()*pool.length)];
 }
 let gameRewardQueue=[];
-function gameOpenOverlay(el){
-  if(!el)return;
-  el.style.removeProperty('display');
-  el.style.removeProperty('visibility');
-  el.style.removeProperty('opacity');
-  el.style.removeProperty('pointer-events');
-  el.classList.add('show');
-  el.setAttribute('aria-hidden','false');
-}
 function gameShowReward(reward,title='Поздравляем!',grant=true){
  const modal=$("#gameRewardModal"), items=$("#rewardItems"); if(!modal||!items||!Array.isArray(reward)||!reward.length)return;
  const alreadyOpen=modal.classList.contains('show');
  const batch=document.querySelector('#gameBatchModal.show');
- if(grant===true){ reward.forEach(gameAddReward); save(); }
- if(alreadyOpen || batch){ gameRewardQueue.push({reward,title,grant:false}); return; }
+ if(grant){ reward.forEach(gameAddReward); save(); }
+ if(alreadyOpen){ gameRewardQueue.push({reward,title,grant:false}); return; }
+ if(batch){ batch.classList.remove('show'); batch.setAttribute('aria-hidden','true'); }
  $("#rewardModalTitle").textContent=title; $("#rewardModalText").textContent=grant?'Получено':'Предпросмотр';
  items.innerHTML=reward.map(x=>`<div class="reward-item"><i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small></div>`).join('');
- gameOpenOverlay(modal);
+ modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
  let sec=3; $("#modalCloseHint").textContent=`Нажмите, чтобы закрыть (${sec}s)`;
  clearInterval(gameModalTimerId); gameModalTimerId=setInterval(()=>{sec--; const el=$("#modalCloseHint"); if(el)el.textContent=sec>0?`Нажмите, чтобы закрыть (${sec}s)`:'Нажмите, чтобы закрыть'; if(sec<=0)clearInterval(gameModalTimerId)},1000);
  gameUpdateStatus();
@@ -446,7 +414,7 @@ function gameOpenPanel(kind){
   ];
  }
  list.innerHTML=rows.map((r,i)=>`<div class="panel-offer-row"><div class="panel-offer-name">${r.name||'Набор события '+(i+1)}</div><div class="panel-offer-body"><div class="panel-offer-items">${r.items.map(x=>`<span><i>${x[0]}</i><b>${x[1]}</b></span>`).join('')}</div><button type="button" data-panel-buy="${r.id||''}" data-free="${r.free?'1':'0'}" data-price="${r.price||0}" data-currency="${r.currency||'money'}">${r.button}</button></div></div>`).join('');
- gameOpenOverlay(modal);
+ modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
 }
 function gamePanelBuy(b){
  if(b.dataset.free==='1'){
@@ -500,12 +468,7 @@ gameEventTimer();
     else { const s=$('#gameStatus'); if(s)s.textContent=`Круг ${lap}: пройди ещё ${Math.max(0,lap-state.gameLap)} круг(а).`; }
   });
   const prize=$('.game-prize-badge');
-  if(prize){
-    prize.setAttribute('role','button'); prize.tabIndex=0;
-    const openPrizePreview=()=>gameShowReward([['🎁','10','призовых попыток']], 'Призы x10', false);
-    prize.addEventListener('click',openPrizePreview);
-    prize.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPrizePreview();}});
-  }
+  if(prize){ prize.setAttribute('role','button'); prize.tabIndex=0; prize.addEventListener('click',()=>gameShowReward([['🎁','10','призовых попыток']], 'Призы x10', false)); }
   document.addEventListener('click',e=>{
     const c=e.target.closest('.game-modal,.game-panel-modal,.game-tasks-modal');
     if(!c || e.target!==c)return;
@@ -518,7 +481,7 @@ gameEventTimer();
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
 })();
 
-renderUI();
+render();
 showScreen("home");
 /* Territory v35 — живой игровой город: без навязчивого автоспама */
 (function initLivingCity(){
@@ -698,7 +661,7 @@ function gameEnsureBatchModal(){
   const host=document.querySelector('#game') || document.body;
   host.appendChild(m);
   const c=m.querySelector('#gameBatchClose');
-  c.onclick=()=>{m.classList.remove('show');m.setAttribute('aria-hidden','true');gameUpdateStatus();setTimeout(gameShowNextQueuedReward,80)};
+  c.onclick=()=>{m.classList.remove('show');m.setAttribute('aria-hidden','true');gameUpdateStatus()};
   m.addEventListener('click',e=>{if(e.target===m)c.click()});
 }
 function gameShowBatchResults(results){
@@ -712,7 +675,7 @@ function gameShowBatchResults(results){
   const totals={}; results.forEach(r=>{const k=`${r.icon}|${r.label}`; totals[k]=(totals[k]||0)+(Number(r.amount)||0)});
   const totalRows=Object.entries(totals).map(([k,n])=>{const [icon,label]=k.split('|');return `<div style="padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.12);font-weight:700">Итого: ${icon} ${n} ${label}</div>`}).join('');
   list.innerHTML=totalRows+rows;
-  gameOpenOverlay(m);
+  m.classList.add('show'); m.setAttribute('aria-hidden','false');
 }
 function gameApplyCellRewardSilent(){
   const cell=GAME_CELLS[((state.gamePos%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS];
@@ -764,11 +727,9 @@ async function gameRoll10(){
   gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
   if(skip)skip.disabled=true;
   save(); gameTasksInit(); gameBoardInit(); gameShowBatchResults(results); gameUpdateStatus();
-  // x10 report is shown first. Bonus dialogs are queued behind it, while the
-  // rewards themselves are granted immediately by gameShowReward().
   if(newlyReached.length){
     const bonusItems=newlyReached.flatMap(r=>r.items||[]);
-    if(bonusItems.length) gameShowReward(bonusItems,`Награда за круг ${newlyReached[newlyReached.length-1].lap}`);
+    setTimeout(()=>gameShowReward(bonusItems,`Награда за круг ${newlyReached[newlyReached.length-1].lap}`),900);
   }
   if(jackpotResults.length){
     const jackpotItems=jackpotResults.map(x=>x.reward).filter(Boolean);
@@ -776,7 +737,7 @@ async function gameRoll10(){
     const title=jackpotResults.length===1
       ? `Награда за круг ${last.round}`
       : `Награды за круги ${first.round}–${last.round}`;
-    if(jackpotItems.length) gameShowReward(jackpotItems,title);
+    setTimeout(()=>gameShowReward(jackpotItems,title),newlyReached.length?4500:900);
   }
 }
 function gameRollUnified(){
@@ -818,11 +779,10 @@ function gameOpenJackpotPreviewV79(){
     }).join('');
     return `<section class="jackpot-group ${active?'current-group':''}"><div class="jackpot-group-title">Круги ${g.from}–${g.to}${active?' · СЕЙЧАС':''}</div><div class="jackpot-row">${cards}</div></section>`;
   }).join('');
-  gameOpenOverlay(modal);
+  modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
   requestAnimationFrame(()=>{const el=list.querySelector('.jackpot-reward.current'); if(el)el.scrollIntoView({block:'center',behavior:'auto'});});
 }
 function gameCloseJackpotPreviewV79(){const modal=$('#gameJackpotModal');if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}}
-gameCloseAllOverlays();
 const rewardPreviewBtnV79=$('#gameRewardPreviewBtn');
 if(rewardPreviewBtnV79)rewardPreviewBtnV79.onclick=gameOpenJackpotPreviewV79;
 const jackpotCloseV79=$('#jackpotClose');
