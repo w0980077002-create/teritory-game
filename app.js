@@ -12,6 +12,33 @@ function gameLoadState(){
   }
 }
 let state=gameLoadState();
+/* Territory v152 — shared Telegram/game identity. Arena consumes this object instead of authenticating itself. */
+(()=>{
+  const tg=()=>window.Telegram?.WebApp||null;
+  const user=()=>tg()?.initDataUnsafe?.user||{};
+  const displayName=()=>[user().first_name,user().last_name].filter(Boolean).join(' ').trim()||user().username||String(state.name||'Игрок');
+  const getInitData=()=>String(tg()?.initData||'');
+  const identity=()=>({id:user().id?String(user().id):String(state.telegramId||''),name:displayName(),username:String(user().username||state.username||''),photoUrl:String(user().photo_url||state.photoUrl||'')});
+  const getHeaders=()=>{const h={};const d=getInitData();if(d)h['x-telegram-init-data']=d;return h};
+  window.territoryAuth={identity,getInitData,getHeaders,get id(){return identity().id},get name(){return identity().name},get username(){return identity().username},get photoUrl(){return identity().photoUrl}};
+  const sync=()=>{const x=identity();if(!x.id)return;state.telegramId=x.id;state.username=x.username;state.photoUrl=x.photoUrl;state.name=x.name;try{localStorage.setItem('territory_save_v1',JSON.stringify(state))}catch(e){}};
+  const refresh=()=>{try{tg()?.ready?.();tg()?.expand?.()}catch(e){} sync(); if(typeof render==='function')render()};
+  let presenceTimer=0;
+  const heartbeat=async()=>{
+    const x=identity();
+    if(!x.id||!getInitData())return;
+    try{
+      await fetch((String(window.TERRITORY_API_BASE||localStorage.getItem('territory_api_base')||location.origin).replace(/\/$/,'')+'/api/presence'),{method:'POST',headers:Object.assign({'content-type':'application/json'},getHeaders()),body:JSON.stringify({id:x.id,name:x.name}),cache:'no-store',keepalive:true});
+    }catch(e){}
+  };
+  const startPresence=()=>{clearInterval(presenceTimer);heartbeat();presenceTimer=setInterval(heartbeat,7000)};
+  window.territoryAuth.refresh=refresh;
+  window.territoryAuth.heartbeat=heartbeat;
+  refresh();
+  setTimeout(refresh,300);
+  startPresence();
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){refresh();startPresence()}else clearInterval(presenceTimer)});
+})();
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
 state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.name||"SSS");
 state.gameDice=Math.max(0,Number(state.gameDice??47)||0); state.gameRolls=Math.max(0,Number(state.gameRolls??0)||0); state.gameSteps=Math.max(0,Number(state.gameSteps??0)||0); state.gameEventVersion=Number(state.gameEventVersion??1)||1; state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0); state.gameMilestones=Array.isArray(state.gameMilestones)?[...new Set(state.gameMilestones.map(Number).filter(Number.isFinite))]:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?[...new Set(state.gameTaskClaims.map(String))]:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?[...new Set(state.gamePanelClaims.map(String))]:[]; state.gameJackpotClaims=Array.isArray(state.gameJackpotClaims)?[...new Set(state.gameJackpotClaims.map(Number).filter(Number.isFinite))]:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS; state.gameSaveVersion=2;
@@ -48,9 +75,74 @@ window.addEventListener("storage",e=>{
     }
   }catch(err){console.warn("Territory external save ignored",err);}
 });
+/* Territory v155 — global progression lives in a compact profile popup, not over the city scene. */
+(function globalProgression(){
+  state.energyLastAt=Number(state.energyLastAt||Date.now());
+  state.dailyRewardDate=String(state.dailyRewardDate||'');
+  state.dailyRewardStreak=Math.max(0,Number(state.dailyRewardStreak||0));
+  state.notifications=Array.isArray(state.notifications)?state.notifications:[];
+  const dayKey=()=>new Date().toISOString().slice(0,10);
+  function gainXp(n){
+    state.exp+=Number(n)||0;
+    while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp;state.notifications.unshift(`Новый уровень: ${state.level}`)}
+  }
+  function regenEnergy(){
+    const now=Date.now(),last=Number(state.energyLastAt||now),mins=Math.floor(Math.max(0,now-last)/60000);
+    if(mins>0){state.energy=Math.min(200,Number(state.energy||0)+mins);state.energyLastAt=last+mins*60000;save();}
+  }
+  function ensureUI(){
+    if(document.querySelector('#globalStatus'))return;
+    const box=document.createElement('div');
+    box.id='globalStatus';
+    box.innerHTML=`<div class="gs-modal"><div class="gs-head"><b>Состояние игрока</b><button type="button" id="gsClose">×</button></div><div class="gs-bars"><span>❤️ <b id="gsHp"></b></span><span>⚡ <b id="gsEnergy"></b></span><span>⭐ <b id="gsXp"></b></span></div><button type="button" id="dailyRewardBtn">🎁 Получить ежедневную награду</button><small id="gsNote"></small></div>`;
+    const style=document.createElement('style');
+    style.textContent=`#globalStatus{position:fixed;inset:0;z-index:999;display:none;align-items:flex-start;justify-content:center;padding:78px 14px 20px;background:rgba(0,0,0,.45);backdrop-filter:blur(3px)}#globalStatus.open{display:flex}.gs-modal{width:min(420px,100%);padding:14px;border:1px solid rgba(255,255,255,.16);border-radius:16px;background:rgba(8,14,22,.96);box-shadow:0 16px 40px rgba(0,0,0,.45);color:#fff}.gs-head{display:flex;align-items:center;justify-content:space-between;font-size:16px}.gs-head button{border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:9px;width:32px;height:32px;font-size:22px}.gs-bars{display:flex;gap:7px;margin:12px 0;flex-wrap:wrap}.gs-bars span{padding:7px 9px;border-radius:9px;background:rgba(255,255,255,.07);font-size:12px}.gs-bars b{font-size:13px}.gs-modal #dailyRewardBtn{width:100%;border:0;border-radius:11px;padding:10px;background:rgba(255,255,255,.12);color:#fff;font-weight:800}.gs-modal #dailyRewardBtn:disabled{opacity:.55}.gs-modal #dailyRewardBtn.ready{box-shadow:0 0 0 1px rgba(255,215,90,.45) inset}.gs-modal #gsNote{display:block;margin-top:9px;opacity:.68;font-size:11px}`;
+    document.head.appendChild(style);document.body.appendChild(box);
+    box.querySelector('#gsClose').onclick=()=>box.classList.remove('open');
+    box.addEventListener('click',e=>{if(e.target===box)box.classList.remove('open')});
+    box.querySelector('#dailyRewardBtn').addEventListener('click',claimDaily);
+    const profile=document.querySelector('.hud .profile');
+    if(profile){profile.style.cursor='pointer';profile.addEventListener('click',()=>{updateUI();box.classList.add('open')})}
+  }
+  function claimDaily(){
+    const b=document.querySelector('#dailyRewardBtn');if(!b)return;
+    const today=dayKey();if(state.dailyRewardDate===today){b.textContent='✓ Уже получено сегодня';b.disabled=true;return}
+    state.dailyRewardDate=today;state.dailyRewardStreak+=1;
+    const coins=100+Math.min(200,(state.dailyRewardStreak-1)*25),gems=5+(state.dailyRewardStreak>=7?5:0);
+    state.coins+=coins;state.gems+=gems;gainXp(15);state.notifications.unshift(`Ежедневная награда: +${coins} 🪙 +${gems} 💎`);state.notifications=state.notifications.slice(0,5);
+    save();render();updateUI();
+  }
+  function updateUI(){
+    regenEnergy();ensureUI();
+    const hp=document.querySelector('#gsHp'),en=document.querySelector('#gsEnergy'),xp=document.querySelector('#gsXp'),note=document.querySelector('#gsNote'),b=document.querySelector('#dailyRewardBtn');
+    if(hp)hp.textContent=`${Math.max(0,state.hp)}/${Math.max(1,state.maxHp)}`;
+    if(en)en.textContent=`${Math.max(0,Math.floor(state.energy||0))}/200`;
+    if(xp)xp.textContent=`${Math.max(0,state.exp)}/100`;
+    if(note)note.textContent=state.notifications[0]||`Серия ежедневных наград: ${state.dailyRewardStreak}`;
+    if(b){const ready=state.dailyRewardDate!==dayKey();b.disabled=!ready;b.classList.toggle('ready',ready);b.textContent=ready?'🎁 Получить ежедневную награду':`✓ Уже получено · серия ${state.dailyRewardStreak}`;}
+  }
+  window.addEventListener('focus',updateUI);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateUI()});
+  setInterval(updateUI,60000);window.globalProgressionRefresh=updateUI;setTimeout(updateUI,0);
+})();
+
+setTimeout(()=>render(),0);
 function render(){
- const coins=$("#coins"), gems=$("#gems"), level=$("#level");
+ const coins=$("#coins"), gems=$("#gems"), level=$("#level"), playerName=$("#playerName"), avatar=$(".hud .avatar");
  if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
+ /* Territory v156 — Telegram profile is shown in the global HUD. */
+ const identity=window.territoryAuth?.identity?.()||{};
+ const displayName=String(identity.name||state.name||'Игрок').trim()||'Игрок';
+ const photoUrl=String(identity.photoUrl||state.photoUrl||'').trim();
+ if(playerName)playerName.textContent=displayName;
+ if(avatar){
+   avatar.textContent=photoUrl?'':'⚔️';
+   avatar.style.backgroundImage=photoUrl?`url("${photoUrl.replace(/"/g,'\\"')}")`:'';
+   avatar.style.backgroundSize=photoUrl?'cover':'';
+   avatar.style.backgroundPosition=photoUrl?'center':'';
+   avatar.style.backgroundRepeat=photoUrl?'no-repeat':'';
+   avatar.setAttribute('aria-label',`Профиль ${displayName}`);
+ }
  $("#weaponName") && ($("#weaponName").textContent=state.weapon); $("#weaponStats") && ($("#weaponStats").textContent=`Урон +${state.bonusDamage}`);
  const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
  renderShop(); renderInventory();
