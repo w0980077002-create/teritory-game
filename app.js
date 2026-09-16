@@ -60,6 +60,9 @@ function showScreen(id){
  document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));
  document.body.classList.toggle("game-open",id==="game");
+ // Monopoly always opens on a clean base screen. Intentional overlays are opened only
+ // by their own buttons after the screen is visible.
+ if(id==="game" && typeof gameCloseAllOverlays==='function') gameCloseAllOverlays();
  if(id==="arena") resetTactical();
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b)showScreen(b.dataset.screen)});
@@ -171,6 +174,16 @@ const GAME_REWARDS=[
  {lap:25,icon:'🪄',title:'Круг 25',items:[['🪄','30','особых наград']]}
 ];
 let gameMoving=false, gameSkipRequested=false, gameTimerId=null, gameModalTimerId=null;
+
+// v131: close every Monopoly overlay on page/screen activation. The reference
+// artwork is the base screen and must never open dimmed after a reload.
+function gameCloseAllOverlays(){
+  ['#gameJackpotModal','#gameRewardModal','#gameTasksModal','#gamePanelModal','#gameBatchModal'].forEach(sel=>{
+    const el=document.querySelector(sel);
+    if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true');}
+  });
+}
+
 function gameEventTimer(){
  const el=$("#gameTimer"); if(!el)return;
  const tick=()=>{const raw=state.gameEndsAt-Date.now(); const left=Math.max(0,raw); const d=Math.floor(left/86400000); const remD=left%86400000; const h=Math.floor(remD/3600000); const remH=remD%3600000; const m=Math.floor(remH/60000); const sec=Math.floor((remH%60000)/1000); el.textContent=raw<=0?'ЗАВЕРШЕНО':`${d}д ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; if(raw<=0){const r=$("#spinBtn");if(r)r.disabled=true;const st=$("#gameStatus");if(st&&!gameMoving)st.textContent='Событие завершено. Дождитесь следующего события.';}};
@@ -793,6 +806,7 @@ function gameOpenJackpotPreviewV79(){
   requestAnimationFrame(()=>{const el=list.querySelector('.jackpot-reward.current'); if(el)el.scrollIntoView({block:'center',behavior:'auto'});});
 }
 function gameCloseJackpotPreviewV79(){const modal=$('#gameJackpotModal');if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}}
+gameCloseAllOverlays();
 const rewardPreviewBtnV79=$('#gameRewardPreviewBtn');
 if(rewardPreviewBtnV79)rewardPreviewBtnV79.onclick=gameOpenJackpotPreviewV79;
 const jackpotCloseV79=$('#jackpotClose');

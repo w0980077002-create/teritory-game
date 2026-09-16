@@ -868,3 +868,34 @@
 @media (orientation:portrait){
   #game.game-clean{background-size:100% 100%!important}
 }
+
+/* Territory v131 — modal state safety. Never dim the reference screen on initial load. */
+#game.game-clean .game-jackpot-modal[aria-hidden="true"],
+#game.game-clean .game-modal[aria-hidden="true"],
+#game.game-clean .game-tasks-modal[aria-hidden="true"],
+#game.game-clean .game-panel-modal[aria-hidden="true"]{
+  display:none!important; visibility:hidden!important; opacity:0!important; pointer-events:none!important;
+}
+#game.game-clean .game-jackpot-modal[aria-hidden="false"],
+#game.game-clean .game-modal[aria-hidden="false"],
+#game.game-clean .game-tasks-modal[aria-hidden="false"],
+#game.game-clean .game-panel-modal[aria-hidden="false"]{
+  display:flex!important; visibility:visible!important; opacity:1!important; pointer-events:auto!important;
+}
+
+/* Territory v132 — hard startup guarantee. Hidden overlays cannot dim Monopoly. */
+#game.game-clean .game-jackpot-modal[aria-hidden="true"],
+#game.game-clean .game-modal[aria-hidden="true"],
+#game.game-clean .game-tasks-modal[aria-hidden="true"],
+#game.game-clean .game-panel-modal[aria-hidden="true"]{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+#game.game-clean.active .game-jackpot-modal[aria-hidden="true"],
+#game.game-clean.active .game-modal[aria-hidden="true"],
+#game.game-clean.active .game-tasks-modal[aria-hidden="true"],
+#game.game-clean.active .game-panel-modal[aria-hidden="true"]{
+  display:none!important;
+}
