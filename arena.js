@@ -1,4 +1,4 @@
-/* Territory v145 — Arena rebuilt from the video reference + agreed Territory rules.
+/* Territory v146 — Arena + active test bots from the video reference + agreed Territory rules.
    The old S98 opponent-picker is intentionally removed.
    This file owns the Arena modal only and keeps the rest of the game state intact. */
 (()=>{
@@ -88,7 +88,9 @@
     if(lobby.players.length<2){window.arenaToast('Нужно минимум 2 игрока');return}
     lobby.started=true;clearInterval(lobbyTimer);
     const mode=MODE.find(x=>x.id===lobby.mode)||MODE[0];
-    battle={mode:lobby.mode,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,defense:[],log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
+    const enemyPool=lobby.players.filter(p=>p!==lobby.players[0]);
+    const enemy=enemyPool[Math.floor(Math.random()*enemyPool.length)]||{name:'Противник',level:Math.max(1,level()),bot:true};
+    battle={mode:lobby.mode,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,enemyName:enemy.name,enemyLevel:enemy.level,enemyBot:!!enemy.bot,attack:null,defense:[],log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`,`🤖 ${enemy.name} подключён как тестовый противник.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
     renderBattle();
   }
   function zone(id,list){return list.find(z=>z[0]===id)?.[1]||id}
@@ -100,7 +102,7 @@
     const defs=DEF_ZONES.map(z=>`<button class="arena140-zone ${battle.defense.includes(z[0])?'selected defense':''}" data-d="${z[0]}"><i>${z[2]}</i><span>${z[1]}</span></button>`).join('');
     const logs=battle.log.slice(-10).map(x=>`<div>${esc(x)}</div>`).join('');
     showModal('⚔️ Arena · бой',`<div class="arena140 arena140-combat">
-      <section class="arena140-fighters"><div class="arena140-fighter"><div class="big-avatar">🧔</div><b>${esc(name())}</b><small>ур. ${level()}</small><div class="arena140-hp"><i style="width:${hp1}%"></i></div><span>${Math.round(battle.playerHp)} / ${battle.maxHp} HP</span></div><div class="arena140-vs">VS</div><div class="arena140-fighter enemy"><div class="big-avatar">⚔️</div><b>${lobby?.mode==='group'?'Команда противника':'Противник'}</b><small>отряд</small><div class="arena140-hp"><i style="width:${hp2}%"></i></div><span>${Math.round(battle.enemyHp)} / ${battle.maxEnemyHp} HP</span></div></section>
+      <section class="arena140-fighters"><div class="arena140-fighter"><div class="big-avatar">🧔</div><b>${esc(name())}</b><small>ур. ${level()}</small><div class="arena140-hp"><i style="width:${hp1}%"></i></div><span>${Math.round(battle.playerHp)} / ${battle.maxHp} HP</span></div><div class="arena140-vs">VS</div><div class="arena140-fighter enemy"><div class="big-avatar">${battle.enemyBot?'🤖':'⚔️'}</div><b>${esc(battle.enemyName||'Противник')}</b><small>${battle.enemyBot?'тестовый бот':'противник'}</small><div class="arena140-hp"><i style="width:${hp2}%"></i></div><span>${Math.round(battle.enemyHp)} / ${battle.maxEnemyHp} HP</span></div></section>
       <section class="arena140-combat-top"><span>Раунд <b>${battle.round}</b></span><span>⏱️ <b>${mm}:${ss}</b></span><span>👥 ${lobby?.players.length||2}</span></section>
       <section class="arena140-select"><div class="arena140-step"><b>1. Атака</b><small>Выбери одну из 4 зон</small></div><div class="arena140-zones">${attacks}</div><div class="arena140-step"><b>2. Защита</b><small>Выбери до двух из 4 зон</small></div><div class="arena140-zones">${defs}</div><button class="arena140-hit" data-hit ${battle.attack&&battle.defense.length===2?'':'disabled'}>⚔️ ПОДТВЕРДИТЬ ХОД</button></section>
       <section class="arena140-log"><div class="arena140-log-head"><b>Боевой журнал</b><button data-collapse>Свернуть</button></div><div class="arena140-log-body">${logs}</div></section>
@@ -118,11 +120,16 @@
     if(!battle||!battle.attack||battle.defense.length!==2)return;
     const s=getState();
     const atk=Number(s.bonusDamage||0)+Number(s.strength||5)+10;
-    const hit=Math.max(8,Math.round(atk*(0.9+Math.random()*.35)));
-    const enemyAttack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)][0];
+    const botAttack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)][0];
+    const botDefense=[];
+    while(botDefense.length<2){const z=DEF_ZONES[Math.floor(Math.random()*DEF_ZONES.length)][0];if(!botDefense.includes(z))botDefense.push(z)}
+    const playerBlocked=botDefense.includes(battle.attack);
+    const hit=Math.max(5,Math.round(atk*(playerBlocked?0.55:0.9+Math.random()*.35)));
+    const enemyAttack=botAttack;
     const enemyBlocked=battle.defense.includes(enemyAttack);
     battle.enemyHp=Math.max(0,battle.enemyHp-hit);
-    battle.log.push(`⚔️ Атака в «${zone(battle.attack,ATTACK_ZONES)}» нанесла −${hit} HP.`);
+    battle.log.push(`⚔️ Ты атаковал «${zone(battle.attack,ATTACK_ZONES)}» — ${battle.enemyName}: −${hit} HP${playerBlocked?' (бот закрыл зону)':''}.`);
+    battle.log.push(`🤖 ${battle.enemyName}: атака «${zone(enemyAttack,ATTACK_ZONES)}», защита — ${botDefense.map(x=>zone(x,DEF_ZONES)).join(', ')}.`);
     if(battle.enemyHp<=0){renderBattle();setTimeout(()=>finishBattle('Победа'),350);return}
     if(enemyBlocked){battle.log.push(`🛡️ Защита закрыла «${zone(enemyAttack,DEF_ZONES)}». Урон остановлен.`)}
     else{const dmg=Math.max(5,Math.round(10+Math.random()*12));battle.playerHp=Math.max(0,battle.playerHp-dmg);battle.log.push(`💥 Противник атаковал «${zone(enemyAttack,ATTACK_ZONES)}»: −${dmg} HP.`)}
