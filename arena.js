@@ -1,4 +1,4 @@
-/* Territory v140 — Arena rebuilt from the video reference + agreed Territory rules.
+/* Territory v144 — Arena rebuilt from the video reference + agreed Territory rules.
    The old S98 opponent-picker is intentionally removed.
    This file owns the Arena modal only and keeps the rest of the game state intact. */
 (()=>{
@@ -16,7 +16,7 @@
   const esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\':'&#92;','"':'&quot;'}[c]));
   const getState=()=>{try{return state}catch(e){return {}}};
   const save=()=>{try{window.save?.()}catch(e){}};
-  const getStats=()=>{try{return JSON.parse(localStorage.getItem('territory_arena_v140')||'{}')}catch(e){return {}}};
+  const getStats=()=>{try{return JSON.parse(localStorage.getItem('territory_arena_v144')||'{}')}catch(e){return {}}};
   let stats=getStats();
   stats.wins=Number(stats.wins||0); stats.losses=Number(stats.losses||0); stats.battles=Number(stats.battles||0);
   stats.history=Array.isArray(stats.history)?stats.history:[];
@@ -24,18 +24,20 @@
   let battle=null;
   let lobbyTimer=null;
   let battleTimer=null;
+  let autoTimer=null;
   let modalOpen=false;
 
   const modal=()=>document.getElementById('arenaModal');
   const title=()=>document.getElementById('arenaModalTitle');
   const body=()=>document.getElementById('arenaModalBody');
   function showModal(t,html){const m=modal();if(!m||!body())return; title().textContent=t;body().innerHTML=html;m.classList.add('show');m.setAttribute('aria-hidden','false');modalOpen=true;}
-  function close(){clearInterval(lobbyTimer);clearInterval(battleTimer);const m=modal();if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}modalOpen=false;lobby=null;battle=null;}
+  function close(){clearInterval(lobbyTimer);clearInterval(battleTimer);clearTimeout(autoTimer);const m=modal();if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}modalOpen=false;lobby=null;battle=null;}
   window.closeArenaModal=close;
   window.arenaToast=(text)=>{const t=document.getElementById('arenaToast');if(!t)return;t.textContent=text;t.classList.add('show');clearTimeout(window.__arenaToast);window.__arenaToast=setTimeout(()=>t.classList.remove('show'),1600)};
 
   function name(){return String(getState().name||'Alex').trim()||'Alex'}
   function level(){return Number(getState().level||1)}
+  function hasVIP(){const s=getState(); return s.vip===true || s.vip===1 || s.vip==='true' || Number(s.vipUntil||0)>Date.now()}
   function renderHome(){
     clearInterval(lobbyTimer);clearInterval(battleTimer);lobby=null;battle=null;
     const s=getState();
@@ -88,7 +90,12 @@
     if(lobby.players.length<2){window.arenaToast('Нужно минимум 2 игрока');return}
     lobby.started=true;clearInterval(lobbyTimer);
     const mode=MODE.find(x=>x.id===lobby.mode)||MODE[0];
-    battle={mode:lobby.mode,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,defense:[],log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
+    if(lobby.mode==='chaos'){
+      const shuffled=[...lobby.players].sort(()=>Math.random()-.5);
+      shuffled.forEach((p,i)=>p.team=(i%2)+1);
+      lobby.players=shuffled;
+    }
+    battle={mode:lobby.mode,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,defense:[],autoBattle:false,log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`,...(lobby.mode==='chaos'?[`🎲 Команды распределены случайно: ${lobby.players.filter(p=>p.team===1).length} × ${lobby.players.filter(p=>p.team===2).length}.`]:[])],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
     renderBattle();
   }
   function zone(id,list){return list.find(z=>z[0]===id)?.[1]||id}
@@ -102,7 +109,7 @@
     showModal('⚔️ Arena · бой',`<div class="arena140 arena140-combat">
       <section class="arena140-fighters"><div class="arena140-fighter"><div class="big-avatar">🧔</div><b>${esc(name())}</b><small>ур. ${level()}</small><div class="arena140-hp"><i style="width:${hp1}%"></i></div><span>${Math.round(battle.playerHp)} / ${battle.maxHp} HP</span></div><div class="arena140-vs">VS</div><div class="arena140-fighter enemy"><div class="big-avatar">⚔️</div><b>${lobby?.mode==='group'?'Команда противника':'Противник'}</b><small>отряд</small><div class="arena140-hp"><i style="width:${hp2}%"></i></div><span>${Math.round(battle.enemyHp)} / ${battle.maxEnemyHp} HP</span></div></section>
       <section class="arena140-combat-top"><span>Раунд <b>${battle.round}</b></span><span>⏱️ <b>${mm}:${ss}</b></span><span>👥 ${lobby?.players.length||2}</span></section>
-      <section class="arena140-select"><div class="arena140-step"><b>1. Атака</b><small>Выбери одну из 4 зон</small></div><div class="arena140-zones">${attacks}</div><div class="arena140-step"><b>2. Защита</b><small>Выбери до двух из 4 зон</small></div><div class="arena140-zones">${defs}</div><button class="arena140-hit" data-hit ${battle.attack&&battle.defense.length===2?'':'disabled'}>⚔️ ПОДТВЕРДИТЬ ХОД</button></section>
+      <section class="arena140-select"><div class="arena140-step"><b>1. Атака</b><small>Выбери одну из 4 зон</small></div><div class="arena140-zones">${attacks}</div><div class="arena140-step"><b>2. Защита</b><small>Выбери две из 4 зон</small></div><div class="arena140-zones">${defs}</div><button class="arena140-hit" data-hit ${battle.attack&&battle.defense.length===2?'':'disabled'}>⚔️ ПОДТВЕРДИТЬ ХОД</button><label class="arena140-autobattle ${hasVIP()?'':'vip-locked'}"><input type="checkbox" data-autobattle ${battle.autoBattle?'checked':''} ${hasVIP()?'':'disabled'}><span class="arena140-check"></span><span>Автобой</span>${hasVIP()?'':'<em>VIP</em>'}</label></section>
       <section class="arena140-log"><div class="arena140-log-head"><b>Боевой журнал</b><button data-collapse>Свернуть</button></div><div class="arena140-log-body">${logs}</div></section>
       <section class="arena140-finish"><button data-finish>Завершить бой</button><button data-extend>Продлить +5 мин</button></section>
     </div>`);
@@ -112,6 +119,19 @@
     body().querySelector('[data-finish]')?.addEventListener('click',()=>finishBattle('Игрок завершил бой'));
     body().querySelector('[data-extend]')?.addEventListener('click',()=>{battle.endsAt+=300000;window.arenaToast('Бой продлён на 5 минут');renderBattle()});
     body().querySelector('[data-collapse]')?.addEventListener('click',e=>{const x=body().querySelector('.arena140-log-body');x.classList.toggle('collapsed');e.target.textContent=x.classList.contains('collapsed')?'Развернуть':'Свернуть'});
+    body().querySelector('[data-autobattle]')?.addEventListener('change',e=>{if(!hasVIP()){e.target.checked=false;battle.autoBattle=false;window.arenaToast('Автобой доступен только игрокам с VIP');return}battle.autoBattle=e.target.checked;window.arenaToast(battle.autoBattle?'Автобой включён':'Автобой выключен');renderBattle()});
+    clearTimeout(autoTimer);
+    if(battle.autoBattle){
+      autoTimer=setTimeout(()=>{
+        if(!battle||battle.ended||!battle.autoBattle)return;
+        if(!battle.attack) battle.attack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)][0];
+        while(battle.defense.length<2){
+          const z=DEF_ZONES[Math.floor(Math.random()*DEF_ZONES.length)][0];
+          if(!battle.defense.includes(z)) battle.defense.push(z);
+        }
+        resolveTurn();
+      },650);
+    }
     battleTimer=setInterval(()=>{if(!battle)return;if(Date.now()>=battle.endsAt)finishBattle('Время боя истекло');else renderBattle()},1000);
   }
   function resolveTurn(){
@@ -133,10 +153,10 @@
   }
   function finishBattle(result){
     if(!battle||battle.ended)return;
-    battle.ended=true;clearInterval(battleTimer);
+    battle.ended=true;clearInterval(battleTimer);clearTimeout(autoTimer);
     const win=result==='Победа';stats.battles++;if(win)stats.wins++;else if(result==='Поражение')stats.losses++;
     stats.history.push({mode:MODE.find(x=>x.id===battle.mode)?.title||'Бой',win,result,at:Date.now()});stats.history=stats.history.slice(-20);
-    localStorage.setItem('territory_arena_v140',JSON.stringify(stats));
+    localStorage.setItem('territory_arena_v144',JSON.stringify(stats));
     if(win){const s=getState();s.coins=Number(s.coins||0)+50;s.exp=Number(s.exp||0)+15;save()}
     lobby=null;battle=null;renderResult(result);
   }

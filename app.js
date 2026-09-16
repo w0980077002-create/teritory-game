@@ -1,4 +1,4 @@
-/* Territory v139 — canonical base + S98 Arena integration */
+/* Territory v142 — canonical base + rebuilt Arena integration */
 const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 function gameLoadState(){
   try{
