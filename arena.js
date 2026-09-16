@@ -37,15 +37,22 @@
   const myUsername=()=>String(getState().username||auth().username||'');
   const myDisplayName=()=>String(getState().name||auth().name||'Игрок').trim()||'Игрок';
   const avatar=(photo,emoji='👤')=>photo?`<img class="arena148-avatar-img" src="${esc(photo)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="arena148-avatar-fallback" style="display:none">${emoji}</span>`:`<span class="arena148-avatar-fallback">${emoji}</span>`;
-  function installPresenceStyle(){}
-  function rosterHtml(){return ''}
-  async function refreshRoster(){try{const d=await api('/api/players');const list=Array.isArray(d.players)?d.players:[];const countEl=body().querySelector('[data-online-count]');if(countEl)countEl.textContent=list.filter(p=>p.online).length}catch(e){}}
+  function installPresenceStyle(){
+    if(document.getElementById('arenaRosterStyle'))return;
+    const style=document.createElement('style');style.id='arenaRosterStyle';style.textContent='.arena148-online-list{display:grid;gap:7px;margin-top:8px}.arena148-online-row{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.05)}.arena148-online-avatar{width:34px;height:34px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:rgba(255,255,255,.1);flex:0 0 34px}.arena148-online-avatar img{width:100%;height:100%;object-fit:cover}.arena148-online-meta{min-width:0;display:grid;gap:1px}.arena148-online-meta b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.arena148-online-meta small{font-size:10px;opacity:.65}.arena148-online-dot{margin-left:auto;width:8px;height:8px;border-radius:50%;background:#45e06f;box-shadow:0 0 8px rgba(69,224,111,.7)}';document.head.appendChild(style);
+  }
+  function rosterHtml(list){
+    const online=list.filter(p=>p.online);
+    if(!online.length)return '<div class=\"arena140-empty\">Пока никого нет онлайн.</div>';
+    return '<div class=\"arena148-online-list\">'+online.map(p=>`<div class=\"arena148-online-row\"><span class=\"arena148-online-avatar\">${avatar(p.photoUrl,'👤')}</span><span class=\"arena148-online-meta\"><b>${esc(p.name||'Игрок')}</b><small>${p.username?'@'+esc(p.username)+' · ':''}ур. ${Number(p.level||1)}</small></span><i class=\"arena148-online-dot\"></i></div>`).join('')+'</div>';
+  }
+  async function refreshRoster(){try{const d=await api('/api/players');const list=Array.isArray(d.players)?d.players:[];const countEl=body().querySelector('[data-online-count]');if(countEl)countEl.textContent=list.filter(p=>p.online).length;const box=body().querySelector('[data-online-list]');if(box)box.innerHTML=rosterHtml(list)}catch(e){}}
 
 
   function renderHome(){installPresenceStyle();clearInterval(lobbyTimer);clearInterval(battleTimer);clearOnline();lobby=null;battle=null;
     showModal('⚔️ Арена',`<div class="arena140"><section class="arena140-hero"><div><div class="arena140-kicker">SDOLARS · ARENA</div><h2>Бой начинается здесь</h2><p>Тест-боты остаются. Для 1×1 добавлен поиск реального игрока через сервер.</p></div><div class="arena140-stat"><b>${stats.wins}</b><span>побед</span></div></section>
       <section class="arena140-modes">${MODE.map(m=>`<button class="arena140-mode" data-mode="${m.id}"><span class="mode-icon">${m.icon}</span><span><b>${m.title}</b><small>${m.desc}</small></span><strong>›</strong></button>`).join('')}</section>
-      <section class="arena148-online"><div class="arena140-section-head"><b>🟢 Сейчас в игре — <span data-online-count>0</span></b></div></section><section class="arena140-rules"><b>Правила Arena</b><div><span>⏱️ 3:00</span><span>👥 до 20</span><span>🎯 4 атаки</span><span>🛡️ 4 защиты</span></div><p>Вышедший игрок не может вернуться в этот бой.</p></section>
+      <section class="arena148-online"><div class="arena140-section-head"><b>🟢 Сейчас в игре — <span data-online-count>0</span></b></div><div data-online-list></div></section><section class="arena140-rules"><b>Правила Arena</b><div><span>⏱️ 3:00</span><span>👥 до 20</span><span>🎯 4 атаки</span><span>🛡️ 4 защиты</span></div><p>Вышедший игрок не может вернуться в этот бой.</p></section>
       <section class="arena140-history"><div class="arena140-section-head"><b>Последние бои</b><span>${stats.battles}</span></div>${stats.history.slice(-4).reverse().map(h=>`<div class="arena140-history-row"><span>${h.win?'🏆':'💀'}</span><span>${esc(h.mode||'Бой')}</span><span>${esc(h.result||'завершён')}</span></div>`).join('')||'<div class="arena140-empty">Пока нет завершённых боёв.</div>'}</section></div>`);
     body().querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>createLobby(b.dataset.mode));refreshRoster();
   }

@@ -23,10 +23,21 @@ let state=gameLoadState();
   window.territoryAuth={identity,getInitData,getHeaders,get id(){return identity().id},get name(){return identity().name},get username(){return identity().username},get photoUrl(){return identity().photoUrl}};
   const sync=()=>{const x=identity();if(!x.id)return;state.telegramId=x.id;state.username=x.username;state.photoUrl=x.photoUrl;state.name=x.name;try{localStorage.setItem('territory_save_v1',JSON.stringify(state))}catch(e){}};
   const refresh=()=>{try{tg()?.ready?.();tg()?.expand?.()}catch(e){} sync(); if(typeof render==='function')render()};
+  let presenceTimer=0;
+  const heartbeat=async()=>{
+    const x=identity();
+    if(!x.id||!getInitData())return;
+    try{
+      await fetch((String(window.TERRITORY_API_BASE||localStorage.getItem('territory_api_base')||location.origin).replace(/\/$/,'')+'/api/presence'),{method:'POST',headers:Object.assign({'content-type':'application/json'},getHeaders()),body:JSON.stringify({id:x.id,name:x.name}),cache:'no-store',keepalive:true});
+    }catch(e){}
+  };
+  const startPresence=()=>{clearInterval(presenceTimer);heartbeat();presenceTimer=setInterval(heartbeat,7000)};
   window.territoryAuth.refresh=refresh;
+  window.territoryAuth.heartbeat=heartbeat;
   refresh();
   setTimeout(refresh,300);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+  startPresence();
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){refresh();startPresence()}else clearInterval(presenceTimer)});
 })();
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
 state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.name||"SSS");
