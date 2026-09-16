@@ -1,16 +1,25 @@
-TERRITORY — VIP АЛЕКСА — ГОТОВЫЙ ПАКЕТ
+Territory / Sdolars — READY BASE v145
 
-Механика:
-Алекс → «Задание Алекса» → 5 НОВЫХ побед на Арене → VIP на 10 дней.
+This package is the complete frontend base assembled from the supplied current project files plus the v145 Arena/VIP/progression integration.
 
-VIP-модуль не меняет Arena и systems-v145.
+Upload the contents of this folder to the GitHub repository root.
+Do not mix arena.js from older ZIPs with this package.
 
-Для подключения в index.html добавь ПОСЛЕ arena.js:
-<script src="vip.js?v=3"></script>
+Main:
+- index.html
+- app.js
+- arena.js (v145)
+- arena.css
+- game.css
+- style.css
+- systems-v145.js/css
+- harbor_top.jpg
 
-Должно быть:
-<script src="app.js?v=138"></script>
-<script src="arena.js?v=139"></script>
-<script src="vip.js?v=3"></script>
+VIP:
+Alex -> accept quest -> 5 new Arena wins -> VIP for 10 days.
+Autobattle is shown as a VIP feature.
 
-После загрузки обнови страницу Telegram Web App.
+Validation:
+- JavaScript syntax checked with Node.
+- index cache-busters updated to v145 for arena and systems.
+- No GitHub write is claimed from this package.
