@@ -1,15 +1,21 @@
-# Territory — v146 patch
+# Territory — canonical mobile base
 
-This ZIP contains **only files changed for v146**. Do not replace unchanged assets/files.
+Canonical mobile frontend base for Territory / Sdolars.
 
-## v146 — Arena test bots
-- Test bots remain in the game.
-- The selected bot is shown by name in combat.
-- Bot now makes a tactical choice each turn: 1 attack zone + 2 defense zones.
-- Bot defense affects incoming player damage.
-- Bot attack uses the existing 4-zone system and can be blocked by the player's 2 selected defense zones.
-- Combat log explicitly records the bot's attack and defense choices.
-- Existing Arena modes, 3-minute lobby, group limit, leaving/re-entry rule, finish/extend controls and other game files are not replaced by this patch.
+## Core systems
+- Mobile city scene for Sdolars
+- Profile and persistent player state
+- Districts
+- Equipment Market and Inventory
+- Game board with 27 cells, dice, x10 mode, rewards, tasks and jackpot preview
+- Tactical Arena based on the S98 combat implementation
+- Separate `server.js` backend for Telegram/PvP features; backend integration remains isolated from the client base
 
-## Install
-Copy/replace only the files included in this ZIP in the existing project.
+## Frontend
+- `index.html` — screens and UI
+- `style.css` — main mobile UI
+- `game.css` — Game board styling
+- `app.js` — core client state and systems
+- `arena.css` / `arena.js` — Arena implementation
+
+Develop new systems from this base instead of mixing older versions.

@@ -1,99 +1,104 @@
-/* Territory v147 — Arena: real Telegram 1x1 matchmaking + test bots.
-   Existing bot mode stays available. Online mode uses the existing S82
-   /api/matchmaking/* and /api/pvp/* endpoints; no other game files are required. */
+
+window.arenaToast=function(text){
+ const t=document.getElementById('arenaToast'); if(!t)return; t.textContent=text; t.classList.add('show'); clearTimeout(window._arenaToastTimer); window._arenaToastTimer=setTimeout(()=>t.classList.remove('show'),1500);
+};
+window.closeArenaModal=function(){clearTimeout(window.s98AutoTimer);const m=document.getElementById('arenaModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');}};
+
 (()=>{
-  const ATTACK_ZONES=[['head','Голова','🎯'],['chest','Грудь','🫀'],['waist','Пояс','🛡️'],['legs','Ноги','🦵']];
-  const DEF_ZONES=[['head','Голова','⬆️'],['chest','Грудь','🛡️'],['waist','Пояс','↔️'],['legs','Ноги','⬇️']];
-  const MODE=[
-    {id:'duel',title:'1×1 бой',icon:'⚔️',desc:'Один против одного. Можно играть с тест-ботом или найти реального игрока.'},
-    {id:'chaos',title:'Хаотичный бой',icon:'🎲',desc:'Все входят в одну комнату, затем игроки случайно распределяются по командам.'},
-    {id:'group',title:'Групповой бой',icon:'👥',desc:'Выбор команды 1 или 2. До 20 игроков в бою.'}
-  ];
-  const esc=s=>String(s??'').replace(/[&<>\\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\':'&#92;','"':'&quot;'}[c]));
-  const getState=()=>{try{return state}catch(e){return {}}};
-  const save=()=>{try{window.save?.()}catch(e){}};
-  const getStats=()=>{try{return JSON.parse(localStorage.getItem('territory_arena_v140')||'{}')}catch(e){return {}}};
-  let stats=getStats(); stats.wins=+stats.wins||0;stats.losses=+stats.losses||0;stats.battles=+stats.battles||0;stats.history=Array.isArray(stats.history)?stats.history:[];
-  let lobby=null,battle=null,lobbyTimer=null,battleTimer=null,onlinePoll=null,searching=false;
-  const modal=()=>document.getElementById('arenaModal'),title=()=>document.getElementById('arenaModalTitle'),body=()=>document.getElementById('arenaModalBody');
-  const apiBase=()=>String(window.TERRITORY_API_BASE||localStorage.getItem('territory_api_base')||location.origin).replace(/\/$/,'');
-  const auth=()=>window.territoryAuth||{};
-  const telegramId=()=>String(auth().id||getState().telegramId||'');
-  const initData=()=>String(typeof auth().getInitData==='function'?auth().getInitData():'');
-  async function api(path,opts={}){
-    const headers=Object.assign({'content-type':'application/json'},opts.headers||{});
-    if(typeof auth().getHeaders==='function')Object.assign(headers,auth().getHeaders());
-    const r=await fetch(apiBase()+path,Object.assign({},opts,{headers,cache:'no-store'}));
-    let data={};try{data=await r.json()}catch(e){} if(!r.ok)throw Object.assign(new Error(data.error||('HTTP '+r.status)),{status:r.status,data}); return data;
-  }
-  function showModal(t,html){const m=modal();if(!m||!body())return;title().textContent=t;body().innerHTML=html;m.classList.add('show');m.setAttribute('aria-hidden','false');}
-  function clearOnline(){clearInterval(onlinePoll);onlinePoll=null;searching=false;}
-  function close(){clearInterval(lobbyTimer);clearInterval(battleTimer);clearOnline();const m=modal();if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}lobby=null;battle=null;}
-  window.closeArenaModal=close;
-  window.arenaToast=(text)=>{const t=document.getElementById('arenaToast');if(!t)return;t.textContent=text;t.classList.add('show');clearTimeout(window.__arenaToast);window.__arenaToast=setTimeout(()=>t.classList.remove('show'),1800)};
-  const name=()=>String(getState().name||auth().name||'Игрок').trim()||'Игрок';
-  const level=()=>Number(getState().level||1);
-  const myPhoto=()=>String(getState().photoUrl||auth().photoUrl||'');
-  const myUsername=()=>String(getState().username||auth().username||'');
-  const myDisplayName=()=>String(getState().name||auth().name||'Игрок').trim()||'Игрок';
-  const avatar=(photo,emoji='👤')=>photo?`<img class="arena148-avatar-img" src="${esc(photo)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="arena148-avatar-fallback" style="display:none">${emoji}</span>`:`<span class="arena148-avatar-fallback">${emoji}</span>`;
-  function installPresenceStyle(){
-    if(document.getElementById('arenaRosterStyle'))return;
-    const style=document.createElement('style');style.id='arenaRosterStyle';style.textContent='.arena148-online-list{display:grid;gap:7px;margin-top:8px}.arena148-online-row{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.05)}.arena148-online-avatar{width:34px;height:34px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:rgba(255,255,255,.1);flex:0 0 34px}.arena148-online-avatar img{width:100%;height:100%;object-fit:cover}.arena148-online-meta{min-width:0;display:grid;gap:1px}.arena148-online-meta b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.arena148-online-meta small{font-size:10px;opacity:.65}.arena148-online-dot{margin-left:auto;width:8px;height:8px;border-radius:50%;background:#45e06f;box-shadow:0 0 8px rgba(69,224,111,.7)}';document.head.appendChild(style);
-  }
-  function rosterHtml(list){
-    const online=list.filter(p=>p.online);
-    if(!online.length)return '<div class=\"arena140-empty\">Пока никого нет онлайн.</div>';
-    return '<div class=\"arena148-online-list\">'+online.map(p=>`<div class=\"arena148-online-row\"><span class=\"arena148-online-avatar\">${avatar(p.photoUrl,'👤')}</span><span class=\"arena148-online-meta\"><b>${esc(p.name||'Игрок')}</b><small>${p.username?'@'+esc(p.username)+' · ':''}ур. ${Number(p.level||1)}</small></span><i class=\"arena148-online-dot\"></i></div>`).join('')+'</div>';
-  }
-  async function refreshRoster(){try{const d=await api('/api/players');const list=Array.isArray(d.players)?d.players:[];const countEl=body().querySelector('[data-online-count]');if(countEl)countEl.textContent=list.filter(p=>p.online).length;const box=body().querySelector('[data-online-list]');if(box)box.innerHTML=rosterHtml(list)}catch(e){}}
-
-
-  function renderHome(){installPresenceStyle();clearInterval(lobbyTimer);clearInterval(battleTimer);clearOnline();lobby=null;battle=null;
-    showModal('⚔️ Арена',`<div class="arena140"><section class="arena140-hero"><div><div class="arena140-kicker">SDOLARS · ARENA</div><h2>Бой начинается здесь</h2><p>Тест-боты остаются. Для 1×1 добавлен поиск реального игрока через сервер.</p></div><div class="arena140-stat"><b>${stats.wins}</b><span>побед</span></div></section>
-      <section class="arena140-modes">${MODE.map(m=>`<button class="arena140-mode" data-mode="${m.id}"><span class="mode-icon">${m.icon}</span><span><b>${m.title}</b><small>${m.desc}</small></span><strong>›</strong></button>`).join('')}</section>
-      <section class="arena148-online"><div class="arena140-section-head"><b>🟢 Сейчас в игре — <span data-online-count>0</span></b></div><div data-online-list></div></section><section class="arena140-rules"><b>Правила Arena</b><div><span>⏱️ 3:00</span><span>👥 до 20</span><span>🎯 4 атаки</span><span>🛡️ 4 защиты</span></div><p>Вышедший игрок не может вернуться в этот бой.</p></section>
-      <section class="arena140-history"><div class="arena140-section-head"><b>Последние бои</b><span>${stats.battles}</span></div>${stats.history.slice(-4).reverse().map(h=>`<div class="arena140-history-row"><span>${h.win?'🏆':'💀'}</span><span>${esc(h.mode||'Бой')}</span><span>${esc(h.result||'завершён')}</span></div>`).join('')||'<div class="arena140-empty">Пока нет завершённых боёв.</div>'}</section></div>`);
-    body().querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>createLobby(b.dataset.mode));refreshRoster();
-  }
-
-  function createLobby(mode){const m=MODE.find(x=>x.id===mode)||MODE[0];
-    lobby={mode,createdAt:Date.now(),endsAt:Date.now()+180000,players:[{name:name(),level:level(),team:mode==='group'?1:null,owner:true,photoUrl:myPhoto(),username:myUsername(),telegramId:telegramId()}],left:false,started:false};renderLobby();
-  }
-  function addFake(){if(!lobby||lobby.started)return;const max=lobby.mode==='duel'?2:20;if(lobby.players.length>=max)return window.arenaToast('Комната заполнена');const bots=['Варг','Рагнар','Стальной Волк','Тёмный рыцарь','Наёмник','Берсерк','Охотник','Гвардеец'];const n=bots[(lobby.players.length-1)%bots.length]+' '+(lobby.players.length+1);lobby.players.push({name:n,level:Math.max(1,level()+Math.floor(Math.random()*3)-1),team:lobby.mode==='group'?(lobby.players.length%2)+1:null,bot:true});renderLobby();}
-  function renderLobby(){clearInterval(lobbyTimer);if(!lobby)return;const m=MODE.find(x=>x.id===lobby.mode)||MODE[0];const remain=Math.max(0,lobby.endsAt-Date.now()),mm=String(Math.floor(remain/60000)).padStart(2,'0'),ss=String(Math.floor(remain/1000)%60).padStart(2,'0');const canStart=lobby.players.length>1;const players=lobby.players.map(p=>`<div class="arena140-player"><span class="avatar arena148-avatar">${p.bot?'⚔️':avatar(p.photoUrl)}</span><span><b>${esc(p.name)}</b><small>${p.username?'@'+esc(p.username)+' · ':''}ур. ${p.level}${p.owner?' · создатель':''}</small></span>${lobby.mode==='group'?`<em class="team team-${p.team}">Команда ${p.team}</em>`:''}</div>`).join('');
-    showModal(`${m.icon} ${m.title}`,`<div class="arena140"><section class="arena140-lobby-head"><div><span class="arena140-kicker">КОМНАТА БОЯ</span><h2>Ожидание игроков</h2><p>${esc(m.desc)}</p></div><div class="arena140-countdown"><small>Автостарт</small><b>${mm}:${ss}</b></div></section><section class="arena140-lobby-card"><div class="arena140-section-head"><b>Игроки</b><span>${lobby.players.length}/${lobby.mode==='duel'?2:20}</span></div><div class="arena140-players">${players}</div></section>
-      ${lobby.mode==='group'?`<section class="arena140-team-choice"><b>Твоя команда</b><div><button data-team="1" class="${lobby.players[0].team===1?'selected':''}">⚔️ Команда 1</button><button data-team="2" class="${lobby.players[0].team===2?'selected':''}">🛡️ Команда 2</button></div></section>`:''}
-      <section class="arena140-actions">${lobby.mode==='duel'?'<button class="arena140-primary" data-online>🌐 Найти реального игрока</button>':''}<button class="arena140-secondary" data-add>＋ Добавить игрока для теста</button><button class="arena140-primary" data-start ${canStart?'':'disabled'}>⚔️ Начать сейчас</button><button class="arena140-leave" data-leave>Выйти из комнаты</button></section>
-      ${lobby.mode==='duel'?'<p class="arena140-note">Онлайн: сервер подберёт другого Telegram-игрока по рейтингу. Если сервер недоступен, тест-бот можно запустить как раньше.</p>':''}<p class="arena140-note">Создатель запускает таймер 3:00. После окончания бой стартует автоматически. Вышедший игрок не может вернуться.</p></div>`);
-    body().querySelector('[data-online]')?.addEventListener('click',startOnlineSearch);body().querySelector('[data-add]')?.addEventListener('click',addFake);body().querySelector('[data-start]')?.addEventListener('click',startBattle);body().querySelector('[data-leave]')?.addEventListener('click',()=>{lobby.left=true;window.arenaToast('Ты вышел. Повторный вход запрещён.');setTimeout(renderHome,500)});body().querySelectorAll('[data-team]').forEach(b=>b.onclick=()=>{lobby.players[0].team=+b.dataset.team;renderLobby()});
-    lobbyTimer=setInterval(()=>{if(!lobby)return;if(Date.now()>=lobby.endsAt){clearInterval(lobbyTimer);startBattle()}else renderLobby()},1000);
-  }
-
-  async function startOnlineSearch(){if(searching)return;const id=telegramId();if(!id){window.arenaToast('Открой игру внутри Telegram для онлайн-боя');return;}clearInterval(lobbyTimer);searching=true;showModal('🌐 Онлайн 1×1',`<div class="arena140 arena140-result"><div class="result-icon">🌐</div><h2>Ищем соперника</h2><p>Подбираем реального Telegram-игрока по рейтингу.</p><div class="arena140-countdown"><b data-search-time>00:00</b></div><button class="arena140-leave" data-cancel-search>Отменить поиск</button></div>`);const started=Date.now();body().querySelector('[data-cancel-search]').onclick=cancelSearch;
-    try{await api('/api/matchmaking/join',{method:'POST',body:JSON.stringify({name:name(),level:level()})});onlinePoll=setInterval(pollMatchmaking,2000);pollMatchmaking();body().querySelector('[data-search-time]').textContent='00:00';const tick=setInterval(()=>{const el=body().querySelector('[data-search-time]');if(!el||!searching){clearInterval(tick);return}const sec=Math.floor((Date.now()-started)/1000);el.textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')},1000);
-    }catch(e){clearOnline();window.arenaToast('Онлайн-сервер недоступен');renderLobby();}
-  }
-  async function pollMatchmaking(){if(!searching)return;try{const d=await api('/api/matchmaking/status?id='+encodeURIComponent(telegramId()));const q=d.queue;if(q?.status==='matched'&&q.matchId){clearOnline();const m=await api('/api/pvp/mine?id='+encodeURIComponent(telegramId()));const match=(m.matches||[]).find(x=>x.id===q.matchId);if(match){const opponentId=String(q.opponent?.playerId||'');lobby={mode:'duel',players:[{name:name(),level:level(),owner:true,photoUrl:myPhoto(),username:myUsername(),telegramId:telegramId()},{name:q.opponent?.name||'Игрок',level:q.opponent?.level||1,online:true,telegramId:opponentId,photoUrl:'',username:''}],started:true};const op=q.opponent||{};lobby.players[1].photoUrl=op.photoUrl||'';lobby.players[1].username=op.username||'';lobby.players[1].name=op.name||lobby.players[1].name;lobby.players[1].level=Number(op.level||lobby.players[1].level);startOnlineBattle(match);}}}catch(e){}}
-  async function cancelSearch(){if(!searching)return;try{await api('/api/matchmaking/leave',{method:'POST',body:JSON.stringify({})})}catch(e){}clearOnline();renderHome();}
-  function startOnlineBattle(m){battle={online:true,matchId:m.id,mode:'duel',round:Number(m.round||1),playerId:telegramId(),playerHp:playerHpFor(m),maxHp:playerMaxHpFor(m),enemyHp:enemyHpFor(m),maxEnemyHp:enemyMaxHpFor(m),attack:null,defense:[],log:(m.log||[]).map(x=>x.text||String(x)),startedAt:m.createdAt||Date.now(),endsAt:Date.now()+600000,ended:false,turn:m.turn};renderBattle();onlinePoll=setInterval(pollOnlineBattle,2000);}
-  const playerHpFor=m=>m.attacker?.id===telegramId()?Number(m.attackerHp):Number(m.defenderHp);const enemyHpFor=m=>m.attacker?.id===telegramId()?Number(m.defenderHp):Number(m.attackerHp);const playerMaxHpFor=m=>m.attacker?.id===telegramId()?100+Number(m.attacker?.power||10)*2:100+Number(m.defender?.power||10)*2;const enemyMaxHpFor=m=>m.attacker?.id===telegramId()?100+Number(m.defender?.power||10)*2:100+Number(m.attacker?.power||10)*2;
-  async function pollOnlineBattle(){if(!battle?.online)return;try{const d=await api('/api/pvp/mine?id='+encodeURIComponent(telegramId()));const m=(d.matches||[]).find(x=>x.id===battle.matchId);if(!m)return;const mine=m.attacker?.id===telegramId();battle.playerHp=mine?Number(m.attackerHp):Number(m.defenderHp);battle.enemyHp=mine?Number(m.defenderHp):Number(m.attackerHp);battle.maxHp=mine?100+Number(m.attacker?.power||10)*2:100+Number(m.defender?.power||10)*2;battle.maxEnemyHp=mine?100+Number(m.defender?.power||10)*2:100+Number(m.attacker?.power||10)*2;battle.round=Number(m.round||1);battle.turn=m.turn;battle.log=(m.log||[]).slice(-12).map(x=>x.text||String(x));const opponent=mine?m.defender:m.attacker;const opponentId=String(opponent?.id||'');if(opponentId){lobby=lobby||{mode:'duel',players:[]};lobby.players[1]={name:opponent?.name||'Игрок',level:Number(opponent?.level||1),online:true,telegramId:opponentId,photoUrl:opponent?.photoUrl||'',username:opponent?.username||''};}if(m.status==='finished'){clearOnline();finishOnline(m);return}renderBattle();}catch(e){}}
-
-  function startBattle(){if(!lobby||lobby.started)return;if(lobby.players.length<2){window.arenaToast('Нужно минимум 2 игрока');return}lobby.started=true;clearInterval(lobbyTimer);const mode=MODE.find(x=>x.id===lobby.mode)||MODE[0];const enemy=lobby.players.find(p=>p!==lobby.players[0]);battle={online:false,mode:lobby.mode,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,enemyName:enemy?.name||'Противник',enemyBot:!!enemy?.bot,attack:null,defense:[],log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`,enemy?.bot?`🤖 Соперник: ${enemy.name}.`:''],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};battle.log=battle.log.filter(Boolean);renderBattle();}
-  const zone=(id,list)=>list.find(z=>z[0]===id)?.[1]||id;
-  function renderBattle(){clearInterval(battleTimer);if(!battle)return;const remain=Math.max(0,battle.endsAt-Date.now()),mm=String(Math.floor(remain/60000)).padStart(2,'0'),ss=String(Math.floor(remain/1000)%60).padStart(2,'0');const hp1=Math.max(0,Math.round(battle.playerHp/battle.maxHp*100)),hp2=Math.max(0,Math.round(battle.enemyHp/battle.maxEnemyHp*100));const attacks=ATTACK_ZONES.map(z=>`<button class="arena140-zone ${battle.attack===z[0]?'selected':''}" data-a="${z[0]}"><i>${z[2]}</i><span>${z[1]}</span></button>`).join('');const defs=DEF_ZONES.map(z=>`<button class="arena140-zone ${battle.defense.includes(z[0])?'selected defense':''}" data-d="${z[0]}"><i>${z[2]}</i><span>${z[1]}</span></button>`).join('');const logs=battle.log.slice(-10).map(x=>`<div>${esc(x)}</div>`).join('');const myTurn=!battle.online||battle.turn===battle.playerId;
-    showModal('⚔️ Arena · бой',`<div class="arena140 arena140-combat"><section class="arena140-fighters"><div class="arena140-fighter"><div class="big-avatar arena148-avatar">${avatar(myPhoto())}</div><b>${esc(name())}</b><small>ур. ${level()}</small><div class="arena140-hp"><i style="width:${hp1}%"></i></div><span>${Math.round(battle.playerHp)} / ${battle.maxHp} HP</span></div><div class="arena140-vs">VS</div><div class="arena140-fighter enemy"><div class="big-avatar arena148-avatar">${battle.online?avatar(lobby?.players?.[1]?.photoUrl,'👤'):'⚔️'}</div><b>${esc(battle.online?(lobby?.players?.[1]?.name||'Игрок'):(battle.enemyName||'Противник'))}</b><small>${battle.online?'реальный игрок':'тест-бот'}</small><div class="arena140-hp"><i style="width:${hp2}%"></i></div><span>${Math.round(battle.enemyHp)} / ${battle.maxEnemyHp} HP</span></div></section>
-      <section class="arena140-combat-top"><span>Раунд <b>${battle.round}</b></span><span>⏱️ <b>${mm}:${ss}</b></span><span>${battle.online?(myTurn?'🟢 Твой ход':'🟡 Ход соперника'):'🤖 Тест'}</span></section>
-      <section class="arena140-select"><div class="arena140-step"><b>1. Атака</b><small>Выбери одну из 4 зон</small></div><div class="arena140-zones">${attacks}</div><div class="arena140-step"><b>2. Защита</b><small>Выбери 2 из 4 зон</small></div><div class="arena140-zones">${defs}</div><button class="arena140-hit" data-hit ${battle.attack&&battle.defense.length===2&&myTurn?'':'disabled'}>⚔️ ПОДТВЕРДИТЬ ХОД</button></section>
-      <section class="arena140-log"><div class="arena140-log-head"><b>Боевой журнал</b><button data-collapse>Свернуть</button></div><div class="arena140-log-body">${logs}</div></section><section class="arena140-finish"><button data-finish>Завершить бой</button>${battle.online?'':'<button data-extend>Продлить +5 мин</button>'}</section></div>`);
-    body().querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{if(battle.online&&battle.turn!==battle.playerId)return window.arenaToast('Сейчас ход соперника');battle.attack=b.dataset.a;renderBattle()});body().querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{if(battle.online&&battle.turn!==battle.playerId)return window.arenaToast('Сейчас ход соперника');const z=b.dataset.d;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);else window.arenaToast('Можно закрыть только 2 зоны');renderBattle()});body().querySelector('[data-hit]')?.addEventListener('click',battle.online?resolveOnlineTurn:resolveTurn);body().querySelector('[data-finish]')?.addEventListener('click',()=>battle.online?window.arenaToast('Онлайн-бой завершается сервером.'):finishBattle('Игрок завершил бой'));body().querySelector('[data-extend]')?.addEventListener('click',()=>{battle.endsAt+=300000;window.arenaToast('Бой продлён на 5 минут');renderBattle()});body().querySelector('[data-collapse]')?.addEventListener('click',e=>{const x=body().querySelector('.arena140-log-body');x.classList.toggle('collapsed');e.target.textContent=x.classList.contains('collapsed')?'Развернуть':'Свернуть'});
-    battleTimer=setInterval(()=>{if(!battle)return;if(Date.now()>=battle.endsAt){if(battle.online)window.arenaToast('Ожидаем серверный результат');else finishBattle('Время боя истекло');}else renderBattle()},1000);
-  }
-  async function resolveOnlineTurn(){if(!battle?.online||!battle.attack||battle.defense.length!==2||battle.turn!==battle.playerId)return;try{await api('/api/pvp/action',{method:'POST',body:JSON.stringify({matchId:battle.matchId,zone:battle.attack,defenses:battle.defense})});battle.attack=null;battle.defense=[];await pollOnlineBattle();}catch(e){window.arenaToast(e.data?.error==='not_your_turn'?'Сейчас ход соперника':'Не удалось отправить ход');await pollOnlineBattle();}}
-  function resolveTurn(){if(!battle||!battle.attack||battle.defense.length!==2)return;const s=getState(),atk=Number(s.bonusDamage||0)+Number(s.strength||5)+10,hit=Math.max(8,Math.round(atk*(0.9+Math.random()*.35))),enemyAttack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)][0],enemyBlocked=battle.defense.includes(enemyAttack);battle.enemyHp=Math.max(0,battle.enemyHp-hit);battle.log.push(`⚔️ Атака в «${zone(battle.attack,ATTACK_ZONES)}» нанесла −${hit} HP.`);if(battle.enemyHp<=0){renderBattle();setTimeout(()=>finishBattle('Победа'),350);return}if(enemyBlocked)battle.log.push(`🛡️ Защита закрыла «${zone(enemyAttack,DEF_ZONES)}». Урон остановлен.`);else{const dmg=Math.max(5,Math.round(10+Math.random()*12));battle.playerHp=Math.max(0,battle.playerHp-dmg);battle.log.push(`💥 ${battle.enemyName||'Противник'} атаковал «${zone(enemyAttack,ATTACK_ZONES)}»: −${dmg} HP.`)}battle.round++;window.territorySystems?.onBattleTurn?.();battle.attack=null;battle.defense=[];if(battle.playerHp<=0){renderBattle();setTimeout(()=>finishBattle('Поражение'),350);return}renderBattle();}
-  function finishBattle(result){if(!battle||battle.ended)return;battle.ended=true;clearInterval(battleTimer);const win=result==='Победа';stats.battles++;if(win)stats.wins++;else if(result==='Поражение')stats.losses++;stats.history.push({mode:MODE.find(x=>x.id===battle.mode)?.title||'Бой',win,result,at:Date.now()});stats.history=stats.history.slice(-20);localStorage.setItem('territory_arena_v140',JSON.stringify(stats));if(win){const s=getState();s.coins=Number(s.coins||0)+50;s.exp=Number(s.exp||0)+15;save()}window.territorySystems?.onBattleFinished?.(result);lobby=null;battle=null;renderResult(result);}
-  function finishOnline(m){if(!battle)return;const me=telegramId(),win=String(m.winner||'')===me;stats.battles++;if(win)stats.wins++;else stats.losses++;stats.history.push({mode:'1×1 онлайн',win,result:win?'Победа':'Поражение',at:Date.now()});stats.history=stats.history.slice(-20);localStorage.setItem('territory_arena_v140',JSON.stringify(stats));battle=null;lobby=null;renderResult(win?'Победа':'Поражение');}
-  function renderResult(result){const win=result==='Победа';showModal(win?'🏆 Победа':'⚔️ Бой завершён',`<div class="arena140 arena140-result"><div class="result-icon">${win?'🏆':'⚔️'}</div><h2>${esc(result)}</h2><p>Бой завершён. Результат сохранён в истории Arena.</p>${win?'<div class="arena140-reward">+50 🪙 &nbsp; +15 XP</div>':''}<button class="arena140-primary" data-back>Вернуться в Arena</button></div>`);body().querySelector('[data-back]').onclick=renderHome;}
-  window.openBattle=renderHome;window.openArena=renderHome;document.addEventListener('click',e=>{if(e.target.closest('[data-arena-close]'))close()});const m=modal();if(m)m.addEventListener('click',e=>{if(e.target===m)close()});
+ const Z=[['head','Голова'],['chest','Грудь'],['stomach','Живот'],['waist','Пояс'],['legs','Ноги']];
+ state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0);
+ const enemies=[
+  {name:'Уличный боец',ico:'🥊',hp:105,damage:13,armor:1,crit:.07,tier:1,reward:45,xp:12},
+  {name:'Наёмник Sdolars',ico:'🗡️',hp:135,damage:16,armor:3,crit:.10,tier:2,reward:65,xp:17},
+  {name:'Гвардеец замка',ico:'🛡️',hp:165,damage:19,armor:5,crit:.13,tier:3,reward:90,xp:23},
+  {name:'Капитан стражи',ico:'⚔️',hp:205,damage:23,armor:7,crit:.16,tier:4,reward:125,xp:30},
+  {name:'Чемпион Sdolars',ico:'👹',hp:250,damage:28,armor:9,crit:.19,tier:5,reward:170,xp:40}
+ ];
+ const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c]));
+ const dmg=()=>Math.max(5,Number(state?.bonusDamage||0)+Number(state?.strength||5));
+ const def=()=>Math.max(0,Number(state?.defense||0));
+ const maxEnergy=()=>Math.min(250,200+Math.max(0,Number(state?.level||1)-1)*5);
+ const hpMax=()=>Math.max(100,Number(state?.maxHp||100));
+ const pct=(v,m)=>Math.max(0,Math.min(100,(Number(v)||0)/(Number(m)||1)*100));
+ const arenaStats=()=>{try{return JSON.parse(localStorage.getItem('territory_s98_arena')||'{}')}catch(e){return {}}};
+ const saveArena=x=>localStorage.setItem('territory_s98_arena',JSON.stringify(x));
+ let stats=arenaStats();stats.wins=Number(stats.wins||0);stats.losses=Number(stats.losses||0);stats.streak=Number(stats.streak||0);stats.best=Number(stats.best||0);stats.history=Array.isArray(stats.history)?stats.history:[];saveArena(stats);
+ function modal(title,html){const t=document.getElementById('arenaModalTitle'),b=document.getElementById('arenaModalBody');if(!t||!b)return; t.textContent=title;b.innerHTML=html;document.getElementById('arenaModal')?.classList.add('show')}
+ function currentPlayerName(){return state?.name||'SSS'}
+ function chooseEnemy(){const lv=Number(state?.level||1),idx=Math.min(enemies.length-1,Math.max(0,Math.floor((lv-1)/2)+Math.min(2,stats.wins)));return {...enemies[idx],maxHp:enemies[idx].hp}}
+ function arenaHome(){
+  const energy=Number(state?.energy||0), cards=enemies.map((e,i)=>{const locked=i>Math.min(enemies.length-1,Math.floor((Number(state?.level||1)-1)/2)+2);return `<div class="s98Opp"><div class="ico">${e.ico}</div><div><b>${esc(e.name)}</b><small>⚔️ ${e.damage} урон · 🛡️ ${e.armor} броня</small><div class="s98Diff">${locked?'🔒 Требуется более высокий уровень':'🏆 Награда '+e.reward+' 🟡 · '+e.xp+' XP'}</div></div><button class="s98Fight" ${locked||energy<10?'disabled':''} data-s98-start="${i}">${energy<10?'⚡10':'В бой'}</button></div>`}).join('');
+  const hist=stats.history.slice(-5).reverse().map(x=>`<div>${x.win?'🏆':'💀'} ${esc(x.enemy)} · ${x.win?'+':''}${x.reward||0} 🟡 · ${x.round||1} раунд.</div>`).join('')||'<div>Пока нет завершённых боёв.</div>';
+  modal('⚔️ Арена',`<div class="s98"><div class="s98Hero"><b>⚔️ Арена Sdolars</b><small>Выбери соперника и проведи полноценный тактический бой.</small></div><div class="s98Grid"><div class="s98Stat">🏆 Победы<b>${stats.wins}</b></div><div class="s98Stat">🔥 Серия<b>${stats.streak}</b></div><div class="s98Stat">⭐ Лучшая<b>${stats.best}</b></div></div><div class="s98Panel"><div class="s98PanelTitle">🎯 Выбери противника</div><div class="s98Opps">${cards}</div></div><div class="s98Panel"><div class="s98PanelTitle">📜 Последние бои</div><div class="s98Log">${hist}</div></div></div>`);
+  document.querySelectorAll('[data-s98-start]').forEach(b=>b.onclick=()=>startFight(Number(b.dataset.s98Start)));
+ }
+ function startFight(i){
+  if(Number(state.energy||0)<10){arenaToast('⚡ Нужно 10 энергии');return}
+  const src=enemies[Math.max(0,Math.min(enemies.length-1,i))];
+  battle={enemy:{...src,maxHp:src.hp,hp:src.hp},turn:'player',round:1,attack:null,defense:[],enemyAttack:null,enemyDefense:[],log:['⚔️ Бой начался. Выбери атаку и две защиты.'],playerHp:Number(state.hp||hpMax()),playerMax:hpMax(),energySpent:0,auto:false,locked:false,anim:'',result:null};
+  render();
+ }
+ function enemyPlan(){const a=[...Z].sort(()=>Math.random()-.5);battle.enemyAttack=a[0][0];battle.enemyDefense=a.slice(1,3).map(x=>x[0])}
+ function zoneLabel(id){return Z.find(x=>x[0]===id)?.[1]||id}
+ function addLog(s){battle.log.push(s);if(battle.log.length>12)battle.log.shift()}
+ function combatMath(){return {attack:Math.max(5,dmg()),armor:def(),crit:Math.min(.35,.08+Number(state.strength||5)/180),dodge:Math.min(.30,.04+Number(state.agility||5)/160)}}
+ function render(){
+  if(!battle)return;
+  const e=battle.enemy,m=combatMath(),can=battle.turn==='player'&&!battle.locked&&!battle.result&&!battle.auto;
+  const logs=battle.log.map(x=>`<div>• ${esc(x)}</div>`).join('');
+  const stage=`<div class="s98Stage"><div class="s98VS">⚔️</div><div class="s98Fx ${battle.anim?'show':''}">${battle.anim==='playerAttack'?'💥':battle.anim==='enemyAttack'?'⚡':''}</div><div class="s98F p ${battle.anim==='playerAttack'?'attack':''} ${battle.anim==='playerHit'?'hit':''}"><div class="s98Avatar">🧔</div><div class="s98FName">${esc(currentPlayerName())}</div></div><div class="s98F e ${battle.anim==='enemyAttack'?'attack':''} ${battle.anim==='enemyHit'?'hit':''}"><div class="s98Avatar">${esc(e.ico)}</div><div class="s98FName">${esc(e.name)}</div></div></div>`;
+  const attackBtns=Z.map(z=>`<button class="s98Zone ${battle.attack===z[0]?'attackSel':''}" data-s98-a="${z[0]}" ${can?'':'disabled'}>${z[1]}</button>`).join('');
+  const defBtns=Z.map(z=>`<button class="s98Zone ${battle.defense.includes(z[0])?'defSel':''}" data-s98-d="${z[0]}" ${can?'':'disabled'}>${z[1]}</button>`).join('');
+  document.getElementById('arenaModalTitle').textContent='⚔️ Арена · тактический бой';
+  document.getElementById('arenaModalBody').innerHTML=`<div class="s98">${stage}<div class="s98HpRow"><div class="s98HpCard"><b>🧔 ${esc(currentPlayerName())} · ур. ${state.level||1}</b><div class="s98Hp"><i style="width:${pct(battle.playerHp,battle.playerMax)}%"></i></div><div class="s98HpText">${Math.ceil(battle.playerHp)} / ${battle.playerMax} HP</div></div><div class="s98HpCard"><b>${esc(e.ico)} ${esc(e.name)}</b><div class="s98Hp enemy"><i style="width:${pct(e.hp,e.maxHp)}%"></i></div><div class="s98HpText">${Math.ceil(e.hp)} / ${e.maxHp} HP</div></div></div><div class="s98CombatStats"><div class="s98CStat">⚔️ Атака<b>${m.attack}</b></div><div class="s98CStat">🛡️ Броня<b>${m.armor}</b></div><div class="s98CStat">⚡ Энергия<b>${state.energy||0}</b></div><div class="s98CStat">🔥 Серия<b>${stats.streak}</b></div></div><div class="s98Turn">Раунд <strong>${battle.round}</strong> · ${battle.turn==='player'?'<strong>Твой ход</strong>':'Ход противника'} · защита <strong>${battle.defense.length}/2</strong></div><div class="s98Step">🎯 1. Выбери зону атаки</div><div class="s98Zones">${attackBtns}</div><div class="s98Step">🛡️ 2. Выбери две зоны защиты</div><div class="s98Zones">${defBtns}</div><div class="s98Actions"><button class="s98Act" data-s98-skill="power" ${can&&Number(state.energy||0)>=20?'':'disabled'}>💥 Сильный ·20</button><button class="s98Act" data-s98-skill="precise" ${can&&Number(state.energy||0)>=15?'':'disabled'}>🎯 Точный ·15</button><button class="s98Act" data-s98-skill="stance" ${can&&Number(state.energy||0)>=15?'':'disabled'}>🛡️ Стойка ·15</button><button class="s98Act main" data-s98-hit ${battle.attack&&battle.defense.length===2&&can?'':'disabled'}>⚔️ НАНЕСТИ УДАР ·10 ⚡</button></div><label class="s98Auto"><input type="checkbox" data-s98-auto ${battle.auto?'checked':''}> Автобой</label><div class="s98Log">${logs}</div><div class="s98Hint">Голова: выше шанс крита · Грудь: стабильный урон · Ноги: ниже шанс уклонения.</div></div>`;
+  const body=document.getElementById('arenaModalBody');
+  body.querySelectorAll('[data-s98-a]').forEach(b=>b.onclick=()=>{if(!can)return;battle.attack=b.dataset.s98A;render()});
+  body.querySelectorAll('[data-s98-d]').forEach(b=>b.onclick=()=>{if(!can)return;const z=b.dataset.s98D;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);render()});
+  body.querySelector('[data-s98-hit]')?.addEventListener('click',()=>doPlayerAttack('normal'));
+  body.querySelectorAll('[data-s98-skill]').forEach(b=>b.addEventListener('click',()=>doPlayerAttack(b.dataset.s98Skill)));
+  body.querySelector('[data-s98-auto]')?.addEventListener('change',e=>{battle.auto=!!e.target.checked;if(battle.auto){autoTurn()}else clearTimeout(window.s98AutoTimer);render()});
+ }
+ function autoTurn(){clearTimeout(window.s98AutoTimer);if(!battle||!battle.auto||battle.turn!=='player'||battle.locked||battle.result)return;window.s98AutoTimer=setTimeout(()=>{if(!battle||!battle.auto||battle.turn!=='player'||battle.locked)return;const a=[...Z].sort(()=>Math.random()-.5);battle.attack=a[0][0];battle.defense=a.slice(1,3).map(x=>x[0]);doPlayerAttack('normal')},450)}
+ function doPlayerAttack(skill){
+  if(!battle||battle.turn!=='player'||battle.locked||battle.result||!battle.attack||battle.defense.length!==2)return;
+  const costs={normal:10,power:20,precise:15,stance:15},cost=costs[skill]||10;if(Number(state.energy||0)<cost){arenaToast('⚡ Недостаточно энергии');return}
+  battle.locked=true;state.energy=Math.max(0,Number(state.energy||0)-cost);battle.energySpent+=cost;enemyPlan();battle.anim='playerAttack';
+  const e=battle.enemy,m=combatMath(),z=battle.attack;let message='',damage=0;
+  if(skill==='stance'){battle.playerGuard=0.55;message='🛡️ Воин встал в стойку: следующий удар ослаблен.'}
+  else{let miss=skill==='precise'?false:Math.random()<Math.max(.02,.11-m.dodge/3);if(miss)message=`💨 Атака в «${zoneLabel(z)}» — промах.`;else if(battle.enemyDefense.includes(z))message=`🛡️ Противник заблокировал «${zoneLabel(z)}». Урон: 0.`;else{const zoneBonus=z==='head'?1.15:z==='chest'?1.05:z==='legs'?.95:1;const skillBonus=skill==='power'?1.45:skill==='precise'?1.12:1;const crit=Math.random()<(skill==='precise'?Math.min(.45,m.crit+.12):m.crit)*(z==='head'?1.3:1);const base=Math.max(5,Math.round((m.attack+10+Math.random()*10)*zoneBonus*skillBonus));damage=Math.max(3,Math.round(base-Number(e.armor||0)));if(crit)damage+=Math.round(damage*.55);e.hp=Math.max(0,e.hp-damage);message=`⚔️ ${skill==='power'?'Сильный ':skill==='precise'?'Точный ':''}удар в «${zoneLabel(z)}»: −${damage} HP${crit?' · 💥 КРИТ!':''}`}}
+  addLog(message);battle.anim='playerAttack';render();
+  if(e.hp<=0){setTimeout(()=>finish(true),380);return}
+  battle.turn='enemy';setTimeout(enemyTurn,650)
+ }
+ function enemyTurn(){
+  if(!battle||battle.result)return;const e=battle.enemy,target=e.enemyAttack||Z[Math.floor(Math.random()*Z.length)][0],blocked=battle.defense.includes(target);battle.anim='enemyAttack';let msg='',damage=0;
+  if(blocked)msg=`🛡️ Блок! Атака «${zoneLabel(target)}» остановлена.`;else{const m=combatMath(),dodge=Math.random()<m.dodge;if(dodge)msg=`💨 Воин увернулся от атаки в «${zoneLabel(target)}».`;else{let base=Number(e.damage||12)+Math.floor(Math.random()*7);const crit=Math.random()<Number(e.crit||.1);damage=Math.max(1,Math.round(base+(crit?base*.5:0)-m.armor));if(battle.playerGuard){damage=Math.round(damage*battle.playerGuard);battle.playerGuard=0}battle.playerHp=Math.max(0,battle.playerHp-damage);state.hp=battle.playerHp;msg=`☠️ ${e.name} атаковал «${zoneLabel(target)}»: −${damage} HP${crit?' · 💥 КРИТ!':''}`}}
+  addLog(msg);render();if(battle.playerHp<=0){setTimeout(()=>finish(false),380);return}
+  battle.round++;battle.attack=null;battle.defense=[];battle.enemyAttack=null;battle.enemyDefense=[];battle.anim='';battle.locked=false;battle.turn='player';try{save()}catch(e){}render();if(battle.auto)autoTurn()
+ }
+ function finish(win){
+  clearTimeout(window.s98AutoTimer);battle.result=win?'win':'loss';battle.locked=true;const e=battle.enemy;
+  if(win){const reward=Number(e.reward||50)+Math.max(0,stats.streak)*5,xp=Number(e.xp||12);state.hp=hpMax();state.coins=Number(state.coins||0)+reward;state.exp=Number(state.exp||0)+xp;stats.wins++;stats.streak++;stats.best=Math.max(stats.best,stats.streak);let levels=0;let need=Number(state.level||1)*100;while(state.exp>=need){state.exp-=need;state.level++;levels++;need=Number(state.level)*100}stats.history.push({win:true,enemy:e.name,reward,xp,round:battle.round});
+   if(stats.history.length>20)stats.history.shift();saveArena(stats);try{save()}catch(x){};arenaToast('🏆 Победа! +'+reward+' 🟡');
+   document.getElementById('arenaModalBody').innerHTML=`<div class="s98"><div class="s98End"><div class="big">🏆</div><b>Победа!</b><p>${esc(e.name)} повержен за ${battle.round} раунд(ов).</p><p>+${reward} 🟡 · +${xp} XP${levels?' · ⬆️ Уровень '+state.level:''}</p><button class="main" data-s98-again>⚔️ Следующий бой</button><button data-s98-home>🏟️ В арену</button></div></div>`;
+  }else{state.hp=1;state.energy=Math.max(0,Number(state.energy||0)-10);stats.losses++;stats.streak=0;stats.history.push({win:false,enemy:e.name,reward:0,xp:0,round:battle.round});if(stats.history.length>20)stats.history.shift();saveArena(stats);try{save()}catch(x){};document.getElementById('arenaModalBody').innerHTML=`<div class="s98"><div class="s98End"><div class="big">💀</div><b>Поражение</b><p>${esc(e.name)} оказался сильнее.</p><p>Серия сброшена. HP осталось: 1.</p><button class="main" data-s98-recover>❤️ Восстановить HP</button><button data-s98-home>🏟️ В арену</button></div></div>`}
+  document.querySelector('[data-s98-again]')?.addEventListener('click',()=>startFight(Math.min(enemies.length-1,Math.floor((Number(state.level||1)-1)/2)+Math.min(2,stats.wins))));
+  document.querySelector('[data-s98-home]')?.addEventListener('click',arenaHome);
+  document.querySelector('[data-s98-recover]')?.addEventListener('click',()=>{state.hp=hpMax();save();arenaToast('❤️ HP восстановлено');arenaHome()});
+ }
+ window.openBattle=function(){arenaHome()};
+ window.renderBattle=render;
+ window.playerStrike=()=>doPlayerAttack('normal');
+ window.enemyStrike=enemyTurn;
+ window.toggleAuto=on=>{if(!battle)return;battle.auto=!!on;render();if(battle.auto)autoTurn()};
+ window.scheduleAutoTurn=autoTurn;
+ window.nextBattle=()=>{const idx=Math.min(enemies.length-1,Math.floor((Number(state.level||1)-1)/2)+Math.min(2,stats.wins));startFight(idx)};
 })();
+
+document.getElementById('arenaClose')?.addEventListener('click',()=>{
+  window.closeArenaModal();
+  if(typeof showScreen==='function') showScreen('home');
+});
+document.getElementById('arenaModal')?.addEventListener('click',e=>{
+  if(e.target.id==='arenaModal') window.closeArenaModal();
+});
