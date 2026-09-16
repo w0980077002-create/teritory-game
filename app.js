@@ -164,11 +164,11 @@ const GAME_CELLS=[
  {icon:'🏁',value:'ФИНИШ',type:'start',label:'КОНЕЦ КРУГА'}
 ];
 const GAME_REWARDS=[
- {lap:15,icon:'💎',title:'Круг 15',items:[['💎','50','кристаллов'],['🧰','2','предмета'],['🪙','1050','монет']]},
- {lap:20,icon:'🧰',title:'Круг 20',items:[['🧰','10','предметов'],['💎','70','кристаллов'],['🪙','1500','монет']]},
- {lap:25,icon:'📜',title:'Круг 25',items:[['📜','30','свитков'],['💎','30','кристаллов'],['🪙','2000','монет']]},
- {lap:30,icon:'🧰',title:'Круг 30',items:[['🧰','10','предметов'],['💎','80','кристаллов'],['🪙','2200','монет']]},
- {lap:35,icon:'📜',title:'Круг 35',items:[['📜','30','свитков'],['🏆','1','редкая награда'],['🪙','3000','монет']]}
+ {lap:5,icon:'📜',title:'Круг 5',items:[['📜','30','свитков']]},
+ {lap:10,icon:'🧰',title:'Круг 10',items:[['🧰','50','предметов']]},
+ {lap:15,icon:'💎',title:'Круг 15',items:[['💎','100','кристаллов']]},
+ {lap:20,icon:'🧰',title:'Круг 20',items:[['🧰','10','предметов']]},
+ {lap:25,icon:'🪄',title:'Круг 25',items:[['🪄','30','особых наград']]}
 ];
 let gameMoving=false, gameSkipRequested=false, gameTimerId=null, gameModalTimerId=null;
 function gameEventTimer(){
@@ -186,7 +186,8 @@ function gameBoardInit(){
   cell.type='button';
   cell.className='board-cell '+(c.type||'')+(i===0?' start':'')+(i===n-1?' finish':'');
   cell.dataset.index=i;
-  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b><small>${c.label}</small></span>`;
+  cell.title=`Клетка ${i+1}: ${c.label}`;
+  cell.innerHTML=`<span class="tile-content"><span class="tile-icon">${c.icon}</span><b>${c.value}</b></span>`;
   const pos=gameGridPosition(i,n);
   cell.style.left=pos.x+'%';
   cell.style.top=pos.y+'%';

@@ -215,3 +215,112 @@
   #game.game-clean .game-side-tools{top:438px!important;width:108px!important}
   #game.game-clean .game-side-tools button{width:108px!important;min-height:40px!important}
 }
+
+/* Territory v123 — match the agreed Monopoly composition */
+#game.game-clean .game-topbar{
+  height:78px!important;
+  grid-template-columns:50px 1fr 150px!important;
+  padding:6px 10px!important;
+}
+#game.game-clean .game-close{width:44px!important;height:44px!important;border-radius:14px!important;font-size:30px!important}
+#game.game-clean .game-title b{font-size:26px!important;line-height:25px!important}
+#game.game-clean .game-title strong{font-size:18px!important;line-height:19px!important}
+#game.game-clean .game-title small{font-size:6px!important;letter-spacing:2px!important}
+#game.game-clean .game-timer{width:150px!important;border-radius:17px!important;padding:7px 6px!important}
+#game.game-clean .game-timer span{font-size:7px!important}
+#game.game-clean .game-timer b{font-size:14px!important}
+
+#game.game-clean .game-reward-track{
+  top:84px!important; left:10px!important; right:145px!important; height:61px!important;
+  gap:5px!important; padding:4px!important; border-radius:15px!important;
+}
+#game.game-clean .reward-step{
+  height:51px!important; border-radius:10px!important; grid-template-columns:29px 1fr!important;
+  padding:3px!important;
+}
+#game.game-clean .reward-icon{font-size:18px!important}
+#game.game-clean .reward-amount{font-size:10px!important;line-height:11px!important}
+#game.game-clean .reward-step small{font-size:6px!important;line-height:8px!important}
+
+#game.game-clean .game-reward-preview{
+  top:84px!important; right:8px!important; width:132px!important; min-height:61px!important;
+  border-radius:15px!important; padding:6px!important;
+}
+#game.game-clean .game-reward-preview span{font-size:23px!important;flex-basis:28px!important}
+#game.game-clean .game-reward-preview div{font-size:9px!important;line-height:11px!important}
+#game.game-clean .game-reward-preview small{font-size:7px!important}
+
+#game.game-clean .game-progress{
+  top:153px!important; height:36px!important; min-width:245px!important;
+  padding:6px 14px!important; font-size:10px!important; gap:12px!important;
+}
+
+/* Compact diamond: 27 separate tiles, with the ship safely inside. */
+#game.game-clean .game-board-wrap{
+  top:190px!important; left:50%!important;
+  width:min(74vw,300px)!important; height:min(74vw,300px)!important;
+}
+#game.game-clean .game-board-shell::before{
+  inset:0!important; border:0!important; border-radius:0!important;
+  background:transparent!important; box-shadow:none!important; clip-path:none!important;
+}
+#game.game-clean .board-cell{
+  width:13.2%!important; height:11.8%!important;
+  border:1.5px solid #755634!important; border-radius:7px!important;
+  box-shadow:inset 0 1px 0 #fff8,0 3px 6px #000b!important;
+}
+#game.game-clean .tile-content{gap:0!important}
+#game.game-clean .tile-icon{font-size:clamp(12px,3.4vw,17px)!important;line-height:17px!important}
+#game.game-clean .tile-content b{font-size:clamp(8px,2.3vw,12px)!important;line-height:12px!important}
+#game.game-clean .board-cell small{display:none!important}
+#game.game-clean .board-cell.start .tile-content b{font-size:10px!important;letter-spacing:.3px!important}
+#game.game-clean .game-center{width:43%!important;height:43%!important;z-index:4!important}
+#game.game-clean .game-token{width:38px!important;height:60px!important;margin:-52px 0 0 -19px!important}
+
+/* Utility column sits outside the diamond rather than over it. */
+#game.game-clean .game-side-tools{
+  top:470px!important; right:7px!important; width:124px!important; gap:6px!important;
+}
+#game.game-clean .game-side-tools button{
+  width:124px!important; min-height:47px!important; grid-template-columns:28px 1fr!important;
+  padding:5px 6px!important; border-radius:12px!important;
+}
+#game.game-clean .game-side-tools button span{font-size:18px!important}
+#game.game-clean .game-side-tools button b{font-size:8px!important;line-height:10px!important}
+#game.game-clean .game-side-tools button small{font-size:6px!important;line-height:8px!important}
+
+#game.game-clean .game-cell-info{
+  left:10px!important; right:10px!important; bottom:108px!important; height:48px!important;
+  border-radius:15px!important;
+}
+#game.game-clean .game-cell-info b{font-size:13px!important;line-height:15px!important}
+#game.game-clean .game-cell-info span{font-size:7px!important;line-height:9px!important}
+
+#game.game-clean .game-bottom{
+  height:103px!important; grid-template-columns:1fr 104px 1fr!important;
+  padding:5px 12px 7px!important; gap:6px!important;
+}
+#game.game-clean .ancient-dice{width:100px!important;height:82px!important;border-radius:20px!important}
+#game.game-clean .dice-face{font-size:37px!important;line-height:39px!important}
+#game.game-clean .ancient-dice small{font-size:11px!important}
+#game.game-clean .dice-count b{font-size:24px!important}
+#game.game-clean .dice-count span:not(.dice-icon){font-size:8px!important}
+#game.game-clean .multi-roll{font-size:9px!important}
+#game.game-clean .skip-roll{max-width:124px!important;font-size:8px!important;padding:9px 8px!important}
+
+@media(max-width:430px){
+  #game.game-clean .game-topbar{grid-template-columns:46px 1fr 132px!important}
+  #game.game-clean .game-timer{width:132px!important}
+  #game.game-clean .game-reward-track{right:140px!important}
+  #game.game-clean .game-reward-preview{width:128px!important}
+  #game.game-clean .game-board-wrap{top:188px!important;width:74vw!important;height:74vw!important;max-width:300px!important;max-height:300px!important}
+  #game.game-clean .game-side-tools{top:470px!important;width:118px!important}
+  #game.game-clean .game-side-tools button{width:118px!important}
+}
+@media(max-width:360px){
+  #game.game-clean .game-reward-track{right:130px!important}
+  #game.game-clean .game-reward-preview{width:120px!important}
+  #game.game-clean .game-board-wrap{top:180px!important;width:76vw!important;height:76vw!important;max-width:275px!important;max-height:275px!important}
+  #game.game-clean .game-side-tools{top:438px!important;width:108px!important}
+  #game.game-clean .game-side-tools button{width:108px!important;min-height:42px!important}
+}
