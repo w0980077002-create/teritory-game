@@ -102,8 +102,8 @@ const server=http.createServer((req,res)=>{
     if(!q)return json(res,200,{ok:true,queue:null});return json(res,200,{ok:true,queue:mmPublic(q)});
   }
   if(u.pathname==='/api/players'&&req.method==='GET'){
+    const a=auth(req); if(a.ok&&a.telegramId){syncTelegramProfile(a.telegramId,a,a.user?.first_name||'Игрок');persist()}
     const q=clean(u.searchParams.get('q')||'',40).toLowerCase(); const clan=clean(u.searchParams.get('clan')||'',80).toLowerCase();
-    const online=[...players.values()].map(x=>x.telegramId||x.playerId).filter(Boolean);
     const arr=Object.values(db.players).filter(p=>{const n=(p.name||'').toLowerCase();const c=(p.clan||'').toLowerCase();return (!q||n.includes(q)||String(p.id).includes(q)||(p.username||'').toLowerCase().includes(q))&&(!clan||c.includes(clan))}).slice(0,50).map(p=>({id:p.id,name:p.name,username:p.username||'',photoUrl:p.photoUrl||'',firstName:p.firstName||'',lastName:p.lastName||'',clan:p.clan||'',level:p.level||1,xp:p.xp||0,online:isPlayerOnline(p.id)}));
     return json(res,200,{ok:true,players:arr});
   }
