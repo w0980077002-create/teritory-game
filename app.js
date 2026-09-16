@@ -210,7 +210,7 @@ function gameGridPosition(i,n){
  // flex/grid sizing can stretch the cells.
  const count=Math.max(1,Number(n)||27);
  const idx=((Math.floor(Number(i)||0)%count)+count)%count;
- const cx=50, cy=50, r=37;
+ const cx=50, cy=50, r=42;
  const verts=[
    {x:cx,y:cy+r},
    {x:cx+r,y:cy},
