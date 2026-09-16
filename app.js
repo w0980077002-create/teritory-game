@@ -30,7 +30,7 @@ function save(){
   state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0);
   state.gameSaveVersion=2;
   try{ localStorage.setItem("territory_save_v1",JSON.stringify(state)); }catch(e){ console.warn("Territory save failed",e); }
-  render();
+  renderUI();
 }
 window.addEventListener("pagehide",()=>{try{state.gameMoving=false; save();}catch(e){}});
 window.addEventListener("beforeunload",()=>{try{state.gameMoving=false; save();}catch(e){}});
@@ -43,11 +43,11 @@ window.addEventListener("storage",e=>{
       state.gameSteps=Math.max(0,Number(state.gameSteps)||0);
       state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
       state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
-      render(); gameBoardInit?.(); gameUpdateStatus?.();
+      renderUI(); gameBoardInit?.(); gameUpdateStatus?.();
     }
   }catch(err){console.warn("Territory external save ignored",err);}
 });
-function render(){
+function renderUI(){
  $("#coins").textContent=state.coins; $("#gems").textContent=state.gems; $("#level").textContent=state.level;
  $("#playerHp").textContent=`${state.hp}/${state.maxHp}`; $("#enemyHp").textContent=`${state.enemyHp}/100`;
  $("#playerHpBar").style.width=`${Math.max(0,state.hp/state.maxHp*100)}%`; $("#enemyHpBar").style.width=`${Math.max(0,state.enemyHp/100*100)}%`;
@@ -294,8 +294,7 @@ function gameShowReward(reward,title='Поздравляем!',grant=true){
  const alreadyOpen=modal.classList.contains('show');
  const batch=document.querySelector('#gameBatchModal.show');
  if(grant===true){ reward.forEach(gameAddReward); save(); }
- if(alreadyOpen){ gameRewardQueue.push({reward,title,grant:false}); return; }
- if(batch){ batch.classList.remove('show'); batch.setAttribute('aria-hidden','true'); }
+ if(alreadyOpen || batch){ gameRewardQueue.push({reward,title,grant:false}); return; }
  $("#rewardModalTitle").textContent=title; $("#rewardModalText").textContent=grant?'Получено':'Предпросмотр';
  items.innerHTML=reward.map(x=>`<div class="reward-item"><i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small></div>`).join('');
  modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
@@ -490,7 +489,7 @@ gameEventTimer();
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
 })();
 
-render();
+renderUI();
 showScreen("home");
 /* Territory v35 — живой игровой город: без навязчивого автоспама */
 (function initLivingCity(){
@@ -670,7 +669,7 @@ function gameEnsureBatchModal(){
   const host=document.querySelector('#game') || document.body;
   host.appendChild(m);
   const c=m.querySelector('#gameBatchClose');
-  c.onclick=()=>{m.classList.remove('show');m.setAttribute('aria-hidden','true');gameUpdateStatus()};
+  c.onclick=()=>{m.classList.remove('show');m.setAttribute('aria-hidden','true');gameUpdateStatus();setTimeout(gameShowNextQueuedReward,80)};
   m.addEventListener('click',e=>{if(e.target===m)c.click()});
 }
 function gameShowBatchResults(results){
@@ -736,9 +735,11 @@ async function gameRoll10(){
   gameMoving=false; state.gameMoving=false; document.querySelector('#game').classList.remove('rolling');
   if(skip)skip.disabled=true;
   save(); gameTasksInit(); gameBoardInit(); gameShowBatchResults(results); gameUpdateStatus();
+  // x10 report is shown first. Bonus dialogs are queued behind it, while the
+  // rewards themselves are granted immediately by gameShowReward().
   if(newlyReached.length){
     const bonusItems=newlyReached.flatMap(r=>r.items||[]);
-    setTimeout(()=>gameShowReward(bonusItems,`Награда за круг ${newlyReached[newlyReached.length-1].lap}`),900);
+    if(bonusItems.length) gameShowReward(bonusItems,`Награда за круг ${newlyReached[newlyReached.length-1].lap}`);
   }
   if(jackpotResults.length){
     const jackpotItems=jackpotResults.map(x=>x.reward).filter(Boolean);
@@ -746,7 +747,7 @@ async function gameRoll10(){
     const title=jackpotResults.length===1
       ? `Награда за круг ${last.round}`
       : `Награды за круги ${first.round}–${last.round}`;
-    setTimeout(()=>gameShowReward(jackpotItems,title),newlyReached.length?4500:900);
+    if(jackpotItems.length) gameShowReward(jackpotItems,title);
   }
 }
 function gameRollUnified(){

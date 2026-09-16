@@ -688,3 +688,183 @@
   #game.game-clean .game-side-tools button{width:126px!important;min-height:53px!important}
   #game.game-clean .game-bottom{height:190px!important;grid-template-columns:1fr 150px 1fr!important;padding:8px 18px 10px!important}
 }
+
+
+/* Territory v128 — lock the actual reference coordinates. */
+#game.game-clean .game-topbar{height:70px!important;pointer-events:none!important}
+#game.game-clean .game-info,#game.game-clean .game-close{pointer-events:auto!important}
+#game.game-clean .game-title{top:5px!important;z-index:130!important}
+#game.game-clean .game-title b{font-size:40px!important;line-height:41px!important}
+#game.game-clean .game-title strong{font-size:25px!important;line-height:27px!important}
+#game.game-clean .game-timer{top:74px!important;width:315px!important;height:62px!important;padding:5px!important;z-index:120!important}
+#game.game-clean .game-timer span{font-size:11px!important;line-height:14px!important}
+#game.game-clean .game-timer b{font-size:24px!important;line-height:27px!important}
+#game.game-clean .game-reward-track{top:139px!important;left:25px!important;right:154px!important;height:91px!important;padding:4px!important;gap:5px!important}
+#game.game-clean .reward-step{height:81px!important;padding:4px 3px!important}
+#game.game-clean .reward-step small{font-size:11px!important;line-height:13px!important}
+#game.game-clean .reward-icon{font-size:29px!important;line-height:31px!important}
+#game.game-clean .reward-amount{font-size:16px!important;line-height:18px!important}
+#game.game-clean .game-reward-preview{top:139px!important;right:7px!important;width:145px!important;height:91px!important;min-height:91px!important;padding:6px!important}
+#game.game-clean .game-reward-preview span{font-size:36px!important;line-height:38px!important;flex:none!important}
+#game.game-clean .game-reward-preview div{font-size:11px!important;line-height:13px!important}
+#game.game-clean .game-reward-preview small{font-size:8px!important;line-height:10px!important}
+
+#game.game-clean .game-board-wrap{top:322px!important;left:50%!important;width:84vw!important;height:84vw!important;max-width:580px!important;max-height:580px!important}
+#game.game-clean .board-cell{width:13.8%!important;height:11.2%!important;padding:1px!important;border-radius:9px!important}
+#game.game-clean .tile-icon{font-size:clamp(17px,3.4vw,27px)!important;line-height:28px!important}
+#game.game-clean .tile-content b{font-size:clamp(9px,2vw,15px)!important;line-height:15px!important}
+#game.game-clean .game-center{width:44%!important;height:44%!important}
+#game.game-clean .game-token{width:54px!important;height:84px!important;margin:-74px 0 0 -27px!important}
+
+#game.game-clean .game-side-tools{top:822px!important;right:7px!important;width:160px!important;gap:6px!important}
+#game.game-clean .game-side-tools button{width:160px!important;min-height:64px!important;padding:6px!important;grid-template-columns:36px 1fr!important;border-radius:12px!important}
+#game.game-clean .game-side-tools button span{font-size:25px!important}
+#game.game-clean .game-side-tools button b{font-size:11px!important;line-height:13px!important}
+#game.game-clean .game-side-tools button small{font-size:9px!important;line-height:11px!important}
+
+#game.game-clean .game-bottom{height:205px!important;display:block!important;padding:0!important;background:linear-gradient(180deg,rgba(2,10,15,.02),rgba(2,10,15,.94))!important}
+#game.game-clean .dice-controls-left{position:absolute!important;left:28px!important;bottom:25px!important;display:flex!important;align-items:flex-start!important;gap:8px!important}
+#game.game-clean .dice-count{grid-template-columns:38px 1fr!important}
+#game.game-clean .dice-icon{font-size:42px!important}
+#game.game-clean .dice-count b{font-size:38px!important}
+#game.game-clean .dice-count span:not(.dice-icon){font-size:14px!important}
+#game.game-clean .dice-count small{font-size:11px!important}
+#game.game-clean .multi-roll{font-size:14px!important;gap:8px!important}
+#game.game-clean .multi-roll input{width:28px!important;height:28px!important}
+#game.game-clean .ancient-dice{position:absolute!important;left:50%!important;bottom:76px!important;transform:translateX(-50%)!important;width:150px!important;max-width:150px!important;height:145px!important;max-height:145px!important;border-radius:27px!important}
+#game.game-clean .dice-face{font-size:55px!important;line-height:58px!important}
+#game.game-clean .ancient-dice small{font-size:19px!important}
+#game.game-clean .skip-roll{position:absolute!important;right:20px!important;bottom:27px!important;width:180px!important;max-width:180px!important;padding:13px 10px!important;font-size:13px!important}
+#game.game-clean .skip-roll input{width:28px!important;height:28px!important}
+
+@media(max-width:600px){
+  #game.game-clean .game-title b{font-size:38px!important;line-height:39px!important}
+  #game.game-clean .game-title strong{font-size:24px!important;line-height:26px!important}
+  #game.game-clean .game-timer{top:74px!important;width:300px!important;height:61px!important}
+  #game.game-clean .game-reward-track{top:139px!important;left:22px!important;right:151px!important;height:88px!important}
+  #game.game-clean .game-reward-preview{top:139px!important;right:7px!important;width:144px!important;height:88px!important;min-height:88px!important}
+  #game.game-clean .game-board-wrap{top:322px!important;width:84vw!important;height:84vw!important;max-width:580px!important;max-height:580px!important}
+  #game.game-clean .game-side-tools{top:822px!important;width:155px!important}
+  #game.game-clean .game-side-tools button{width:155px!important;min-height:62px!important}
+}
+
+/* Territory v128 — exact mobile composition correction from the supplied reference. */
+#game.game-clean .game-title{top:5px!important;z-index:130!important}
+#game.game-clean .game-title b{font-size:40px!important;line-height:41px!important}
+#game.game-clean .game-title strong{font-size:25px!important;line-height:27px!important}
+#game.game-clean .game-timer{top:74px!important;width:315px!important;height:62px!important;z-index:120!important}
+#game.game-clean .game-timer span{font-size:11px!important;line-height:14px!important}
+#game.game-clean .game-timer b{font-size:24px!important;line-height:27px!important}
+
+#game.game-clean .game-reward-track{top:139px!important;left:25px!important;right:154px!important;height:91px!important;padding:4px!important;gap:5px!important}
+#game.game-clean .reward-step{height:81px!important;padding:4px 3px!important}
+#game.game-clean .reward-step small{font-size:11px!important;line-height:13px!important}
+#game.game-clean .reward-icon{font-size:29px!important;line-height:31px!important}
+#game.game-clean .reward-amount{font-size:16px!important;line-height:18px!important}
+#game.game-clean .game-reward-preview{top:139px!important;right:7px!important;width:145px!important;height:91px!important;min-height:91px!important;padding:6px!important}
+#game.game-clean .game-reward-preview span{font-size:36px!important;line-height:38px!important;flex:none!important}
+#game.game-clean .game-reward-preview div{font-size:11px!important;line-height:13px!important}
+#game.game-clean .game-reward-preview small{font-size:8px!important;line-height:10px!important}
+
+/* 27-cell field: large central diamond, matching the reference scale. */
+#game.game-clean .game-board-wrap{top:322px!important;left:50%!important;width:84vw!important;height:84vw!important;max-width:580px!important;max-height:580px!important}
+#game.game-clean .board-cell{width:13.8%!important;height:11.2%!important;padding:1px!important;border-radius:9px!important}
+#game.game-clean .tile-icon{font-size:clamp(17px,3.4vw,27px)!important;line-height:28px!important}
+#game.game-clean .tile-content b{font-size:clamp(9px,2vw,15px)!important;line-height:15px!important}
+#game.game-clean .game-center{width:44%!important;height:44%!important}
+#game.game-clean .game-token{width:54px!important;height:84px!important;margin:-74px 0 0 -27px!important}
+
+#game.game-clean .game-side-tools{top:822px!important;right:7px!important;width:160px!important;gap:6px!important}
+#game.game-clean .game-side-tools button{width:160px!important;min-height:64px!important;padding:6px!important;grid-template-columns:36px 1fr!important;border-radius:12px!important}
+#game.game-clean .game-side-tools button span{font-size:25px!important}
+#game.game-clean .game-side-tools button b{font-size:11px!important;line-height:13px!important}
+#game.game-clean .game-side-tools button small{font-size:9px!important;line-height:11px!important}
+
+/* Bottom controls are positioned independently so the roll button can never grow into the board. */
+#game.game-clean .game-bottom{height:205px!important;display:block!important;padding:0!important;background:linear-gradient(180deg,rgba(2,10,15,.02),rgba(2,10,15,.94))!important}
+#game.game-clean .dice-controls-left{position:absolute!important;left:28px!important;bottom:25px!important;display:flex!important;align-items:flex-start!important;gap:8px!important}
+#game.game-clean .dice-count{grid-template-columns:38px 1fr!important}
+#game.game-clean .dice-icon{font-size:42px!important}
+#game.game-clean .dice-count b{font-size:38px!important}
+#game.game-clean .dice-count span:not(.dice-icon){font-size:14px!important}
+#game.game-clean .dice-count small{font-size:11px!important}
+#game.game-clean .multi-roll{font-size:14px!important;gap:8px!important}
+#game.game-clean .multi-roll input{width:28px!important;height:28px!important}
+#game.game-clean .ancient-dice{position:absolute!important;left:50%!important;bottom:76px!important;transform:translateX(-50%) rotate(-4deg)!important;width:150px!important;min-width:150px!important;max-width:150px!important;height:145px!important;min-height:145px!important;max-height:145px!important;border-radius:27px!important;flex:none!important}
+#game.game-clean .dice-face{font-size:55px!important;line-height:58px!important}
+#game.game-clean .ancient-dice small{font-size:19px!important}
+#game.game-clean .skip-roll{position:absolute!important;right:20px!important;bottom:27px!important;width:180px!important;max-width:180px!important;padding:13px 10px!important;font-size:13px!important}
+#game.game-clean .skip-roll input{width:28px!important;height:28px!important}
+
+@media(max-width:600px){
+  #game.game-clean .game-title b{font-size:38px!important;line-height:39px!important}
+  #game.game-clean .game-title strong{font-size:24px!important;line-height:26px!important}
+  #game.game-clean .game-timer{top:74px!important;width:300px!important;height:61px!important}
+  #game.game-clean .game-reward-track{top:139px!important;left:22px!important;right:151px!important;height:88px!important}
+  #game.game-clean .reward-step{height:78px!important}
+  #game.game-clean .game-reward-preview{top:139px!important;right:7px!important;width:144px!important;height:88px!important;min-height:88px!important}
+  #game.game-clean .game-board-wrap{top:322px!important;width:84vw!important;height:84vw!important;max-width:580px!important;max-height:580px!important}
+  #game.game-clean .game-side-tools{top:822px!important;width:155px!important}
+  #game.game-clean .game-side-tools button{width:155px!important;min-height:62px!important}
+}
+
+
+/* Territory v130 — exact visual reference layer.
+   The supplied reference artwork is the fixed visual composition. Existing DOM controls
+   remain functional as transparent hit areas so the gameplay code is not discarded. */
+#game.game-clean{
+  position:fixed!important;inset:0!important;
+  width:100vw!important;height:100dvh!important;
+  min-height:0!important;overflow:hidden!important;
+  background:#07121a url("monopoly_reference.png") center center / 100% 100% no-repeat!important;
+  isolation:isolate!important;
+}
+#game.game-clean .game-harbor{display:none!important}
+#game.game-clean .game-topbar,
+#game.game-clean .game-main,
+#game.game-clean .game-bottom{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}
+#game.game-clean .game-title,
+#game.game-clean .game-timer,
+#game.game-clean .game-progress,
+#game.game-clean .game-reward-track,
+#game.game-clean .game-reward-preview,
+#game.game-clean .game-board-wrap,
+#game.game-clean .game-side-tools,
+#game.game-clean .game-cell-info,
+#game.game-clean .ancient-dice,
+#game.game-clean .dice-controls-left,
+#game.game-clean .skip-roll{z-index:30!important}
+
+/* The artwork supplies the visuals; these elements are interaction layers. */
+#game.game-clean .game-title,
+#game.game-clean .game-timer,
+#game.game-clean .game-progress,
+#game.game-clean .game-reward-track,
+#game.game-clean .game-board-wrap,
+#game.game-clean .game-cell-info,
+#game.game-clean .dice-controls-left{visibility:hidden!important;pointer-events:none!important}
+#game.game-clean .game-center,
+#game.game-clean .game-token{visibility:hidden!important}
+
+#game.game-clean .game-info,
+#game.game-clean .game-close,
+#game.game-clean .game-reward-preview,
+#game.game-clean .game-side-tools button,
+#game.game-clean .ancient-dice,
+#game.game-clean .multi-roll,
+#game.game-clean .skip-roll{background:transparent!important;border:0!important;box-shadow:none!important;color:transparent!important;text-shadow:none!important}
+#game.game-clean .game-info{position:absolute!important;left:0.5%!important;top:0.7%!important;width:11%!important;height:8%!important;z-index:60!important}
+#game.game-clean .game-close{position:absolute!important;right:0.5%!important;top:0.7%!important;width:11%!important;height:8%!important;z-index:60!important}
+#game.game-clean .game-reward-preview{position:absolute!important;right:1%!important;top:10.7%!important;width:16%!important;height:9%!important;min-height:0!important;padding:0!important;z-index:60!important}
+#game.game-clean .game-side-tools{position:absolute!important;right:1%!important;top:66.5%!important;width:23%!important;display:flex!important;flex-direction:column!important;gap:0!important;z-index:60!important}
+#game.game-clean .game-side-tools button{width:100%!important;height:6.5vh!important;min-height:0!important;padding:0!important}
+#game.game-clean .ancient-dice{position:absolute!important;left:39%!important;bottom:7.8%!important;width:23%!important;height:16%!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;padding:0!important;z-index:60!important;transform:none!important}
+#game.game-clean .multi-roll{position:absolute!important;left:4%!important;bottom:4%!important;width:27%!important;height:7%!important;z-index:60!important;display:block!important}
+#game.game-clean .multi-roll input{opacity:0!important;width:100%!important;height:100%!important;margin:0!important;position:absolute!important;inset:0!important}
+#game.game-clean .skip-roll{position:absolute!important;right:4%!important;bottom:4%!important;width:27%!important;height:7%!important;z-index:60!important;padding:0!important}
+#game.game-clean .skip-roll input{opacity:0!important;width:100%!important;height:100%!important;margin:0!important;position:absolute!important;inset:0!important}
+
+/* Keep the reference artwork fully visible on portrait phones. */
+@media (orientation:portrait){
+  #game.game-clean{background-size:100% 100%!important}
+}
