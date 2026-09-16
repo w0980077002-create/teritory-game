@@ -1,0 +1,9 @@
+Вставь одну строку в index.html сразу после подключения arena.js:
+
+<script src="vip.js?v=3"></script>
+
+Итог:
+
+<script src="app.js?v=138"></script>
+<script src="arena.js?v=139"></script>
+<script src="vip.js?v=3"></script>
