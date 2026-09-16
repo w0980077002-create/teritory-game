@@ -1,0 +1,46 @@
+/* Territory VIP Quest styles */
+
+.vip-quest-card{
+  margin:10px 0;
+  border:1px solid rgba(255,215,0,.28);
+  border-radius:14px;
+  padding:12px;
+  background:rgba(25,22,15,.96);
+  color:#fff;
+}
+
+.vip-quest-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+
+.vip-quest-head b{
+  font-size:15px;
+}
+
+.vip-quest-head small{
+  opacity:.8;
+}
+
+.vip-quest-text{
+  margin:9px 0;
+  font-size:13px;
+  line-height:1.35;
+  opacity:.9;
+}
+
+.vip-quest-card button{
+  width:100%;
+  min-height:42px;
+  border:0;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.vip-quest-card button:disabled{
+  opacity:.6;
+  cursor:default;
+}
