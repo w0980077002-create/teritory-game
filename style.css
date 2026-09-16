@@ -520,7 +520,7 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
 @media(max-height:760px){.final-location{top:10px}.final-house{bottom:28%;height:120px}.final-gate{bottom:27%;height:166px}.final-hero{bottom:6%;transform:translateX(-50%) scale(.9)}.final-npc.left,.final-npc.right{bottom:12%}.final-actions{top:66px;gap:4px}.final-actions button{height:58px}.final-message{bottom:9%}.final-status{bottom:3px}}
 
 /* Territory v13 — real rendered Sdolars scene */
-.world-final{background:#07111b url('sdolars_scene.png') center center/cover no-repeat !important;}
+.world-final{background:#07111b url('sdolars_clean_scene.png') center center/cover no-repeat !important;}
 /* The generated scene is the visual foundation. Keep only functional HTML controls over it. */
 .world-final > .final-sky,
 .world-final > .final-city-back,
@@ -549,7 +549,7 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
 
 /* Territory v14 — cinematic real scene, functional UI over a clean scene crop */
 .world-final{
-  background:#07111b url('sdolars_scene_clean.png') center center/cover no-repeat !important;
+  background:#07111b url('sdolars_clean_scene.png') center center/cover no-repeat !important;
 }
 .world-final:after{display:none !important}
 .world-final > .final-sky,

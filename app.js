@@ -1,4 +1,4 @@
-/* Territory v93 — item rewards now grant their full quantity */
+/* Territory v138 — canonical base + S98 Arena integration */
 const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 function gameLoadState(){
   try{
@@ -13,6 +13,7 @@ function gameLoadState(){
 }
 let state=gameLoadState();
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
+state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.name||"SSS");
 state.gameDice=Math.max(0,Number(state.gameDice??47)||0); state.gameRolls=Math.max(0,Number(state.gameRolls??0)||0); state.gameSteps=Math.max(0,Number(state.gameSteps??0)||0); state.gameEventVersion=Number(state.gameEventVersion??1)||1; state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0); state.gameMilestones=Array.isArray(state.gameMilestones)?[...new Set(state.gameMilestones.map(Number).filter(Number.isFinite))]:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?[...new Set(state.gameTaskClaims.map(String))]:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?[...new Set(state.gamePanelClaims.map(String))]:[]; state.gameJackpotClaims=Array.isArray(state.gameJackpotClaims)?[...new Set(state.gameJackpotClaims.map(Number).filter(Number.isFinite))]:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS; state.gameSaveVersion=2;
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
@@ -28,7 +29,7 @@ function save(){
   state.gamePos=((Math.floor(state.gamePos)%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
   state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
   state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0);
-  state.gameSaveVersion=2;
+  state.gameSaveVersion=2; state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0);
   try{ localStorage.setItem("territory_save_v1",JSON.stringify(state)); }catch(e){ console.warn("Territory save failed",e); }
   render();
 }
@@ -48,58 +49,19 @@ window.addEventListener("storage",e=>{
   }catch(err){console.warn("Territory external save ignored",err);}
 });
 function render(){
- $("#coins").textContent=state.coins; $("#gems").textContent=state.gems; $("#level").textContent=state.level;
- $("#playerHp").textContent=`${state.hp}/${state.maxHp}`; $("#enemyHp").textContent=`${state.enemyHp}/100`;
- $("#playerHpBar").style.width=`${Math.max(0,state.hp/state.maxHp*100)}%`; $("#enemyHpBar").style.width=`${Math.max(0,state.enemyHp/100*100)}%`;
- $("#weaponName").textContent=state.weapon; $("#weaponStats").textContent=`Урон +${state.bonusDamage}`;
+ const coins=$("#coins"), gems=$("#gems"), level=$("#level");
+ if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
+ $("#weaponName") && ($("#weaponName").textContent=state.weapon); $("#weaponStats") && ($("#weaponStats").textContent=`Урон +${state.bonusDamage}`);
  const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
  renderShop(); renderInventory();
-  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
+ const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
 }
 function showScreen(id){
  document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));
- if(id==="arena") resetTactical();
+ if(id==="arena") setTimeout(()=>{ if(window.openBattle) window.openBattle(); },0);
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b)showScreen(b.dataset.screen)});
-function resetTactical(){
- document.querySelectorAll(".zones button").forEach(b=>b.classList.remove("selected"));
- $("#fightBtn").disabled=true; $("#combatLog").textContent="Выберите зону атаки и две зоны защиты.";
-}
-$("#attackZones").addEventListener("click",e=>{
- const b=e.target.closest("button"); if(!b)return;
- document.querySelectorAll("#attackZones button").forEach(x=>x.classList.remove("selected")); b.classList.add("selected"); updateFight();
-});
-$("#defenseZones").addEventListener("click",e=>{
- const b=e.target.closest("button"); if(!b)return;
- b.classList.toggle("selected");
- const selected=[...document.querySelectorAll("#defenseZones button.selected")];
- if(selected.length>2) selected[0].classList.remove("selected");
- updateFight();
-});
-function updateFight(){
- const a=$("#attackZones button.selected"); const d=document.querySelectorAll("#defenseZones button.selected");
- $("#fightBtn").disabled=!(a&&d.length===2);
-}
-$("#fightBtn").onclick=()=>{
- const attack=$("#attackZones button.selected").dataset.zone;
- const defense=[...document.querySelectorAll("#defenseZones button.selected")].map(x=>x.dataset.zone);
- const enemyDefense=zones[Math.floor(Math.random()*5)];
- const damage=state.bonusDamage+10+(attack==="head"?4:attack==="legs"?2:0);
- let dealt=enemyDefense===attack?Math.max(3,Math.floor(damage*.35)):damage;
- state.enemyHp=Math.max(0,state.enemyHp-dealt);
- const enemyAttack=zones[Math.floor(Math.random()*5)];
- const enemyDamage=10;
- const blocked=defense.includes(enemyAttack);
- const taken=blocked?0:enemyDamage;
- state.hp=Math.max(0,state.hp-taken);
- $("#combatLog").textContent=`Вы: ${names[attack]} → −${dealt} HP. Враг атакует: ${names[enemyAttack]}${blocked?" — БЛОК!":" — −"+taken+" HP."}`;
- $("#turnLabel").textContent="ХОД "+(Number($("#turnLabel").textContent.replace(/\D/g,""))+1);
- if(state.enemyHp<=0){state.coins+=150;state.exp+=40;$("#combatLog").textContent+=" Победа! +150 🪙 +40 XP.";state.enemyHp=100;}
- if(state.hp<=0){state.hp=state.maxHp;state.coins=Math.max(0,state.coins-100);$("#combatLog").textContent+=" Вы проиграли. Восстановление −100 🪙.";}
- if(state.exp>=100){state.level++;state.exp-=100;state.maxHp+=10;state.hp=state.maxHp;$("#combatLog").textContent+=" Новый уровень!";}
- save(); resetTactical();
-};
 function renderShop(){
  const day=Math.floor(Date.now()/86400000);
  if(state.marketDay!==day){ state.marketDay=day; }
