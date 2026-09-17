@@ -30,8 +30,9 @@ function save(){
   state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
   state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0);
   state.gameSaveVersion=2; state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0);
-  try{ localStorage.setItem("territory_save_v1",JSON.stringify(state)); }catch(e){ console.warn("Territory save failed",e); }
+  saveLocalOnly();
   render();
+  scheduleTerritoryRemoteSave();
 }
 window.addEventListener("pagehide",()=>{try{state.gameMoving=false; save();}catch(e){}});
 window.addEventListener("beforeunload",()=>{try{state.gameMoving=false; save();}catch(e){}});
@@ -115,6 +116,101 @@ function applyTelegramProfile(){
   state.telegramDisplayName=name;
   state.name=name;
   state.telegramPhotoUrl=photo;
+}
+
+const TERRITORY_SERVER_URL='https://territory-sdolars-server.w0660077702.workers.dev';
+let territoryServerReady=false;
+let territoryServerPromise=null;
+let territoryRemoteSaveTimer=null;
+let territoryRemoteSaveInFlight=false;
+let territoryRemoteSaveQueued=false;
+
+function getTelegramInitData(){
+  try{
+    const tg=window.Telegram&&window.Telegram.WebApp;
+    return tg&&typeof tg.initData==='string'?tg.initData:'';
+  }catch(e){return '';}
+}
+function territoryStateForServer(){
+  const copy={...state};
+  delete copy.telegramUserId;
+  delete copy.telegramUsername;
+  delete copy.telegramDisplayName;
+  delete copy.telegramPhotoUrl;
+  return copy;
+}
+async function territoryPost(path,payload){
+  const res=await fetch(TERRITORY_SERVER_URL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),cache:'no-store'});
+  let data=null;
+  try{data=await res.json();}catch(e){throw new Error('Сервер вернул неверный ответ');}
+  if(!res.ok||!data||data.ok!==true)throw new Error(data&&data.error?data.error:`HTTP ${res.status}`);
+  return data;
+}
+async function territoryServerAuth(){
+  const initData=getTelegramInitData();
+  if(!initData){return false;}
+  const localRaw=localStorage.getItem('territory_save_v1');
+  let localSnapshot=null;
+  try{localSnapshot=localRaw?JSON.parse(localRaw):null;}catch(e){localSnapshot=null;}
+  try{
+    const data=await territoryPost('/api/auth',{initData});
+    const u=getTelegramUser();
+    if(data.created){
+      const sameUser=!!(u&&localSnapshot&&String(localSnapshot.telegramUserId||'')===String(u.id));
+      if(sameUser){
+        state={...localSnapshot};
+        applyTelegramProfile();
+        saveLocalOnly();
+        await territoryPost('/api/save',{initData,state:territoryStateForServer()});
+      }else{
+        state={...data.state};
+        applyTelegramProfile();
+        saveLocalOnly();
+      }
+    }else if(data.state&&typeof data.state==='object'){
+      state={...state,...data.state};
+      applyTelegramProfile();
+      saveLocalOnly();
+    }
+    territoryServerReady=true;
+    render();
+    return true;
+  }catch(err){
+    console.warn('Territory server auth failed; local save remains active:',err);
+    territoryServerReady=false;
+    return false;
+  }
+}
+function saveLocalOnly(){
+  try{localStorage.setItem('territory_save_v1',JSON.stringify(state));}catch(e){console.warn('Territory local save failed',e);}
+}
+function scheduleTerritoryRemoteSave(){
+  if(!getTelegramInitData())return;
+  clearTimeout(territoryRemoteSaveTimer);
+  territoryRemoteSaveTimer=setTimeout(()=>territoryRemoteSave(),700);
+}
+async function territoryRemoteSave(){
+  if(!getTelegramInitData())return;
+  if(!territoryServerReady){
+    if(territoryServerPromise)await territoryServerPromise;
+    if(!territoryServerReady)return;
+  }
+  if(territoryRemoteSaveInFlight){territoryRemoteSaveQueued=true;return;}
+  territoryRemoteSaveInFlight=true;
+  try{
+    const initData=getTelegramInitData();
+    await territoryPost('/api/save',{initData,state:territoryStateForServer()});
+  }catch(err){
+    console.warn('Territory remote save failed; local save is safe:',err);
+  }finally{
+    territoryRemoteSaveInFlight=false;
+    if(territoryRemoteSaveQueued){territoryRemoteSaveQueued=false;territoryRemoteSave();}
+  }
+}
+function startTerritoryServer(){
+  if(territoryServerPromise)return territoryServerPromise;
+  territoryServerPromise=territoryServerAuth();
+  return territoryServerPromise;
 }
 
 function render(){
@@ -523,6 +619,7 @@ gameEventTimer();
 render();
 showScreen("home");
 applyTelegramProfile();
+startTerritoryServer();
 /* Territory v35 — живой игровой город: без навязчивого автоспама */
 (function initLivingCity(){
   const home=document.querySelector('.real-home');
