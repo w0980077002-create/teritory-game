@@ -444,6 +444,12 @@ gameEventTimer();
 })();
 
 render();
+["#gameRewardModal","#gameTasksModal","#gamePanelModal","#gameJackpotModal"].forEach(id=>{
+  const el=document.querySelector(id);
+  if(el){el.classList.remove("show");el.setAttribute("aria-hidden","true");}
+});
+const gameScreen=document.querySelector("#game");
+if(gameScreen) gameScreen.classList.remove("active");
 showScreen("home");
 /* Territory v35 — живой игровой город: без навязчивого автоспама */
 (function initLivingCity(){
