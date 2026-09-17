@@ -48,6 +48,50 @@ window.addEventListener("storage",e=>{
     }
   }catch(err){console.warn("Territory external save ignored",err);}
 });
+/* Territory v7 — Telegram identity
+   The Mini App gets the display profile from Telegram when opened inside Telegram.
+   The fallback avatar remains for users without a Telegram photo (or when testing in a browser).
+   A real server must verify Telegram.WebApp.initData before treating the Telegram ID as trusted auth.
+*/
+function getTelegramUser(){
+  try{
+    const tg=window.Telegram&&window.Telegram.WebApp;
+    if(!tg) return null;
+    try{tg.ready(); tg.expand();}catch(_e){}
+    const u=tg.initDataUnsafe&&tg.initDataUnsafe.user;
+    return u&&u.id?u:null;
+  }catch(e){return null;}
+}
+function telegramDisplayName(u){
+  if(!u)return 'Territory';
+  const first=String(u.first_name||'').trim();
+  const last=String(u.last_name||'').trim();
+  const username=String(u.username||'').trim();
+  return [first,last].filter(Boolean).join(' ') || (username?('@'+username):'Territory');
+}
+function applyTelegramProfile(){
+  const u=getTelegramUser();
+  const nameEl=$('#profilePlayerName');
+  const avatar=$('#profileAvatar');
+  if(!u){
+    if(nameEl) nameEl.textContent=String(state.name||'Territory');
+    if(avatar){avatar.src='profile_avatar.png';avatar.alt='Стандартный аватар';}
+    return;
+  }
+  const name=telegramDisplayName(u);
+  if(nameEl) nameEl.textContent=name;
+  if(avatar){
+    avatar.src=u.photo_url||'profile_avatar.png';
+    avatar.alt=`Аватар ${name}`;
+    avatar.onerror=()=>{avatar.onerror=null;avatar.src='profile_avatar.png';};
+  }
+  // Store only display-safe profile data locally for offline/browser continuity.
+  state.telegramUserId=String(u.id);
+  state.telegramUsername=String(u.username||'');
+  state.name=name;
+  state.telegramPhotoUrl=String(u.photo_url||'');
+}
+
 function render(){
  const coins=$("#coins"), gems=$("#gems"), level=$("#level");
  if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
@@ -56,6 +100,7 @@ function render(){
  renderShop(); renderInventory();
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
  const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
+ applyTelegramProfile();
  set("#profileLevel",state.level); set("#profileLevelText",Math.max(1,state.level));
  set("#profileExp",`${state.exp||120}/${state.maxExp||300}`);
  set("#profileGems",state.gems); set("#profileCoins",state.coins); set("#profileEnergy",`${state.energy}/200`); set("#profileStone",state.combatStone);
@@ -452,6 +497,7 @@ gameEventTimer();
 
 render();
 showScreen("home");
+applyTelegramProfile();
 /* Territory v35 — живой игровой город: без навязчивого автоспама */
 (function initLivingCity(){
   const home=document.querySelector('.real-home');

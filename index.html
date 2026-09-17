@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#10131a">
-<title>Territory — Sdolars · LIVE v139</title>
+<title>Territory — Sdolars · LIVE v140</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="style.css?v=139">
 <link rel="stylesheet" href="game.css?v=139">
 <link rel="stylesheet" href="arena.css?v=139">
@@ -222,11 +223,11 @@ body:has(#home.active) .bottom-nav { display: none !important; }
       </div>
       <div class="profile-card">
         <div class="profile-avatar-wrap">
-          <img src="profile_avatar.png" alt="Персонаж" class="profile-avatar-img">
+          <img id="profileAvatar" src="profile_avatar.png" alt="Аватар игрока" class="profile-avatar-img">
           <span class="profile-level" id="profileLevel">5</span>
         </div>
         <div class="profile-main">
-          <div class="profile-name">Territory</div>
+          <div class="profile-name" id="profilePlayerName">Territory</div>
           <div class="profile-chapter">Глава 5 · Уровень <span id="profileLevelText">3</span></div>
           <div class="profile-exp"><i id="profileExpBar"></i><b id="profileExp">120/300</b></div>
         </div>
@@ -347,6 +348,7 @@ body:has(#home.active) .bottom-nav { display: none !important; }
     </div>
   </div>
   <div class="arena-toast" id="arenaToast" role="status" aria-live="polite"></div>
+  <div id="refToast" aria-live="polite"></div>
 
   <nav class="bottom-nav">
     <button data-screen="home">🏠<span>Город</span></button>
