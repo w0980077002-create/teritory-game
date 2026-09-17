@@ -1915,3 +1915,32 @@ body:has(#home.active) .bottom-nav button:active{transform:scale(.97)!important}
  body:has(#home.active) .bottom-nav button{font-size:17px!important;border-radius:8px!important}
  body:has(#home.active) .bottom-nav button span{font-size:7px!important;line-height:9px!important}
 }
+
+
+/* Territory v4 FINAL HOME COMPOSITION: clean artwork only; no baked UI overlap. */
+body:has(#home.active){overflow:hidden!important;background:#07111b!important}
+body:has(#home.active) #app{position:relative!important;width:100%!important;height:100%!important;overflow:hidden!important}
+body:has(#home.active) .hud{position:absolute!important;left:0!important;right:0!important;top:0!important;height:78px!important;min-height:78px!important;z-index:300!important;display:flex!important;box-sizing:border-box!important}
+body:has(#home.active) main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important}
+body:has(#home.active) #home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#07111b!important}
+body:has(#home.active) .real-home{position:absolute!important;left:0!important;right:0!important;top:78px!important;bottom:64px!important;width:auto!important;height:auto!important;overflow:hidden!important;background:#07111b!important;z-index:1!important}
+body:has(#home.active) .real-home-image{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;min-height:0!important;object-fit:fill!important;object-position:center center!important;transform:none!important;animation:none!important;filter:none!important;z-index:1!important}
+/* The approved clean artwork contains only the city + small hero. */
+body:has(#home.active) .baked-ui-mask{display:none!important}
+body:has(#home.active) .world-final{display:none!important}
+/* HTML controls sit above the artwork and never overtake the hero. */
+body:has(#home.active) .live-city-title{z-index:40!important}
+body:has(#home.active) .live-city-time{z-index:40!important}
+body:has(#home.active) .live-side-ui{z-index:45!important}
+body:has(#home.active) .npc-label{z-index:44!important}
+body:has(#home.active) .city-pve-entry{z-index:80!important;bottom:76px!important}
+body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:64px!important;min-height:64px!important;z-index:250!important}
+/* Remove legacy scene layers that could duplicate people, signs or interface. */
+body:has(#home.active) .real-home > .hotspot,
+body:has(#home.active) .real-home > .scene-hotspots{z-index:90!important}
+@media(max-width:430px){
+ body:has(#home.active) .hud{height:72px!important;min-height:72px!important}
+ body:has(#home.active) .real-home{top:72px!important;bottom:60px!important}
+ body:has(#home.active) .bottom-nav{height:60px!important;min-height:60px!important}
+ body:has(#home.active) .city-pve-entry{bottom:68px!important}
+}
