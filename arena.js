@@ -1,4 +1,4 @@
-/* Territory G8 loader — stable feature chain + Alex quest triggers */
+/* Territory G9 loader — stable feature chain + Duke Alex portrait */
 (function(){
   "use strict";
   function load(src){
@@ -13,6 +13,6 @@
     .then(function(){return load("equipment.js?v=1");})
     .then(function(){return load("market.js?v=1");})
     .then(function(){return load("districts.js?v=1");})
-    .then(function(){return load("duke-alex.js?v=2");})
-    .catch(function(err){console.error("Territory G8 loader:",err);});
+    .then(function(){return load("duke-alex.js?v=3");})
+    .catch(function(err){console.error("Territory G9 loader:",err);});
 })();
