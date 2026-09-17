@@ -3,156 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#10131a">
+<meta name="theme-color" content="#081119">
 <title>Territory — Sdolars</title>
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="game.css">
 <link rel="stylesheet" href="arena.css">
-
-
-
 </head>
 <body>
 <div id="app">
-  <header class="hud">
-    <div class="profile">
-      <div class="avatar">⚔️</div>
-      <div>
-        <b id="playerName">SSS</b>
-        <span>Уровень <strong id="level">1</strong></span>
-      </div>
+<header class="hud">
+  <div class="player-card"><div class="avatar">⚔️</div><div><b id="playerName">SSS</b><span>Уровень <strong id="level">17</strong></span></div></div>
+  <div class="resources"><span>🪙 <b id="coins">27883</b></span><span>💎 <b id="gems">245</b></span></div>
+</header>
+<main id="screens">
+<section id="home" class="screen active">
+  <div class="city-scene">
+    <div class="moon"></div><div class="mountains"></div>
+    <div class="city-back"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="city-mid"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="street"><div class="street-light l"></div><div class="street-light r"></div><div class="road-line"></div></div>
+    <div class="scene-title"><small>ГОРОД</small><b>SDOLARS</b></div>
+    <div class="npc alex"><span>🧔</span><b>Alex</b><small>Лорд-командующий</small></div>
+    <div class="npc merchant"><span>🧔‍♂️</span><b>Торговец</b><small>Снаряжение</small></div>
+    <div class="quick-actions">
+      <button data-screen="arena"><strong>⚔️</strong><b>Арена</b><small>Бои</small></button>
+      <button data-screen="market"><strong>🛒</strong><b>Рынок</b><small>Торговля</small></button>
+      <button data-screen="districts"><strong>🗺️</strong><b>Районы</b><small>Город</small></button>
     </div>
-    <div class="resources">
-      <div>🪙 <b id="coins">1000</b></div>
-      <div>💎 <b id="gems">25</b></div>
-    </div>
-  </header>
-
-  <main>
-    <section id="home" class="screen active home-real">
-  <div class="real-home">
-    <img src="sdolars_scene.png" alt="Sdolars" class="real-home-image">
-<div class="live-side-ui" aria-label="Быстрые действия">
-      <button data-screen="arena"><span>⚔️</span><b>Арена</b><small>Бой</small></button>
-      <button data-screen="market"><span>🛒</span><b>Рынок</b><small>Торговля</small></button>
-      <button data-screen="districts"><span>🗺️</span><b>Районы</b><small>Город</small></button>
-      <button data-screen="game"><span class="game-icon-ancient">⚄⚂</span><b>Game</b><small>Кубики</small></button>
-    </div>
-    <button class="npc-label guard-label" data-screen="districts" aria-label="Alex — Лорд-командующий"><b>Alex</b><small>Лорд-командующий</small></button>
-    <button class="npc-label trader-label" data-screen="market" aria-label="Торговец"><b>Торговец</b><small>Покупка / Продажа</small></button>
   </div>
 </section>
-
-    <section id="districts" class="screen">
-      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>РАЙОНЫ SDOLARS</h2></div>
-      <div class="map">
-        <div class="road r1"></div><div class="road r2"></div>
-        <button class="map-point arena-point" data-screen="arena">⚔️<small>Арена</small></button>
-        <button class="map-point market-point" data-screen="market">🛒<small>Рынок</small></button>
-        <button class="map-point game-point" data-screen="game"><span class="game-icon-ancient">⚄⚂</span><small>Game</small></button>
-        <button class="map-point port-point" data-district="port">⚓<small>Порт</small></button>
-        <button class="map-point ruins-point" data-district="ruins">🏚️<small>Руины</small></button>
-        <button class="map-point center-point" data-district="center">🏙️<small>Центр</small></button>
-      </div>
-      <div class="district-info" id="districtInfo">
-        <small id="districtKicker">РАЙОН SDOLARS</small><b id="districtTitle">Центральный квартал</b>
-        <span id="districtText">Выбирай район и отправляйся туда. У каждого места — свои события и награды.</span>
-        <button id="districtAction">Отправиться</button>
-      </div>
-      <div class="district-log" id="districtLog">Городская карта открыта.</div>
-    </section>
-
-    <section id="market" class="screen">
-      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>РЫНОК СНАРЯЖЕНИЯ</h2></div>
-      <div class="merchant merchant-live"><div class="merchant-face">🧔‍♂️</div><div><b>ТОРГОВЕЦ</b><span id="merchantMood">«Сегодня хороший товар.»</span></div><em id="merchantRep">Репутация 0</em></div>
-      <div class="merchant-stock-head"><b>ТОВАРЫ ДНЯ</b><small id="marketReset">Ассортимент обновится позже</small></div>
-      <div class="shop-grid" id="shopGrid"></div>
-      <div class="sell-panel"><div><b>Продать предмет</b><small>Торговец покупает найденные предметы</small></div><button id="sellItemBtn">Продать случайный предмет · 40 🪙</button></div>
-      <div class="merchant-log" id="merchantLog">Торговец ждёт сделки.</div>
-    </section>
-
-    <section id="inventory" class="screen">
-      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>ИНВЕНТАРЬ</h2></div>
-      <div class="equipment-card">
-        <div class="equip-art">🪓</div><div><b id="weaponName">Кулаки</b><span id="weaponStats">Урон +0</span></div>
-      </div>
-      <div class="inventory-grid" id="inventoryGrid"></div>
-    </section>
-
-    <section id="game" class="screen game-screen">
-      <div class="game-bg" aria-hidden="true"></div>
-      <header class="game-topbar">
-        <button class="game-close" data-screen="home" aria-label="Закрыть">×</button>
-        <div class="game-title"><b>Territory</b><strong>Монополия</strong><small>GAME · ЗИМНЕЕ СОБЫТИЕ</small></div>
-        <div class="game-timer"><span>До окончания события</span><b id="gameTimer">2д 12:08:58</b></div>
-      </header>
-      <div class="game-reward-head"><b>Предпросмотр наград</b><button type="button" id="gameRewardPreviewBtn">ОТКРЫТЬ</button></div>
-      <div class="game-reward-track" id="gameRewardTrack" aria-label="Награды за круги"></div>
-      <div class="game-tools" aria-label="Инструменты Монополии">
-        <button type="button" id="gameGiftBtn"><span>🎁</span><b>Подарок</b><small>Ежедневный</small></button>
-        <button type="button" id="gameTasksBtn"><span>📜</span><b>Задания</b><small>Монополия</small></button>
-        <button type="button" id="gameSpecialBtn"><span>🧰</span><b>Спецпредложение</b><small>Монополия</small></button>
-      </div>
-      <div class="game-progress" aria-live="polite"><b id="gameTurnNo">Ход 0</b><span>Круг <b id="gameLapBadge">0</b></span><span>Клетка <b id="gameCellNo">1</b>/27</span></div>
-      <div class="game-main">
-        <div class="game-harbor" aria-hidden="true"></div>
-        <div class="game-board-wrap">
-          <div class="game-board-shell">
-            <div class="game-board" id="gameBoard" aria-label="Игровое поле"></div>
-            <div class="game-center">
-              <div class="game-ship-wrap"><div class="game-ship-art" aria-label="Старинный парусник S$S"></div></div>
-              <b>S$S</b><small>SDOLARS WINTER</small>
-            </div>
-            <div class="game-token" id="gameToken" aria-label="Ваша фишка">♟</div>
-          </div>
-        </div>
-        <div class="game-cell-info" id="gameCellInfo"><b>Клетка 1 · СТАРТ</b><span>Отправная точка · начни путешествие</span></div>
-      </main>
-      <div class="game-bottom">
-        <div class="dice-controls-left">
-          <div class="dice-count"><span class="dice-icon">🎲</span><b id="diceCount">40</b><span>кубиков</span><small>1 бросок за ход</small></div>
-          <label class="multi-roll"><input type="checkbox" id="roll10Btn"><span>Бросок <b>×10</b></span></label>
-        </div>
-        <button type="button" class="ancient-dice" id="spinBtn" aria-label="Бросить кубик"><span class="dice-face" id="diceFace">⚄</span><small>БРОСИТЬ</small></button>
-        <label class="skip-roll"><input type="checkbox" id="skipRollBtn"><span>Пропустить<br>анимацию</span></label>
-      </div>
-      <div class="game-jackpot-modal" id="gameJackpotModal" aria-hidden="true">
-        <div class="game-jackpot-card">
-          <button type="button" class="game-modal-close" id="jackpotClose" aria-label="Закрыть">×</button>
-          <div class="modal-banner">ПРЕДПРОСМОТР НАГРАД</div>
-          <h3>Jackpot · награды по кругам</h3>
-          <p class="jackpot-subtitle">Каждый круг имеет отдельную награду. Полученные отмечены ✓.</p>
-          <div class="jackpot-list" id="jackpotList"></div>
-        </div>
-      </div>
-      <div class="game-modal" id="gameRewardModal" aria-hidden="true">
-        <div class="game-modal-card"><button type="button" class="game-modal-close" id="gameModalClose">×</button><div class="modal-banner">МОНОПОЛИЯ</div><h3 id="rewardModalTitle">Поздравляем!</h3><p id="rewardModalText">Получено</p><div class="reward-items" id="rewardItems"></div><small class="modal-close-hint" id="modalCloseHint">Нажмите, чтобы закрыть</small></div>
-      </div>
-      <div class="game-tasks-modal" id="gameTasksModal" aria-hidden="true"><div class="game-tasks-card"><button type="button" class="game-modal-close" id="gameTasksClose">×</button><h3>Монополия: Задания</h3><div id="gameTasksList"></div></div></div>
-      <div class="game-panel-modal" id="gamePanelModal" aria-hidden="true"><div class="game-panel-card"><button type="button" class="game-modal-close" id="gamePanelClose">×</button><div class="panel-banner"><span id="gamePanelIcon">🎁</span><div><b id="gamePanelTitle">Монополия</b><small id="gamePanelSubtitle">Событие</small></div></div><div id="gamePanelList" class="game-panel-list"></div></div></div>
-    </section>
-  </main>
-
-  <div class="arena-modal" id="arenaModal" aria-hidden="true">
-    <div class="arena-sheet" role="dialog" aria-modal="true" aria-labelledby="arenaModalTitle">
-      <div class="arena-modal-head">
-        <h2 id="arenaModalTitle">⚔️ Арена</h2>
-        <button type="button" class="arena-close" id="arenaClose">Закрыть</button>
-      </div>
-      <div id="arenaModalBody"></div>
-    </div>
-  </div>
-  <div class="arena-toast" id="arenaToast" role="status" aria-live="polite"></div>
-
-  <nav class="bottom-nav">
-    <button data-screen="home">🏠<span>Город</span></button>
-    <button data-screen="arena">⚔️<span>Арена</span></button>
-    <button data-screen="districts">🗺️<span>Районы</span></button>
-    <button data-screen="inventory">🎒<span>Профиль</span></button>
-    <button data-screen="market">🛒<span>Магазин</span></button>
-  </nav>
+<section id="arena" class="screen">
+  <div class="section-head"><button class="back" data-screen="home">‹</button><div><small>SDOLARS</small><h1>АРЕНА</h1></div><button class="lang" id="langBtn">RU</button></div>
+  <div id="arenaRoot"></div>
+</section>
+<section id="districts" class="screen"><div class="section-head"><button class="back" data-screen="home">‹</button><div><small>ГОРОД</small><h1>РАЙОНЫ</h1></div><button class="lang">RU</button></div><div class="district-grid"><button data-district="center">🏙️<b>Центр</b><small>Площадь Sdolars</small></button><button data-district="port">⚓<b>Порт</b><small>Старые причалы</small></button><button data-district="ruins">🏚️<b>Руины</b><small>Опасный район</small></button></div><div id="districtLog" class="info-panel">Выбери район.</div></section>
+<section id="market" class="screen"><div class="section-head"><button class="back" data-screen="home">‹</button><div><small>SDOLARS</small><h1>РЫНОК</h1></div><button class="lang">RU</button></div><div class="merchant-banner"><span>🧔‍♂️</span><div><b>ТОРГОВЕЦ</b><small>Снаряжение и оружие</small></div></div><div id="shopGrid" class="shop-grid"></div><div id="marketLog" class="info-panel">Торговец ждёт сделки.</div></section>
+<section id="profile" class="screen"><div class="section-head"><button class="back" data-screen="home">‹</button><div><small>ПЕРСОНАЖ</small><h1>ПРОФИЛЬ</h1></div><button class="lang">RU</button></div><div class="profile-big"><div class="avatar big">⚔️</div><div><b id="profileName">SSS</b><span>Уровень <strong id="profileLevel">17</strong></span></div></div><div class="stat-grid"><div>⚔️<span>Сила</span><b id="strength">5</b></div><div>🛡️<span>Защита</span><b id="defense">0</b></div><div>💨<span>Ловкость</span><b id="agility">5</b></div><div>⚡<span>Энергия</span><b id="energy">100</b></div></div><div class="info-panel">Профиль и прогресс сохраняются локально на устройстве.</div></section>
+</main>
+<nav class="bottom-nav"><button data-screen="home" class="active">🏠<span>Город</span></button><button data-screen="arena">⚔️<span>Арена</span></button><button data-screen="districts">🗺️<span>Районы</span></button><button data-screen="profile">🎒<span>Профиль</span></button><button data-screen="market">🛒<span>Магазин</span></button></nav>
 </div>
-<script src="app.js"></script>
-<script src="arena.js"></script>
-</body>
-</html>
+<script src="app.js"></script><script src="arena.js"></script>
+</body></html>
