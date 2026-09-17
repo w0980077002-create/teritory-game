@@ -1,13 +1,21 @@
-# Territory — Global Clean Base
+# Territory — canonical mobile base
 
-Полностью очищенная мобильная база Territory / Sdolars.
+Canonical mobile frontend base for Territory / Sdolars.
 
-- Старт всегда открывает Город.
-- Нет старых Game/Monopoly модальных окон.
-- Нет Casino, VIP, командного штаба, осады и логистики.
-- Арена вынесена в отдельный экран.
-- Арена использует ровно 4 зоны атаки: Голова, Грудь, Живот, Ноги.
-- В каждом ходу выбираются ровно 2 зоны защиты.
-- 1×1, хаос и группа представлены как интерфейс сетевого этапа; фальшивый онлайн не заявляется.
-- Есть локальная тренировочная схватка для проверки боевой механики.
-- Все основные данные сохраняются в localStorage.
+## Core systems
+- Mobile city scene for Sdolars
+- Profile and persistent player state
+- Districts
+- Equipment Market and Inventory
+- Game board with 27 cells, dice, x10 mode, rewards, tasks and jackpot preview
+- Tactical Arena based on the S98 combat implementation
+- Separate `server.js` backend for Telegram/PvP features; backend integration remains isolated from the client base
+
+## Frontend
+- `index.html` — screens and UI
+- `style.css` — main mobile UI
+- `game.css` — Game board styling
+- `app.js` — core client state and systems
+- `arena.css` / `arena.js` — Arena implementation
+
+Develop new systems from this base instead of mixing older versions.
