@@ -117,6 +117,9 @@ body:has(#home.active) .bottom-nav { display: none !important; }
 @media (max-width: 420px) { .v5-zone:active { opacity: .12 !important; } }
 </style>
 
+<style id="territory-v61-profile">
+.profile-screen{background:linear-gradient(#07111b,#0b1722)!important;color:#fff;padding:0 12px 86px;overflow:auto}.profile-head{height:58px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(76,164,255,.25);position:sticky;top:0;background:#07111b;z-index:5}.profile-head h2{margin:0;font-size:19px;letter-spacing:1px}.profile-back{width:42px;height:42px;border-radius:12px;border:1px solid #236da6;background:#0b2234;color:#fff;font-size:32px;line-height:1}.profile-card{margin:12px 0 10px;padding:10px;border:1px solid #1878bd;border-radius:16px;background:linear-gradient(135deg,rgba(5,22,39,.98),rgba(9,34,56,.94));display:flex;align-items:center;gap:12px;box-shadow:0 0 18px rgba(0,130,255,.16)}.profile-avatar-wrap{width:104px;height:118px;position:relative;flex:none;border:3px solid #72baff;border-radius:16px;overflow:hidden;background:#102337}.profile-avatar-img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block}.profile-level{position:absolute;left:-1px;bottom:-1px;background:#071522;border:2px solid #6fbaff;border-radius:10px;padding:3px 9px;font-size:20px;font-weight:900}.profile-main{min-width:0;flex:1}.profile-name{font-family:Georgia,serif;font-size:31px;font-weight:900;text-shadow:0 2px 5px #000}.profile-chapter{font-size:16px;color:#4ee5ff;margin:2px 0 12px}.profile-exp{height:22px;border:2px solid #14618f;border-radius:13px;background:#02070d;position:relative;overflow:hidden}.profile-exp i{position:absolute;left:0;top:0;bottom:0;width:40%;background:linear-gradient(90deg,#08bfff,#2d75ff);display:block}.profile-exp b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px}.profile-resources{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.profile-resources div{padding:9px 4px;border:1px solid #216e9e;border-radius:10px;background:#081a2a;text-align:center;font-size:18px}.profile-resources b{display:block;font-size:12px;margin-top:3px}.profile-section-title{margin:16px 2px 7px;color:#52ddff;font-weight:900;letter-spacing:1px}.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.profile-stats button{border:1px solid #236d9e;border-radius:13px;background:linear-gradient(#102b42,#071522);color:#fff;padding:10px 5px;min-height:116px}.profile-stats span{font-size:25px;display:block}.profile-stats b{display:block;font-size:13px;margin-top:3px}.profile-stats strong{display:block;font-size:25px;color:#ffd45a;margin:4px}.profile-stats small{display:block;font-size:9px;color:#9fb5c7}.profile-points{margin-top:9px;padding:11px;border-radius:11px;background:#101f2b;border:1px solid #2b5874;text-align:center;color:#b7c9d6}.profile-points b{color:#ffd34d}.profile-equipment{margin-top:10px;padding:12px;border-radius:14px;border:1px solid #245f88;background:#0a1b2a;display:flex;align-items:center;justify-content:space-between;gap:8px}.profile-equipment div{display:grid;grid-template-columns:34px 1fr;column-gap:7px}.profile-equipment span{grid-row:1/3;font-size:26px}.profile-equipment b{font-size:14px}.profile-equipment small{font-size:10px;color:#a7bdcc}.profile-equipment button{border:1px solid #2b86c1;border-radius:9px;background:#0d3653;color:#fff;padding:9px 10px;font-weight:800}@media(max-width:390px){.profile-avatar-wrap{width:88px;height:105px}.profile-name{font-size:26px}.profile-chapter{font-size:13px}.profile-stats button{min-height:108px}}
+</style>
 </head>
 <body>
 <div id="app">
@@ -211,6 +214,38 @@ body:has(#home.active) .bottom-nav { display: none !important; }
     </div>
   </div>
 </section>
+
+    <section id="profile" class="screen profile-screen">
+      <div class="profile-head">
+        <button class="profile-back" data-screen="home">‹</button>
+        <h2>ПРОФИЛЬ</h2>
+      </div>
+      <div class="profile-card">
+        <div class="profile-avatar-wrap">
+          <img src="profile_avatar.png" alt="Персонаж" class="profile-avatar-img">
+          <span class="profile-level" id="profileLevel">5</span>
+        </div>
+        <div class="profile-main">
+          <div class="profile-name">Territory</div>
+          <div class="profile-chapter">Глава 5 · Уровень <span id="profileLevelText">3</span></div>
+          <div class="profile-exp"><i id="profileExpBar"></i><b id="profileExp">120/300</b></div>
+        </div>
+      </div>
+      <div class="profile-resources">
+        <div>💎<b id="profileGems">1330</b></div><div>🪙<b id="profileCoins">1779</b></div><div>⚡<b id="profileEnergy">191/200</b></div><div>🔮<b id="profileStone">842</b></div>
+      </div>
+      <div class="profile-section-title">ХАРАКТЕРИСТИКИ</div>
+      <div class="profile-stats">
+        <button data-stat="strength"><span>💪</span><b>Сила</b><strong id="profileStrength">5</strong><small>Урон / крит</small></button>
+        <button data-stat="agility"><span>🏃</span><b>Ловкость</b><strong id="profileAgility">5</strong><small>Уклонение</small></button>
+        <button data-stat="defense"><span>🛡️</span><b>Защита</b><strong id="profileDefense">0</strong><small>Снижение урона</small></button>
+      </div>
+      <div class="profile-points">Свободные очки: <b id="profileFreePoints">0</b></div>
+      <div class="profile-equipment">
+        <div><span>⚔️</span><b id="profileWeapon">Кулаки</b><small id="profileWeaponStats">Урон +0</small></div>
+        <button data-screen="inventory">ИНВЕНТАРЬ</button>
+      </div>
+    </section>
 
     <section id="districts" class="screen">
       <div class="subhead"><button class="back" data-screen="home">‹</button><h2>РАЙОНЫ SDOLARS</h2></div>
