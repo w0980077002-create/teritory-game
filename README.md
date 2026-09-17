@@ -1,37 +1,40 @@
-# Territory — Clean Base
+# Territory — Clean Base v1
 
-Clean mobile frontend base for Territory / Sdolars.
+Единая чистая мобильная frontend-база Territory / Sdolars.
 
-## Included
-- Portrait mobile city scene
-- Persistent player state
-- Districts
-- Equipment Market / Inventory
-- 27-cell game board, dice, x10, rewards, tasks and jackpot preview
-- Stable tactical Arena combat core
-- Full, uncropped Sdolars scene asset (`sdolars_scene.png`)
+## Оставлено
+- Главная сцена Sdolars в portrait-формате
+- Верхний HUD и нижняя навигация
+- Видимые кнопки быстрого доступа: Арена, Рынок, Районы, Game
+- Кнопки Alex и Торговец
+- Районы
+- Рынок / инвентарь
+- Game: 27 клеток, кубики, x10, награды, задания, preview
+- Тактическое Arena-ядро как временный PvE frontend
+- Сохранение состояния в localStorage
 
-## Explicitly removed from this base
+## Убрано из frontend-базы
+- server.js
 - Casino
-- Command HQ
-- Siege
-- Logistics
 - VIP
-- Old embedded Base64 city background
-- Obsolete city/world generations
-- Duplicate version layers
+- Командный штаб
+- Осада
+- Логистика
+- старые world/final поколения
+- старые inline CSS v14/v23/v25
+- декоративные автособытия/всплывающие панели на главном экране
+- дублирующие прозрачные кнопки нижней навигации
 
-## Important
-This is the clean frontend foundation. The current Arena combat file is the stable tactical PvE core from the audited base; real multiplayer Arena (1x1, chaotic teams, group up to 20, 3-minute lobby, leave/re-entry rule) requires a network/backend layer and is not falsely presented as implemented here.
+## Важно
+Настоящая multiplayer Arena ещё не считается реализованной. Для неё позже нужен отдельный backend/network слой с lobby 3 минуты, 1x1, хаотическим распределением, групповым боем до 20 игроков и запретом повторного входа после выхода.
 
-## GitHub
-Upload the contents of this folder to the repository root. For GitHub Pages/static hosting, no server.js is required for the frontend.
-
-## Files
+## Файлы
 - index.html
 - style.css
 - game.css
 - arena.css
 - app.js
 - arena.js
-- sdolars_scene.jpg
+- sdolars_scene.png
+- README.md
+- VERSION.txt

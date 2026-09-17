@@ -4,89 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#10131a">
-<title>Territory — Sdolars · LIVE v139</title>
+<title>Territory — Sdolars</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="game.css">
 <link rel="stylesheet" href="arena.css">
-<style id="territory-v14-real-scene">
-.world-final{background:#07111b none center center/cover no-repeat !important}
-.world-final:after{display:none!important}
-.world-final>.final-sky,.world-final>.final-city-back,.world-final>.final-house,.world-final>.final-gate,.world-final>.final-street,.world-final>.final-lamp,.world-final>.final-guard,.world-final>.final-trader,.world-final>.final-citizen,.world-final>.final-camp,.world-final>.final-hero,.world-final>.final-message{display:none!important}
-.final-location{z-index:50!important;top:18px!important;left:18px!important;width:218px!important}
-.final-time{z-index:50!important;top:22px!important;right:150px!important}
-.final-actions{z-index:55!important;top:92px!important;right:10px!important}
-.scene-hotspots{position:absolute;inset:0;z-index:35;pointer-events:none}
-.scene-hotspots .hotspot{position:absolute;display:block;padding:0;background:transparent;border:0;pointer-events:auto}
-.hotspot-weapon{left:5%;bottom:23%;width:27%;height:13%}
-.hotspot-market{right:5%;bottom:23%;width:27%;height:13%}
-.hotspot-center{left:30%;right:30%;bottom:31%;height:12%}
-</style>
 
-<style id="territory-v23-reference-screen">
-/* V23: визуальный эталон экрана как единая игровая сцена */
-.hud, .bottom-nav { display:none !important; }
-.home-real{position:absolute!important;inset:0!important;overflow:hidden!important;background:#07111b!important;}
-.real-home{position:absolute!important;inset:0!important;overflow:hidden!important;background:#07111b!important;}
-.real-home-image{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:auto!important;min-height:0!important;object-fit:contain!important;object-position:top center!important;display:block!important;}
-.real-home:after{content:"";position:absolute;left:0;right:0;bottom:0;height:8%;background:linear-gradient(transparent,rgba(3,8,13,.28));pointer-events:none;z-index:2}
-.scene-hotspots{position:absolute!important;inset:0!important;z-index:20!important;pointer-events:none!important}
-.real-home .hotspot{position:absolute!important;display:block!important;background:transparent!important;border:0!important;pointer-events:auto!important;padding:0!important}
-/* positions correspond to the reference image */
-.hs-arena{right:2%;top:14%;width:16%;height:9%}
-.hs-market{right:2%;top:23%;width:16%;height:9%}
-.hs-inventory{right:2%;top:32%;width:16%;height:9%}
-.hs-districts{right:2%;top:41%;width:16%;height:9%}
-.hs-game{right:2%;top:50%;width:16%;height:9%}
-.hs-weapon{left:2%;top:49%;width:25%;height:12%}
-.hs-city{left:31%;top:37%;width:38%;height:30%}
-.hs-bottom-home{left:0;bottom:0;width:20%;height:10%}
-.hs-bottom-arena{left:20%;bottom:0;width:20%;height:10%}
-.hs-bottom-districts{left:40%;bottom:0;width:20%;height:10%}
-.hs-bottom-profile{left:60%;bottom:0;width:20%;height:10%}
-.hs-bottom-shop{left:80%;bottom:0;width:20%;height:10%}
-/* disable old animation overlays: the reference already contains the visual composition */
-.live-city{display:none!important}
-@media (max-width:430px){.real-home-image{width:100%!important;height:auto!important}}
-</style>
 
-<style id="territory-v25-fix">
-/* v25: one source of truth — clean artwork + real HTML controls. */
-body:has(#home.active){overflow:hidden!important;background:#07111b!important}
-body:has(#home.active) .hud{position:absolute!important;top:0!important;left:0!important;right:0!important;height:78px!important;min-height:78px!important;z-index:220!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;padding:7px 12px!important}
-body:has(#home.active) main{position:absolute!important;inset:0!important;height:100%!important;min-height:0!important}
-body:has(#home.active) #home{position:absolute!important;inset:0!important;height:100%!important;padding:0!important;margin:0!important;overflow:hidden!important}
-body:has(#home.active) .real-home{position:absolute!important;left:0!important;right:0!important;top:78px!important;bottom:64px!important;height:auto!important;overflow:hidden!important;background:#07111b!important}
-body:has(#home.active) .real-home-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;transform:none!important;filter:none!important}
-body:has(#home.active) .baked-ui-mask{display:none!important}
-.live-city-title{position:absolute;z-index:30;left:18px;top:18px;width:245px;box-sizing:border-box;padding:12px 16px 11px;background:rgba(7,15,24,.72);border:1px solid rgba(182,199,214,.72);border-radius:15px;box-shadow:0 8px 24px rgba(0,0,0,.28);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;flex-direction:column;line-height:1}
-.live-city-title small{font-size:9px;letter-spacing:2px;color:#aab7c4;margin-bottom:4px}
-.live-city-title strong{font-family:Georgia,serif;font-size:31px;letter-spacing:2px;color:#f2f5f7}
-.live-city-title em{font-style:normal;font-size:8px;letter-spacing:1px;color:#b8c2cb;margin-top:6px}
-.live-city-time{position:absolute;z-index:31;right:92px;top:22px;padding:9px 12px;border:1px solid rgba(175,193,208,.68);border-radius:12px;background:rgba(7,15,24,.68);color:#e8edf2;font-size:11px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
-.live-city-time b{font-size:13px;margin-left:5px}
-body:has(#home.active) .live-side-ui{position:absolute!important;z-index:40!important;right:9px!important;top:13%!important;width:58px!important;display:flex!important;flex-direction:column!important;gap:6px!important}
-body:has(#home.active) .live-side-ui button{width:58px!important;height:64px!important;min-height:64px!important;padding:4px 2px!important;box-sizing:border-box!important;border-radius:12px!important;background:rgba(8,18,28,.38)!important;border:1px solid rgba(174,191,207,.52)!important;box-shadow:0 4px 12px rgba(0,0,0,.2)!important;backdrop-filter:blur(2px)!important;-webkit-backdrop-filter:blur(2px)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0!important}
-body:has(#home.active) .live-side-ui button span{font-size:19px!important;line-height:20px!important}
-body:has(#home.active) .live-side-ui button b{font-size:8px!important;line-height:11px!important;font-weight:600!important}
-body:has(#home.active) .live-side-ui button small{font-size:6px!important;line-height:8px!important;color:#aeb9c5!important}
-body:has(#home.active) .live-side-ui button:active{background:rgba(28,42,55,.55)!important;transform:scale(.97)!important}
-body:has(#home.active) .hs-arena,body:has(#home.active) .hs-market,body:has(#home.active) .hs-inventory,body:has(#home.active) .hs-districts,body:has(#home.active) .hs-game{display:none!important}
-body:has(#home.active) .hs-weapon{z-index:41!important;left:2%!important;top:50%!important;width:27%!important;height:13%!important}
-body:has(#home.active) .hs-city{z-index:41!important;left:28%!important;top:48%!important;width:44%!important;height:20%!important}
-body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:64px!important;min-height:64px!important;z-index:230!important}
-@media(max-width:390px){
- body:has(#home.active) .hud{height:72px!important;min-height:72px!important;padding:6px 9px!important}
- body:has(#home.active) .real-home{top:72px!important;bottom:60px!important}
- .live-city-title{left:12px;top:12px;width:205px;padding:9px 12px}
- .live-city-title strong{font-size:26px}
- .live-city-time{right:72px;top:15px;font-size:9px;padding:7px 9px}
- body:has(#home.active) .live-side-ui{right:6px!important;top:14%!important;width:52px!important;gap:5px!important}
- body:has(#home.active) .live-side-ui button{width:52px!important;height:58px!important;min-height:58px!important}
- body:has(#home.active) .live-side-ui button span{font-size:17px!important}
- body:has(#home.active) .live-side-ui button b{font-size:7px!important}
- body:has(#home.active) .live-side-ui button small{font-size:5px!important}
-}
-</style>
 
 </head>
 <body>
@@ -110,7 +33,7 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
   <div class="real-home">
     <img src="sdolars_scene.png" alt="Sdolars" class="real-home-image">
     <div class="live-city-title" aria-label="Город Sdolars"><small>ГОРОД</small><strong>SDOLARS</strong><em>ЦЕНТРАЛЬНЫЙ КВАРТАЛ</em></div>
-    <div class="live-city-time">19:42 · ВЕЧЕР <b>🌙</b></div><div id="alexQuestBadge" class="alex-quest-badge">Город</div>
+    
     <div class="live-side-ui" aria-label="Быстрые действия">
       <button data-screen="arena"><span>⚔️</span><b>Арена</b><small>Бой</small></button>
       <button data-screen="market"><span>🛒</span><b>Рынок</b><small>Торговля</small></button>
@@ -131,31 +54,6 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
     <button class="hotspot hs-bottom-districts" data-screen="districts" aria-label="Районы"></button>
     <button class="hotspot hs-bottom-profile" data-screen="inventory" aria-label="Профиль"></button>
     <button class="hotspot hs-bottom-shop" data-screen="market" aria-label="Магазин"></button>
-
-    <!-- ЖИВОЙ ИГРОВОЙ СЛОЙ: эффекты привязаны к объектам сцены, без искусственных "призраков" -->
-    <div class="living-scene" aria-hidden="true">
-      <div class="torch-glow tg-left"></div><div class="torch-glow tg-right"></div>
-      <div class="brazier-flame"><i></i><b></b></div>
-      <div class="brazier-smoke"><i></i><b></b><em></em></div>
-      <div class="ember-field"><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="banner-sway bs-left"></div><div class="banner-sway bs-right"></div>
-      <div class="bird-flight bf-one"></div><div class="bird-flight bf-two"></div>
-      <div class="rain-dust"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="scene-vignette"></div>
-      <div class="scene-action" id="sceneAction" role="status"></div>
-      <div class="city-event" id="cityEvent" aria-live="polite">
-        <div class="city-event-card">
-          <small id="cityEventKicker">СОБЫТИЕ ГОРОДА</small>
-          <b id="cityEventTitle">Вечерний караван</b>
-          <p id="cityEventText">У ворот Sdolars появился торговый караван.</p>
-          <div class="city-event-actions">
-            <button data-event="help">Помочь</button>
-            <button data-event="trade">Торговать</button>
-            <button data-event="close">Позже</button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 

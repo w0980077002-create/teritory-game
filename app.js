@@ -1,4 +1,4 @@
-/* Territory v139 — canonical base + S98 Arena integration */
+/* Territory CLEAN BASE v1 — canonical frontend foundation */
 const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 function gameLoadState(){
   try{
@@ -52,7 +52,6 @@ function render(){
  const coins=$("#coins"), gems=$("#gems"), level=$("#level");
  if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
  $("#weaponName") && ($("#weaponName").textContent=state.weapon); $("#weaponStats") && ($("#weaponStats").textContent=`Урон +${state.bonusDamage}`);
- const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
  renderShop(); renderInventory();
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
 }
@@ -451,143 +450,6 @@ render();
 const gameScreen=document.querySelector("#game");
 if(gameScreen) gameScreen.classList.remove("active");
 showScreen("home");
-/* Territory v35 — живой игровой город: без навязчивого автоспама */
-(function initLivingCity(){
-  const home=document.querySelector('.real-home');
-  if(!home || home.dataset.lifeReady==='1') return;
-  home.dataset.lifeReady='1';
-  const action=home.querySelector('#sceneAction');
-  const center=home.querySelector('.hs-city');
-  const weapon=home.querySelector('.hs-weapon');
-  const guard=home.querySelector('.guard-label');
-  const trader=home.querySelector('.trader-label');
-  let timer;
-  function notify(text){
-    if(!action)return;
-    action.textContent=text;
-    action.classList.remove('show');
-    void action.offsetWidth;
-    action.classList.add('show');
-    clearTimeout(timer);
-    timer=setTimeout(()=>action.classList.remove('show'),3000);
-  }
-  [[center,'Центральный квартал Sdolars'],[weapon,'Оружейная: покупка и ремонт'],[guard,'Alex: «В городе спокойно. Будь внимателен.»'],[trader,'Торговец: «Посмотри товары, странник.»']]
-    .forEach(([el,text])=>el&&el.addEventListener('click',()=>notify(text)));
-})();
-
-/* Territory v32 — scene interactions */
-(function sceneInteractions(){
-  const home=document.querySelector('.real-home'); if(!home)return;
-  const action=document.querySelector('#sceneAction');
-  const notes={
-    '.hs-city':'Центральный квартал: город открыт для исследования.',
-    '.hs-weapon':'Оружейная готова: выбирай оружие и улучшай снаряжение.',
-    '.guard-label':'Alex: «В городе спокойно. Будь внимателен.»',
-    '.trader-label':'Торговец: «Посмотри товары, странник.»'
-  };
-  Object.entries(notes).forEach(([sel,text])=>{
-    const el=home.querySelector(sel); if(!el)return;
-    el.addEventListener('click',()=>{
-      if(!action)return;
-      action.textContent=text; action.classList.add('show');
-      clearTimeout(el._t); el._t=setTimeout(()=>action.classList.remove('show'),3000);
-    });
-  });
-})();
-
-
-/* Territory v38 — Alex becomes a real city NPC with a persistent quest */
-(function alexQuest(){
-  const home=document.querySelector('.real-home'); const guard=home&&home.querySelector('.guard-label'); const action=home&&home.querySelector('#sceneAction');
-  if(!home||!guard||!action)return;
-  function msg(text){ action.innerHTML=text; action.classList.add('show'); clearTimeout(action._alexTimer); action._alexTimer=setTimeout(()=>action.classList.remove('show'),5000); }
-  guard.addEventListener('click',function(ev){
-    ev.preventDefault(); ev.stopImmediatePropagation();
-    if(state.alexQuest===0){
-      state.alexQuest=1; save();
-      msg('<b>Alex:</b> «Нужен патруль у ворот. Следи за городом и помогай, если начнётся тревога.»<br><button id="alexAccept" class="alex-mini-btn">Принято</button>');
-    }else if(state.alexQuest===1){
-      msg('<b>Alex:</b> «Патруль продолжается. Следи за событиями города.»');
-    }else{
-      msg('<b>Alex:</b> «Хорошая работа. Город может на тебя рассчитывать.»');
-    }
-  },true);
-  action.addEventListener('click',function(ev){
-    const b=ev.target.closest('#alexAccept'); if(!b)return;
-    b.textContent='Задание принято'; b.disabled=true; state.cityRep+=1; save();
-    setTimeout(()=>action.classList.remove('show'),900);
-  });
-})();
-
-/* Territory v36 — живой автоматический поток городских событий */
-(function cityEvents(){
-  const home=document.querySelector('.real-home');
-  const event=document.querySelector('#cityEvent');
-  if(!home||!event)return;
-  const title=document.querySelector('#cityEventTitle');
-  const text=document.querySelector('#cityEventText');
-  const kicker=document.querySelector('#cityEventKicker');
-  let timer=null, nextTimer=null, opened=false, lastIndex=-1;
-  const events=[
-    {k:'СОБЫТИЕ ГОРОДА',t:'Вечерний караван',d:'У ворот Sdolars появился торговый караван.',help:'Караванщики отблагодарили тебя: +60 🪙',trade:'Удачный торг: +35 🪙',h:60,tr:35,xp:10},
-    {k:'ЗАДАНИЕ ALEX',t:'Сигнал у ворот',d:'Alex подал знак: у городских ворот нужна помощь.',help:'Ты помог Alex отбить нападение: +150 🪙 +25 XP',trade:'Alex: «Сейчас не до торговли.»',h:150,tr:0,xp:25,alex:true},
-    {k:'ГОРОДСКАЯ СЛУЖБА',t:'Тревога у ворот',d:'Alex заметил подозрительное движение за стеной.',help:'Ты помог стражу. +45 🪙 +10 XP',trade:'Сейчас не до торговли.',h:45,tr:0,xp:10},
-    {k:'СЛУЧАЙНАЯ ВСТРЕЧА',t:'Потерянный кошелёк',d:'На площади кто-то обронил кошелёк с монетами.',help:'Ты вернул кошелёк хозяину: +80 🪙',trade:'Ты оставил находку себе: +25 🪙',h:80,tr:25,xp:8},
-    {k:'СЛУХИ ГОРОДА',t:'Странник у таверны',d:'Незнакомец шепчет о дороге, которая открылась за стеной.',help:'Ты выслушал странника: +30 🪙 +12 XP',trade:'Ты обменялся новостями: +20 🪙',h:30,tr:20,xp:12},
-    {k:'ГОРОДСКАЯ ЖИЗНЬ',t:'Ссора на рынке',d:'Двое торговцев спорят прямо посреди площади.',help:'Ты помог уладить спор: +50 🪙 +10 XP',trade:'Ты сделал ставку на исход: +40 🪙',h:50,tr:40,xp:10},
-    {k:'ТОРГОВЫЙ СЛУЧАЙ',t:'Срочный заказ торговца',d:'Торговец ищет покупателя на редкое оружие до закрытия рынка.',help:'Ты помог с заказом: +70 🪙 +12 XP',trade:'Ты поторговался жёстко: +55 🪙',h:70,tr:55,xp:12,trader:true},
-    {k:'РЕДКОЕ СОБЫТИЕ',t:'Посыльный из-за стен',d:'В город прибыл раненый посыльный с важной вестью.',help:'Ты помог посыльному: +120 🪙 +20 XP',trade:'Ты получил плату за доставку: +70 🪙',h:120,tr:70,xp:20}
-  ];
-  function close(){
-    event.classList.remove('show');
-    home.classList.remove('city-event-active');
-    opened=false;
-    clearTimeout(timer);
-    scheduleNext(9000+Math.random()*10000);
-  }
-  function pickEvent(){
-    if(state.alexQuest===1 && Math.random()<0.42){
-      const ai=events.findIndex(x=>x.alex); if(ai>=0 && ai!==lastIndex){ lastIndex=ai; return events[ai]; }
-    }
-    let i=Math.floor(Math.random()*events.length);
-    if(events.length>1 && i===lastIndex) i=(i+1)%events.length;
-    lastIndex=i; return events[i];
-  }
-  function open(){
-    if(opened || !document.querySelector('#home.active')) return;
-    opened=true; home.classList.add('city-event-active');
-    const e=pickEvent(); event._current=e;
-    kicker.textContent=e.k; title.textContent=e.t; text.textContent=e.d;
-    event.querySelector('.city-event-actions').innerHTML='<button data-event="help">Помочь</button><button data-event="trade">Торговать</button><button data-event="close">Позже</button>';
-    event.classList.add('show');
-    clearTimeout(timer);
-    timer=setTimeout(()=>close(),15000);
-  }
-  function scheduleNext(ms){
-    clearTimeout(nextTimer);
-    nextTimer=setTimeout(open,ms);
-  }
-  event.addEventListener('click',e=>{
-    const b=e.target.closest('[data-event]'); if(!b)return;
-    const cur=event._current;
-    if(b.dataset.event==='close'){close();return;}
-    const reward=b.dataset.event==='help'?cur.h:cur.tr;
-    if(reward){
-      state.coins+=reward;
-      state.exp+=cur.xp||10;
-      if(cur.alex && state.alexQuest===1){state.alexQuest=2; state.cityRep+=2;}
-      if(cur.trader){state.merchantRep+=1;}
-      while(state.exp>=100){state.exp-=100;state.level++;state.maxHp+=10;state.hp=state.maxHp;}
-      save();
-    }
-    text.textContent=b.dataset.event==='help'?cur.help:cur.trade;
-    event.querySelector('.city-event-actions').innerHTML='<button data-event="close">Продолжить</button>';
-    clearTimeout(timer); timer=setTimeout(close,2600);
-  });
-  // Город начинает жить сам: первое событие — быстро, затем новые встречи появляются регулярно.
-  scheduleNext(7000);
-})();
-
 /* Territory v40 — районы становятся игровыми локациями */
 (function livingDistricts(){
   const screen=document.querySelector('#districts'); if(!screen)return;
