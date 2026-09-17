@@ -1,26 +1,28 @@
-# Territory v140 — canonical continuation base
+# Territory — canonical mobile base
 
-This patch keeps the current working Territory/Sdolars frontend as the base and replaces the incorrect S98 Arena layer.
+Canonical mobile frontend base for Territory / Sdolars.
 
-## Arena v140
-- 3 modes: 1×1, chaotic, group
-- 3-minute room timer with automatic start
-- group mode up to 20 players
-- team 1 / team 2 selection in group mode
-- 4 attack zones: head, chest, waist, legs
-- 4 defense zones, with 2 selected per turn
-- turn-based combat
-- collapsible combat log
-- finish / extend fight controls
-- leaving a room prevents re-entry to that room
-- local test-player button for checking the flow before real multiplayer backend integration
+## Core systems
+- Mobile city scene for Sdolars
+- Profile and persistent player state
+- Districts
+- Equipment Market and Inventory
+- Game board with 27 cells, dice, x10 mode, rewards, tasks and jackpot preview
+- Tactical Arena based on the S98 combat implementation
+- Separate `server.js` backend for Telegram/PvP features; backend integration remains isolated from the client base
 
-## Canonical base preserved
-- Sdolars city scene
-- profile and persistent state
-- districts
-- equipment market / inventory
-- Game board
-- existing server.js remains isolated
+## Frontend
+- `index.html` — screens and UI
+- `style.css` — main mobile UI
+- `game.css` — Game board styling
+- `app.js` — core client state and systems
+- `arena.css` / `arena.js` — Arena implementation
 
-The supplied gameplay video is the visual/process reference for the next development stages. Features visible in the video that are not yet implemented in the current base should be added incrementally from this base rather than mixing older versions.
+Develop new systems from this base instead of mixing older versions.
+
+
+## Canonical v140
+- Sdolars scene: `sdolars_clean_scene.png`
+- Arena: 1×1, chaotic, group; 3-minute lobby; 4 attack zones; exactly 2 defense zones.
+- Arena close button is bound directly to `#arenaClose`.
+- Arena remains a local/client prototype; network multiplayer is not implemented by this package.
