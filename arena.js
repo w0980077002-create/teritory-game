@@ -1,4 +1,4 @@
-/* Territory G5 loader — Arena + VIP + Equipment + Market */
+/* Territory G6 loader — Arena + VIP + Equipment + Market + Districts */
 (function(){
   "use strict";
   function load(src){
@@ -14,5 +14,6 @@
     .then(function(){ return load("vip.js?v=1"); })
     .then(function(){ return load("equipment.js?v=1"); })
     .then(function(){ return load("market.js?v=1"); })
-    .catch(function(err){ console.error("Territory G5 loader:",err); });
+    .then(function(){ return load("districts.js?v=1"); })
+    .catch(function(err){ console.error("Territory G6 loader:",err); });
 })();
