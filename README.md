@@ -1,4 +1,4 @@
-# Territory — canonical mobile base
+# Territory — READY mobile package
 
 Canonical mobile frontend base for Territory / Sdolars.
 
@@ -34,3 +34,12 @@ Develop new systems from this base instead of mixing older versions.
 - Arena close restores the screen that was open before Arena.
 - No casino screen is present in `index.html`; old unused casino selectors are not active.
 - Package is a client/mobile prototype; `server.js` is not required for GitHub Pages/Telegram static hosting.
+
+
+## READY package audit
+- One visual source is used for the Sdolars home screen (`sdolars_scene.jpg`).
+- Legacy embedded scene data was removed from `index.html` to avoid duplicate/blurred backgrounds.
+- The home screen keeps functional transparent hotspots, while duplicate overlay panels are disabled.
+- Removed/disabled legacy casino, VIP, command-HQ, siege and logistics UI from the active home presentation.
+- Arena, Districts, Market, Profile and Game remain in the package.
+- No network multiplayer backend is required for the static client package.
