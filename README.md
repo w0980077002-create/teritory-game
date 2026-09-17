@@ -1,20 +1,17 @@
-# Territory — City PvE v1
+# Territory — Sdolars
 
-Мобильная вертикальная версия Territory на базе текущего рабочего проекта.
+## Current build
+Territory mobile vertical prototype with the approved Sdolars city composition.
 
-## Что добавлено
-- Отдельный городской PvE-путь, не связанный с Arena.
-- Герой начинает путь и визуально движется вправо.
-- Последовательные обычные противники.
-- Ручная атака по 4 зонам.
-- Каждый удар расходует Боевой камень.
-- Прогресс города 0–100%.
-- На 100% появляется босс с таймером.
-- Победа повышает уровень города и сбрасывает прогресс.
-- Поражение босса не повышает город и оставляет 100% для повторной попытки.
-- При нуле Боевых камней бой останавливается.
-- Состояние сохраняется в localStorage.
-- Arena оставлена отдельной системой.
-- Нижняя навигация: Город / Инвентарь / Экипировка / Задания / Клан.
+### Visual lock
+- Compact top HUD with player, level, coins, diamonds and visible HP bar.
+- Sdolars scene uses the approved premium city artwork and smaller hero composition.
+- Short, icon-first controls for multilingual players.
+- Separate Arena access.
+- City Battle / PvE is separate from Arena.
+- Bottom navigation: City, Inventory, Equipment, Quests, Clan.
 
-Это первая рабочая PvE-версия цикла; числовой баланс можно отдельно настраивать после теста в Telegram.
+### City PvE
+City progression is separate from Arena: manual attacks, Battle Stones, 0–100% progress, boss timer, victory/DEFEAT and persistent progress.
+
+This is a prototype build; balance values remain adjustable.

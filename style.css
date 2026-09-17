@@ -1844,3 +1844,74 @@ body:has(#casino.active) #casino .reward-step{cursor:pointer!important}
 .city-pve-entry{width:min(46vw,190px)!important;min-height:54px!important;padding:7px 12px!important;border-radius:14px!important;gap:6px!important;background:linear-gradient(180deg,rgba(116,73,34,.96),rgba(52,31,20,.98))!important;border:1px solid rgba(255,220,160,.78)!important;box-shadow:0 6px 16px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.14)!important}.city-pve-entry span{font-size:20px!important}.city-pve-entry b{font-size:15px!important;letter-spacing:1.5px!important}.city-pve-entry small{font-size:7px!important;letter-spacing:.4px!important;margin-top:-2px!important}
 body:has(#home.active) .live-side-ui button{border-radius:14px!important;background:linear-gradient(180deg,rgba(19,29,38,.60),rgba(8,15,22,.62))!important;box-shadow:0 5px 14px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.08)!important}
 body:has(#home.active) .live-side-ui button b{font-size:8px!important;letter-spacing:.2px!important}
+
+
+/* Territory v3 — BEAUTY HOME LOCK: approved compact hero + premium button language */
+body:has(#home.active){background:#07111b!important}
+body:has(#home.active) .hud{
+  position:absolute!important;top:0!important;left:0!important;right:0!important;height:78px!important;min-height:78px!important;
+  display:flex!important;align-items:center!important;z-index:300!important;padding:7px 10px!important;
+  background:linear-gradient(180deg,rgba(5,13,21,.99),rgba(8,17,27,.95))!important;
+  border-bottom:1px solid rgba(83,105,127,.72)!important;box-shadow:0 5px 18px rgba(0,0,0,.34)!important;
+}
+body:has(#home.active) .hud .profile{gap:8px!important;min-width:0!important;position:relative!important}
+body:has(#home.active) .hud .avatar{width:50px!important;height:50px!important;border-radius:13px!important;font-size:25px!important;background:linear-gradient(145deg,#4c5663,#202731)!important;border:1px solid #738196!important;box-shadow:inset 0 1px rgba(255,255,255,.14),0 4px 10px rgba(0,0,0,.28)!important}
+body:has(#home.active) .hud .profile>b{font-size:16px!important;line-height:17px!important;letter-spacing:.2px!important}
+body:has(#home.active) .hud .profile>div>span{font-size:10px!important;color:#9faab7!important;line-height:13px!important}
+.hud-hp{position:absolute;left:0;top:54px;width:118px;height:6px;border-radius:5px;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.12);overflow:hidden}
+.hud-hp i{display:block;width:100%;height:100%;background:linear-gradient(90deg,#d83d38,#7dc84d);transition:width .25s}
+.hud-hp em{display:none}
+body:has(#home.active) .hud .resources{gap:6px!important;margin-left:auto!important}
+body:has(#home.active) .hud .resources div{min-width:80px!important;padding:8px 9px!important;border-radius:11px!important;background:linear-gradient(180deg,rgba(23,34,47,.98),rgba(13,22,32,.98))!important;border:1px solid #43566a!important;box-shadow:inset 0 1px rgba(255,255,255,.08),0 4px 10px rgba(0,0,0,.2)!important;font-size:12px!important;white-space:nowrap!important}
+body:has(#home.active) main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important}
+body:has(#home.active) #home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;padding:0!important;overflow:hidden!important}
+body:has(#home.active) .real-home{position:absolute!important;top:78px!important;left:0!important;right:0!important;bottom:64px!important;width:auto!important;height:auto!important;overflow:hidden!important;background:#09131d!important}
+body:has(#home.active) .real-home-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;transform:none!important;animation:none!important;filter:none!important}
+/* Hide legacy scene labels that competed with the approved clean composition. */
+body:has(#home.active) .npc-label{display:none!important}
+body:has(#home.active) .alex-quest-badge{display:none!important}
+/* Premium city plate */
+body:has(#home.active) .live-city-title{left:10px!important;top:12px!important;width:176px!important;padding:8px 11px!important;border-radius:14px!important;background:rgba(5,14,23,.66)!important;border:1px solid rgba(177,201,220,.58)!important;box-shadow:0 7px 18px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.08)!important;backdrop-filter:blur(3px)!important;-webkit-backdrop-filter:blur(3px)!important}
+body:has(#home.active) .live-city-title small{font-size:7px!important;letter-spacing:1.7px!important;color:#9eaebe!important}
+body:has(#home.active) .live-city-title strong{font-family:Georgia,serif!important;font-size:24px!important;line-height:25px!important;letter-spacing:1.5px!important;color:#f4f4f1!important}
+body:has(#home.active) .live-city-title em{font-size:6.5px!important;letter-spacing:.9px!important;color:#aeb9c4!important}
+body:has(#home.active) .live-city-time{right:74px!important;top:14px!important;padding:7px 9px!important;border-radius:12px!important;background:rgba(5,14,23,.66)!important;border:1px solid rgba(177,201,220,.5)!important;box-shadow:0 6px 15px rgba(0,0,0,.2)!important;font-size:8px!important;color:#e5ebef!important}
+/* Side controls: icon first, short title second, tiny helper third. */
+body:has(#home.active) .live-side-ui{top:17%!important;right:7px!important;width:60px!important;gap:7px!important}
+body:has(#home.active) .live-side-ui button{width:60px!important;height:70px!important;min-height:70px!important;padding:5px 2px!important;border-radius:15px!important;background:linear-gradient(180deg,rgba(9,20,31,.78),rgba(5,13,22,.72))!important;border:1px solid rgba(169,189,207,.62)!important;box-shadow:0 6px 15px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.09)!important;backdrop-filter:blur(3px)!important;-webkit-backdrop-filter:blur(3px)!important}
+body:has(#home.active) .live-side-ui button span{font-size:21px!important;line-height:22px!important}
+body:has(#home.active) .live-side-ui button b{font-size:9px!important;line-height:11px!important;font-weight:800!important;color:#f1f4f6!important}
+body:has(#home.active) .live-side-ui button small{font-size:6px!important;line-height:8px!important;color:#aeb9c4!important}
+body:has(#home.active) .live-side-ui button:active{transform:scale(.96)!important;background:rgba(33,48,63,.86)!important}
+/* Approved BOY button: small, centered, never a giant plaque over the hero. */
+body:has(#home.active) .city-pve-entry{left:50%!important;bottom:74px!important;transform:translateX(-50%)!important;width:148px!important;min-height:52px!important;padding:6px 10px!important;border-radius:16px!important;z-index:240!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;background:linear-gradient(180deg,rgba(116,73,34,.96),rgba(52,31,20,.98))!important;border:1px solid rgba(255,220,160,.82)!important;box-shadow:0 7px 18px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.13)!important}
+body:has(#home.active) .city-pve-entry span{font-size:19px!important}
+body:has(#home.active) .city-pve-entry b{font-family:Georgia,serif!important;font-size:14px!important;letter-spacing:1.4px!important;color:#ffe5b3!important}
+body:has(#home.active) .city-pve-entry small{width:100%!important;font-size:6.5px!important;line-height:8px!important;color:#d7c4a6!important;margin-top:-2px!important}
+/* Bottom nav: five compact, distinct, readable buttons. */
+body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:64px!important;min-height:64px!important;z-index:250!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important;padding:3px 6px max(3px,env(safe-area-inset-bottom))!important;background:rgba(7,14,22,.98)!important;border-top:1px solid #465466!important;box-shadow:0 -6px 17px rgba(0,0,0,.3)!important;backdrop-filter:blur(4px)!important}
+body:has(#home.active) .bottom-nav button{height:100%!important;min-width:0!important;margin:0!important;padding:2px!important;border-radius:9px!important;background:transparent!important;border:1px solid transparent!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important;color:#aeb8c3!important;font-size:19px!important;overflow:hidden!important}
+body:has(#home.active) .bottom-nav button span{font-size:8px!important;line-height:10px!important;white-space:nowrap!important}
+body:has(#home.active) .bottom-nav button:first-child{background:rgba(43,34,19,.82)!important;border-color:#b17d2c!important;color:#f0bd65!important;box-shadow:inset 0 1px rgba(255,255,255,.08)!important}
+body:has(#home.active) .bottom-nav button:active{transform:scale(.97)!important}
+@media(max-width:390px){
+ body:has(#home.active) .hud{height:72px!important;min-height:72px!important;padding:6px 8px!important}
+ body:has(#home.active) .hud .avatar{width:44px!important;height:44px!important}
+ body:has(#home.active) .hud .profile>b{font-size:15px!important}
+ body:has(#home.active) .hud .profile>div>span{font-size:9px!important}
+ .hud-hp{top:49px;width:104px;height:5px}
+ body:has(#home.active) .hud .resources div{min-width:68px!important;padding:7px 7px!important;font-size:10px!important}
+ body:has(#home.active) .real-home{top:72px!important;bottom:60px!important}
+ body:has(#home.active) .live-city-title{left:8px!important;top:8px!important;width:160px!important;padding:7px 9px!important}
+ body:has(#home.active) .live-city-title strong{font-size:21px!important;line-height:22px!important}
+ body:has(#home.active) .live-city-time{right:63px!important;top:10px!important;padding:6px 7px!important;font-size:7px!important}
+ body:has(#home.active) .live-side-ui{right:5px!important;top:16%!important;width:54px!important;gap:5px!important}
+ body:has(#home.active) .live-side-ui button{width:54px!important;height:63px!important;min-height:63px!important;border-radius:13px!important}
+ body:has(#home.active) .live-side-ui button span{font-size:19px!important}
+ body:has(#home.active) .live-side-ui button b{font-size:8px!important}
+ body:has(#home.active) .live-side-ui button small{font-size:5.5px!important}
+ body:has(#home.active) .city-pve-entry{bottom:67px!important;width:138px!important;min-height:49px!important}
+ body:has(#home.active) .bottom-nav{height:60px!important;min-height:60px!important;padding:2px 4px max(2px,env(safe-area-inset-bottom))!important}
+ body:has(#home.active) .bottom-nav button{font-size:17px!important;border-radius:8px!important}
+ body:has(#home.active) .bottom-nav button span{font-size:7px!important;line-height:9px!important}
+}

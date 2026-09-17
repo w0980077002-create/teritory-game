@@ -50,7 +50,7 @@ window.addEventListener("storage",e=>{
 });
 function render(){
  const coins=$("#coins"), gems=$("#gems"), level=$("#level");
- if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
+ if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level; const hpNow=Math.max(0,Number(state.hp??0)); const hpMax=Math.max(1,Number(state.maxHp??120)); const hpBar=$("#hudHpBar"); const hpText=$("#playerHp"); if(hpBar)hpBar.style.width=Math.max(0,Math.min(100,hpNow/hpMax*100))+"%"; if(hpText)hpText.textContent=`${hpNow} / ${hpMax} HP`;
  $("#weaponName") && ($("#weaponName").textContent=state.weapon); $("#weaponStats") && ($("#weaponStats").textContent=`Урон +${state.bonusDamage}`);
  const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
  renderShop(); renderInventory();
