@@ -1,4 +1,4 @@
-/* Territory G3 loader — preserves Arena and enables VIP without editing index.html */
+/* Territory G4 loader — preserves Arena and loads VIP + Equipment */
 (function(){
   "use strict";
   function load(src){
@@ -12,5 +12,6 @@
   }
   load("arena-core.js?v=140")
     .then(function(){ return load("vip.js?v=1"); })
-    .catch(function(err){ console.error("Territory G3 loader:",err); });
+    .then(function(){ return load("equipment.js?v=1"); })
+    .catch(function(err){ console.error("Territory G4 loader:",err); });
 })();
