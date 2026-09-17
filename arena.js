@@ -1,4 +1,4 @@
-/* Territory G6 loader — Arena + VIP + Equipment + Market + Districts */
+/* Territory G7 loader — Arena + VIP + Equipment + Market + Districts + Duke Alex */
 (function(){
   "use strict";
   function load(src){
@@ -15,5 +15,6 @@
     .then(function(){ return load("equipment.js?v=1"); })
     .then(function(){ return load("market.js?v=1"); })
     .then(function(){ return load("districts.js?v=1"); })
-    .catch(function(err){ console.error("Territory G6 loader:",err); });
+    .then(function(){ return load("duke-alex.js?v=1"); })
+    .catch(function(err){ console.error("Territory G7 loader:",err); });
 })();
