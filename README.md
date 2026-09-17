@@ -1,26 +1,20 @@
-# Territory v140 — canonical continuation base
+# Territory — Sdolars Clean Base
 
-This patch keeps the current working Territory/Sdolars frontend as the base and replaces the incorrect S98 Arena layer.
+Единая мобильная база проекта без старых поколений интерфейса.
 
-## Arena v140
-- 3 modes: 1×1, chaotic, group
-- 3-minute room timer with automatic start
-- group mode up to 20 players
-- team 1 / team 2 selection in group mode
-- 4 attack zones: head, chest, waist, legs
-- 4 defense zones, with 2 selected per turn
-- turn-based combat
-- collapsible combat log
-- finish / extend fight controls
-- leaving a room prevents re-entry to that room
-- local test-player button for checking the flow before real multiplayer backend integration
+## Структура
+- `index.html` — экран Города и основные разделы.
+- `style.css` — единый мобильный стиль.
+- `arena.js` / `arena.css` — тактическая Arena.
+- `app.js` — состояние игрока, рынок, районы и локальное сохранение.
+- `VERSION.txt` — версия базы.
 
-## Canonical base preserved
-- Sdolars city scene
-- profile and persistent state
-- districts
-- equipment market / inventory
-- Game board
-- existing server.js remains isolated
+## Arena
+- 1 × 1, хаотичный и групповой режимы обозначены как сетевой этап до подключения сервера.
+- Локальная тренировка используется для проверки механики.
+- Ровно 4 зоны: Голова, Грудь, Живот, Ноги.
+- За ход выбирается 1 зона атаки и ровно 2 зоны защиты.
 
-The supplied gameplay video is the visual/process reference for the next development stages. Features visible in the video that are not yet implemented in the current base should be added incrementally from this base rather than mixing older versions.
+## Запуск
+Открыть `index.html` в браузере или Telegram WebView.
+Состояние игрока хранится локально на устройстве.
