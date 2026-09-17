@@ -1832,3 +1832,47 @@ body:has(#casino.active) #casino .reward-step{cursor:pointer!important}
 #casino.game-screen.active .task-row button{font-size:8px!important;padding:8px 10px!important;background:linear-gradient(180deg,#a66a31,#61351e)!important;border-color:#d9a15a!important;color:#ffecc2!important}
 #casino.game-screen.active .game-status{z-index:40!important}
 @media(max-height:700px){#casino.game-screen.active .game-panel-card,#casino.game-screen.active .game-tasks-card{max-height:72%!important}}
+
+/* Territory City v2 — agreed bottom navigation + seamless PvE city journey */
+.bottom-nav{grid-template-columns:repeat(5,1fr);height:70px;padding:0 2px max(0px,env(safe-area-inset-bottom));}
+.bottom-nav button{position:relative;gap:1px;font-size:20px;min-width:0;padding:4px 1px;}
+.bottom-nav button span{font-size:8px;white-space:nowrap;}
+.bottom-nav button.active{color:#f0bd65;text-shadow:0 0 10px rgba(240,189,101,.18);}
+.fight-float{position:absolute;z-index:45;left:40%;bottom:76px;transform:translateX(-50%);width:66px;height:46px;border-radius:14px;background:linear-gradient(180deg,#b65a3a,#6f2e22);border:1px solid #dc8a65;box-shadow:0 6px 16px #0009,0 0 0 2px rgba(9,13,18,.65);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:2px;color:#fff;font-weight:900;}
+.fight-float span{font-size:19px;line-height:19px;}
+.fight-float b{font-size:8px;line-height:10px;}
+.fight-float:active{transform:translateX(-50%) scale(.96);}
+.section-intro,.quest-card,.clan-card,.equip-slots{margin:12px;background:#1a2028;border:1px solid #394452;border-radius:14px;}
+.section-intro{display:flex;align-items:center;gap:12px;padding:14px;}
+.section-icon{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;background:#252d38;border:1px solid #4a5665;font-size:25px;flex:none;}
+.section-intro b,.section-intro span,.quest-card b,.quest-card span,.quest-card em,.clan-card b,.clan-card span{display:block;}
+.section-intro b,.quest-card b,.clan-card b{font-size:14px;}
+.section-intro span,.quest-card span,.clan-card span{font-size:10px;color:#9ea8b6;margin-top:4px;line-height:1.35;}
+.equip-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;background:transparent;border:0;}
+.equip-slot{min-height:105px;padding:9px 5px;border:1px solid #394452;border-radius:12px;background:#1a2028;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.equip-slot small{font-size:7px;color:#8996a5;letter-spacing:.5px;}
+.equip-slot b{font-size:27px;}
+.equip-slot span{font-size:9px;color:#d8dee5;}
+.quest-card,.clan-card{padding:14px;}
+.quest-card em{font-style:normal;font-size:9px;color:#d9a15d;margin-top:9px;}
+.clan-card button{margin-top:12px;width:100%;height:36px;border-radius:9px;background:#252d38;color:#7f8995;border:1px solid #3b4654;}
+@media(max-width:390px){.fight-float{width:60px;height:44px}.bottom-nav button{font-size:18px}.bottom-nav button span{font-size:7px}.equip-slot{min-height:96px}}
+
+
+/* Territory v141 — seamless city -> PvE journey */
+.pve-journey{position:fixed;inset:0;z-index:10050;display:none;overflow:hidden;background:#07111b;pointer-events:none}
+.pve-journey.show{display:block}
+.pve-journey-scene{position:absolute;inset:0;background:#07111b url('sdolars_clean_scene.png') center center/cover no-repeat;transform:scale(1);will-change:transform;}
+.pve-journey.show .pve-journey-scene{animation:pveCityForward 2.35s cubic-bezier(.18,.72,.2,1) forwards}
+.pve-journey-scene:before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,10,16,.35),transparent 28%,rgba(3,8,13,.12) 65%,rgba(3,8,13,.55));}
+.pve-journey-scene:after{content:'';position:absolute;inset:-15%;background:radial-gradient(circle at 50% 72%,transparent 0 22%,rgba(3,8,13,.08) 42%,rgba(3,8,13,.58) 100%);animation:pveVignette 2.35s ease forwards;}
+.pve-journey-label{position:absolute;z-index:4;left:50%;bottom:13%;transform:translateX(-50%);min-width:190px;padding:11px 16px;text-align:center;border:1px solid rgba(196,213,228,.45);border-radius:13px;background:rgba(5,12,19,.72);box-shadow:0 8px 28px rgba(0,0,0,.35);color:#f2f5f7;font-size:13px;font-weight:800;backdrop-filter:blur(5px);}
+.pve-journey-foe{position:absolute;z-index:5;left:50%;top:43%;transform:translate(-50%,-50%) scale(.15);opacity:0;font-size:76px;filter:drop-shadow(0 10px 12px rgba(0,0,0,.55));}
+.pve-journey.show .pve-journey-foe{animation:pveFoeApproach 2.35s cubic-bezier(.2,.7,.2,1) forwards;}
+.pve-journey-dust{position:absolute;z-index:6;left:50%;bottom:12%;width:46vw;height:14vh;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(205,185,153,.24),transparent 68%);filter:blur(5px);opacity:0;animation:pveDust 2.35s ease forwards;}
+@keyframes pveCityForward{0%{transform:scale(1) translateY(0)}58%{transform:scale(1.09) translateY(1.5%)}100%{transform:scale(1.18) translateY(4%)}}
+@keyframes pveVignette{0%{opacity:.25}65%{opacity:.65}100%{opacity:.95}}
+@keyframes pveFoeApproach{0%,48%{opacity:0;transform:translate(-50%,-50%) scale(.12)}68%{opacity:.75;transform:translate(-50%,-50%) scale(.48)}100%{opacity:1;transform:translate(-50%,-50%) scale(.9)}}
+@keyframes pveDust{0%,55%{opacity:0;transform:translateX(-50%) scale(.6)}75%{opacity:.45;transform:translateX(-50%) scale(1.05)}100%{opacity:.12;transform:translateX(-50%) scale(1.3)}}
+@media(max-width:430px){.pve-journey-label{font-size:12px;bottom:14%;min-width:175px}.pve-journey-foe{font-size:64px}}
+@media(prefers-reduced-motion:reduce){.pve-journey.show .pve-journey-scene,.pve-journey.show .pve-journey-foe,.pve-journey-dust,.pve-journey-scene:after{animation-duration:1ms!important}}

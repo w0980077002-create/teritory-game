@@ -19,3 +19,7 @@ Canonical mobile frontend base for Territory / Sdolars.
 - `arena.css` / `arena.js` — Arena implementation
 
 Develop new systems from this base instead of mixing older versions.
+
+
+## v141
+Seamless City → PvE journey added: the hero advances through the same Sdolars scene before the tactical Arena opens.
