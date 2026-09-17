@@ -128,7 +128,7 @@ body:has(#home.active) .bottom-nav { display: none !important; }
     <!-- V5: прозрачный слой кликов. Визуал интерфейса находится в одном фоне,
          поэтому второй HUD больше не рисуется поверх него. -->
     <div class="v5-click-layer" aria-label="Навигация города">
-      <button class="v5-zone v5-profile" data-screen="inventory" aria-label="Профиль"></button>
+      <button class="v5-zone v5-profile" data-screen="profile" aria-label="Профиль"></button>
 
       <!-- Ресурсы: 4 отдельные кликабельные зоны поверх готового визуала -->
       <button class="v5-zone v5-resource-gems" data-action="gems" aria-label="Алмазы"></button>
@@ -155,7 +155,7 @@ body:has(#home.active) .bottom-nav { display: none !important; }
       <button class="v5-zone v5-bottom1" data-action="fight" aria-label="Бой"></button>
       <button class="v5-zone v5-bottom2" data-screen="arena" aria-label="Арена"></button>
       <button class="v5-zone v5-bottom3" data-screen="inventory" aria-label="Инвентарь"></button>
-      <button class="v5-zone v5-bottom4" data-screen="inventory" aria-label="Экипировка"></button>
+      <button class="v5-zone v5-bottom4" data-screen="profile" aria-label="Экипировка"></button>
       <button class="v5-zone v5-bottom5" data-screen="districts" aria-label="Задания"></button>
       <button class="v5-zone v5-bottom6" data-screen="districts" aria-label="Карта"></button>
     </div>
@@ -317,7 +317,7 @@ body:has(#home.active) .bottom-nav { display: none !important; }
     <button data-screen="home">🏠<span>Город</span></button>
     <button data-screen="arena">⚔️<span>Арена</span></button>
     <button data-screen="districts">🗺️<span>Районы</span></button>
-    <button data-screen="inventory">🎒<span>Профиль</span></button>
+    <button data-screen="profile">🎒<span>Профиль</span></button>
     <button data-screen="market">🛒<span>Магазин</span></button>
   </nav>
 </div>
