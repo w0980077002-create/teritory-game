@@ -4,10 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#10131a">
-<title>Territory — Sdolars · READY v1</title>
-<link rel="stylesheet" href="style.css?v=ready1">
-<link rel="stylesheet" href="game.css?v=ready1">
-<link rel="stylesheet" href="arena.css?v=ready1">
+<title>Territory — Sdolars · LIVE v139</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="game.css">
+<link rel="stylesheet" href="arena.css">
+<style id="territory-v14-real-scene">
+.world-final{background:#07111b none center center/cover no-repeat !important}
+.world-final:after{display:none!important}
+.world-final>.final-sky,.world-final>.final-city-back,.world-final>.final-house,.world-final>.final-gate,.world-final>.final-street,.world-final>.final-lamp,.world-final>.final-guard,.world-final>.final-trader,.world-final>.final-citizen,.world-final>.final-camp,.world-final>.final-hero,.world-final>.final-message{display:none!important}
+.final-location{z-index:50!important;top:18px!important;left:18px!important;width:218px!important}
+.final-time{z-index:50!important;top:22px!important;right:150px!important}
+.final-actions{z-index:55!important;top:92px!important;right:10px!important}
+.scene-hotspots{position:absolute;inset:0;z-index:35;pointer-events:none}
+.scene-hotspots .hotspot{position:absolute;display:block;padding:0;background:transparent;border:0;pointer-events:auto}
+.hotspot-weapon{left:5%;bottom:23%;width:27%;height:13%}
+.hotspot-market{right:5%;bottom:23%;width:27%;height:13%}
+.hotspot-center{left:30%;right:30%;bottom:31%;height:12%}
+</style>
+
 <style id="territory-v23-reference-screen">
 /* V23: визуальный эталон экрана как единая игровая сцена */
 .hud, .bottom-nav { display:none !important; }
@@ -74,48 +88,6 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
 }
 </style>
 
-
-<style id="territory-ready-clean-home">
-/* READY PACKAGE: one visual source for the Sdolars home scene.
-   The supplied portrait artwork already contains its scene labels; avoid
-   stacking a second set of large HTML panels over it. */
-body:has(#home.active){background:#07111b!important;overflow:hidden!important}
-body:has(#home.active) #home{position:absolute!important;inset:0!important;height:100%!important;padding:0!important;margin:0!important;overflow:hidden!important}
-body:has(#home.active) .real-home{position:absolute!important;left:0!important;right:0!important;top:66px!important;bottom:64px!important;height:auto!important;overflow:hidden!important;background:#07111b!important}
-body:has(#home.active) .real-home-image{
-  position:absolute!important;left:50%!important;top:0!important;
-  width:auto!important;height:100%!important;min-height:0!important;
-  transform:translateX(-50%)!important;object-fit:contain!important;
-  object-position:center top!important;filter:none!important;display:block!important;
-}
-body:has(#home.active) .npc-label,
-body:has(#home.active) .live-city-title,
-body:has(#home.active) .live-city-time,
-body:has(#home.active) .alex-quest-badge,
-body:has(#home.active) .live-side-ui,
-body:has(#home.active) .living-scene{display:none!important}
-body:has(#home.active) .hud{
-  position:absolute!important;top:0!important;left:0!important;right:0!important;
-  height:66px!important;min-height:66px!important;z-index:220!important;
-  display:flex!important;background:linear-gradient(180deg,rgba(8,14,20,.96),rgba(8,14,20,.78))!important;
-}
-body:has(#home.active) main{position:absolute!important;inset:0!important;height:100%!important;min-height:0!important}
-body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:64px!important;min-height:64px!important;z-index:230!important;background:rgba(10,15,21,.96)!important}
-body:has(#home.active) .real-home .hotspot{z-index:41!important;background:transparent!important;border:0!important}
-body:has(#home.active) .hs-arena{right:0;top:0;width:20%;height:22%}
-body:has(#home.active) .hs-market{right:0;top:20%;width:20%;height:22%}
-body:has(#home.active) .hs-inventory{right:0;top:40%;width:20%;height:20%}
-body:has(#home.active) .hs-districts{right:0;top:59%;width:20%;height:20%}
-body:has(#home.active) .hs-game{right:0;top:77%;width:20%;height:20%}
-body:has(#home.active) .hs-weapon{left:0;top:39%;width:30%;height:20%}
-body:has(#home.active) .hs-city{left:28%;top:25%;width:44%;height:42%}
-body:has(#home.active) .hs-bottom-home,
-body:has(#home.active) .hs-bottom-arena,
-body:has(#home.active) .hs-bottom-districts,
-body:has(#home.active) .hs-bottom-profile,
-body:has(#home.active) .hs-bottom-shop{display:none!important}
-</style>
-
 </head>
 <body>
 <div id="app">
@@ -136,7 +108,7 @@ body:has(#home.active) .hs-bottom-shop{display:none!important}
   <main>
     <section id="home" class="screen active home-real">
   <div class="real-home">
-    <img src="sdolars_scene.jpg" alt="Sdolars" class="real-home-image">
+    <img src="sdolars_scene.png" alt="Sdolars" class="real-home-image">
     <div class="live-city-title" aria-label="Город Sdolars"><small>ГОРОД</small><strong>SDOLARS</strong><em>ЦЕНТРАЛЬНЫЙ КВАРТАЛ</em></div>
     <div class="live-city-time">19:42 · ВЕЧЕР <b>🌙</b></div><div id="alexQuestBadge" class="alex-quest-badge">Город</div>
     <div class="live-side-ui" aria-label="Быстрые действия">
@@ -238,7 +210,7 @@ body:has(#home.active) .hs-bottom-shop{display:none!important}
         <button type="button" id="gameSpecialBtn"><span>🧰</span><b>Спецпредложение</b><small>Монополия</small></button>
       </div>
       <div class="game-progress" aria-live="polite"><b id="gameTurnNo">Ход 0</b><span>Круг <b id="gameLapBadge">0</b></span><span>Клетка <b id="gameCellNo">1</b>/27</span></div>
-      <main class="game-main">
+      <div class="game-main">
         <div class="game-harbor" aria-hidden="true"></div>
         <div class="game-board-wrap">
           <div class="game-board-shell">
@@ -296,7 +268,7 @@ body:has(#home.active) .hs-bottom-shop{display:none!important}
     <button data-screen="market">🛒<span>Магазин</span></button>
   </nav>
 </div>
-<script src="app.js?v=ready1"></script>
-<script src="arena.js?v=ready1"></script>
+<script src="app.js"></script>
+<script src="arena.js"></script>
 </body>
 </html>

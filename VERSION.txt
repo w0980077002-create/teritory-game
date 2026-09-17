@@ -1,17 +1,2 @@
-Territory — Sdolars
-READY package v1
-Static Telegram Web App / GitHub Pages package
-
-Included:
-- index.html
-- style.css
-- game.css
-- app.js
-- arena.css
-- arena.js
-- sdolars_scene.jpg
-- README.md
-
-Excluded from this ready static package:
-- server.js (not required for the static Telegram/GitHub Pages client)
-- legacy casino/VIP/command-HQ/siege/logistics presentation
+Territory CLEAN BASE
+2026-09-17

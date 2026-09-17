@@ -1,46 +1,105 @@
-/* Territory v140 — Arena tactical mobile prototype.
-   Local/client simulation: 1x1, chaos, group; 3-minute lobby; 4 attack zones; exactly 2 defense zones. */
-(()=>{
-const A=[['head','Голова','🎯'],['chest','Грудь','🫀'],['waist','Пояс','🛡️'],['legs','Ноги','🦵']];
-const D=[['head','Голова','⬆️'],['chest','Грудь','🛡️'],['waist','Пояс','↔️'],['legs','Ноги','⬇️']];
-const M=[
-{id:'duel',title:'1×1 бой',icon:'⚔️',desc:'Один против одного. Ожидание — 3 минуты.'},
-{id:'chaos',title:'Хаотичный бой',icon:'🎲',desc:'Все входят в одну комнату, затем команды распределяются случайно.'},
-{id:'group',title:'Групповой бой',icon:'👥',desc:'Выбор команды 1 или 2. До 20 игроков.'}];
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const st=()=>{try{return state}catch(e){return {}}},modal=()=>document.getElementById('arenaModal'),body=()=>document.getElementById('arenaModalBody');
-let stats={wins:0,losses:0,battles:0,history:[]},lobby=null,battle=null,lt=null,bt=null;
-try{stats={...stats,...JSON.parse(localStorage.getItem('territory_arena_v140')||'{}')}}catch(e){}
-function saveStats(){localStorage.setItem('territory_arena_v140',JSON.stringify(stats))}
-function show(t,h){const m=modal(),b=body();if(!m||!b)return;document.getElementById('arenaModalTitle').textContent=t;b.innerHTML=h;m.classList.add('show');m.setAttribute('aria-hidden','false')}
-function close(){clearInterval(lt);clearInterval(bt);lt=bt=null;lobby=battle=null;const m=modal();if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}if(typeof window.showScreen==='function'){try{window.showScreen(window.__arenaReturnScreen||'home')}catch(e){}}}
-window.closeArenaModal=close;
-window.arenaToast=t=>{const x=document.getElementById('arenaToast');if(!x)return;x.textContent=t;x.classList.add('show');clearTimeout(window.__arenaToast);window.__arenaToast=setTimeout(()=>x.classList.remove('show'),1600)};
-const name=()=>String(st().name||'SSS'),level=()=>Number(st().level||1);
-function home(){
-clearInterval(lt);clearInterval(bt);lobby=battle=null;
-const hist=(stats.history||[]).slice(-5).reverse().map(h=>`<div class="arena140-history-row"><span>${h.win?'🏆':'💀'}</span><span>${esc(h.mode)}</span><span>${esc(h.result)}</span></div>`).join('');
-show('⚔️ Арена',`<div class="arena140"><section class="arena140-hero"><div><div class="arena140-kicker">SDOLARS · ARENA</div><h2>Бой начинается здесь</h2><p>Тактический бой по ходам. Выбирай атаку и две зоны защиты.</p></div><div class="arena140-stat"><b>${stats.wins||0}</b><span>побед</span></div></section><section class="arena140-modes">${M.map(m=>`<button class="arena140-mode" data-mode="${m.id}"><span class="mode-icon">${m.icon}</span><span><b>${m.title}</b><small>${m.desc}</small></span><strong>›</strong></button>`).join('')}</section><section class="arena140-rules"><b>Правила Arena</b><div><span>⏱️ 3:00</span><span>👥 до 20</span><span>🎯 4 атаки</span><span>🛡️ 4 защиты</span></div><p>Вышедший игрок не может повторно войти в этот же бой.</p></section><section class="arena140-history"><div class="arena140-section-head"><b>Последние бои</b><span>${stats.battles||0}</span></div>${hist||'<div class="arena140-empty">Пока нет завершённых боёв.</div>'}</section></div>`);
-body().querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>lobbyStart(b.dataset.mode))}
-function lobbyStart(mode){lobby={mode,endsAt:Date.now()+180000,started:false,left:false,players:[{name:name(),level:level(),team:mode==='group'?1:null,owner:true}]};lobbyView()}
-function add(){if(!lobby||lobby.started)return;const max=lobby.mode==='duel'?2:20;if(lobby.players.length>=max)return arenaToast('Комната заполнена');const n=['Варг','Рагнар','Стальной Волк','Наёмник','Берсерк','Охотник','Гвардеец'];const i=lobby.players.length-1;lobby.players.push({name:n[i%n.length]+' '+(i+2),level:Math.max(1,level()+Math.floor(Math.random()*3)-1),team:lobby.mode==='group'?(i%2)+1:null,bot:true});lobbyView()}
-function lobbyView(){clearInterval(lt);if(!lobby)return;const m=M.find(x=>x.id===lobby.mode),r=Math.max(0,lobby.endsAt-Date.now()),mm=String(Math.floor(r/60000)).padStart(2,'0'),ss=String(Math.floor(r/1000)%60).padStart(2,'0'),max=lobby.mode==='duel'?2:20;
-const ps=lobby.players.map(p=>`<div class="arena140-player"><span class="avatar">${p.bot?'⚔️':'🧔'}</span><span><b>${esc(p.name)}</b><small>ур. ${p.level}${p.owner?' · создатель':''}</small></span>${lobby.mode==='group'?`<em class="team team-${p.team}">Команда ${p.team}</em>`:''}</div>`).join('');
-show(`${m.icon} ${m.title}`,`<div class="arena140"><section class="arena140-lobby-head"><div><span class="arena140-kicker">КОМНАТА БОЯ</span><h2>Ожидание игроков</h2><p>${esc(m.desc)}</p></div><div class="arena140-countdown"><small>Автостарт</small><b>${mm}:${ss}</b></div></section><section class="arena140-lobby-card"><div class="arena140-section-head"><b>Игроки</b><span>${lobby.players.length}/${max}</span></div><div class="arena140-players">${ps}</div></section>${lobby.mode==='group'?`<section class="arena140-team-choice"><b>Твоя команда</b><div><button data-team="1" class="${lobby.players[0].team===1?'selected':''}">⚔️ Команда 1</button><button data-team="2" class="${lobby.players[0].team===2?'selected':''}">🛡️ Команда 2</button></div></section>`:''}<section class="arena140-actions"><button class="arena140-secondary" data-add>＋ Добавить игрока для теста</button><button class="arena140-primary" data-start ${lobby.players.length>1?'':'disabled'}>⚔️ Начать сейчас</button><button class="arena140-leave" data-leave>Выйти из комнаты</button></section><p class="arena140-note">Создатель запускает таймер 3:00. После окончания бой стартует автоматически.</p></div>`);
-body().querySelector('[data-add]')?.addEventListener('click',add);body().querySelector('[data-start]')?.addEventListener('click',battleStart);body().querySelector('[data-leave]')?.addEventListener('click',()=>{lobby.left=true;clearInterval(lt);arenaToast('Ты вышел. Повторный вход запрещён.');setTimeout(home,500)});
-body().querySelectorAll('[data-team]').forEach(b=>b.onclick=()=>{lobby.players[0].team=+b.dataset.team;lobbyView()});
-lt=setInterval(()=>{if(!lobby)return;if(Date.now()>=lobby.endsAt){clearInterval(lt);battleStart()}else lobbyView()},1000)}
-function battleStart(){if(!lobby||lobby.started||lobby.left||lobby.players.length<2){if(lobby&&lobby.players.length<2)arenaToast('Нужно минимум 2 игрока');return}if(lobby.mode==='chaos'){lobby.players.forEach((p,i)=>p.team=(i%2)+1)}lobby.started=true;clearInterval(lt);battle={round:1,playerHp:+(st().hp||120),maxHp:+(st().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,def:[],endsAt:Date.now()+600000,log:['⚔️ Бой начался.']};battleView()}
-function battleView(){clearInterval(bt);if(!battle)return;const r=Math.max(0,battle.endsAt-Date.now()),mm=String(Math.floor(r/60000)).padStart(2,'0'),ss=String(Math.floor(r/1000)%60).padStart(2,'0'),p=Math.max(0,battle.playerHp/battle.maxHp*100),e=Math.max(0,battle.enemyHp/battle.maxEnemyHp*100);
-const az=A.map(z=>`<button class="arena140-zone ${battle.attack===z[0]?'selected':''}" data-a="${z[0]}"><i>${z[2]}</i><span>${z[1]}</span></button>`).join(''),dz=D.map(z=>`<button class="arena140-zone ${battle.def.includes(z[0])?'selected defense':''}" data-d="${z[0]}"><i>${z[2]}</i><span>${z[1]}</span></button>`).join('');
-show('⚔️ Arena · бой',`<div class="arena140 arena140-combat"><section class="arena140-fighters"><div class="arena140-fighter"><div class="big-avatar">🧔</div><b>${esc(name())}</b><small>ур. ${level()}</small><div class="arena140-hp"><i style="width:${p}%"></i></div><span>${Math.round(battle.playerHp)} / ${battle.maxHp} HP</span></div><div class="arena140-vs">VS</div><div class="arena140-fighter enemy"><div class="big-avatar">⚔️</div><b>Противник</b><small>отряд</small><div class="arena140-hp"><i style="width:${e}%"></i></div><span>${Math.round(battle.enemyHp)} / ${battle.maxEnemyHp} HP</span></div></section><section class="arena140-combat-top"><span>Раунд <b>${battle.round}</b></span><span>⏱️ <b>${mm}:${ss}</b></span><span>👥 ${lobby?.players.length||2}</span></section><section class="arena140-select"><div class="arena140-step"><b>1. Атака</b><small>Выбери одну из 4 зон</small></div><div class="arena140-zones">${az}</div><div class="arena140-step"><b>2. Защита</b><small>Выбери ровно две зоны</small></div><div class="arena140-zones">${dz}</div><button class="arena140-hit" data-hit ${battle.attack&&battle.def.length===2?'':'disabled'}>⚔️ ПОДТВЕРДИТЬ ХОД</button></section><section class="arena140-log"><div class="arena140-log-head"><b>Боевой журнал</b><button data-collapse>Свернуть</button></div><div class="arena140-log-body">${battle.log.slice(-10).map(x=>`<div>${esc(x)}</div>`).join('')}</div></section><section class="arena140-finish"><button data-finish>Завершить бой</button><button data-extend>Продлить +5 мин</button></section></div>`);
-body().querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{battle.attack=b.dataset.a;battleView()});body().querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const z=b.dataset.d;if(battle.def.includes(z))battle.def=battle.def.filter(x=>x!==z);else if(battle.def.length<2)battle.def.push(z);else return arenaToast('Можно закрыть только 2 зоны');battleView()});body().querySelector('[data-hit]')?.addEventListener('click',turn);body().querySelector('[data-finish]')?.addEventListener('click',()=>finish(false,'Игрок завершил бой'));body().querySelector('[data-extend]')?.addEventListener('click',()=>{battle.endsAt+=300000;arenaToast('Бой продлён на 5 минут');battleView()});body().querySelector('[data-collapse]')?.addEventListener('click',x=>{const q=body().querySelector('.arena140-log-body');q.classList.toggle('collapsed');x.currentTarget.textContent=q.classList.contains('collapsed')?'Развернуть':'Свернуть'});
-bt=setInterval(()=>{if(Date.now()>=battle.endsAt)finish(false,'Время боя истекло');else battleView()},1000)}
-function turn(){if(!battle||!battle.attack||battle.def.length!==2)return;const s=st(),d=Math.max(8,Math.round((+(s.strength||5)+ +(s.bonusDamage||0)+10)*(0.9+Math.random()*.35)));battle.enemyHp=Math.max(0,battle.enemyHp-d);battle.log.push(`🎯 ${A.find(x=>x[0]===battle.attack)[1]}: -${d} HP`);if(battle.enemyHp<=0)return finish(true,'Противник повержен');const enemy=A[Math.floor(Math.random()*A.length)][0];if(!battle.def.includes(enemy)){const hit=Math.max(4,Math.round(9+Math.random()*10- +(s.defense||0)*.35));battle.playerHp=Math.max(0,battle.playerHp-hit);battle.log.push(`⚡ Ответный удар: -${hit} HP`)}else battle.log.push(`🛡️ Защита закрыла ${A.find(x=>x[0]===enemy)[1]}`);if(battle.playerHp<=0)return finish(false,'Ты проиграл бой');battle.round++;battle.attack=null;battle.def=[];battleView()}
-function finish(win,reason){if(!battle)return;clearInterval(bt);stats.battles=(stats.battles||0)+1;if(win)stats.wins=(stats.wins||0)+1;else stats.losses=(stats.losses||0)+1;stats.history=(stats.history||[]);stats.history.push({win,mode:lobby?.mode||'Бой',result:win?'победа':'поражение'});if(stats.history.length>20)stats.history.shift();saveStats();const m=win?'🏆 Победа!':'⚔️ Бой завершён';show('⚔️ Результат',`<div class="arena140 arena140-result"><section class="arena140-end"><div class="big">${win?'🏆':'⚔️'}</div><h2>${m}</h2><p>${esc(reason)}</p><button class="arena140-primary" data-home>🏟️ В арену</button></section></div>`);body().querySelector('[data-home]')?.addEventListener('click',home)}
-window.openBattle=home;window.openArena=home;
+/* Stable tactical combat core. Multiplayer lobby/network layer is intentionally not mixed into this clean frontend base. */
 
-/* FIX: bind the actual close button used by index.html. */
-document.addEventListener('click',e=>{if(e.target.closest('#arenaClose,[data-arena-close]'))close()});
-const mm=modal();if(mm)mm.addEventListener('click',e=>{if(e.target===mm)close()});
+window.arenaToast=function(text){
+ const t=document.getElementById('arenaToast'); if(!t)return; t.textContent=text; t.classList.add('show'); clearTimeout(window._arenaToastTimer); window._arenaToastTimer=setTimeout(()=>t.classList.remove('show'),1500);
+};
+window.closeArenaModal=function(){clearTimeout(window.s98AutoTimer);const m=document.getElementById('arenaModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');}};
+
+(()=>{
+ const Z=[['head','Голова'],['chest','Грудь'],['stomach','Живот'],['waist','Пояс'],['legs','Ноги']];
+ state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0);
+ const enemies=[
+  {name:'Уличный боец',ico:'🥊',hp:105,damage:13,armor:1,crit:.07,tier:1,reward:45,xp:12},
+  {name:'Наёмник Sdolars',ico:'🗡️',hp:135,damage:16,armor:3,crit:.10,tier:2,reward:65,xp:17},
+  {name:'Гвардеец замка',ico:'🛡️',hp:165,damage:19,armor:5,crit:.13,tier:3,reward:90,xp:23},
+  {name:'Капитан стражи',ico:'⚔️',hp:205,damage:23,armor:7,crit:.16,tier:4,reward:125,xp:30},
+  {name:'Чемпион Sdolars',ico:'👹',hp:250,damage:28,armor:9,crit:.19,tier:5,reward:170,xp:40}
+ ];
+ const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c]));
+ const dmg=()=>Math.max(5,Number(state?.bonusDamage||0)+Number(state?.strength||5));
+ const def=()=>Math.max(0,Number(state?.defense||0));
+ const maxEnergy=()=>Math.min(250,200+Math.max(0,Number(state?.level||1)-1)*5);
+ const hpMax=()=>Math.max(100,Number(state?.maxHp||100));
+ const pct=(v,m)=>Math.max(0,Math.min(100,(Number(v)||0)/(Number(m)||1)*100));
+ const arenaStats=()=>{try{return JSON.parse(localStorage.getItem('territory_s98_arena')||'{}')}catch(e){return {}}};
+ const saveArena=x=>localStorage.setItem('territory_s98_arena',JSON.stringify(x));
+ let stats=arenaStats();stats.wins=Number(stats.wins||0);stats.losses=Number(stats.losses||0);stats.streak=Number(stats.streak||0);stats.best=Number(stats.best||0);stats.history=Array.isArray(stats.history)?stats.history:[];saveArena(stats);
+ function modal(title,html){const t=document.getElementById('arenaModalTitle'),b=document.getElementById('arenaModalBody');if(!t||!b)return; t.textContent=title;b.innerHTML=html;document.getElementById('arenaModal')?.classList.add('show')}
+ function currentPlayerName(){return state?.name||'SSS'}
+ function chooseEnemy(){const lv=Number(state?.level||1),idx=Math.min(enemies.length-1,Math.max(0,Math.floor((lv-1)/2)+Math.min(2,stats.wins)));return {...enemies[idx],maxHp:enemies[idx].hp}}
+ function arenaHome(){
+  const energy=Number(state?.energy||0), cards=enemies.map((e,i)=>{const locked=i>Math.min(enemies.length-1,Math.floor((Number(state?.level||1)-1)/2)+2);return `<div class="s98Opp"><div class="ico">${e.ico}</div><div><b>${esc(e.name)}</b><small>⚔️ ${e.damage} урон · 🛡️ ${e.armor} броня</small><div class="s98Diff">${locked?'🔒 Требуется более высокий уровень':'🏆 Награда '+e.reward+' 🟡 · '+e.xp+' XP'}</div></div><button class="s98Fight" ${locked||energy<10?'disabled':''} data-s98-start="${i}">${energy<10?'⚡10':'В бой'}</button></div>`}).join('');
+  const hist=stats.history.slice(-5).reverse().map(x=>`<div>${x.win?'🏆':'💀'} ${esc(x.enemy)} · ${x.win?'+':''}${x.reward||0} 🟡 · ${x.round||1} раунд.</div>`).join('')||'<div>Пока нет завершённых боёв.</div>';
+  modal('⚔️ Арена',`<div class="s98"><div class="s98Hero"><b>⚔️ Арена Sdolars</b><small>Выбери соперника и проведи полноценный тактический бой.</small></div><div class="s98Grid"><div class="s98Stat">🏆 Победы<b>${stats.wins}</b></div><div class="s98Stat">🔥 Серия<b>${stats.streak}</b></div><div class="s98Stat">⭐ Лучшая<b>${stats.best}</b></div></div><div class="s98Panel"><div class="s98PanelTitle">🎯 Выбери противника</div><div class="s98Opps">${cards}</div></div><div class="s98Panel"><div class="s98PanelTitle">📜 Последние бои</div><div class="s98Log">${hist}</div></div></div>`);
+  document.querySelectorAll('[data-s98-start]').forEach(b=>b.onclick=()=>startFight(Number(b.dataset.s98Start)));
+ }
+ function startFight(i){
+  if(Number(state.energy||0)<10){arenaToast('⚡ Нужно 10 энергии');return}
+  const src=enemies[Math.max(0,Math.min(enemies.length-1,i))];
+  battle={enemy:{...src,maxHp:src.hp,hp:src.hp},turn:'player',round:1,attack:null,defense:[],enemyAttack:null,enemyDefense:[],log:['⚔️ Бой начался. Выбери атаку и две защиты.'],playerHp:Number(state.hp||hpMax()),playerMax:hpMax(),energySpent:0,auto:false,locked:false,anim:'',result:null};
+  render();
+ }
+ function enemyPlan(){const a=[...Z].sort(()=>Math.random()-.5);battle.enemyAttack=a[0][0];battle.enemyDefense=a.slice(1,3).map(x=>x[0])}
+ function zoneLabel(id){return Z.find(x=>x[0]===id)?.[1]||id}
+ function addLog(s){battle.log.push(s);if(battle.log.length>12)battle.log.shift()}
+ function combatMath(){return {attack:Math.max(5,dmg()),armor:def(),crit:Math.min(.35,.08+Number(state.strength||5)/180),dodge:Math.min(.30,.04+Number(state.agility||5)/160)}}
+ function render(){
+  if(!battle)return;
+  const e=battle.enemy,m=combatMath(),can=battle.turn==='player'&&!battle.locked&&!battle.result&&!battle.auto;
+  const logs=battle.log.map(x=>`<div>• ${esc(x)}</div>`).join('');
+  const stage=`<div class="s98Stage"><div class="s98VS">⚔️</div><div class="s98Fx ${battle.anim?'show':''}">${battle.anim==='playerAttack'?'💥':battle.anim==='enemyAttack'?'⚡':''}</div><div class="s98F p ${battle.anim==='playerAttack'?'attack':''} ${battle.anim==='playerHit'?'hit':''}"><div class="s98Avatar">🧔</div><div class="s98FName">${esc(currentPlayerName())}</div></div><div class="s98F e ${battle.anim==='enemyAttack'?'attack':''} ${battle.anim==='enemyHit'?'hit':''}"><div class="s98Avatar">${esc(e.ico)}</div><div class="s98FName">${esc(e.name)}</div></div></div>`;
+  const attackBtns=Z.map(z=>`<button class="s98Zone ${battle.attack===z[0]?'attackSel':''}" data-s98-a="${z[0]}" ${can?'':'disabled'}>${z[1]}</button>`).join('');
+  const defBtns=Z.map(z=>`<button class="s98Zone ${battle.defense.includes(z[0])?'defSel':''}" data-s98-d="${z[0]}" ${can?'':'disabled'}>${z[1]}</button>`).join('');
+  document.getElementById('arenaModalTitle').textContent='⚔️ Арена · тактический бой';
+  document.getElementById('arenaModalBody').innerHTML=`<div class="s98">${stage}<div class="s98HpRow"><div class="s98HpCard"><b>🧔 ${esc(currentPlayerName())} · ур. ${state.level||1}</b><div class="s98Hp"><i style="width:${pct(battle.playerHp,battle.playerMax)}%"></i></div><div class="s98HpText">${Math.ceil(battle.playerHp)} / ${battle.playerMax} HP</div></div><div class="s98HpCard"><b>${esc(e.ico)} ${esc(e.name)}</b><div class="s98Hp enemy"><i style="width:${pct(e.hp,e.maxHp)}%"></i></div><div class="s98HpText">${Math.ceil(e.hp)} / ${e.maxHp} HP</div></div></div><div class="s98CombatStats"><div class="s98CStat">⚔️ Атака<b>${m.attack}</b></div><div class="s98CStat">🛡️ Броня<b>${m.armor}</b></div><div class="s98CStat">⚡ Энергия<b>${state.energy||0}</b></div><div class="s98CStat">🔥 Серия<b>${stats.streak}</b></div></div><div class="s98Turn">Раунд <strong>${battle.round}</strong> · ${battle.turn==='player'?'<strong>Твой ход</strong>':'Ход противника'} · защита <strong>${battle.defense.length}/2</strong></div><div class="s98Step">🎯 1. Выбери зону атаки</div><div class="s98Zones">${attackBtns}</div><div class="s98Step">🛡️ 2. Выбери две зоны защиты</div><div class="s98Zones">${defBtns}</div><div class="s98Actions"><button class="s98Act" data-s98-skill="power" ${can&&Number(state.energy||0)>=20?'':'disabled'}>💥 Сильный ·20</button><button class="s98Act" data-s98-skill="precise" ${can&&Number(state.energy||0)>=15?'':'disabled'}>🎯 Точный ·15</button><button class="s98Act" data-s98-skill="stance" ${can&&Number(state.energy||0)>=15?'':'disabled'}>🛡️ Стойка ·15</button><button class="s98Act main" data-s98-hit ${battle.attack&&battle.defense.length===2&&can?'':'disabled'}>⚔️ НАНЕСТИ УДАР ·10 ⚡</button></div><label class="s98Auto"><input type="checkbox" data-s98-auto ${battle.auto?'checked':''}> Автобой</label><div class="s98Log">${logs}</div><div class="s98Hint">Голова: выше шанс крита · Грудь: стабильный урон · Ноги: ниже шанс уклонения.</div></div>`;
+  const body=document.getElementById('arenaModalBody');
+  body.querySelectorAll('[data-s98-a]').forEach(b=>b.onclick=()=>{if(!can)return;battle.attack=b.dataset.s98A;render()});
+  body.querySelectorAll('[data-s98-d]').forEach(b=>b.onclick=()=>{if(!can)return;const z=b.dataset.s98D;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);render()});
+  body.querySelector('[data-s98-hit]')?.addEventListener('click',()=>doPlayerAttack('normal'));
+  body.querySelectorAll('[data-s98-skill]').forEach(b=>b.addEventListener('click',()=>doPlayerAttack(b.dataset.s98Skill)));
+  body.querySelector('[data-s98-auto]')?.addEventListener('change',e=>{battle.auto=!!e.target.checked;if(battle.auto){autoTurn()}else clearTimeout(window.s98AutoTimer);render()});
+ }
+ function autoTurn(){clearTimeout(window.s98AutoTimer);if(!battle||!battle.auto||battle.turn!=='player'||battle.locked||battle.result)return;window.s98AutoTimer=setTimeout(()=>{if(!battle||!battle.auto||battle.turn!=='player'||battle.locked)return;const a=[...Z].sort(()=>Math.random()-.5);battle.attack=a[0][0];battle.defense=a.slice(1,3).map(x=>x[0]);doPlayerAttack('normal')},450)}
+ function doPlayerAttack(skill){
+  if(!battle||battle.turn!=='player'||battle.locked||battle.result||!battle.attack||battle.defense.length!==2)return;
+  const costs={normal:10,power:20,precise:15,stance:15},cost=costs[skill]||10;if(Number(state.energy||0)<cost){arenaToast('⚡ Недостаточно энергии');return}
+  battle.locked=true;state.energy=Math.max(0,Number(state.energy||0)-cost);battle.energySpent+=cost;enemyPlan();battle.anim='playerAttack';
+  const e=battle.enemy,m=combatMath(),z=battle.attack;let message='',damage=0;
+  if(skill==='stance'){battle.playerGuard=0.55;message='🛡️ Воин встал в стойку: следующий удар ослаблен.'}
+  else{let miss=skill==='precise'?false:Math.random()<Math.max(.02,.11-m.dodge/3);if(miss)message=`💨 Атака в «${zoneLabel(z)}» — промах.`;else if(battle.enemyDefense.includes(z))message=`🛡️ Противник заблокировал «${zoneLabel(z)}». Урон: 0.`;else{const zoneBonus=z==='head'?1.15:z==='chest'?1.05:z==='legs'?.95:1;const skillBonus=skill==='power'?1.45:skill==='precise'?1.12:1;const crit=Math.random()<(skill==='precise'?Math.min(.45,m.crit+.12):m.crit)*(z==='head'?1.3:1);const base=Math.max(5,Math.round((m.attack+10+Math.random()*10)*zoneBonus*skillBonus));damage=Math.max(3,Math.round(base-Number(e.armor||0)));if(crit)damage+=Math.round(damage*.55);e.hp=Math.max(0,e.hp-damage);message=`⚔️ ${skill==='power'?'Сильный ':skill==='precise'?'Точный ':''}удар в «${zoneLabel(z)}»: −${damage} HP${crit?' · 💥 КРИТ!':''}`}}
+  addLog(message);battle.anim='playerAttack';render();
+  if(e.hp<=0){setTimeout(()=>finish(true),380);return}
+  battle.turn='enemy';setTimeout(enemyTurn,650)
+ }
+ function enemyTurn(){
+  if(!battle||battle.result)return;const e=battle.enemy,target=e.enemyAttack||Z[Math.floor(Math.random()*Z.length)][0],blocked=battle.defense.includes(target);battle.anim='enemyAttack';let msg='',damage=0;
+  if(blocked)msg=`🛡️ Блок! Атака «${zoneLabel(target)}» остановлена.`;else{const m=combatMath(),dodge=Math.random()<m.dodge;if(dodge)msg=`💨 Воин увернулся от атаки в «${zoneLabel(target)}».`;else{let base=Number(e.damage||12)+Math.floor(Math.random()*7);const crit=Math.random()<Number(e.crit||.1);damage=Math.max(1,Math.round(base+(crit?base*.5:0)-m.armor));if(battle.playerGuard){damage=Math.round(damage*battle.playerGuard);battle.playerGuard=0}battle.playerHp=Math.max(0,battle.playerHp-damage);state.hp=battle.playerHp;msg=`☠️ ${e.name} атаковал «${zoneLabel(target)}»: −${damage} HP${crit?' · 💥 КРИТ!':''}`}}
+  addLog(msg);render();if(battle.playerHp<=0){setTimeout(()=>finish(false),380);return}
+  battle.round++;battle.attack=null;battle.defense=[];battle.enemyAttack=null;battle.enemyDefense=[];battle.anim='';battle.locked=false;battle.turn='player';try{save()}catch(e){}render();if(battle.auto)autoTurn()
+ }
+ function finish(win){
+  clearTimeout(window.s98AutoTimer);battle.result=win?'win':'loss';battle.locked=true;const e=battle.enemy;
+  if(win){const reward=Number(e.reward||50)+Math.max(0,stats.streak)*5,xp=Number(e.xp||12);state.hp=hpMax();state.coins=Number(state.coins||0)+reward;state.exp=Number(state.exp||0)+xp;stats.wins++;stats.streak++;stats.best=Math.max(stats.best,stats.streak);let levels=0;let need=Number(state.level||1)*100;while(state.exp>=need){state.exp-=need;state.level++;levels++;need=Number(state.level)*100}stats.history.push({win:true,enemy:e.name,reward,xp,round:battle.round});
+   if(stats.history.length>20)stats.history.shift();saveArena(stats);try{save()}catch(x){};arenaToast('🏆 Победа! +'+reward+' 🟡');
+   document.getElementById('arenaModalBody').innerHTML=`<div class="s98"><div class="s98End"><div class="big">🏆</div><b>Победа!</b><p>${esc(e.name)} повержен за ${battle.round} раунд(ов).</p><p>+${reward} 🟡 · +${xp} XP${levels?' · ⬆️ Уровень '+state.level:''}</p><button class="main" data-s98-again>⚔️ Следующий бой</button><button data-s98-home>🏟️ В арену</button></div></div>`;
+  }else{state.hp=1;state.energy=Math.max(0,Number(state.energy||0)-10);stats.losses++;stats.streak=0;stats.history.push({win:false,enemy:e.name,reward:0,xp:0,round:battle.round});if(stats.history.length>20)stats.history.shift();saveArena(stats);try{save()}catch(x){};document.getElementById('arenaModalBody').innerHTML=`<div class="s98"><div class="s98End"><div class="big">💀</div><b>Поражение</b><p>${esc(e.name)} оказался сильнее.</p><p>Серия сброшена. HP осталось: 1.</p><button class="main" data-s98-recover>❤️ Восстановить HP</button><button data-s98-home>🏟️ В арену</button></div></div>`}
+  document.querySelector('[data-s98-again]')?.addEventListener('click',()=>startFight(Math.min(enemies.length-1,Math.floor((Number(state.level||1)-1)/2)+Math.min(2,stats.wins))));
+  document.querySelector('[data-s98-home]')?.addEventListener('click',arenaHome);
+  document.querySelector('[data-s98-recover]')?.addEventListener('click',()=>{state.hp=hpMax();save();arenaToast('❤️ HP восстановлено');arenaHome()});
+ }
+ window.openBattle=function(){arenaHome()};
+ window.renderBattle=render;
+ window.playerStrike=()=>doPlayerAttack('normal');
+ window.enemyStrike=enemyTurn;
+ window.toggleAuto=on=>{if(!battle)return;battle.auto=!!on;render();if(battle.auto)autoTurn()};
+ window.scheduleAutoTurn=autoTurn;
+ window.nextBattle=()=>{const idx=Math.min(enemies.length-1,Math.floor((Number(state.level||1)-1)/2)+Math.min(2,stats.wins));startFight(idx)};
 })();
+
+document.getElementById('arenaClose')?.addEventListener('click',()=>{
+  window.closeArenaModal();
+  if(typeof showScreen==='function') showScreen('home');
+});
+document.getElementById('arenaModal')?.addEventListener('click',e=>{
+  if(e.target.id==='arenaModal'){window.closeArenaModal();if(typeof showScreen==='function') showScreen('home');}
+});

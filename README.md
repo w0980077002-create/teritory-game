@@ -1,45 +1,37 @@
-# Territory — READY mobile package
+# Territory — Clean Base
 
-Canonical mobile frontend base for Territory / Sdolars.
+Clean mobile frontend base for Territory / Sdolars.
 
-## Core systems
-- Mobile city scene for Sdolars
-- Profile and persistent player state
+## Included
+- Portrait mobile city scene
+- Persistent player state
 - Districts
-- Equipment Market and Inventory
-- Game board with 27 cells, dice, x10 mode, rewards, tasks and jackpot preview
-- Tactical Arena based on the S98 combat implementation
-- Separate `server.js` backend for Telegram/PvP features; backend integration remains isolated from the client base
+- Equipment Market / Inventory
+- 27-cell game board, dice, x10, rewards, tasks and jackpot preview
+- Stable tactical Arena combat core
+- Full, uncropped Sdolars scene asset (`sdolars_scene.png`)
 
-## Frontend
-- `index.html` — screens and UI
-- `style.css` — main mobile UI
-- `game.css` — Game board styling
-- `app.js` — core client state and systems
-- `arena.css` / `arena.js` — Arena implementation
+## Explicitly removed from this base
+- Casino
+- Command HQ
+- Siege
+- Logistics
+- VIP
+- Old embedded Base64 city background
+- Obsolete city/world generations
+- Duplicate version layers
 
-Develop new systems from this base instead of mixing older versions.
+## Important
+This is the clean frontend foundation. The current Arena combat file is the stable tactical PvE core from the audited base; real multiplayer Arena (1x1, chaotic teams, group up to 20, 3-minute lobby, leave/re-entry rule) requires a network/backend layer and is not falsely presented as implemented here.
 
+## GitHub
+Upload the contents of this folder to the repository root. For GitHub Pages/static hosting, no server.js is required for the frontend.
 
-## Canonical v140
-- Sdolars scene: `sdolars_clean_scene.png`
-- Arena: 1×1, chaotic, group; 3-minute lobby; 4 attack zones; exactly 2 defense zones.
-- Arena close button is bound directly to `#arenaClose`.
-- Arena remains a local/client prototype; network multiplayer is not implemented by this package.
-
-
-## v140 package audit
-- Version references synchronized to v140 in `index.html`.
-- Arena v140 styles included in `arena.css`.
-- Arena close restores the screen that was open before Arena.
-- No casino screen is present in `index.html`; old unused casino selectors are not active.
-- Package is a client/mobile prototype; `server.js` is not required for GitHub Pages/Telegram static hosting.
-
-
-## READY package audit
-- One visual source is used for the Sdolars home screen (`sdolars_scene.jpg`).
-- Legacy embedded scene data was removed from `index.html` to avoid duplicate/blurred backgrounds.
-- The home screen keeps functional transparent hotspots, while duplicate overlay panels are disabled.
-- Removed/disabled legacy casino, VIP, command-HQ, siege and logistics UI from the active home presentation.
-- Arena, Districts, Market, Profile and Game remain in the package.
-- No network multiplayer backend is required for the static client package.
+## Files
+- index.html
+- style.css
+- game.css
+- arena.css
+- app.js
+- arena.js
+- sdolars_scene.jpg
