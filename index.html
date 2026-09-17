@@ -20,6 +20,10 @@
 .hotspot-weapon{left:5%;bottom:23%;width:27%;height:13%}
 .hotspot-market{right:5%;bottom:23%;width:27%;height:13%}
 .hotspot-center{left:30%;right:30%;bottom:31%;height:12%}
+
+/* V5 resource controls: top resource panels are real touch targets. */
+.ref-resource{pointer-events:auto!important;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.ref-resource:active{filter:brightness(1.18);transform:scale(.985);}
 </style>
 
 <style id="territory-v23-reference-screen">
@@ -146,7 +150,7 @@ body:has(#home.active) .bottom-nav { display: none !important; }
 
     <div class="ref-hud" aria-label="Игровая информация">
       <div class="ref-profile"><div class="ref-avatar">⚔️<b id="level">5</b></div><div><strong>Territory</strong><span>Глава 5 · Уровень 3</span><i><em></em><b>120/300</b></i></div></div>
-      <div class="ref-res"><div>💎 <b id="gems">1330</b> <strong>+</strong></div><div>🪙 <b id="coins">1779</b> <strong>+</strong></div><div>⚡ <b>191/200</b> <strong>+</strong></div></div>
+      <div class="ref-res" aria-label="Ресурсы"><div class="ref-resource" data-action="gems" role="button" tabindex="0" aria-label="Алмазы">💎 <b id="gems">1330</b> <strong>+</strong></div><div class="ref-resource" data-action="coins" role="button" tabindex="0" aria-label="Монеты">🪙 <b id="coins">1779</b> <strong>+</strong></div><div class="ref-resource" data-action="energy" role="button" tabindex="0" aria-label="Энергия">⚡ <b id="energy">191/200</b> <strong>+</strong></div></div>
       <div class="ref-actions"><button data-action="messages">✉️<b>Сообщения</b><i>2</i></button><button data-action="achievements">🏆<b>Достижения</b></button><button data-action="settings">⚙️<b>Настройки</b></button><button data-action="language">🇬🇧<b>EN</b></button></div>
       <div class="ref-task"><b>Текущее задание</b><strong>Поговори с кузнецом</strong><span>📍 Кузница</span><i>›</i></div>
       <div class="ref-daily"><span>🎁</span><b>Ежедневный бонус</b><strong>23:45:12</strong></div>

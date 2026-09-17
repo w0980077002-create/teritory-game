@@ -755,7 +755,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPrev
 
 /* Approved City HUD actions */
 (function(){
-  const labels={messages:'Сообщения',achievements:'Достижения',settings:'Настройки',language:'Язык: English',bonuses:'Бонусы',events:'События',vip:'VIP',forge:'Кузница',tavern:'Таверна',shop:'Магазин'};
+  const labels={messages:'Сообщения',achievements:'Достижения',settings:'Настройки',language:'Язык: English',bonuses:'Бонусы',events:'События',vip:'VIP',forge:'Кузница',tavern:'Таверна',shop:'Магазин',gems:'Алмазы',coins:'Монеты',energy:'Энергия'};
   function refToast(text){
     let t=document.getElementById('refToast');
     if(!t){t=document.createElement('div');t.id='refToast';document.body.appendChild(t);}
