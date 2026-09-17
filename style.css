@@ -64,3 +64,92 @@ button{font:inherit;color:inherit;border:0;cursor:pointer;-webkit-tap-highlight-
 @media(max-height:650px){
   .side.left{top:210px}.side.right{top:330px}.daily{top:125px}.quest{top:105px}.bottom-nav .nav-btn{height:64px}
 }
+
+/* CITY V3 — character layer and touch-friendly mobile layout */
+.city-hero-wrap{
+  position:absolute;
+  z-index:4;
+  left:50%;
+  bottom:calc(108px + var(--safe-bottom));
+  transform:translateX(-50%);
+  width:180px;
+  height:245px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  pointer-events:none;
+}
+.city-hero-ground{
+  position:absolute;
+  bottom:36px;
+  width:118px;
+  height:22px;
+  border-radius:50%;
+  background:rgba(0,0,0,.58);
+  filter:blur(7px);
+}
+.city-hero{
+  position:relative;
+  z-index:2;
+  width:150px;
+  height:210px;
+  object-fit:contain;
+  object-position:center bottom;
+  filter:drop-shadow(0 7px 8px rgba(0,0,0,.65));
+}
+.hero-vip{
+  position:relative;
+  z-index:4;
+  pointer-events:auto;
+  margin-top:-8px;
+  min-width:72px;
+  height:34px;
+  padding:0 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  border:1px solid rgba(255,206,64,.75);
+  border-radius:9px;
+  background:rgba(8,20,31,.72);
+  box-shadow:0 4px 12px rgba(0,0,0,.55),inset 0 0 12px rgba(255,193,36,.12);
+}
+.hero-vip span{font-size:21px;color:#ffd52d;text-shadow:0 0 8px rgba(255,203,48,.55)}
+.hero-vip b{font-size:12px;letter-spacing:.7px;color:#ffe27a}
+
+@media(max-width:560px){
+  .city-hero-wrap{
+    bottom:calc(148px + var(--safe-bottom));
+    width:150px;
+    height:210px;
+  }
+  .city-hero{
+    width:125px;
+    height:175px;
+  }
+  .city-hero-ground{bottom:31px;width:98px;height:18px}
+  .hero-vip{height:30px;min-width:66px;padding:0 10px}
+  .hero-vip span{font-size:18px}
+  .hero-vip b{font-size:11px}
+
+  /* Six main destinations become two compact rows on phone screens. */
+  .bottom-nav{
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(2,1fr);
+    height:132px;
+  }
+  .nav-btn{height:59px}
+  .nav-btn span{font-size:25px;line-height:26px}
+  .nav-btn b{font-size:10px}
+}
+
+@media(max-width:380px){
+  .city-hero-wrap{
+    bottom:calc(144px + var(--safe-bottom));
+    transform:translateX(-50%) scale(.92);
+    transform-origin:bottom center;
+  }
+  .bottom-nav{height:126px}
+  .nav-btn{height:56px}
+}
