@@ -752,3 +752,109 @@ if(jackpotCloseV79)jackpotCloseV79.onclick=gameCloseJackpotPreviewV79;
 const jackpotModalV79=$('#gameJackpotModal');
 if(jackpotModalV79)jackpotModalV79.addEventListener('click',e=>{if(e.target===jackpotModalV79)gameCloseJackpotPreviewV79()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPreviewV79()});
+
+/* Territory City PvE v1 — separate from Arena */
+(function(){
+  const PVE_ZONES=[['head','Голова'],['chest','Грудь'],['waist','Пояс'],['legs','Ноги']];
+  const PVE_NAMES=['Уличный страж','Наёмник Sdolars','Боец квартала','Тяжёлый охранник','Охотник','Капитан стражи','Броненосец','Городской чемпион'];
+  state.cityLevel=Math.max(1,Math.min(240,Number(state.cityLevel??1)||1));
+  state.cityProgress=Math.max(0,Math.min(100,Number(state.cityProgress??0)||0));
+  state.battleStones=Math.max(0,Number(state.battleStones??120)||0);
+  state.cityPveEnemyIndex=Math.max(0,Math.min(7,Number(state.cityPveEnemyIndex??Math.floor(state.cityProgress/12.5))||0));
+  state.cityPveEnemyHp=Math.max(1,Number(state.cityPveEnemyHp||0)||0);
+  state.cityPveBossHp=Math.max(0,Number(state.cityPveBossHp||0)||0);
+  state.cityPveBossTimer=Number(state.cityPveBossTimer||0)||0;
+  state.cityPveActive=false;
+  let pveTimer=null, bossTimer=null, selected='chest', heroMoved=false;
+  const pve=$('#cityPve');
+  if(!pve)return;
+  const entry=$('#cityPveEntry'), close=$('#cityPveClose'), attack=$('#cityPveAttack'), zones=$('#cityPveZones');
+  const status=$('#cityPveStatus'), log=$('#cityPveLog'), enemy=$('#cityPveEnemy'), enemyName=$('#cityPveEnemyName'), enemyHp=$('#cityPveEnemyHp');
+  const progressBar=$('#cityPveProgressBar'), progressText=$('#cityPveProgressText'), stones=$('#cityPveStones'), level=$('#cityPveLevel');
+  const card=$('#cityPveCard'), boss=$('#cityPveBoss'), result=$('#cityPveResult');
+  function citySave(){
+    state.cityLevel=Math.max(1,Math.min(240,Math.floor(Number(state.cityLevel)||1)));
+    state.cityProgress=Math.max(0,Math.min(100,Number(state.cityProgress)||0));
+    state.battleStones=Math.max(0,Math.floor(Number(state.battleStones)||0));
+    try{localStorage.setItem('territory_save_v1',JSON.stringify(state));}catch(e){}
+    render();
+  }
+  function botMaxHp(){return Math.round(75+state.cityLevel*8.5+state.cityPveEnemyIndex*24)}
+  function bossMaxHp(){return Math.round(900+state.cityLevel*95+state.cityLevel*state.cityLevel*1.7)}
+  function bossSeconds(){return Math.max(30,45-Math.floor(state.cityLevel/35))}
+  function playerDamage(){return Math.max(8,Math.round(18+state.level*.22+state.strength*1.5+state.bonusDamage))}
+  function botDamage(){return Math.max(5,Math.round(9+state.cityLevel*.9+state.cityPveEnemyIndex*2))}
+  function setStatus(t){if(status)status.textContent=t}
+  function renderProgress(){
+    const pct=Math.max(0,Math.min(100,state.cityProgress));
+    if(progressBar)progressBar.style.width=pct+'%'; if(progressText)progressText.textContent=Math.round(pct)+'%';
+    if(stones)stones.textContent=state.battleStones; if(level)level.textContent='ГОРОД '+state.cityLevel;
+  }
+  function buildZones(){
+    zones.innerHTML=PVE_ZONES.map(([id,n])=>`<button type="button" data-pve-zone="${id}" class="${selected===id?'sel':''}">${n}</button>`).join('');
+  }
+  function setEnemy(){
+    const hp=state.cityPveEnemyHp>0?state.cityPveEnemyHp:botMaxHp(); state.cityPveEnemyHp=hp;
+    enemyName.textContent=PVE_NAMES[state.cityPveEnemyIndex]||PVE_NAMES[0]; enemyHp.textContent=`${hp} / ${botMaxHp()} HP`;
+    $('#cityPveTarget').textContent=enemyName.textContent; $('#cityPvePhase').textContent='ОБЫЧНЫЙ ПРОТИВНИК';
+    if(enemy)enemy.style.opacity='1';
+  }
+  function openPve(){
+    state.cityPveActive=true; pve.classList.add('show'); pve.setAttribute('aria-hidden','false'); result.hidden=true; boss.hidden=true; card.hidden=false;
+    heroMoved=false; const h=$('#cityPveHero'); h.classList.remove('walk','walk2');
+    renderProgress(); buildZones();
+    if(state.cityProgress>=100){ startBoss(); return; }
+    setEnemy(); attack.disabled=state.battleStones<=0; setStatus('Герой выходит на улицу…');
+    setTimeout(()=>{h.classList.add('walk');setStatus('Двигайся по городу. Каждый удар требует Боевой камень.');heroMoved=true},80);
+  }
+  function closePve(){
+    state.cityPveActive=false; clearInterval(pveTimer);clearInterval(bossTimer); pve.classList.remove('show');pve.setAttribute('aria-hidden','true'); citySave();
+  }
+  function defeatPlayer(){
+    clearInterval(bossTimer); card.hidden=true; boss.hidden=true; result.hidden=false;
+    $('#cityPveResultIcon').textContent='💀'; $('#cityPveResultKicker').textContent='ПОРАЖЕНИЕ'; $('#cityPveResultTitle').textContent='DEFEAT';
+    $('#cityPveResultText').textContent='Город не повышен. Прогресс остаётся 100% — усились и попробуй босса снова.';
+    $('#cityPveResultBtn').textContent='Вернуться к городу'; state.cityProgress=100; citySave();
+  }
+  function startBoss(){
+    clearInterval(bossTimer); state.cityProgress=100; state.cityPveBossHp=state.cityPveBossHp>0?state.cityPveBossHp:bossMaxHp(); state.cityPveBossTimer=state.cityPveBossTimer>0?state.cityPveBossTimer:bossSeconds();
+    card.hidden=true; result.hidden=true; boss.hidden=false; $('#cityPveBossName').textContent='Властелин '+(state.cityLevel===1?'улиц':'квартала'); $('#cityPveBossHp').textContent=`${state.cityPveBossHp.toLocaleString('ru-RU')} HP`; $('#cityPveBossTimer').textContent=state.cityPveBossTimer;
+    setStatus('100% — босс города. Успей победить до окончания таймера.'); citySave();
+    bossTimer=setInterval(()=>{
+      state.cityPveBossTimer--; $('#cityPveBossTimer').textContent=Math.max(0,state.cityPveBossTimer);
+      if(state.cityPveBossTimer<=0){clearInterval(bossTimer); defeatPlayer();}
+    },1000);
+  }
+  function winBoss(){
+    clearInterval(bossTimer); state.cityPveBossHp=0; state.cityPveBossTimer=0;
+    state.coins=(Number(state.coins)||0)+500+state.cityLevel*25; state.gems=(Number(state.gems)||0)+2; state.battleStones=Math.max(0,state.battleStones+8);
+    state.cityLevel=Math.min(240,state.cityLevel+1); state.cityProgress=0; state.cityPveEnemyIndex=0; state.cityPveEnemyHp=0;
+    boss.hidden=true; card.hidden=true; result.hidden=false; $('#cityPveResultIcon').textContent='🏆'; $('#cityPveResultKicker').textContent='ГОРОД ПРОЙДЕН'; $('#cityPveResultTitle').textContent='Победа!'; $('#cityPveResultText').textContent='Награда: монеты, Алмаз и Боевой камень. Следующий город стал сильнее.'; $('#cityPveResultBtn').textContent='Начать следующий город'; citySave();
+  }
+  function bossHit(){
+    if(state.battleStones<=0){attack.disabled=true;setStatus('Боевые камни закончились. Бой остановлен.');return}
+    state.battleStones--; const dmg=Math.max(1,playerDamage()+Math.floor(Math.random()*9)); state.cityPveBossHp=Math.max(0,state.cityPveBossHp-dmg);
+    const blocked=selected==='waist'; const incoming=blocked?Math.floor(botDamage()*.45):botDamage(); state.hp=Math.max(0,state.hp-incoming);
+    $('#cityPveBossHp').textContent=`${state.cityPveBossHp.toLocaleString('ru-RU')} HP`; log.textContent=`Удар в «${PVE_ZONES.find(z=>z[0]===selected)[1]}»: −${dmg} HP боссу. Ответный удар: −${incoming} HP.`; renderProgress(); citySave();
+    if(state.cityPveBossHp<=0){winBoss();return} if(state.hp<=0){defeatPlayer();return} if(state.battleStones<=0){attack.disabled=true;setStatus('Боевые камни закончились. Вернись позже или получи их за задания.');}
+  }
+  function botHit(){
+    if(state.battleStones<=0){attack.disabled=true;setStatus('Боевые камни закончились. Герой остаётся на старте.');return}
+    state.battleStones--; const dmg=Math.max(1,playerDamage()+Math.floor(Math.random()*7)); state.cityPveEnemyHp=Math.max(0,state.cityPveEnemyHp-dmg);
+    const incoming=Math.max(1,Math.floor(botDamage()*(selected==='waist'?.45:1))); state.hp=Math.max(0,state.hp-incoming);
+    enemyHp.textContent=`${state.cityPveEnemyHp} / ${botMaxHp()} HP`; log.textContent=`Удар в «${PVE_ZONES.find(z=>z[0]===selected)[1]}»: −${dmg}. Противник отвечает: −${incoming} HP.`; renderProgress();
+    if(state.hp<=0){attack.disabled=true;setStatus('Герой повержен. Подготовься и продолжи позже.');citySave();return}
+    if(state.cityPveEnemyHp<=0){
+      state.cityPveEnemyIndex++; state.cityProgress=Math.min(100,Math.round(state.cityPveEnemyIndex*12.5)); state.cityPveEnemyHp=0;
+      log.textContent='Противник побеждён. Герой продолжает путь вправо.'; const h=$('#cityPveHero');h.classList.remove('walk');h.classList.add('walk2');
+      renderProgress(); citySave();
+      if(state.cityProgress>=100){setTimeout(startBoss,700)} else {setTimeout(()=>{setEnemy();attack.disabled=state.battleStones<=0;setStatus(`Пройдено ${state.cityProgress}%. Следующий противник впереди.`)},500)}
+    } else {citySave();}
+    if(state.battleStones<=0 && state.cityProgress<100){attack.disabled=true;setStatus('Боевые камни закончились. Герой остановился у начала пути.');}
+  }
+  entry?.addEventListener('click',openPve); close?.addEventListener('click',closePve);
+  zones?.addEventListener('click',e=>{const b=e.target.closest('[data-pve-zone]');if(!b)return;selected=b.dataset.pveZone;buildZones()});
+  attack?.addEventListener('click',()=>{if(!state.cityPveActive)return;if(state.cityProgress>=100)bossHit();else botHit()});
+  $('#cityPveResultBtn')?.addEventListener('click',()=>{result.hidden=true;if(state.cityProgress>=100)startBoss();else{state.cityPveActive=true;card.hidden=false;setEnemy();openPve()}});
+  renderProgress();
+})();

@@ -1,25 +1,20 @@
-# Territory — canonical mobile base
+# Territory — City PvE v1
 
-Canonical mobile frontend base for Territory / Sdolars.
+Мобильная вертикальная версия Territory на базе текущего рабочего проекта.
 
-## Core systems
-- Mobile city scene for Sdolars
-- Profile and persistent player state
-- Districts
-- Equipment Market and Inventory
-- Game board with 27 cells, dice, x10 mode, rewards, tasks and jackpot preview
-- Tactical Arena based on the S98 combat implementation
-- Separate `server.js` backend for Telegram/PvP features; backend integration remains isolated from the client base
+## Что добавлено
+- Отдельный городской PvE-путь, не связанный с Arena.
+- Герой начинает путь и визуально движется вправо.
+- Последовательные обычные противники.
+- Ручная атака по 4 зонам.
+- Каждый удар расходует Боевой камень.
+- Прогресс города 0–100%.
+- На 100% появляется босс с таймером.
+- Победа повышает уровень города и сбрасывает прогресс.
+- Поражение босса не повышает город и оставляет 100% для повторной попытки.
+- При нуле Боевых камней бой останавливается.
+- Состояние сохраняется в localStorage.
+- Arena оставлена отдельной системой.
+- Нижняя навигация: Город / Инвентарь / Экипировка / Задания / Клан.
 
-## Frontend
-- `index.html` — screens and UI
-- `style.css` — main mobile UI
-- `game.css` — Game board styling
-- `app.js` — core client state and systems
-- `arena.css` / `arena.js` — Arena implementation
-
-Develop new systems from this base instead of mixing older versions.
-
-
-## v141
-Seamless City → PvE journey added: the hero advances through the same Sdolars scene before the tactical Arena opens.
+Это первая рабочая PvE-версия цикла; числовой баланс можно отдельно настраивать после теста в Telegram.

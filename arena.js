@@ -102,37 +102,3 @@ document.getElementById('arenaClose')?.addEventListener('click',()=>{
 document.getElementById('arenaModal')?.addEventListener('click',e=>{
   if(e.target.id==='arenaModal') window.closeArenaModal();
 });
-
-/* Separate Fight button: opens Arena without creating a second navigation screen. */
-let pveJourneyBusy=false;
-function startCityPveJourney(){
-  if(pveJourneyBusy)return;
-  pveJourneyBusy=true;
-  const overlay=document.getElementById('pveJourney');
-  const label=document.getElementById('pveJourneyLabel');
-  const foe=document.getElementById('pveJourneyFoe');
-  if(!overlay){ pveJourneyBusy=false; if(typeof window.openBattle==='function') window.openBattle(); return; }
-  if(label) label.textContent='Выход на бой…';
-  if(foe) foe.textContent='⚔️';
-  overlay.classList.remove('show');
-  void overlay.offsetWidth;
-  overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
-  setTimeout(()=>{if(label)label.textContent='Впереди противник…';},900);
-  setTimeout(()=>{if(label)label.textContent='Бой начинается!';},1750);
-  setTimeout(()=>{
-    overlay.classList.remove('show');
-    overlay.setAttribute('aria-hidden','true');
-    pveJourneyBusy=false;
-    if(typeof window.openBattle==='function') window.openBattle();
-  },2350);
-}
-window.startCityPveJourney=startCityPveJourney;
-document.addEventListener('click',e=>{
-  const b=e.target.closest('[data-arena-open]');
-  if(!b)return;
-  e.preventDefault();
-  const home=document.getElementById('home');
-  if(home?.classList.contains('active')){startCityPveJourney();return;}
-  if(typeof window.openBattle==='function') window.openBattle();
-});
