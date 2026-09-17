@@ -48,10 +48,16 @@ window.addEventListener("storage",e=>{
     }
   }catch(err){console.warn("Territory external save ignored",err);}
 });
-/* Territory v7 — Telegram identity
-   The Mini App gets the display profile from Telegram when opened inside Telegram.
-   The fallback avatar remains for users without a Telegram photo (or when testing in a browser).
-   A real server must verify Telegram.WebApp.initData before treating the Telegram ID as trusted auth.
+/* Territory v9 — Telegram player identity
+   The profile is intentionally tied to the Telegram account that opened the Mini App:
+   • photo_url -> real Telegram profile photo
+   • first_name + last_name -> Telegram display name
+   • username -> fallback when the name is unavailable
+   • profile_avatar.png -> final fallback when Telegram has no usable photo
+
+   IMPORTANT: initDataUnsafe is used only for display in this client.
+   For real account authentication and server saves, the backend must validate
+   Telegram.WebApp.initData using the bot token. Never trust the Telegram ID from the client alone.
 */
 function getTelegramUser(){
   try{
@@ -67,29 +73,48 @@ function telegramDisplayName(u){
   const first=String(u.first_name||'').trim();
   const last=String(u.last_name||'').trim();
   const username=String(u.username||'').trim();
-  return [first,last].filter(Boolean).join(' ') || (username?('@'+username):'Territory');
+  const full=[first,last].filter(Boolean).join(' ');
+  return full || (username ? '@'+username : 'Territory');
 }
 function applyTelegramProfile(){
   const u=getTelegramUser();
   const nameEl=$('#profilePlayerName');
   const avatar=$('#profileAvatar');
+
   if(!u){
+    // Outside Telegram: keep the local game name and the safe standard avatar.
+    // We deliberately do not reuse another user's cached Telegram identity.
     if(nameEl) nameEl.textContent=String(state.name||'Territory');
-    if(avatar){avatar.src='profile_avatar.png';avatar.alt='Стандартный аватар';}
+    if(avatar){
+      avatar.src='profile_avatar.png';
+      avatar.alt='Стандартный аватар Territory';
+    }
     return;
   }
+
   const name=telegramDisplayName(u);
-  if(nameEl) nameEl.textContent=name;
-  if(avatar){
-    avatar.src=u.photo_url||'profile_avatar.png';
-    avatar.alt=`Аватар ${name}`;
-    avatar.onerror=()=>{avatar.onerror=null;avatar.src='profile_avatar.png';};
+  const photo=String(u.photo_url||'').trim();
+
+  if(nameEl){
+    nameEl.textContent=name;
+    nameEl.title=name;
   }
-  // Store only display-safe profile data locally for offline/browser continuity.
+  if(avatar){
+    avatar.onerror=()=>{
+      avatar.onerror=null;
+      avatar.src='profile_avatar.png';
+      avatar.alt=`Стандартный аватар — ${name}`;
+    };
+    avatar.src=photo || 'profile_avatar.png';
+    avatar.alt=photo ? `Фото Telegram — ${name}` : `Стандартный аватар — ${name}`;
+  }
+
+  // Keep the Telegram identity attached to this local save for the next server step.
   state.telegramUserId=String(u.id);
   state.telegramUsername=String(u.username||'');
+  state.telegramDisplayName=name;
   state.name=name;
-  state.telegramPhotoUrl=String(u.photo_url||'');
+  state.telegramPhotoUrl=photo;
 }
 
 function render(){
