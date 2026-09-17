@@ -3,7 +3,7 @@
 window.arenaToast=function(text){
  const t=document.getElementById('arenaToast'); if(!t)return; t.textContent=text; t.classList.add('show'); clearTimeout(window._arenaToastTimer); window._arenaToastTimer=setTimeout(()=>t.classList.remove('show'),1500);
 };
-window.closeArenaModal=function(){clearTimeout(window.s98AutoTimer);const m=document.getElementById('arenaModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');}};
+window.closeArenaModal=function(){clearTimeout(window.s98AutoTimer);const m=document.getElementById('arenaModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');} if(typeof window.showScreen==='function') window.showScreen('home');};
 
 (()=>{
  const Z=[['head','Голова'],['chest','Грудь'],['stomach','Живот'],['waist','Пояс'],['legs','Ноги']];

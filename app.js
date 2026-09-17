@@ -93,7 +93,7 @@ if(sellBtn)sellBtn.onclick=()=>{
 function renderInventory(){
  $("#inventoryGrid").innerHTML=state.inventory.map((x,i)=>`<div class="item"><div class="pic">${x}</div><b>Предмет ${i+1}</b><span>Экипировка</span></div>`).join("");
 }
-/* Territory v43 — Game: reference-inspired diamond event board */
+/* Game: reference-inspired diamond event board */
 const GAME_CELLS=[
  {icon:'🏁',value:'СТАРТ',type:'start',label:'НАЧАЛО ПУТЕШЕСТВИЯ'},
  {icon:'💎',value:'20',type:'purple',label:'КРИСТАЛЛЫ'},
@@ -164,7 +164,7 @@ function gameBoardInit(){
  gameSelectCell(state.gamePos);
 }
 function gameGridPosition(i,n){
- // v108: 27 unique points distributed by equal distance along the
+ // 27 unique points distributed by equal distance along the
  // four sides of one fixed diamond. No duplicated corner tiles and no
  // flex/grid sizing can stretch the cells.
  const count=Math.max(1,Number(n)||27);
@@ -419,7 +419,7 @@ const gamePanelList=$("#gamePanelList"); if(gamePanelList)gamePanelList.addEvent
 gameBoardInit();
 gameEventTimer();
 
-/* Territory v54 — Game finished interactions */
+/* Game finished interactions */
 (function finishGameBlock(){
   const track=$('#gameRewardTrack');
   if(track) track.addEventListener('click',e=>{
@@ -450,7 +450,7 @@ render();
 const gameScreen=document.querySelector("#game");
 if(gameScreen) gameScreen.classList.remove("active");
 showScreen("home");
-/* Territory v40 — районы становятся игровыми локациями */
+/* Районы становятся игровыми локациями */
 (function livingDistricts(){
   const screen=document.querySelector('#districts'); if(!screen)return;
   const info=document.querySelector('#districtInfo'), kicker=document.querySelector('#districtKicker'), title=document.querySelector('#districtTitle'), text=document.querySelector('#districtText'), action=document.querySelector('#districtAction'), log=document.querySelector('#districtLog');
@@ -477,7 +477,7 @@ showScreen("home");
 })();
 
 
-/* Territory v78 — real x10 roll: 10 independent throws + 10-reward summary */
+/* Game x10 roll: 10 independent throws + summary */
 function gameEnsureBatchModal(){
   if(document.querySelector('#gameBatchModal')) return;
   const m=document.createElement('div');
@@ -578,7 +578,7 @@ function gameRollUnified(){
 const unifiedRollButton=$('#spinBtn');
 if(unifiedRollButton)unifiedRollButton.onclick=gameRollUnified;
 
-/* Territory v79 — restore/finalize reward preview after x10 update */
+/* Game reward preview */
 const JACKPOT_GROUPS_V79=Array.from({length:47},(_,i)=>{
   const from=i*5+1, to=from+4;
   const patterns=[
