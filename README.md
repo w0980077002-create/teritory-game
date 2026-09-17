@@ -1,17 +1,16 @@
-# Territory — Sdolars
+# Territory — City v1
 
-## Current build
-Territory mobile vertical prototype with the approved Sdolars city composition.
+Стартовый рабочий мобильный экран Sdolars.
 
-### Visual lock
-- Compact top HUD with player, level, coins, diamonds and visible HP bar.
-- Sdolars scene uses the approved premium city artwork and smaller hero composition.
-- Short, icon-first controls for multilingual players.
-- Separate Arena access.
-- City Battle / PvE is separate from Arena.
-- Bottom navigation: City, Inventory, Equipment, Quests, Clan.
+Файлы:
+- index.html — экран города
+- style.css — адаптивная вёрстка под Android/iPhone
+- app.js — клики, окна, ресурсы, таймер ежедневного бонуса
+- assets/city-background.png — утверждённый визуальный фон
 
-### City PvE
-City progression is separate from Arena: manual attacks, Battle Stones, 0–100% progress, boss timer, victory/DEFEAT and persistent progress.
+Открытие:
+1. Распаковать архив.
+2. Открыть index.html в браузере или разместить папку на GitHub Pages.
+3. Для Telegram Web App использовать HTTPS-хостинг (GitHub Pages подходит).
 
-This is a prototype build; balance values remain adjustable.
+Следующий этап: подключить реальные разделы Бой/Арена, Инвентарь, Экипировку и Задания, не ломая структуру главного экрана.
