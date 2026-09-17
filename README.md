@@ -1,20 +1,21 @@
-# Territory — Sdolars Clean Base
+# Territory — canonical mobile base
 
-Единая мобильная база проекта без старых поколений интерфейса.
+Canonical mobile frontend base for Territory / Sdolars.
 
-## Структура
-- `index.html` — экран Города и основные разделы.
-- `style.css` — единый мобильный стиль.
-- `arena.js` / `arena.css` — тактическая Arena.
-- `app.js` — состояние игрока, рынок, районы и локальное сохранение.
-- `VERSION.txt` — версия базы.
+## Core systems
+- Mobile city scene for Sdolars
+- Profile and persistent player state
+- Districts
+- Equipment Market and Inventory
+- Game board with 27 cells, dice, x10 mode, rewards, tasks and jackpot preview
+- Tactical Arena based on the S98 combat implementation
+- Separate `server.js` backend for Telegram/PvP features; backend integration remains isolated from the client base
 
-## Arena
-- 1 × 1, хаотичный и групповой режимы обозначены как сетевой этап до подключения сервера.
-- Локальная тренировка используется для проверки механики.
-- Ровно 4 зоны: Голова, Грудь, Живот, Ноги.
-- За ход выбирается 1 зона атаки и ровно 2 зоны защиты.
+## Frontend
+- `index.html` — screens and UI
+- `style.css` — main mobile UI
+- `game.css` — Game board styling
+- `app.js` — core client state and systems
+- `arena.css` / `arena.js` — Arena implementation
 
-## Запуск
-Открыть `index.html` в браузере или Telegram WebView.
-Состояние игрока хранится локально на устройстве.
+Develop new systems from this base instead of mixing older versions.
