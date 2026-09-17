@@ -57,6 +57,8 @@ function render(){
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
 }
 function showScreen(id){
+ const current=document.querySelector(".screen.active")?.id||"home";
+ if(id==="arena") window.__arenaReturnScreen=current;
  document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));
  if(id==="arena") setTimeout(()=>{ if(window.openBattle) window.openBattle(); },0);

@@ -13,7 +13,7 @@ let stats={wins:0,losses:0,battles:0,history:[]},lobby=null,battle=null,lt=null,
 try{stats={...stats,...JSON.parse(localStorage.getItem('territory_arena_v140')||'{}')}}catch(e){}
 function saveStats(){localStorage.setItem('territory_arena_v140',JSON.stringify(stats))}
 function show(t,h){const m=modal(),b=body();if(!m||!b)return;document.getElementById('arenaModalTitle').textContent=t;b.innerHTML=h;m.classList.add('show');m.setAttribute('aria-hidden','false')}
-function close(){clearInterval(lt);clearInterval(bt);lt=bt=null;lobby=battle=null;const m=modal();if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}}
+function close(){clearInterval(lt);clearInterval(bt);lt=bt=null;lobby=battle=null;const m=modal();if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}if(typeof window.showScreen==='function'){try{window.showScreen(window.__arenaReturnScreen||'home')}catch(e){}}}
 window.closeArenaModal=close;
 window.arenaToast=t=>{const x=document.getElementById('arenaToast');if(!x)return;x.textContent=t;x.classList.add('show');clearTimeout(window.__arenaToast);window.__arenaToast=setTimeout(()=>x.classList.remove('show'),1600)};
 const name=()=>String(st().name||'SSS'),level=()=>Number(st().level||1);

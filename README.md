@@ -26,3 +26,11 @@ Develop new systems from this base instead of mixing older versions.
 - Arena: 1×1, chaotic, group; 3-minute lobby; 4 attack zones; exactly 2 defense zones.
 - Arena close button is bound directly to `#arenaClose`.
 - Arena remains a local/client prototype; network multiplayer is not implemented by this package.
+
+
+## v140 package audit
+- Version references synchronized to v140 in `index.html`.
+- Arena v140 styles included in `arena.css`.
+- Arena close restores the screen that was open before Arena.
+- No casino screen is present in `index.html`; old unused casino selectors are not active.
+- Package is a client/mobile prototype; `server.js` is not required for GitHub Pages/Telegram static hosting.
