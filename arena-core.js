@@ -29,8 +29,21 @@
   const modal=()=>document.getElementById('arenaModal');
   const title=()=>document.getElementById('arenaModalTitle');
   const body=()=>document.getElementById('arenaModalBody');
-  function showModal(t,html){const m=modal();if(!m||!body())return; title().textContent=t;body().innerHTML=html;m.classList.add('show');m.setAttribute('aria-hidden','false');modalOpen=true;}
-  function close(){clearInterval(lobbyTimer);clearInterval(battleTimer);const m=modal();if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}modalOpen=false;lobby=null;battle=null;}
+  function showModal(t,html){const m=modal();if(!m||!body())return; m.style.display=''; title().textContent=t;body().innerHTML=html;m.classList.add('show');m.setAttribute('aria-hidden','false');modalOpen=true;}
+  function close(){
+    clearInterval(lobbyTimer); clearInterval(battleTimer);
+    const m=modal();
+    if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');m.style.display='none';}
+    modalOpen=false; lobby=null; battle=null;
+    // Arena is opened as a modal over the Arena screen. Closing it must return to the fixed City screen.
+    try{
+      if(typeof window.showScreen==='function') window.showScreen('home');
+      document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id==='home'));
+      const home=document.getElementById('home'); if(home) home.style.display='block';
+      const arena=document.getElementById('arena'); if(arena) arena.classList.remove('active');
+      document.querySelectorAll('.bottom-nav [data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen==='home'));
+    }catch(e){console.warn('Arena close navigation',e)}
+  }
   window.closeArenaModal=close;
   window.arenaToast=(text)=>{const t=document.getElementById('arenaToast');if(!t)return;t.textContent=text;t.classList.add('show');clearTimeout(window.__arenaToast);window.__arenaToast=setTimeout(()=>t.classList.remove('show'),1600)};
 

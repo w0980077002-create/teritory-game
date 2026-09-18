@@ -2,7 +2,7 @@
 (function(){
   "use strict";
   const files=[
-    "arena-core.js?v=142",
+    "arena-core.js?v=143",
     "vip.js?v=1",
     "equipment.js?v=1",
     "market.js?v=1",
@@ -16,5 +16,5 @@
   ];
   function loadScript(src){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});}
   function loadCss(href){return new Promise(resolve=>{if([...document.querySelectorAll('link[rel="stylesheet"]')].some(x=>x.href.includes('arena.css')))return resolve();const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.onload=resolve;l.onerror=resolve;document.head.appendChild(l);});}
-  loadCss('arena.css?v=142').then(()=>files.reduce((p,f)=>p.then(()=>loadScript(f)),Promise.resolve())).catch(e=>console.error('Territory G43 load error',e));
+  loadCss('arena.css?v=143').then(()=>files.reduce((p,f)=>p.then(()=>loadScript(f)),Promise.resolve())).catch(e=>console.error('Territory G43 load error',e));
 })();
