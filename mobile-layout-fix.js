@@ -1,11 +1,11 @@
-/* Territory G27 — G26 working layout + remove floating Alex crown */
+/* Territory G28 — G26 base + visual HP correction */
 (function(){
 "use strict";
 
 function addStyle(){
-  if(document.getElementById("territoryG26Style")) return;
+  if(document.getElementById("territoryG28Style")) return;
   var s=document.createElement("style");
-  s.id="territoryG26Style";
+  s.id="territoryG28Style";
   s.textContent=`
     body:has(#home.active){overflow:hidden!important;background:#07111b!important}
     body:has(#home.active) #app{max-width:none!important;width:100%!important;height:100dvh!important;background:#07111b!important}
@@ -27,6 +27,32 @@ function addStyle(){
 
     /* G26: remove the old floating Alex crown on every screen. */
     #territoryAlexButton{display:none!important;pointer-events:none!important;}
+
+
+    /* G28: replace only the baked HP text in the approved city artwork. */
+    #g28-hp-display{
+      position:absolute!important;
+      left:24%!important;
+      top:4.35%!important;
+      width:16%!important;
+      height:3.15%!important;
+      z-index:9005!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      box-sizing:border-box!important;
+      border:0!important;
+      border-radius:0 18px 18px 0!important;
+      background:rgba(3,9,16,.94)!important;
+      color:#fff!important;
+      font-size:clamp(15px,3.25vw,24px)!important;
+      line-height:1!important;
+      font-weight:800!important;
+      font-family:Arial,sans-serif!important;
+      text-shadow:0 1px 2px rgba(0,0,0,.8)!important;
+      pointer-events:none!important;
+      white-space:nowrap!important;
+    }
 
     .territory-g23-hit{
       position:absolute!important;display:block!important;
@@ -84,6 +110,13 @@ function install(){
   var home=document.getElementById("home");
   if(!home || home.dataset.g26==="1") return;
   home.dataset.g26="1";
+  if(!document.getElementById("g28-hp-display")){
+    var hp=document.createElement("div");
+    hp.id="g28-hp-display";
+    hp.textContent="120/120";
+    home.appendChild(hp);
+  }
+
 
   hit("g23-profile",{"data-screen":"profile","aria-label":"Профиль"});
   hit("g23-gems",{"data-action":"gems","aria-label":"Алмазы"});
@@ -125,22 +158,4 @@ else install();
 setTimeout(install,300);
 setTimeout(install,1000);
 setTimeout(install,1800);
-})();
-
-/* Territory G27 — HP baseline fix, based on golden G26 */
-(function(){
-  "use strict";
-  function fixHP(){
-    try{
-      var raw=localStorage.getItem("territory_save_v1");
-      if(!raw)return;
-      var s=JSON.parse(raw);
-      if(!s || typeof s!=="object")return;
-      if(Number(s.hp)===120 && Number(s.maxHp)!==120){
-        s.maxHp=120;
-        localStorage.setItem("territory_save_v1",JSON.stringify(s));
-      }
-    }catch(e){}
-  }
-  fixHP();
 })();
