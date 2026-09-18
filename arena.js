@@ -1,4 +1,4 @@
-/* Territory G33 loader — real Tasks section, G26-safe */
+/* Territory G34 loader — Rewards/Bonuses */
 (function(){
 "use strict";
 function load(src){return new Promise(function(resolve,reject){
@@ -14,5 +14,6 @@ load("arena-core.js?v=140")
 .then(function(){return load("mobile-layout-fix.js?v=29");})
 .then(function(){return load("click-fix.js?v=1");})
 .then(function(){return load("tasks-section.js?v=33");})
-.catch(function(err){console.error("Territory G33 loader:",err);});
+.then(function(){return load("rewards-section.js?v=34");})
+.catch(function(err){console.error("Territory G34 loader:",err);});
 })();
