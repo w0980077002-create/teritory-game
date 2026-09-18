@@ -18,14 +18,14 @@
    return current;
   }catch(e){return {combatStone:20};}
  };
- let st=load();
- const defaults={name:'SSS',level:1,exp:0,maxExp:100,hp:120,maxHp:120,coins:1000,gems:25,energy:100,combatStone:20,strength:5,agility:5,defense:0,endurance:12,weaponMastery:1,freePoints:0,weapon:'Кулаки',bonusDamage:0,inventory:[],equipped:{},equipmentSlots:{weapon:null,helmet:null,armor:null,gloves:null,boots:null},durability:{},pveProgress:0,cityLevel:1,pveWins:0,hunger:100,lang:'ru',dailyClaim:'',vipDays:0};
- st={...defaults,...st,equipped:{...defaults.equipped,...(st.equipped||{})},equipmentSlots:{...defaults.equipmentSlots,...(st.equipmentSlots||{})},durability:{...defaults.durability,...(st.durability||{})}};
+ let st=window.TerritoryStore.state;
+ const defaults=window.TerritoryStore.defaults;
+ Object.assign(st,defaults,st,{equipped:{...defaults.equipped,...(st.equipped||{})},equipmentSlots:{...defaults.equipmentSlots,...(st.equipmentSlots||{})},durability:{...defaults.durability,...(st.durability||{})},quests:Array.isArray(st.quests)?st.quests:[],achievements:Array.isArray(st.achievements)?st.achievements:[],daily:{...defaults.daily,...(st.daily||{})}});
  st.coins=Math.max(0,Number(st.coins)||0);st.gems=Math.max(0,Number(st.gems)||0);st.energy=Math.max(0,Number(st.energy)||0);st.combatStone=Math.max(0,Number(st.combatStone)||0);
  const slotFor=id=>({axe:'weapon',sword:'weapon',helm:'helmet',armor:'armor',gloves:'gloves',boots:'boots'}[id]||'armor');
  Object.keys(st.equipped).forEach(id=>{if(st.equipped[id]&&!st.equipmentSlots[slotFor(id)])st.equipmentSlots[slotFor(id)]=id;});
  Object.values(st.equipmentSlots).forEach(id=>{if(id)st.equipped[id]=true;});
- const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st));localStorage.setItem('territory_save',JSON.stringify(st))}catch(e){}; if(typeof window.render==='function')window.render(); updateHud();};
+ const save=()=>{try{window.TerritoryStore.saveNow('global')}catch(e){}; if(typeof window.render==='function')window.render(); updateHud();};
  function updateHud(){const map={playerName:st.name,level:st.level,coins:st.coins,gems:st.gems,energy:st.energy,combatStone:st.combatStone};Object.entries(map).forEach(([id,v])=>{const e=$('#'+id);if(e)e.textContent=v});}
  function resourcePanel(kind){
   const data={

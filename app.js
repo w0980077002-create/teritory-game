@@ -11,7 +11,7 @@ function gameLoadState(){
     return structuredClone(defaultState);
   }
 }
-let state=gameLoadState();
+let state=window.TerritoryStore.state;
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
 state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.name||"SSS");
 state.gameDice=Math.max(0,Number(state.gameDice??47)||0); state.gameRolls=Math.max(0,Number(state.gameRolls??0)||0); state.gameSteps=Math.max(0,Number(state.gameSteps??0)||0); state.gameEventVersion=Number(state.gameEventVersion??1)||1; state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0); state.gameMilestones=Array.isArray(state.gameMilestones)?[...new Set(state.gameMilestones.map(Number).filter(Number.isFinite))]:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?[...new Set(state.gameTaskClaims.map(String))]:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?[...new Set(state.gamePanelClaims.map(String))]:[]; state.gameJackpotClaims=Array.isArray(state.gameJackpotClaims)?[...new Set(state.gameJackpotClaims.map(Number).filter(Number.isFinite))]:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS; state.gameSaveVersion=2;
@@ -30,7 +30,7 @@ function save(){
   state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
   state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0);
   state.gameSaveVersion=2; state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0);
-  try{ localStorage.setItem("territory_save_v1",JSON.stringify(state)); }catch(e){ console.warn("Territory save failed",e); }
+  try{ window.TerritoryStore.saveNow("app"); }catch(e){ console.warn("Territory save failed",e); }
   render();
 }
 window.addEventListener("pagehide",()=>{try{state.gameMoving=false; save();}catch(e){}});
@@ -40,7 +40,7 @@ window.addEventListener("storage",e=>{
   try{
     const incoming=JSON.parse(e.newValue);
     if(incoming&&typeof incoming==="object"){
-      state={...state,...incoming};
+      Object.assign(state,incoming);
       state.gameSteps=Math.max(0,Number(state.gameSteps)||0);
       state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
       state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
@@ -68,32 +68,7 @@ function showScreen(id){
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b){e.preventDefault();e.stopPropagation();showScreen(b.dataset.screen)}});
 
-/* G49 — City PvE battle: deliberately separate from Arena and Game/Monopoly. */
-(function initPVE(){
- const A=[['head','Голова'],['chest','Грудь'],['stomach','Живот'],['legs','Ноги']];
- let battle={enemyHp:100,maxHp:100,attack:null,defense:[],progress:0,enemy:0,ended:false};
- const enemyData=[['👹','Разбойник у ворот'],['🧟','Городской налётчик'],['⚔️','Страж дороги'],['🐺','Дикий хищник']];
- const $=s=>document.querySelector(s);
- function log(t){const el=$("#pveLog");if(!el)return;const row=document.createElement('div');row.textContent=t;el.appendChild(row);el.scrollTop=el.scrollHeight;}
- function draw(){
-   const pa=$("#pveAttackZones"),pd=$("#pveDefenseZones"),btn=$("#pveAttackBtn"); if(!pa||!pd)return;
-   pa.innerHTML=A.map(z=>`<button class="g49-zone ${battle.attack===z[0]?'sel-a':''}" data-pve-a="${z[0]}">${z[1]}</button>`).join('');
-   pd.innerHTML=A.map(z=>`<button class="g49-zone ${battle.defense.includes(z[0])?'sel-d':''}" data-pve-d="${z[0]}">${z[1]}</button>`).join('');
-   btn.disabled=!!battle.ended||!battle.attack||battle.defense.length!==2;
-   $("#pveEnemyHp").style.width=`${Math.max(0,battle.enemyHp/battle.maxHp*100)}%`; $("#pveHpText").textContent=`${Math.round(battle.enemyHp)} / ${battle.maxHp} HP`;
-   const pt=$("#pveProgress"),tt=$("#pveProgressText"); if(pt)pt.style.width=`${battle.progress}%`; if(tt)tt.textContent=battle.ended?`Путь завершён · прогресс ${battle.progress}%`:`Обычный противник · прогресс ${battle.progress}%`;
- }
- function resetEnemy(){const e=enemyData[battle.enemy%enemyData.length];$("#pveEnemyArt").textContent=e[0];$("#pveEnemyName").textContent=e[1];battle.enemyHp=100;battle.maxHp=100;battle.attack=null;battle.defense=[];battle.ended=false;draw();}
- function hit(){if(battle.ended||!battle.attack||battle.defense.length!==2)return;
-   const dmg=10+Math.floor(Math.random()*9)+(battle.attack==='head'?3:0);battle.enemyHp=Math.max(0,battle.enemyHp-dmg);log(`⚔️ Ты атаковал «${A.find(x=>x[0]===battle.attack)[1]}»: −${dmg} HP.`);
-   const enemyAttack=A[Math.floor(Math.random()*A.length)][0];
-   if(battle.enemyHp<=0){battle.progress=Math.min(100,battle.progress+25);log('🏆 Противник побеждён. Путь продолжается вправо.');battle.enemy++; if(battle.progress>=100){battle.ended=true;$("#pveEnemyName").textContent='Босс Sdolars';$("#pveEnemyDesc").textContent='Следующая цель — городской босс';log('👑 Достигнут 100%. Появился БОСС.');} else resetEnemy(); draw(); return;}
-   if(battle.defense.includes(enemyAttack)){log(`🛡️ Ты заблокировал атаку в «${A.find(x=>x[0]===enemyAttack)[1]}».`);} else {log(`💥 Противник атаковал «${A.find(x=>x[0]===enemyAttack)[1]}»: −${6+Math.floor(Math.random()*7)} HP.`);}
-   battle.attack=null;battle.defense=[];draw();
- }
- window.pveInit=()=>{if(!$("#pveAttackZones"))return;if(!battle.started){battle.started=true;draw()}};
- document.addEventListener('click',e=>{const a=e.target.closest('[data-pve-a]');if(a){battle.attack=a.dataset.pveA;draw();return}const d=e.target.closest('[data-pve-d]');if(d){const z=d.dataset.pveD;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);draw();return}if(e.target.closest('#pveAttackBtn'))hit()});
-})();
+/* G59: legacy G49 PvE engine removed. Canonical PvE lives in Territory_G56_GLOBAL.js. */
 function renderShop(){
  const day=Math.floor(Date.now()/86400000);
  if(state.marketDay!==day){ state.marketDay=day; }
