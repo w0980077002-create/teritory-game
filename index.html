@@ -224,6 +224,7 @@ body:has(#home.active) #home > .g40-ui-hit,
 body:has(#home.active) #home > .hotspot,
 body:has(#home.active) #home > .npc-label{pointer-events:none!important;display:none!important}
 </style>
+<style id="territory-g60-disable-legacy-pve">#pve{display:none!important}</style>
 </head>
 <body>
 <div id="app">
@@ -246,7 +247,7 @@ body:has(#home.active) #home > .npc-label{pointer-events:none!important;display:
   <div class="real-home">
     <img src="sdolars_clean_scene.png" alt="Sdolars" class="real-home-image">
     <div class="g59-city-hit-layer" aria-label="Интерактивный город">
-      <button type="button" data-g59="profile" aria-label="Профиль игрока"></button>
+      <button type="button" data-g59="profile" data-ui="profile" aria-label="Профиль игрока"></button>
       <button type="button" data-g59="gems" data-ui="gems" aria-label="Алмазы"></button>
       <button type="button" data-g59="coins" data-ui="coins" aria-label="Монеты"></button>
       <button type="button" data-g59="energy" data-ui="energy" aria-label="Энергия"></button>
@@ -265,8 +266,8 @@ body:has(#home.active) #home > .npc-label{pointer-events:none!important;display:
       <button type="button" data-g59="tavern" data-ui="tavern" aria-label="Таверна"></button>
       <button type="button" data-g59="market" data-screen="market" aria-label="Магазин"></button>
       <button type="button" data-g59="alex" aria-label="Alex"></button>
-      <button type="button" data-g59="battle" aria-label="Бой"></button>
-      <button type="button" data-g59="arena" aria-label="Арена"></button>
+      <button type="button" data-g59="battle" data-screen="pve" aria-label="Бой"></button>
+      <button type="button" data-g59="arena" data-screen="arena" aria-label="Арена"></button>
       <button type="button" data-g59="inventory" data-screen="inventory" aria-label="Инвентарь"></button>
       <button type="button" data-g59="equipment" data-screen="inventory" aria-label="Экипировка"></button>
       <button type="button" data-g59="quests" data-screen="districts" aria-label="Задания"></button>
@@ -483,9 +484,9 @@ body:has(#home.active) #home > .npc-label{pointer-events:none!important;display:
     <button data-screen="market">🛒<span>Магазин</span></button>
   </nav>
 </div>
-<script src="app.js?v=400"></script>
-<script src="arena.js?v=460"></script>
-<script src="Territory_G56_GLOBAL.js?v=560"></script>
+<script src="app.js?v=600"></script>
+<script src="arena.js?v=600"></script>
+<script src="Territory_G56_GLOBAL.js?v=600"></script>
 
 <script id="territory-g59-city-router">
 (function(){
@@ -512,8 +513,8 @@ body:has(#home.active) #home > .npc-label{pointer-events:none!important;display:
       if(a==='market'){synthetic({'data-screen':'market'});return;}
       if(a==='inventory'||a==='equipment'){synthetic({'data-screen':'inventory'});return;}
       if(a==='game'){synthetic({'data-screen':'game'});return;}
-      if(a==='arena'){if(typeof window.openArena==='function')window.openArena();return;}
-      if(a==='battle'){if(typeof window.pveOpen==='function')window.pveOpen();return;}
+      if(a==='arena'){if(typeof window.openArena==='function')window.openArena();else synthetic({'data-screen':'arena'});return;}
+      if(a==='battle'){if(typeof window.pveOpen==='function')window.pveOpen();else synthetic({'data-screen':'pve'});return;}
       if(a==='quests'||a==='map'){synthetic({'data-screen':'districts'});return;}
     },true);
   }
