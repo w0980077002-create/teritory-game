@@ -19,3 +19,6 @@ Canonical mobile frontend base for Territory / Sdolars.
 - `arena.css` / `arena.js` — Arena implementation
 
 Develop new systems from this base instead of mixing older versions.
+
+
+G40 TRUE FIX: restored the complete embedded Sdolars artwork as the sole visual source on the City screen. The legacy HTML HUD/side labels are hidden on City; invisible touch hotspots remain active.

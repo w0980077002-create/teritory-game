@@ -154,6 +154,22 @@ body:has(#home.active) .hs-bottom-map6{height:60px!important}
 #g40-map{left:81%;top:80%;width:19%;height:10%}
 @media(max-width:760px){#home .real-home-image{object-fit:contain!important}}
 </style>
+<style id="territory-g40-home-clean-lock">
+/* G40 TRUE visual lock: the supplied Sdolars artwork already contains the complete HUD and side/bottom UI.
+   Do not stack the old HTML HUD on top of the artwork. Keep only invisible touch hotspots. */
+body:has(#home.active) .hud{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;}
+body:has(#home.active) #app{display:block!important;}
+body:has(#home.active) #app>main{position:absolute!important;inset:0!important;height:100%!important;min-height:0!important;}
+body:has(#home.active) #home.home-real{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;padding:0!important;}
+body:has(#home.active) #home .real-home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;}
+body:has(#home.active) #home .real-home-image{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:auto!important;min-height:0!important;object-fit:contain!important;object-position:top center!important;}
+body:has(#home.active) #home .live-city-title,
+body:has(#home.active) #home .live-city-time,
+body:has(#home.active) #home .alex-quest-badge,
+body:has(#home.active) #home .live-side-ui,
+body:has(#home.active) #home .npc-label,
+body:has(#home.active) #home .living-scene{display:none!important;}
+</style>
 </head>
 <body>
 <div id="app">
