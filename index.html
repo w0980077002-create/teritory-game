@@ -220,6 +220,35 @@ body:has(#home.active) #home .city-hit-layer button{
 .city-action-modal{position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.62)}
 .city-action-modal.show{display:flex}.city-action-card{width:min(92vw,390px);max-height:80vh;overflow:auto;padding:18px;border:1px solid #506273;border-radius:18px;background:#101b26;box-shadow:0 18px 50px rgba(0,0,0,.5);color:#eef3f7}.city-action-card h3{margin:0 0 8px;font-size:19px}.city-action-card p{color:#b9c5cf;line-height:1.45}.city-action-card .city-close{margin-top:12px;width:100%;padding:12px;border:1px solid #506273;border-radius:12px;background:#182735;color:#fff;font-weight:700}
 </style>
+
+<style id="territory-g58-real-hitmap">
+body:has(#home.active) #home .city-hit-layer{position:absolute!important;inset:0!important;z-index:99999!important;display:block!important;pointer-events:none!important}
+body:has(#home.active) #home .city-hit-layer .city-hit{position:absolute!important;display:block!important;box-sizing:border-box!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;opacity:0!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important}
+#home .city-hit[data-action="profile"]{left:1%;top:0%;width:15%;height:9%}
+#home .city-hit[data-action="gems"]{left:39%;top:.5%;width:16%;height:5.5%}
+#home .city-hit[data-action="coins"]{left:57%;top:.5%;width:17%;height:5.5%}
+#home .city-hit[data-action="energy"]{left:76%;top:.5%;width:23%;height:5.5%}
+#home .city-hit[data-action="combatStone"]{left:39%;top:5%;width:17%;height:5.5%}
+#home .city-hit[data-action="messages"]{left:56%;top:5%;width:10.5%;height:5.5%}
+#home .city-hit[data-action="achievements"]{left:66%;top:5%;width:11%;height:5.5%}
+#home .city-hit[data-action="settings"]{left:77%;top:5%;width:11%;height:5.5%}
+#home .city-hit[data-action="language"]{left:87%;top:5%;width:12%;height:5.5%}
+#home .city-hit[data-action="task"]{left:2%;top:9%;width:38%;height:9%}
+#home .city-hit[data-action="bonuses"]{left:0%;top:17%;width:13%;height:7.5%}
+#home .city-hit[data-action="events"]{left:0%;top:24%;width:13%;height:7.5%}
+#home .city-hit[data-action="vip"]{left:0%;top:31%;width:13%;height:7.5%}
+#home .city-hit[data-action="game"]{left:0%;top:38%;width:13%;height:8.5%}
+#home .city-hit[data-action="forge"]{right:0%;top:24%;width:14%;height:8%}
+#home .city-hit[data-action="tavern"]{right:0%;top:32%;width:14%;height:8%}
+#home .city-hit[data-action="market"]{right:0%;top:40%;width:14%;height:8%}
+#home .city-hit[data-action="alex"]{left:2%;top:38%;width:46%;height:47%}
+#home .city-hit[data-action="battle"]{left:0%;top:83%;width:16.67%;height:11%}
+#home .city-hit[data-action="arena"]{left:16.67%;top:83%;width:16.67%;height:11%}
+#home .city-hit[data-action="inventory"]{left:33.34%;top:83%;width:16.67%;height:11%}
+#home .city-hit[data-action="equipment"]{left:50.01%;top:83%;width:16.67%;height:11%}
+#home .city-hit[data-action="quests"]{left:66.68%;top:83%;width:16.67%;height:11%}
+#home .city-hit[data-action="map"]{left:83.35%;top:83%;width:16.65%;height:11%}
+</style>
 </head>
 <body>
 <div id="app">
@@ -241,6 +270,32 @@ body:has(#home.active) #home .city-hit-layer button{
     <section id="home" class="screen active home-real">
   <div class="real-home">
     <img src="sdolars_clean_scene.png" alt="Sdolars" class="real-home-image">
+    <div class="city-hit-layer" aria-label="Интерактивные зоны города">
+      <button type="button" class="city-hit" data-action="profile" aria-label="Профиль игрока"></button>
+      <button type="button" class="city-hit" data-action="gems" aria-label="Алмазы"></button>
+      <button type="button" class="city-hit" data-action="coins" aria-label="Монеты"></button>
+      <button type="button" class="city-hit" data-action="energy" aria-label="Энергия"></button>
+      <button type="button" class="city-hit" data-action="combatStone" aria-label="Боевые камни"></button>
+      <button type="button" class="city-hit" data-action="messages" aria-label="Сообщения"></button>
+      <button type="button" class="city-hit" data-action="achievements" aria-label="Достижения"></button>
+      <button type="button" class="city-hit" data-action="settings" aria-label="Настройки"></button>
+      <button type="button" class="city-hit" data-action="language" aria-label="Язык"></button>
+      <button type="button" class="city-hit" data-action="bonuses" aria-label="Бонусы"></button>
+      <button type="button" class="city-hit" data-action="events" aria-label="События"></button>
+      <button type="button" class="city-hit" data-action="vip" aria-label="VIP"></button>
+      <button type="button" class="city-hit" data-action="game" aria-label="Game"></button>
+      <button type="button" class="city-hit" data-action="task" aria-label="Текущее задание"></button>
+      <button type="button" class="city-hit" data-action="forge" aria-label="Кузница"></button>
+      <button type="button" class="city-hit" data-action="tavern" aria-label="Таверна"></button>
+      <button type="button" class="city-hit" data-action="market" aria-label="Магазин"></button>
+      <button type="button" class="city-hit" data-action="alex" aria-label="Alex"></button>
+      <button type="button" class="city-hit" data-action="battle" aria-label="Бой"></button>
+      <button type="button" class="city-hit" data-action="arena" aria-label="Арена"></button>
+      <button type="button" class="city-hit" data-action="inventory" aria-label="Инвентарь"></button>
+      <button type="button" class="city-hit" data-action="equipment" aria-label="Экипировка"></button>
+      <button type="button" class="city-hit" data-action="quests" aria-label="Задания"></button>
+      <button type="button" class="city-hit" data-action="map" aria-label="Карта"></button>
+    </div>
     <button id="g40-battle" class="g40-hit" data-screen="pve" aria-label="Бой"></button>
     <button id="g40-arena" class="g40-hit" data-screen="arena" aria-label="Арена"></button>
     <button id="g40-inventory" class="g40-hit" data-screen="inventory" aria-label="Инвентарь"></button>
@@ -494,14 +549,20 @@ body:has(#home.active) #home .city-hit-layer button{
     layer.addEventListener('click',e=>{
       const b=e.target.closest('button');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
       if(b.classList.contains('alex-hit')){ if(typeof window.TerritoryAlexTalk==='function')window.TerritoryAlexTalk(); else {const g=home.querySelector('.guard-label');g?.click();} return; }
-      const ui=b.dataset.ui, id=b.dataset.screen;
-      if(ui==='profile'){openInventory('profile');return;}
-      if(ui){openInfo(ui);return;}
-      if(id==='inventory'){openInventory(b.id==='g40-equipment'||b.dataset.open==='forge'?'equipment':'inventory');return;}
-      if(id==='arena'){go('arena'); if(typeof window.openArena==='function')setTimeout(()=>window.openArena(),0);return;}
-      if(id==='pve'){go('pve'); if(typeof window.pveInit==='function')setTimeout(()=>window.pveInit(),0);return;}
-      if(id==='quests'){go('quests');return;}
-      if(id==='game'||id==='market'||id==='districts'||id==='home'){go(id);return;}
+      const a=b.dataset.action;
+      if(a==='alex'){if(typeof window.TerritoryAlexTalk==='function'){window.TerritoryAlexTalk();}return;}
+      if(a==='profile'){home.querySelector('.g40-ui-hit[data-ui="profile"]')?.click();return;}
+      if(a==='gems'||a==='coins'||a==='energy'||a==='combatStone'||a==='messages'||a==='achievements'||a==='settings'||a==='language'||a==='bonuses'||a==='events'||a==='vip'||a==='tavern'){home.querySelector('.g40-ui-hit[data-ui="'+a+'"]')?.click();return;}
+      if(a==='forge'){home.querySelector('.city-forge-hit')?.click();return;}
+      if(a==='market'){home.querySelector('.city-market-hit')?.click();return;}
+      if(a==='game'){home.querySelector('.g40-ui-hit[data-screen="game"]')?.click();return;}
+      if(a==='task'){home.querySelector('.city-forge-hit')?.click();return;}
+      if(a==='battle'){go('pve');if(typeof window.pveOpen==='function')window.pveOpen();return;}
+      if(a==='arena'){go('arena');if(typeof window.openArena==='function')setTimeout(()=>window.openArena(),0);return;}
+      if(a==='inventory'){home.querySelector('#g40-inventory')?.click();return;}
+      if(a==='equipment'){home.querySelector('#g40-equipment')?.click();return;}
+      if(a==='quests'){go('quests');return;}
+      if(a==='map'){go('districts');return;}
     },true);
     // Map the visible bottom/side labels to their literal destinations.
     const q=document.getElementById('g40-quests'); if(q)q.dataset.screen='quests';
