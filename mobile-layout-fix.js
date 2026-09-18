@@ -1,4 +1,4 @@
-/* Territory G26 — G26 working layout + remove floating Alex crown */
+/* Territory G27 — G26 working layout + remove floating Alex crown */
 (function(){
 "use strict";
 
@@ -125,4 +125,22 @@ else install();
 setTimeout(install,300);
 setTimeout(install,1000);
 setTimeout(install,1800);
+})();
+
+/* Territory G27 — HP baseline fix, based on golden G26 */
+(function(){
+  "use strict";
+  function fixHP(){
+    try{
+      var raw=localStorage.getItem("territory_save_v1");
+      if(!raw)return;
+      var s=JSON.parse(raw);
+      if(!s || typeof s!=="object")return;
+      if(Number(s.hp)===120 && Number(s.maxHp)!==120){
+        s.maxHp=120;
+        localStorage.setItem("territory_save_v1",JSON.stringify(s));
+      }
+    }catch(e){}
+  }
+  fixHP();
 })();
