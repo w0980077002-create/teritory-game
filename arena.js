@@ -1,3 +1,6 @@
+/* Territory G49 — Arena combat controls: manual mode + small Autoboy switch.
+   PvE remains completely separate and is not modified here.
+   Based on the verified G48 Arena. */
 /* Territory G46 — Arena integrated combat pass based on verified G48.
    Mechanics preserved; mobile/target-state reliability tightened.
    The old S98 opponent-picker remains removed.
@@ -115,7 +118,7 @@
     const combatants=lobby.players.map((p,i)=>({...p,team:p.team||(lobby.mode==='duel'?(i===0?1:2):p.team),id:`${p.name}-${i}`,maxHp:120+Math.max(0,(Number(p.level)||1)-1)*5,hp:120+Math.max(0,(Number(p.level)||1)-1)*5,defeated:false}));
     const cs=combatStats();
     const playerMax=Number(getState().maxHp||120);
-    battle={mode:lobby.mode,team:myTeam,round:1,playerHp:Number(getState().hp||playerMax),maxHp:playerMax,enemyHp:120,maxEnemyHp:120,attack:null,defense:[],targetName:null,combatants,log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
+    battle={mode:lobby.mode,team:myTeam,round:1,playerHp:Number(getState().hp||playerMax),maxHp:playerMax,enemyHp:120,maxEnemyHp:120,attack:null,defense:[],targetName:null,autoBattle:false,autoTimer:null,combatants,log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
     if(lobby.mode==='duel') battle.targetName=combatants.find(p=>p.team!==myTeam)?.name||'Противник';
     else battle.targetName=combatants.find(p=>p.team&&p.team!==myTeam)?.name||null;
     renderBattle();
@@ -137,12 +140,13 @@
       <section class="arena140-combat-top"><span>Раунд <b>${battle.round}</b></span><span>⏱️ <b>${mm}:${ss}</b></span><span>🎯 ${target?esc(target.name):'цель не выбрана'}</span></section>
       <section class="arena140-team-strip"><span>Твоя сторона: <b>Команда ${battle.team}</b></span><span>⚔️ ${aliveTeam(battle.team).length} живы · противник ${aliveTeam(battle.team===1?2:1).length}</span></section>
       ${(battle.mode==='group'||battle.mode==='chaos')?`<section class="arena140-rosters"><div class="arena140-roster-title"><b>Отряды</b><small>Выбери цель</small></div><div class="arena140-roster-grid"><div><span class="roster-label team1-label">⚔️ Команда 1</span>${(battle.combatants||[]).filter(p=>p.team===1).map(p=>`<button class="arena140-target ${battle.targetName===p.name?'selected':''} ${p.defeated?'defeated':''}" data-target-name="${esc(p.name)}" ${p.defeated||p.team===battle.team?'disabled':''}>${p.bot?'⚔️':'🧔'} ${esc(p.name)}<small>${p.defeated?'💀 повержен':'HP '+Math.max(0,Math.round(p.hp))+' / '+p.maxHp+' · ур. '+p.level}</small></button>`).join('')||'<span class="arena140-empty">нет игроков</span>'}</div><div><span class="roster-label team2-label">🛡️ Команда 2</span>${(battle.combatants||[]).filter(p=>p.team===2).map(p=>`<button class="arena140-target ${battle.targetName===p.name?'selected':''} ${p.defeated?'defeated':''}" data-target-name="${esc(p.name)}" ${p.defeated||p.team===battle.team?'disabled':''}>${p.bot?'⚔️':'🧔'} ${esc(p.name)}<small>${p.defeated?'💀 повержен':'HP '+Math.max(0,Math.round(p.hp))+' / '+p.maxHp+' · ур. '+p.level}</small></button>`).join('')||'<span class="arena140-empty">нет игроков</span>'}</div></div></section>`:''}
-      <section class="arena140-select"><div class="arena140-step"><b>1. Атака</b><small>Выбери одну из 4 зон</small></div><div class="arena140-zones">${attacks}</div><div class="arena140-step"><b>2. Защита</b><small>Выбери до двух из 4 зон</small></div><div class="arena140-zones">${defs}</div><button class="arena140-hit" data-hit ${battle.attack&&battle.defense.length===2?'':'disabled'}>⚔️ ПОДТВЕРДИТЬ ХОД</button></section>
+      <section class="arena140-select"><div class="arena140-step"><b>1. Атака</b><small>Выбери одну из 4 зон</small></div><div class="arena140-zones">${attacks}</div><div class="arena140-step"><b>2. Защита</b><small>Выбери две из 4 зон</small></div><div class="arena140-zones">${defs}</div><div class="arena140-auto"><label><input type="checkbox" data-autobattle ${battle.autoBattle?'checked':''}> <span>Автобой</span></label><small>${battle.autoBattle?'Действия выбираются автоматически':'Ручной бой'}</small></div><button class="arena140-hit" data-hit ${battle.autoBattle?'disabled':(battle.attack&&battle.defense.length===2?'':'disabled')}>⚔️ ПОДТВЕРДИТЬ ХОД</button></section>
       <section class="arena140-log"><div class="arena140-log-head"><b>Боевой журнал</b><button data-collapse>Свернуть</button></div><div class="arena140-log-body">${logs}</div></section>
       <section class="arena140-finish"><button data-finish>Завершить бой</button><button data-extend>Продлить +5 мин</button></section>
     </div>`);
-    body().querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{battle.attack=b.dataset.a;renderBattle()});
-    body().querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const z=b.dataset.d;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);else window.arenaToast('Можно закрыть только 2 зоны');renderBattle()});
+    body().querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{if(battle?.autoBattle)return;battle.attack=b.dataset.a;renderBattle()});
+    body().querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{if(battle?.autoBattle)return;const z=b.dataset.d;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);else window.arenaToast('Можно закрыть только 2 зоны');renderBattle()});
+    body().querySelector('[data-autobattle]')?.addEventListener('change',e=>{if(!battle)return;battle.autoBattle=!!e.target.checked;battle.attack=null;battle.defense=[];if(battle.autoBattle){window.arenaToast('Автобой включён');autoRound()}else{clearTimeout(battle.autoTimer);battle.autoTimer=null;window.arenaToast('Ручной бой включён');renderBattle()}});
     body().querySelectorAll('[data-target-name]').forEach(b=>b.onclick=()=>{if(!battle||b.disabled)return;const p=(battle.combatants||[]).find(x=>x.name===b.dataset.targetName&&!x.defeated&&x.team!==battle.team);if(!p){window.arenaToast('Цель недоступна');return}battle.targetName=p.name;renderBattle()});
     body().querySelector('[data-hit]')?.addEventListener('click',resolveTurn);
     body().querySelector('[data-finish]')?.addEventListener('click',()=>finishBattle('Игрок завершил бой'));
@@ -165,6 +169,21 @@
     battle.log.push(`💥 ${actor.name} атакует тебя: −${dmg} HP.`);
     const me=(battle.combatants||[]).find(p=>p.name===name() && p.team===battle.team);
     if(me) me.hp=battle.playerHp;
+  }
+
+  function autoRound(){
+    if(!battle||battle.ended||!battle.autoBattle)return;
+    clearTimeout(battle.autoTimer);
+    if((battle.mode==='group'||battle.mode==='chaos') && !battle.targetName){
+      const foes=aliveTeam(battle.team===1?2:1);
+      const target=foes[Math.floor(Math.random()*foes.length)];
+      if(target)battle.targetName=target.name;
+    }
+    battle.attack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)][0];
+    const shuffled=DEF_ZONES.map(z=>z[0]).sort(()=>Math.random()-0.5);
+    battle.defense=shuffled.slice(0,2);
+    battle.autoTimer=setTimeout(()=>{if(battle?.autoBattle)resolveTurn()},700);
+    renderBattle();
   }
 
   function resolveTurn(){
@@ -203,10 +222,11 @@
     if(battle.playerHp<=0){renderBattle();setTimeout(()=>finishBattle('Поражение'),350);return}
     if((battle.combatants||[]).some(p=>p.name===name()&&p.hp<=0)){renderBattle();setTimeout(()=>finishBattle('Поражение'),350);return}
     renderBattle();
+    if(battle.autoBattle)autoRound();
   }
   function finishBattle(result){
     if(!battle||battle.ended)return;
-    battle.ended=true;clearInterval(battleTimer);
+    battle.ended=true;clearInterval(battleTimer);clearTimeout(battle.autoTimer);
     const win=result==='Победа';stats.battles++;if(win)stats.wins++;else if(result==='Поражение')stats.losses++;
     stats.history.push({mode:MODE.find(x=>x.id===battle.mode)?.title||'Бой',win,result,at:Date.now()});stats.history=stats.history.slice(-20);
     localStorage.setItem('territory_arena_g45',JSON.stringify(stats));
