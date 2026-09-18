@@ -1,12 +1,9 @@
-/* Territory G22 loader */
+/* Territory G23 loader */
 (function(){
 "use strict";
 function load(src){return new Promise(function(resolve,reject){
-  var s=document.createElement("script");
-  s.src=src;
-  s.onload=resolve;
-  s.onerror=reject;
-  document.head.appendChild(s);
+ var s=document.createElement("script");s.src=src;s.onload=resolve;s.onerror=reject;
+ document.head.appendChild(s);
 });}
 load("arena-core.js?v=140")
 .then(function(){return load("vip.js?v=1");})
@@ -14,7 +11,7 @@ load("arena-core.js?v=140")
 .then(function(){return load("market.js?v=1");})
 .then(function(){return load("districts.js?v=1");})
 .then(function(){return load("duke-alex.js?v=4");})
-.then(function(){return load("mobile-layout-fix.js?v=22");})
+.then(function(){return load("mobile-layout-fix.js?v=23");})
 .then(function(){return load("click-fix.js?v=1");})
-.catch(function(err){console.error("Territory G22 loader:",err);});
+.catch(function(err){console.error("Territory G23 loader:",err);});
 })();
