@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#10131a">
-<title>Territory — Sdolars · LIVE G45</title>
+<title>Territory — Sdolars · G60</title>
 <link rel="stylesheet" href="style.css?v=400">
 <link rel="stylesheet" href="game.css?v=400">
 <link rel="stylesheet" href="arena.css?v=139">
@@ -409,8 +409,10 @@ body:has(#home.active) .real-home .g40-ui-hit{inset:auto!important;}
     <button data-screen="market">🛒<span>Магазин</span></button>
   </nav>
 </div>
-<script src="app.js?v=400"></script>
-<script src="arena.js?v=460"></script>
-<script src="Territory_G58_GLOBAL.js?v=580"></script>
+
+<!-- Territory G60: runtime scripts load after the DOM so City controls initialize correctly. -->
+<script src="app.js?v=600"></script>
+<script src="arena.js?v=600"></script>
+<script src="Territory_G58_GLOBAL.js?v=600"></script>
 </body>
 </html>
