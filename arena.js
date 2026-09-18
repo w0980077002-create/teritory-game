@@ -1,4 +1,4 @@
-/* Territory G29 loader */
+/* Territory G30 loader — G26 base + quests */
 (function(){
 "use strict";
 function load(src){return new Promise(function(resolve,reject){
@@ -13,5 +13,6 @@ load("arena-core.js?v=140")
 .then(function(){return load("duke-alex.js?v=4");})
 .then(function(){return load("mobile-layout-fix.js?v=29");})
 .then(function(){return load("click-fix.js?v=1");})
-.catch(function(err){console.error("Territory G29 loader:",err);});
+.then(function(){return load("quests.js?v=30");})
+.catch(function(err){console.error("Territory G30 loader:",err);});
 })();
