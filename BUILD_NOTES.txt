@@ -1,0 +1,11 @@
+G50 BUILD NOTES
+
+Base: Territory G49
+Next version: G50
+
+Changes:
+1. Preserved all G49 active files and behavior.
+2. Added development-core.js from the discovered G40 foundation.
+3. Added app event bridge for territory:characterChanged so Character Core updates are reflected in the live app.
+4. Added legacy/G40/arena-loader.js only for historical preservation; it is not loaded.
+5. Cache version: v150.

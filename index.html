@@ -110,6 +110,16 @@ body:has(#home.active) .hs-bottom-map6{display:block!important;position:absolute
 .hs-bottom-equipment6{left:50%;width:16.6667%}
 .hs-bottom-quests6{left:66.6667%;width:16.6667%}
 .hs-bottom-map6{left:83.3334%;width:16.6667%}
+/* G48 FIX: the City uses the six-button artwork hit areas; hide the separate global nav on City. */
+body:has(#home.active) .bottom-nav{display:none!important}
+/* G48 FIX: City hit areas must win over all legacy layers. */
+body:has(#home.active) .hs-bottom-battle,
+body:has(#home.active) .hs-bottom-arena6,
+body:has(#home.active) .hs-bottom-inventory6,
+body:has(#home.active) .hs-bottom-equipment6,
+body:has(#home.active) .hs-bottom-quests6,
+body:has(#home.active) .hs-bottom-map6{z-index:999!important;pointer-events:auto!important}
+
 body:has(#home.active) .hs-bottom-battle,
 body:has(#home.active) .hs-bottom-arena6,
 body:has(#home.active) .hs-bottom-inventory6,
@@ -171,7 +181,7 @@ body:has(#home.active) .hs-bottom-map6{height:60px!important}
     <button class="hotspot hs-bottom-districts" data-screen="districts" aria-label="Районы"></button>
     <button class="hotspot hs-bottom-profile" data-screen="inventory" aria-label="Профиль"></button>
     <button class="hotspot hs-bottom-shop" data-screen="market" aria-label="Магазин"></button>
-    <button class="hotspot hs-bottom-battle" data-screen="pve" aria-label="Бой"></button>
+    <button type="button" class="hotspot hs-bottom-battle" data-screen="pve" aria-label="Бой"></button>
     <button class="hotspot hs-bottom-arena6" data-screen="arena" aria-label="Арена"></button>
     <button class="hotspot hs-bottom-inventory6" data-screen="inventory" aria-label="Инвентарь"></button>
     <button class="hotspot hs-bottom-equipment6" data-screen="inventory" aria-label="Экипировка"></button>
@@ -334,7 +344,8 @@ body:has(#home.active) .hs-bottom-map6{height:60px!important}
     <button data-screen="market">🛒<span>Магазин</span></button>
   </nav>
 </div>
-<script src="app.js?v=149"></script>
-<script src="arena.js?v=149"></script>
+<script src="app.js?v=150"></script>
+<script src="arena.js?v=150"></script>
+<script src="development-core.js?v=1"></script>
 </body>
 </html>
