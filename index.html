@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#10131a">
-<title>Territory — Sdolars · G60</title>
+<title>Territory — Sdolars · LIVE G45</title>
 <link rel="stylesheet" href="style.css?v=400">
 <link rel="stylesheet" href="game.css?v=400">
 <link rel="stylesheet" href="arena.css?v=139">
@@ -170,13 +170,6 @@ body:has(#home.active) #home .alex-quest-badge,
 body:has(#home.active) #home .live-side-ui,
 body:has(#home.active) #home .npc-label,
 body:has(#home.active) #home .living-scene{display:none!important;}
-</style>
-<style id="territory-g57-hit-fix">
-/* G57: invisible interactive hit areas over the baked City reference artwork. */
-body:has(#home.active) .real-home .g40-hit,
-body:has(#home.active) .real-home .g40-ui-hit{position:absolute!important;display:block!important;z-index:80!important;background:transparent!important;border:0!important;padding:0!important;margin:0!important;min-width:0!important;min-height:0!important;opacity:0!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;}
-body:has(#home.active) .real-home .g40-hit{inset:auto!important;}
-body:has(#home.active) .real-home .g40-ui-hit{inset:auto!important;}
 </style>
 </head>
 <body>
@@ -409,10 +402,8 @@ body:has(#home.active) .real-home .g40-ui-hit{inset:auto!important;}
     <button data-screen="market">🛒<span>Магазин</span></button>
   </nav>
 </div>
-
-<!-- Territory G60: runtime scripts load after the DOM so City controls initialize correctly. -->
-<script src="app.js?v=600"></script>
-<script src="arena.js?v=600"></script>
-<script src="Territory_G58_GLOBAL.js?v=600"></script>
+<script src="app.js?v=400"></script>
+<script src="arena.js?v=460"></script>
+<script src="Territory_G56_GLOBAL.js?v=560"></script>
 </body>
 </html>
