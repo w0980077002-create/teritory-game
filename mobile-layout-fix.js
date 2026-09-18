@@ -1,11 +1,11 @@
-/* Territory G28 — G26 base + visual HP correction */
+/* Territory G29 — G26 base + compact HP correction */
 (function(){
 "use strict";
 
 function addStyle(){
-  if(document.getElementById("territoryG28Style")) return;
+  if(document.getElementById("territoryG29Style")) return;
   var s=document.createElement("style");
-  s.id="territoryG28Style";
+  s.id="territoryG29Style";
   s.textContent=`
     body:has(#home.active){overflow:hidden!important;background:#07111b!important}
     body:has(#home.active) #app{max-width:none!important;width:100%!important;height:100dvh!important;background:#07111b!important}
@@ -29,29 +29,28 @@ function addStyle(){
     #territoryAlexButton{display:none!important;pointer-events:none!important;}
 
 
-    /* G28: replace only the baked HP text in the approved city artwork. */
-    #g28-hp-display{
+    /* G29: compact HP correction aligned to the existing HP bar. */
+    #g29-hp-display{
       position:absolute!important;
-      left:24%!important;
-      top:4.35%!important;
-      width:16%!important;
-      height:3.15%!important;
+      left:23.8%!important;
+      top:4.75%!important;
+      width:15.4%!important;
+      height:2.55%!important;
       z-index:9005!important;
       display:flex!important;
       align-items:center!important;
       justify-content:center!important;
       box-sizing:border-box!important;
-      border:0!important;
-      border-radius:0 18px 18px 0!important;
-      background:rgba(3,9,16,.94)!important;
+      background:rgba(3,13,23,.94)!important;
       color:#fff!important;
-      font-size:clamp(15px,3.25vw,24px)!important;
+      font-size:clamp(17px,3.0vw,22px)!important;
       line-height:1!important;
       font-weight:800!important;
       font-family:Arial,sans-serif!important;
-      text-shadow:0 1px 2px rgba(0,0,0,.8)!important;
+      text-shadow:0 1px 2px rgba(0,0,0,.9)!important;
       pointer-events:none!important;
       white-space:nowrap!important;
+      border-radius:2px!important;
     }
 
     .territory-g23-hit{
@@ -110,9 +109,9 @@ function install(){
   var home=document.getElementById("home");
   if(!home || home.dataset.g26==="1") return;
   home.dataset.g26="1";
-  if(!document.getElementById("g28-hp-display")){
+  if(!document.getElementById("g29-hp-display")){
     var hp=document.createElement("div");
-    hp.id="g28-hp-display";
+    hp.id="g29-hp-display";
     hp.textContent="120/120";
     home.appendChild(hp);
   }
