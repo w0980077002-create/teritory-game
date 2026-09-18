@@ -171,6 +171,16 @@ body:has(#home.active) #home .live-side-ui,
 body:has(#home.active) #home .npc-label,
 body:has(#home.active) #home .living-scene{display:none!important;}
 </style>
+
+<style id="territory-g57-alex-hit-fix">
+/* G57: Alex is part of the baked City artwork. Give only his visible area a transparent touch target. */
+body:has(#home.active) #home .alex-hit{
+  display:block!important;position:absolute!important;z-index:70;
+  left:4%!important;top:44%!important;width:43%!important;height:37%!important;
+  padding:0!important;margin:0!important;border:0!important;background:transparent!important;
+  opacity:0!important;pointer-events:auto!important;touch-action:manipulation;
+}
+</style>
 </head>
 <body>
 <div id="app">
@@ -230,6 +240,7 @@ body:has(#home.active) #home .living-scene{display:none!important;}
     <button class="hotspot hs-districts" data-screen="districts" aria-label="Районы"></button>
     <button class="hotspot hs-game" data-screen="game" aria-label="Game"></button>
     <button class="npc-label guard-label" data-screen="districts" aria-label="Alex — Лорд-командующий"><b>Alex</b><small>Лорд-командующий</small></button>
+    <button class="alex-hit" type="button" aria-label="Поговорить с Alex"></button>
     <button class="npc-label trader-label" data-screen="market" aria-label="Торговец"><b>Торговец</b><small>Покупка / Продажа</small></button>
     <div id="g40UiToast" class="g40-ui-toast" aria-live="polite"></div>
     <button class="hotspot hs-weapon" data-screen="market" aria-label="Оружие"></button>
