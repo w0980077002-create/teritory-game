@@ -1,1 +1,0 @@
-Territory City V5 — single visual layer. Replace index.html, style.css, app.js and territory_reference_bg.png in the repository. Keep arena.css, arena.js, game.css and all other existing files. V5 hides the duplicated HTML HUD on the City screen and uses transparent click zones over the approved reference visual.
