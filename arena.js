@@ -1,4 +1,4 @@
-/* Territory G18 loader */
+/* Territory G19 loader — keep all existing game modules */
 (function(){
 "use strict";
 function load(src){return new Promise(function(resolve,reject){
@@ -10,6 +10,6 @@ load("arena-core.js?v=140")
 .then(function(){return load("market.js?v=1");})
 .then(function(){return load("districts.js?v=1");})
 .then(function(){return load("duke-alex.js?v=4");})
-.then(function(){return load("mobile-layout-fix.js?v=3");})
-.catch(function(err){console.error("Territory G18 loader:",err);});
+.then(function(){return load("mobile-layout-fix.js?v=4");})
+.catch(function(err){console.error("Territory G19 loader:",err);});
 })();
