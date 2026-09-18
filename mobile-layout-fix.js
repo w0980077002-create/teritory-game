@@ -1,11 +1,11 @@
-/* Territory G24 — remove extra floating Alex crown button */
+/* Territory G25 — remove floating Alex crown button on all screens */
 (function(){
 "use strict";
 
 function addStyle(){
-  if(document.getElementById("territoryG24Style")) return;
+  if(document.getElementById("territoryG25Style")) return;
   var s=document.createElement("style");
-  s.id="territoryG24Style";
+  s.id="territoryG25Style";
   s.textContent=`
     body:has(#home.active){overflow:hidden!important;background:#07111b!important}
     body:has(#home.active) #app{max-width:none!important;width:100%!important;height:100dvh!important;background:#07111b!important}
@@ -24,6 +24,9 @@ function addStyle(){
       display:none!important;
       pointer-events:none!important;
     }
+
+    /* Remove the old floating Alex crown button on every screen. */
+    #territoryAlexButton{display:none!important;pointer-events:none!important;}
 
     .territory-g24-hit{
       position:absolute!important;display:block!important;
