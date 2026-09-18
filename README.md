@@ -1,22 +1,25 @@
-# Territory G43 GLOBAL — Sdolars
+# Territory G44 GLOBAL
 
-Current GAME build: G43.
+G44 is the next integrated gameplay pass built directly from the verified G43 GLOBAL working base.
 
-G43 continues the verified G42 City/PvE base without changing the approved Sdolars City artwork or its transparent hit areas.
+## Preserved
+- Sdolars City artwork/composition and existing City navigation.
+- Character/economy state from G42/G43.
+- G48.1 Arena implementation in `arena.js`.
+- 1x1 / Chaos / Group Arena rules.
 
-## G43 pass
-- Canonical G48 Arena is restored as the Arena entry point; the old duplicate Arena shell is no longer intercepting the Arena button.
-- Arena keeps 1x1, chaos, group up to 20, 3-minute lobby, 4 attack zones, 4 defense zones, target selection, enemy response, combat log, and close-to-City navigation.
-- Equipment now has explicit slots: weapon, helmet, armor, gloves, boots.
-- Existing G42 inventory/equipment state is migrated into the slot model.
-- Equipped damage/defense is used by PvE.
-- Durability and Forge repair remain part of the gameplay loop.
-- PvE city path, progress, rewards, hunger and boss loop remain intact.
-
-## Working files
-index.html, app.js, style.css, game.css, arena.js, arena.css, Territory_G43_GLOBAL.js, Territory_G43_GLOBAL.css plus the required City assets.
+## G44 gameplay pass
+- Reworked PvE battle presentation into a dedicated battle stage.
+- Visible hero/enemy HP, round counter and combat stats.
+- Four attack zones and exactly two defense zones remain the core tactical choice.
+- PvE path/progress is shown during the fight.
+- Reward preview is shown before the turn.
+- Battle log remains visible.
+- PvE equipment bonuses now respect item durability: broken equipment no longer grants its damage/defense bonus.
+- Reopening PvE starts a fresh encounter instead of retaining a stale enemy state.
+- Equipment repair/durability loop from G42 remains integrated.
 
 ## Important
-This is still a client-side prototype. Real cross-device Arena multiplayer requires the SERVER/WebSocket layer and server-side validation.
+This is still a client-side prototype. Real cross-device Arena multiplayer, authoritative economy, anti-cheat and server validation require the separate SERVER/WebSocket implementation.
 
-SERVER repo is not changed by this GAME build.
+Do not upload this package to the SERVER repository.
