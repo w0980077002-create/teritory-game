@@ -522,29 +522,88 @@ showScreen("home");
 })();
 
 
-/* Territory v38 — Alex becomes a real city NPC with a persistent quest */
+/* Territory G61 — Alex interaction only. City geometry/navigation untouched. */
 (function alexQuest(){
-  const home=document.querySelector('.real-home'); const guard=home&&home.querySelector('.guard-label'); const alexHit=home&&home.querySelector('.alex-hit'); const action=home&&home.querySelector('#sceneAction');
-  if(!home||!action)return;
-  function msg(text){ action.innerHTML=text; action.classList.add('show'); clearTimeout(action._alexTimer); action._alexTimer=setTimeout(()=>action.classList.remove('show'),5000); }
-  function talkToAlex(ev){
-    ev.preventDefault(); ev.stopImmediatePropagation();
-    if(state.alexQuest===0){
-      state.alexQuest=1; save();
-      msg('<b>Alex:</b> «Нужен патруль у ворот. Следи за городом и помогай, если начнётся тревога.»<br><button id="alexAccept" class="alex-mini-btn">Принято</button>');
-    }else if(state.alexQuest===1){
-      msg('<b>Alex:</b> «Патруль продолжается. Следи за событиями города.»');
-    }else{
-      msg('<b>Alex:</b> «Хорошая работа. Город может на тебя рассчитывать.»');
-    }
+  const home=document.querySelector('.real-home');
+  const guard=home&&home.querySelector('.guard-label');
+  const alexHit=home&&home.querySelector('.alex-hit');
+  if(!home)return;
+
+  function ensureStyle(){
+    if(document.getElementById('territory-g61-alex-style'))return;
+    const st=document.createElement('style');
+    st.id='territory-g61-alex-style';
+    st.textContent=`
+      #territoryAlexDialog{position:fixed;inset:0;z-index:2147483000;display:none;align-items:flex-end;justify-content:center;padding:12px;box-sizing:border-box;background:rgba(2,7,12,.68);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+      #territoryAlexDialog.show{display:flex}
+      #territoryAlexDialog .g61-card{width:min(680px,100%);max-height:78vh;overflow:auto;box-sizing:border-box;border:1px solid #9b7a3b;border-radius:18px;background:linear-gradient(180deg,#142330,#08111a);box-shadow:0 18px 60px #000b;color:#f4f1e8;padding:16px}
+      #territoryAlexDialog .g61-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+      #territoryAlexDialog .g61-avatar{width:58px;height:58px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#5b3b22,#171d24);font-size:34px;border:1px solid #b08b48;flex:0 0 auto}
+      #territoryAlexDialog .g61-name{font-size:19px;font-weight:900}.g61-sub{display:block;color:#c6ad73;font-size:11px;margin-top:2px}
+      #territoryAlexDialog .g61-text{font-size:16px;line-height:1.42;margin:8px 0 16px;color:#f1f3f5}
+      #territoryAlexDialog .g61-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      #territoryAlexDialog button{min-height:48px;border-radius:12px;border:1px solid #657687;background:#182531;color:#fff;font-weight:900;font-size:14px;padding:10px;touch-action:manipulation}
+      #territoryAlexDialog .g61-accept{background:linear-gradient(180deg,#3f9b45,#21652a);border-color:#7bd37f}
+      #territoryAlexDialog .g61-close{background:#182531}
+      @media(max-width:390px){#territoryAlexDialog{padding:8px}.g61-card{padding:12px!important}.g61-text{font-size:14px!important}.g61-actions{grid-template-columns:1fr!important}}
+    `;
+    document.head.appendChild(st);
   }
-  if(guard)guard.addEventListener('click',talkToAlex,true);
-  if(alexHit)alexHit.addEventListener('click',talkToAlex,true);
-  action.addEventListener('click',function(ev){
-    const b=ev.target.closest('#alexAccept'); if(!b)return;
-    b.textContent='Задание принято'; b.disabled=true; state.cityRep+=1; save();
-    setTimeout(()=>action.classList.remove('show'),900);
-  });
+
+  function ensureDialog(){
+    let o=document.getElementById('territoryAlexDialog');
+    if(o)return o;
+    ensureStyle();
+    o=document.createElement('div');
+    o.id='territoryAlexDialog';
+    o.setAttribute('aria-hidden','true');
+    o.innerHTML=`<div class="g61-card" role="dialog" aria-modal="true" aria-labelledby="g61AlexTitle">
+      <div class="g61-head"><div class="g61-avatar">🧔</div><div><div id="g61AlexTitle" class="g61-name">Герцог Alex</div><span class="g61-sub">Хранитель Sdolars</span></div></div>
+      <div id="g61AlexText" class="g61-text"></div>
+      <div id="g61AlexActions" class="g61-actions"></div>
+    </div>`;
+    document.body.appendChild(o);
+    o.addEventListener('click',e=>{if(e.target===o)closeDialog()});
+    return o;
+  }
+  function closeDialog(){
+    const o=document.getElementById('territoryAlexDialog');
+    if(o){o.classList.remove('show');o.setAttribute('aria-hidden','true')}
+  }
+  function openDialog(){
+    const o=ensureDialog();
+    const text=o.querySelector('#g61AlexText');
+    const actions=o.querySelector('#g61AlexActions');
+    if(state.alexQuest===0){
+      text.textContent='«Приветствую, воин. В Sdolars каждый может стать легендой. У меня для тебя поручение. Готов помочь?»';
+      actions.innerHTML='<button class="g61-accept" type="button" data-alex-accept>Принять задание</button><button class="g61-close" type="button" data-alex-close>Пока нет</button>';
+    }else if(state.alexQuest===1){
+      text.textContent='«Патруль продолжается. Следи за городом и помогай, если начнётся тревога.»';
+      actions.innerHTML='<button class="g61-close" type="button" data-alex-close>Понятно</button>';
+    }else{
+      text.textContent='«Хорошая работа, воин. Город может на тебя рассчитывать.»';
+      actions.innerHTML='<button class="g61-close" type="button" data-alex-close>Закрыть</button>';
+    }
+    o.classList.add('show');o.setAttribute('aria-hidden','false');
+  }
+  function acceptQuest(){
+    state.alexQuest=1;
+    state.cityRep=Number(state.cityRep||0)+1;
+    save();
+    const o=ensureDialog();
+    o.querySelector('#g61AlexText').textContent='«Отлично. Поручение принято. Следи за городом и не пропускай тревогу.»';
+    o.querySelector('#g61AlexActions').innerHTML='<button class="g61-close" type="button" data-alex-close>Закрыть</button>';
+  }
+  window.TerritoryAlexTalk=function(){openDialog()};
+  function bind(el){if(!el)return;el.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openDialog()},true)}
+  bind(guard);bind(alexHit);
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('#territoryAlexDialog [data-alex-accept],#territoryAlexDialog [data-alex-close]');
+    if(!b)return;
+    e.preventDefault();e.stopImmediatePropagation();
+    if(b.hasAttribute('data-alex-accept'))acceptQuest();else closeDialog();
+  },true);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDialog()});
 })();
 
 /* Territory v36 — живой автоматический поток городских событий */
