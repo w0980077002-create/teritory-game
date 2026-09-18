@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#10131a">
-<title>Territory — Sdolars · G58 BUTTONS FIXED</title>
+<title>Territory — Sdolars · LIVE G45</title>
 <link rel="stylesheet" href="style.css?v=400">
 <link rel="stylesheet" href="game.css?v=400">
 <link rel="stylesheet" href="arena.css?v=139">
@@ -172,82 +172,57 @@ body:has(#home.active) #home .npc-label,
 body:has(#home.active) #home .living-scene{display:none!important;}
 </style>
 
-<style id="territory-g58-button-map">
-/* G58 FIX: one touch layer exactly matching the baked 941x1672 City artwork. */
-body:has(#home.active) #home .city-hit-layer{
-  position:absolute!important;left:0!important;top:0!important;width:100%!important;
-  aspect-ratio:941 / 1672!important;height:auto!important;z-index:900!important;
-  pointer-events:none!important;overflow:visible!important;
+<style id="territory-g57-alex-hit-fix">
+/* G57: Alex is part of the baked City artwork. Give only his visible area a transparent touch target. */
+body:has(#home.active) #home .alex-hit{
+  display:block!important;position:absolute!important;z-index:70;
+  left:4%!important;top:44%!important;width:43%!important;height:37%!important;
+  padding:0!important;margin:0!important;border:0!important;background:transparent!important;
+  opacity:0!important;pointer-events:auto!important;touch-action:manipulation;
 }
-body:has(#home.active) #home .city-hit-layer button{
-  position:absolute!important;display:block!important;box-sizing:border-box!important;
-  margin:0!important;padding:0!important;border:0!important;background:transparent!important;
-  opacity:0!important;pointer-events:auto!important;touch-action:manipulation!important;
-  -webkit-tap-highlight-color:transparent!important;
-}
-/* Bottom six buttons — coordinates follow the actual artwork, not the viewport. */
-#home .city-hit-layer #g40-battle{left:0%;top:83.5%;width:16.67%;height:10.9%}
-#home .city-hit-layer #g40-arena{left:16.67%;top:83.5%;width:16.67%;height:10.9%}
-#home .city-hit-layer #g40-inventory{left:33.34%;top:83.5%;width:16.67%;height:10.9%}
-#home .city-hit-layer #g40-equipment{left:50.01%;top:83.5%;width:16.67%;height:10.9%}
-#home .city-hit-layer #g40-quests{left:66.68%;top:83.5%;width:16.67%;height:10.9%}
-#home .city-hit-layer #g40-map{left:83.35%;top:83.5%;width:16.65%;height:10.9%}
-/* Top HUD. */
-#home .city-hit-layer [data-ui="profile"]{left:1%;top:0.5%;width:15%;height:8.2%}
-#home .city-hit-layer [data-ui="gems"]{left:38%;top:0.6%;width:18%;height:4.8%}
-#home .city-hit-layer [data-ui="coins"]{left:57.5%;top:0.6%;width:17%;height:4.8%}
-#home .city-hit-layer [data-ui="energy"]{left:76%;top:0.6%;width:23%;height:4.8%}
-#home .city-hit-layer [data-ui="combatStone"]{left:39%;top:5.0%;width:17%;height:5.2%}
-#home .city-hit-layer [data-ui="messages"]{left:56%;top:5.0%;width:10%;height:5.2%}
-#home .city-hit-layer [data-ui="achievements"]{left:66%;top:5.0%;width:11%;height:5.2%}
-#home .city-hit-layer [data-ui="settings"]{left:77%;top:5.0%;width:11%;height:5.2%}
-#home .city-hit-layer [data-ui="language"]{left:87.5%;top:5.0%;width:11.5%;height:5.2%}
-/* Left and right city buttons. */
-#home .city-hit-layer [data-ui="bonuses"]{left:0.8%;top:17.0%;width:12.5%;height:7.0%}
-#home .city-hit-layer [data-ui="events"]{left:0.8%;top:23.8%;width:12.5%;height:7.0%}
-#home .city-hit-layer [data-ui="vip"]{left:0.8%;top:30.6%;width:12.5%;height:7.0%}
-#home .city-hit-layer [data-screen="game"]{left:0.8%;top:37.2%;width:12.5%;height:7.0%}
-#home .city-hit-layer .city-forge-hit{right:0.8%;top:24.0%;width:13%;height:7.0%}
-#home .city-hit-layer [data-ui="tavern"]{right:0.8%;top:31.2%;width:13%;height:7.0%}
-#home .city-hit-layer .city-market-hit{right:0.8%;top:38.4%;width:13%;height:7.0%}
-/* Alex's visible artwork. */
-#home .city-hit-layer .alex-hit{left:3%;top:40%;width:43%;height:43%}
-</style>
-<style id="territory-g58-panels">
-.city-quests-screen{background:linear-gradient(180deg,#0b1722,#101820);color:#f2f4f7;padding:10px!important;overflow:auto!important}
-.city-quest-card{display:flex;gap:12px;align-items:flex-start;margin:10px;padding:14px;border:1px solid #334657;border-radius:14px;background:#101d29;box-shadow:0 8px 24px rgba(0,0,0,.2)}
-.city-quest-card .quest-icon{font-size:30px}.city-quest-card b{font-size:17px}.city-quest-card p{margin:6px 0;color:#c2ccd5;font-size:13px;line-height:1.4}.city-quest-card small{color:#8fa1b1}
-.city-action-modal{position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.62)}
-.city-action-modal.show{display:flex}.city-action-card{width:min(92vw,390px);max-height:80vh;overflow:auto;padding:18px;border:1px solid #506273;border-radius:18px;background:#101b26;box-shadow:0 18px 50px rgba(0,0,0,.5);color:#eef3f7}.city-action-card h3{margin:0 0 8px;font-size:19px}.city-action-card p{color:#b9c5cf;line-height:1.45}.city-action-card .city-close{margin-top:12px;width:100%;padding:12px;border:1px solid #506273;border-radius:12px;background:#182735;color:#fff;font-weight:700}
 </style>
 
-<style id="territory-g58-real-hitmap">
-body:has(#home.active) #home .city-hit-layer{position:absolute!important;inset:0!important;z-index:99999!important;display:block!important;pointer-events:none!important}
-body:has(#home.active) #home .city-hit-layer .city-hit{position:absolute!important;display:block!important;box-sizing:border-box!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;opacity:0!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important}
-#home .city-hit[data-action="profile"]{left:1%;top:0%;width:15%;height:9%}
-#home .city-hit[data-action="gems"]{left:39%;top:.5%;width:16%;height:5.5%}
-#home .city-hit[data-action="coins"]{left:57%;top:.5%;width:17%;height:5.5%}
-#home .city-hit[data-action="energy"]{left:76%;top:.5%;width:23%;height:5.5%}
-#home .city-hit[data-action="combatStone"]{left:39%;top:5%;width:17%;height:5.5%}
-#home .city-hit[data-action="messages"]{left:56%;top:5%;width:10.5%;height:5.5%}
-#home .city-hit[data-action="achievements"]{left:66%;top:5%;width:11%;height:5.5%}
-#home .city-hit[data-action="settings"]{left:77%;top:5%;width:11%;height:5.5%}
-#home .city-hit[data-action="language"]{left:87%;top:5%;width:12%;height:5.5%}
-#home .city-hit[data-action="task"]{left:2%;top:9%;width:38%;height:9%}
-#home .city-hit[data-action="bonuses"]{left:0%;top:17%;width:13%;height:7.5%}
-#home .city-hit[data-action="events"]{left:0%;top:24%;width:13%;height:7.5%}
-#home .city-hit[data-action="vip"]{left:0%;top:31%;width:13%;height:7.5%}
-#home .city-hit[data-action="game"]{left:0%;top:38%;width:13%;height:8.5%}
-#home .city-hit[data-action="forge"]{right:0%;top:24%;width:14%;height:8%}
-#home .city-hit[data-action="tavern"]{right:0%;top:32%;width:14%;height:8%}
-#home .city-hit[data-action="market"]{right:0%;top:40%;width:14%;height:8%}
-#home .city-hit[data-action="alex"]{left:2%;top:38%;width:46%;height:47%}
-#home .city-hit[data-action="battle"]{left:0%;top:83%;width:16.67%;height:11%}
-#home .city-hit[data-action="arena"]{left:16.67%;top:83%;width:16.67%;height:11%}
-#home .city-hit[data-action="inventory"]{left:33.34%;top:83%;width:16.67%;height:11%}
-#home .city-hit[data-action="equipment"]{left:50.01%;top:83%;width:16.67%;height:11%}
-#home .city-hit[data-action="quests"]{left:66.68%;top:83%;width:16.67%;height:11%}
-#home .city-hit[data-action="map"]{left:83.35%;top:83%;width:16.65%;height:11%}
+<style id="territory-g59-clean-city-hitmap">
+/* G59: one non-overlapping touch map. The artwork remains untouched. */
+body:has(#home.active) #home .g59-city-hit-layer{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:auto!important;aspect-ratio:941/1672!important;z-index:100000!important;pointer-events:none!important;display:block!important}
+body:has(#home.active) #home .g59-city-hit-layer button{position:absolute!important;display:block!important;box-sizing:border-box!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important;opacity:0!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important}
+/* Top HUD */
+.g59-city-hit-layer [data-g59="profile"]{left:1%;top:0%;width:16%;height:9%}
+.g59-city-hit-layer [data-g59="gems"]{left:39%;top:.5%;width:16%;height:5.2%}
+.g59-city-hit-layer [data-g59="coins"]{left:57%;top:.5%;width:17%;height:5.2%}
+.g59-city-hit-layer [data-g59="energy"]{left:76%;top:.5%;width:23%;height:5.2%}
+.g59-city-hit-layer [data-g59="combatStone"]{left:39%;top:5.2%;width:17%;height:5.2%}
+.g59-city-hit-layer [data-g59="messages"]{left:56%;top:5.2%;width:10%;height:5.2%}
+.g59-city-hit-layer [data-g59="achievements"]{left:66%;top:5.2%;width:11%;height:5.2%}
+.g59-city-hit-layer [data-g59="settings"]{left:77%;top:5.2%;width:10.5%;height:5.2%}
+.g59-city-hit-layer [data-g59="language"]{left:87.5%;top:5.2%;width:11.5%;height:5.2%}
+/* Current task and daily reward */
+.g59-city-hit-layer [data-g59="task"]{left:1.5%;top:9%;width:38%;height:9%}
+.g59-city-hit-layer [data-g59="daily"]{right:1%;top:10.5%;width:29%;height:8%}
+/* Side buttons — deliberately separated from Alex */
+.g59-city-hit-layer [data-g59="bonuses"]{left:.5%;top:17%;width:13%;height:7%}
+.g59-city-hit-layer [data-g59="events"]{left:.5%;top:24%;width:13%;height:7%}
+.g59-city-hit-layer [data-g59="vip"]{left:.5%;top:31%;width:13%;height:7%}
+.g59-city-hit-layer [data-g59="game"]{left:.5%;top:38%;width:13%;height:7%}
+.g59-city-hit-layer [data-g59="forge"]{right:.5%;top:24%;width:14%;height:7%}
+.g59-city-hit-layer [data-g59="tavern"]{right:.5%;top:31%;width:14%;height:7%}
+.g59-city-hit-layer [data-g59="market"]{right:.5%;top:38%;width:14%;height:8%}
+/* Alex: only the visible character area; it no longer covers side controls. */
+.g59-city-hit-layer [data-g59="alex"]{left:3%;top:47%;width:38%;height:34%}
+/* Bottom six */
+.g59-city-hit-layer [data-g59="battle"]{left:0%;top:84%;width:16.67%;height:10.5%}
+.g59-city-hit-layer [data-g59="arena"]{left:16.67%;top:84%;width:16.67%;height:10.5%}
+.g59-city-hit-layer [data-g59="inventory"]{left:33.34%;top:84%;width:16.67%;height:10.5%}
+.g59-city-hit-layer [data-g59="equipment"]{left:50.01%;top:84%;width:16.67%;height:10.5%}
+.g59-city-hit-layer [data-g59="quests"]{left:66.68%;top:84%;width:16.67%;height:10.5%}
+.g59-city-hit-layer [data-g59="map"]{left:83.35%;top:84%;width:16.65%;height:10.5%}
+</style>
+
+<style id="territory-g59-disable-legacy-city-hitboxes">
+body:has(#home.active) #home > .g40-hit,
+body:has(#home.active) #home > .g40-ui-hit,
+body:has(#home.active) #home > .hotspot,
+body:has(#home.active) #home > .npc-label{pointer-events:none!important;display:none!important}
 </style>
 </head>
 <body>
@@ -270,31 +245,32 @@ body:has(#home.active) #home .city-hit-layer .city-hit{position:absolute!importa
     <section id="home" class="screen active home-real">
   <div class="real-home">
     <img src="sdolars_clean_scene.png" alt="Sdolars" class="real-home-image">
-    <div class="city-hit-layer" aria-label="Интерактивные зоны города">
-      <button type="button" class="city-hit" data-action="profile" aria-label="Профиль игрока"></button>
-      <button type="button" class="city-hit" data-action="gems" aria-label="Алмазы"></button>
-      <button type="button" class="city-hit" data-action="coins" aria-label="Монеты"></button>
-      <button type="button" class="city-hit" data-action="energy" aria-label="Энергия"></button>
-      <button type="button" class="city-hit" data-action="combatStone" aria-label="Боевые камни"></button>
-      <button type="button" class="city-hit" data-action="messages" aria-label="Сообщения"></button>
-      <button type="button" class="city-hit" data-action="achievements" aria-label="Достижения"></button>
-      <button type="button" class="city-hit" data-action="settings" aria-label="Настройки"></button>
-      <button type="button" class="city-hit" data-action="language" aria-label="Язык"></button>
-      <button type="button" class="city-hit" data-action="bonuses" aria-label="Бонусы"></button>
-      <button type="button" class="city-hit" data-action="events" aria-label="События"></button>
-      <button type="button" class="city-hit" data-action="vip" aria-label="VIP"></button>
-      <button type="button" class="city-hit" data-action="game" aria-label="Game"></button>
-      <button type="button" class="city-hit" data-action="task" aria-label="Текущее задание"></button>
-      <button type="button" class="city-hit" data-action="forge" aria-label="Кузница"></button>
-      <button type="button" class="city-hit" data-action="tavern" aria-label="Таверна"></button>
-      <button type="button" class="city-hit" data-action="market" aria-label="Магазин"></button>
-      <button type="button" class="city-hit" data-action="alex" aria-label="Alex"></button>
-      <button type="button" class="city-hit" data-action="battle" aria-label="Бой"></button>
-      <button type="button" class="city-hit" data-action="arena" aria-label="Арена"></button>
-      <button type="button" class="city-hit" data-action="inventory" aria-label="Инвентарь"></button>
-      <button type="button" class="city-hit" data-action="equipment" aria-label="Экипировка"></button>
-      <button type="button" class="city-hit" data-action="quests" aria-label="Задания"></button>
-      <button type="button" class="city-hit" data-action="map" aria-label="Карта"></button>
+    <div class="g59-city-hit-layer" aria-label="Интерактивный город">
+      <button type="button" data-g59="profile" aria-label="Профиль игрока"></button>
+      <button type="button" data-g59="gems" data-ui="gems" aria-label="Алмазы"></button>
+      <button type="button" data-g59="coins" data-ui="coins" aria-label="Монеты"></button>
+      <button type="button" data-g59="energy" data-ui="energy" aria-label="Энергия"></button>
+      <button type="button" data-g59="combatStone" data-ui="combatStone" aria-label="Боевые камни"></button>
+      <button type="button" data-g59="messages" data-ui="messages" aria-label="Сообщения"></button>
+      <button type="button" data-g59="achievements" data-ui="achievements" aria-label="Достижения"></button>
+      <button type="button" data-g59="settings" data-ui="settings" aria-label="Настройки"></button>
+      <button type="button" data-g59="language" data-ui="language" aria-label="Язык"></button>
+      <button type="button" data-g59="task" data-ui="repair" aria-label="Текущее задание — кузница"></button>
+      <button type="button" data-g59="daily" data-ui="bonuses" aria-label="Ежедневный бонус"></button>
+      <button type="button" data-g59="bonuses" data-ui="bonuses" aria-label="Бонусы"></button>
+      <button type="button" data-g59="events" data-ui="events" aria-label="События"></button>
+      <button type="button" data-g59="vip" data-ui="vip" aria-label="VIP"></button>
+      <button type="button" data-g59="game" data-screen="game" aria-label="Game"></button>
+      <button type="button" data-g59="forge" data-ui="repair" aria-label="Кузница"></button>
+      <button type="button" data-g59="tavern" data-ui="tavern" aria-label="Таверна"></button>
+      <button type="button" data-g59="market" data-screen="market" aria-label="Магазин"></button>
+      <button type="button" data-g59="alex" aria-label="Alex"></button>
+      <button type="button" data-g59="battle" aria-label="Бой"></button>
+      <button type="button" data-g59="arena" aria-label="Арена"></button>
+      <button type="button" data-g59="inventory" data-screen="inventory" aria-label="Инвентарь"></button>
+      <button type="button" data-g59="equipment" data-screen="inventory" aria-label="Экипировка"></button>
+      <button type="button" data-g59="quests" data-screen="districts" aria-label="Задания"></button>
+      <button type="button" data-g59="map" data-screen="districts" aria-label="Карта"></button>
     </div>
     <button id="g40-battle" class="g40-hit" data-screen="pve" aria-label="Бой"></button>
     <button id="g40-arena" class="g40-hit" data-screen="arena" aria-label="Арена"></button>
@@ -316,9 +292,9 @@ body:has(#home.active) #home .city-hit-layer .city-hit{position:absolute!importa
     <button class="g40-ui-hit" style="left:1.0%;top:23.5%;width:12.0%;height:6.0%" data-ui="events" aria-label="События"></button>
     <button class="g40-ui-hit" style="left:1.0%;top:30.0%;width:12.0%;height:6.0%" data-ui="vip" aria-label="VIP"></button>
     <button class="g40-ui-hit" style="left:1.0%;top:36.8%;width:12.0%;height:6.0%" data-screen="game" aria-label="Game"></button>
-    <button class="g40-ui-hit city-forge-hit" data-screen="inventory" data-open="forge" aria-label="Кузница"></button>
+    <button class="g40-ui-hit" style="right:1.0%;top:24.3%;width:12.5%;height:6.5%" data-screen="inventory" aria-label="Кузница"></button>
     <button class="g40-ui-hit" style="right:1.0%;top:31.5%;width:12.5%;height:6.5%" data-ui="tavern" aria-label="Таверна"></button>
-    <button class="g40-ui-hit city-market-hit" data-screen="market" aria-label="Магазин"></button>
+    <button class="g40-ui-hit" style="right:1.0%;top:38.5%;width:12.5%;height:6.5%" data-screen="market" aria-label="Магазин"></button>
 
     <div class="live-city-title" aria-label="Город Sdolars"><small>ГОРОД</small><strong>SDOLARS</strong><em>ЦЕНТРАЛЬНЫЙ КВАРТАЛ</em></div>
     <div class="live-city-time">19:42 · ВЕЧЕР <b>🌙</b></div><div id="alexQuestBadge" class="alex-quest-badge">Город</div>
@@ -334,6 +310,7 @@ body:has(#home.active) #home .city-hit-layer .city-hit{position:absolute!importa
     <button class="hotspot hs-districts" data-screen="districts" aria-label="Районы"></button>
     <button class="hotspot hs-game" data-screen="game" aria-label="Game"></button>
     <button class="npc-label guard-label" data-screen="districts" aria-label="Alex — Лорд-командующий"><b>Alex</b><small>Лорд-командующий</small></button>
+    <button class="alex-hit" type="button" aria-label="Поговорить с Alex"></button>
     <button class="npc-label trader-label" data-screen="market" aria-label="Торговец"><b>Торговец</b><small>Покупка / Продажа</small></button>
     <div id="g40UiToast" class="g40-ui-toast" aria-live="polite"></div>
     <button class="hotspot hs-weapon" data-screen="market" aria-label="Оружие"></button>
@@ -414,12 +391,6 @@ body:has(#home.active) #home .city-hit-layer .city-hit{position:absolute!importa
         <button id="districtAction">Отправиться</button>
       </div>
       <div class="district-log" id="districtLog">Городская карта открыта.</div>
-    </section>
-
-    <section id="quests" class="screen city-quests-screen">
-      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>ЗАДАНИЯ</h2></div>
-      <div class="city-quest-card"><div class="quest-icon">📜</div><div><b id="cityQuestTitle">Задание города</b><p id="cityQuestText">Поговори с Alex, следи за событиями города и помогай Sdolars.</p><small id="cityQuestStatus">Статус: доступно</small></div></div>
-      <div class="city-quest-card"><div class="quest-icon">⚒️</div><div><b>Кузница</b><p>Посети кузницу, чтобы проверить оружие и снаряжение.</p><small>Награда зависит от текущего задания</small></div></div>
     </section>
 
     <section id="market" class="screen">
@@ -512,62 +483,39 @@ body:has(#home.active) #home .city-hit-layer .city-hit{position:absolute!importa
     <button data-screen="market">🛒<span>Магазин</span></button>
   </nav>
 </div>
-<script src="app.js?v=580"></script>
-<script src="arena.js?v=580"></script>
+<script src="app.js?v=400"></script>
+<script src="arena.js?v=460"></script>
 <script src="Territory_G56_GLOBAL.js?v=560"></script>
 
-
-
-<script id="territory-g58-final-router">
+<script id="territory-g59-city-router">
 (function(){
   'use strict';
   function init(){
-    const home=document.querySelector('#home .real-home'); if(!home)return;
-    let layer=home.querySelector('.city-hit-layer');
+    const layer=document.querySelector('#home .g59-city-hit-layer');
     if(!layer)return;
-    // Exact artwork hit map. These are intentionally one layer above the picture.
-    const go=id=>{const t=document.getElementById(id);if(!t)return false;document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x===t));return true};
-    const openInventory=mode=>{if(!go('inventory'))return;const inv=document.getElementById('inventory');inv.dataset.inventoryMode=mode;inv.classList.toggle('equipment-mode',mode==='equipment');const h=inv.querySelector('.subhead h2');if(h)h.textContent=mode==='equipment'?'ЭКИПИРОВКА':mode==='profile'?'ПРОФИЛЬ ПЕРСОНАЖА':'ИНВЕНТАРЬ';};
-    const modal=document.createElement('div'); modal.className='city-action-modal'; modal.innerHTML='<div class="city-action-card" role="dialog" aria-modal="true"><h3 id="cityActionTitle"></h3><p id="cityActionText"></p><button class="city-close" type="button">Закрыть</button></div>'; document.body.appendChild(modal);
-    const title=modal.querySelector('#cityActionTitle'), text=modal.querySelector('#cityActionText');
-    const info={
-      gems:['Алмазы','Твои алмазы: '+(window.state?.gems ?? document.getElementById('gems')?.textContent ?? '—')],
-      coins:['Монеты','Твои монеты: '+(window.state?.coins ?? document.getElementById('coins')?.textContent ?? '—')],
-      energy:['Энергия','Энергия используется для городских действий и постепенно восстанавливается.'],
-      combatStone:['Боевые камни','Боевые камни используются в городских PvE-боях.'],
-      messages:['Сообщения','Здесь будут отображаться игровые сообщения.'],
-      achievements:['Достижения','Здесь отображаются достижения героя.'],
-      settings:['Настройки','Настройки игры.'],
-      language:['Язык','Текущий язык интерфейса: русский.'],
-      bonuses:['Бонусы','Доступные городские бонусы.'],
-      events:['События','Городские события и встречи.'],
-      vip:['VIP','Раздел VIP.'],
-      tavern:['Таверна','В таверне можно восстановить голод и получить городские сведения.']
+    const fire=el=>{if(!el)return;el.click();};
+    const synthetic=(attrs)=>{
+      const b=document.createElement('button');
+      Object.entries(attrs).forEach(([k,v])=>b.setAttribute(k,v));
+      b.style.cssText='position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none';
+      document.body.appendChild(b);b.click();b.remove();
     };
-    const openInfo=k=>{const d=info[k]||[k,'Раздел открыт.'];title.textContent=d[0];text.textContent=d[1];modal.classList.add('show');};
-    modal.querySelector('.city-close').onclick=()=>modal.classList.remove('show'); modal.onclick=e=>{if(e.target===modal)modal.classList.remove('show')};
-    layer.addEventListener('click',e=>{
-      const b=e.target.closest('button');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
-      if(b.classList.contains('alex-hit')){ if(typeof window.TerritoryAlexTalk==='function')window.TerritoryAlexTalk(); else {const g=home.querySelector('.guard-label');g?.click();} return; }
-      const a=b.dataset.action;
-      if(a==='alex'){if(typeof window.TerritoryAlexTalk==='function'){window.TerritoryAlexTalk();}return;}
-      if(a==='profile'){home.querySelector('.g40-ui-hit[data-ui="profile"]')?.click();return;}
-      if(a==='gems'||a==='coins'||a==='energy'||a==='combatStone'||a==='messages'||a==='achievements'||a==='settings'||a==='language'||a==='bonuses'||a==='events'||a==='vip'||a==='tavern'){home.querySelector('.g40-ui-hit[data-ui="'+a+'"]')?.click();return;}
-      if(a==='forge'){home.querySelector('.city-forge-hit')?.click();return;}
-      if(a==='market'){home.querySelector('.city-market-hit')?.click();return;}
-      if(a==='game'){home.querySelector('.g40-ui-hit[data-screen="game"]')?.click();return;}
-      if(a==='task'){home.querySelector('.city-forge-hit')?.click();return;}
-      if(a==='battle'){go('pve');if(typeof window.pveOpen==='function')window.pveOpen();return;}
-      if(a==='arena'){go('arena');if(typeof window.openArena==='function')setTimeout(()=>window.openArena(),0);return;}
-      if(a==='inventory'){home.querySelector('#g40-inventory')?.click();return;}
-      if(a==='equipment'){home.querySelector('#g40-equipment')?.click();return;}
-      if(a==='quests'){go('quests');return;}
-      if(a==='map'){go('districts');return;}
+    const alex=()=>{ if(typeof window.TerritoryAlexTalk==='function') window.TerritoryAlexTalk(); };
+    layer.addEventListener('click',function(e){
+      const b=e.target.closest('button');if(!b)return;
+      e.preventDefault();e.stopImmediatePropagation();
+      const a=b.dataset.g59;
+      if(a==='alex'){alex();return;}
+      if(a==='profile'){synthetic({'data-ui':'profile'});return;}
+      if(['gems','coins','energy','combatStone','messages','achievements','settings','language','bonuses','events','vip','tavern'].includes(a)){synthetic({'data-ui':a});return;}
+      if(a==='forge'||a==='task'){synthetic({'data-ui':'repair'});return;}
+      if(a==='market'){synthetic({'data-screen':'market'});return;}
+      if(a==='inventory'||a==='equipment'){synthetic({'data-screen':'inventory'});return;}
+      if(a==='game'){synthetic({'data-screen':'game'});return;}
+      if(a==='arena'){if(typeof window.openArena==='function')window.openArena();return;}
+      if(a==='battle'){if(typeof window.pveOpen==='function')window.pveOpen();return;}
+      if(a==='quests'||a==='map'){synthetic({'data-screen':'districts'});return;}
     },true);
-    // Map the visible bottom/side labels to their literal destinations.
-    const q=document.getElementById('g40-quests'); if(q)q.dataset.screen='quests';
-    const m=document.getElementById('g40-map'); if(m)m.dataset.screen='districts';
-    const backToHome=document.querySelectorAll('#inventory .back'); backToHome.forEach(x=>x.addEventListener('click',()=>go('home'),true));
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

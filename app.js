@@ -66,15 +66,7 @@ function showScreen(id){
  if(id==="arena") setTimeout(()=>{ if(window.openArena) window.openArena(); },0);
  if(id==="pve") setTimeout(()=>{ if(window.pveInit) window.pveInit(); },0);
 }
-document.addEventListener("click",e=>{
-  const b=e.target.closest("[data-screen]");
-  if(!b)return;
-  e.preventDefault(); e.stopPropagation();
-  const id=b.dataset.screen;
-  showScreen(id);
-  if(id==="arena" && typeof window.openArena==="function") setTimeout(()=>window.openArena(),0);
-  if(id==="pve" && typeof window.pveInit==="function") setTimeout(()=>window.pveInit(),0);
-});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b){e.preventDefault();e.stopPropagation();showScreen(b.dataset.screen)}});
 
 /* G49 — City PvE battle: deliberately separate from Arena and Game/Monopoly. */
 (function initPVE(){
@@ -532,8 +524,8 @@ showScreen("home");
 
 /* Territory v38 — Alex becomes a real city NPC with a persistent quest */
 (function alexQuest(){
-  const home=document.querySelector('.real-home'); const guard=home&&home.querySelector('.guard-label'); const action=home&&home.querySelector('#sceneAction');
-  if(!home||!guard||!action)return;
+  const home=document.querySelector('.real-home'); const guard=home&&home.querySelector('.guard-label'); const alexHit=home&&home.querySelector('.alex-hit'); const action=home&&home.querySelector('#sceneAction');
+  if(!home||!action)return;
   function msg(text){ action.innerHTML=text; action.classList.add('show'); clearTimeout(action._alexTimer); action._alexTimer=setTimeout(()=>action.classList.remove('show'),5000); }
   function talkToAlex(ev){
     ev.preventDefault(); ev.stopImmediatePropagation();
@@ -546,8 +538,8 @@ showScreen("home");
       msg('<b>Alex:</b> «Хорошая работа. Город может на тебя рассчитывать.»');
     }
   }
-  window.TerritoryAlexTalk=talkToAlex;
-  guard.addEventListener('click',talkToAlex,true);
+  if(guard)guard.addEventListener('click',talkToAlex,true);
+  if(alexHit)alexHit.addEventListener('click',talkToAlex,true);
   action.addEventListener('click',function(ev){
     const b=ev.target.closest('#alexAccept'); if(!b)return;
     b.textContent='Задание принято'; b.disabled=true; state.cityRep+=1; save();
