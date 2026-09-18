@@ -171,14 +171,23 @@ body:has(#home.active) #home .live-side-ui,
 body:has(#home.active) #home .npc-label,
 body:has(#home.active) #home .living-scene{display:none!important;}
 </style>
-
-<style id="territory-g57-alex-hit-fix">
-/* G57: Alex is part of the baked City artwork. Give only his visible area a transparent touch target. */
+<style id="territory-g58-touch-restore">
+/* G58: restore reliable touch routing on the baked City screen.
+   The artwork is visual only; transparent controls must receive the tap. */
+body:has(#home.active) #home .real-home-image{pointer-events:none!important;}
+body:has(#home.active) #home .g40-hit,
+body:has(#home.active) #home .g40-ui-hit{
+  pointer-events:auto!important;
+  z-index:500!important;
+  touch-action:manipulation!important;
+}
+body:has(#home.active) #home .g40-hit{display:block!important;}
+body:has(#home.active) #home .g40-ui-hit{display:block!important;}
 body:has(#home.active) #home .alex-hit{
-  display:block!important;position:absolute!important;z-index:70;
-  left:4%!important;top:44%!important;width:43%!important;height:37%!important;
+  display:block!important;position:absolute!important;z-index:510!important;
+  left:4%!important;top:44%!important;width:43%!important;height:35%!important;
   padding:0!important;margin:0!important;border:0!important;background:transparent!important;
-  opacity:0!important;pointer-events:auto!important;touch-action:manipulation;
+  opacity:0!important;pointer-events:auto!important;touch-action:manipulation!important;
 }
 </style>
 </head>
@@ -240,7 +249,6 @@ body:has(#home.active) #home .alex-hit{
     <button class="hotspot hs-districts" data-screen="districts" aria-label="Районы"></button>
     <button class="hotspot hs-game" data-screen="game" aria-label="Game"></button>
     <button class="npc-label guard-label" data-screen="districts" aria-label="Alex — Лорд-командующий"><b>Alex</b><small>Лорд-командующий</small></button>
-    <button class="alex-hit" type="button" aria-label="Поговорить с Alex"></button>
     <button class="npc-label trader-label" data-screen="market" aria-label="Торговец"><b>Торговец</b><small>Покупка / Продажа</small></button>
     <div id="g40UiToast" class="g40-ui-toast" aria-live="polite"></div>
     <button class="hotspot hs-weapon" data-screen="market" aria-label="Оружие"></button>

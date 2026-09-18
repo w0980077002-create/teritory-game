@@ -66,7 +66,17 @@ function showScreen(id){
  if(id==="arena") setTimeout(()=>{ if(window.openArena) window.openArena(); },0);
  if(id==="pve") setTimeout(()=>{ if(window.pveInit) window.pveInit(); },0);
 }
-document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b){e.preventDefault();e.stopPropagation();showScreen(b.dataset.screen)}});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-screen]");
+  if(!b)return;
+  e.preventDefault();
+  e.stopPropagation();
+  const id=b.dataset.screen;
+  showScreen(id);
+  // Explicitly wake the section controller for the three critical City routes.
+  if(id==="arena" && typeof window.openArena==="function") window.openArena();
+  if(id==="pve" && typeof window.pveInit==="function") window.pveInit();
+},{capture:true});
 
 /* G49 — City PvE battle: deliberately separate from Arena and Game/Monopoly. */
 (function initPVE(){
@@ -95,6 +105,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");
  document.addEventListener('click',e=>{const a=e.target.closest('[data-pve-a]');if(a){battle.attack=a.dataset.pveA;draw();return}const d=e.target.closest('[data-pve-d]');if(d){const z=d.dataset.pveD;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);draw();return}if(e.target.closest('#pveAttackBtn'))hit()});
 })();
 function renderShop(){
+ const shopGrid=$("#shopGrid");
  const day=Math.floor(Date.now()/86400000);
  if(state.marketDay!==day){ state.marketDay=day; }
  const shift=day%weapons.length;
@@ -103,10 +114,11 @@ function renderShop(){
  const moodEl=$("#merchantMood"); if(moodEl)moodEl.textContent=mood;
  const repEl=$("#merchantRep"); if(repEl)repEl.textContent=`Репутация ${state.merchantRep}`;
  const resetEl=$("#marketReset"); if(resetEl){const left=86400000-(Date.now()%86400000);resetEl.textContent=`Новый ассортимент примерно через ${Math.max(1,Math.ceil(left/3600000))} ч.`;}
- $("#shopGrid").innerHTML=stock.map(w=>{const finalCost=state.merchantRep>=5?Math.floor(w.cost*.9):state.merchantRep>=2?Math.floor(w.cost*.95):w.cost;return `<div class="item"><div class="pic">${w.icon}</div><b>${w.name}</b><span>Урон +${w.damage}</span><button data-buy="${w.name}" data-cost="${finalCost}">${finalCost} 🪙 · КУПИТЬ</button></div>`}).join('');
+ if(shopGrid)shopGrid.innerHTML=stock.map(w=>{const finalCost=state.merchantRep>=5?Math.floor(w.cost*.9):state.merchantRep>=2?Math.floor(w.cost*.95):w.cost;return `<div class="item"><div class="pic">${w.icon}</div><b>${w.name}</b><span>Урон +${w.damage}</span><button data-buy="${w.name}" data-cost="${finalCost}">${finalCost} 🪙 · КУПИТЬ</button></div>`}).join('');
 }
 
-$("#shopGrid").addEventListener("click",e=>{
+const shopGridEl=$("#shopGrid");
+if(shopGridEl)shopGridEl.addEventListener("click",e=>{
  const b=e.target.closest("[data-buy]"); if(!b)return;
  const w=weapons.find(x=>x.name===b.dataset.buy); const cost=Number(b.dataset.cost||w.cost);
  if(state.coins<cost){const l=$("#merchantLog");if(l)l.textContent="Торговец: «Не хватает монет.»";return;}
@@ -524,10 +536,10 @@ showScreen("home");
 
 /* Territory v38 — Alex becomes a real city NPC with a persistent quest */
 (function alexQuest(){
-  const home=document.querySelector('.real-home'); const guard=home&&home.querySelector('.guard-label'); const alexHit=home&&home.querySelector('.alex-hit'); const action=home&&home.querySelector('#sceneAction');
-  if(!home||!action)return;
+  const home=document.querySelector('.real-home'); const guard=home&&home.querySelector('.guard-label'); const action=home&&home.querySelector('#sceneAction');
+  if(!home||!guard||!action)return;
   function msg(text){ action.innerHTML=text; action.classList.add('show'); clearTimeout(action._alexTimer); action._alexTimer=setTimeout(()=>action.classList.remove('show'),5000); }
-  function talkToAlex(ev){
+  guard.addEventListener('click',function(ev){
     ev.preventDefault(); ev.stopImmediatePropagation();
     if(state.alexQuest===0){
       state.alexQuest=1; save();
@@ -537,9 +549,7 @@ showScreen("home");
     }else{
       msg('<b>Alex:</b> «Хорошая работа. Город может на тебя рассчитывать.»');
     }
-  }
-  if(guard)guard.addEventListener('click',talkToAlex,true);
-  if(alexHit)alexHit.addEventListener('click',talkToAlex,true);
+  },true);
   action.addEventListener('click',function(ev){
     const b=ev.target.closest('#alexAccept'); if(!b)return;
     b.textContent='Задание принято'; b.disabled=true; state.cityRep+=1; save();
