@@ -147,6 +147,18 @@
   }
   window.openBattle=renderHome;
   window.openArena=renderHome;
-  document.addEventListener('click',e=>{if(e.target.closest('[data-arena-close]'))close()});
+  // G42 close fix: the canonical HTML button is #arenaClose (it has no data-arena-close).
+  // Bind both paths and use capture so no global click handler can swallow the event.
+  function bindClose(){
+    const b=document.getElementById('arenaClose');
+    if(b && !b.__territoryArenaCloseBound){
+      b.__territoryArenaCloseBound=true;
+      b.setAttribute('aria-label','Закрыть арену');
+      b.innerHTML='×';
+      b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();close();},true);
+    }
+  }
+  document.addEventListener('click',e=>{if(e.target.closest('[data-arena-close],#arenaClose'))close()},true);
+  bindClose();
   const m=modal();if(m)m.addEventListener('click',e=>{if(e.target===m)close()});
 })();
