@@ -1,4 +1,4 @@
-/* Territory v140 — Arena visual layer: compact, dark, mobile-first, inspired by the supplied video. */
+/* Territory G43 — Arena visual layer: compact, dark, mobile-first, inspired by the supplied video. */
 #arenaModal{position:fixed;inset:0;z-index:10000;display:none;align-items:flex-end;justify-content:center;background:rgba(2,5,9,.78);backdrop-filter:blur(5px);padding:0}
 #arenaModal.show{display:flex}
 #arenaModal .arena-sheet{width:min(100%,760px);height:min(96vh,900px);overflow:hidden;border-radius:22px 22px 0 0;background:#0d1219;color:#eef3f7;box-shadow:0 -20px 60px rgba(0,0,0,.55);display:flex;flex-direction:column}
@@ -58,3 +58,6 @@
 }
 #arenaModal .arena-close:active{transform:scale(.94)!important;background:#2b3946!important}
 @media(max-width:390px){#arenaModal .arena-close{flex-basis:40px!important;width:40px!important;min-width:40px!important;max-width:40px!important;height:40px!important;min-height:40px!important;max-height:40px!important;font-size:28px!important}}
+
+/* G43 — compact team strip */
+.arena140-team-strip{display:flex;justify-content:space-between;gap:8px;margin:0 0 7px;padding:7px 9px;border:1px solid #293742;border-radius:10px;background:#18232c;color:#8fa0ab;font-size:9px}.arena140-team-strip b{color:#fff}.arena140-team-strip span:last-child{text-align:right;color:#7f909b}@media(max-width:380px){.arena140-team-strip{font-size:8px}}

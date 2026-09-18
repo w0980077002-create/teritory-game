@@ -1,4 +1,4 @@
-/* Territory v140 — Arena rebuilt from the video reference + agreed Territory rules.
+/* Territory G43 — Arena team/battle pass from the video reference + agreed Territory rules.
    The old S98 opponent-picker is intentionally removed.
    This file owns the Arena modal only and keeps the rest of the game state intact. */
 (()=>{
@@ -16,7 +16,7 @@
   const esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\':'&#92;','"':'&quot;'}[c]));
   const getState=()=>{try{return state}catch(e){return {}}};
   const save=()=>{try{window.save?.()}catch(e){}};
-  const getStats=()=>{try{return JSON.parse(localStorage.getItem('territory_arena_v140')||'{}')}catch(e){return {}}};
+  const getStats=()=>{try{return JSON.parse(localStorage.getItem('territory_arena_g43')||'{}')}catch(e){return {}}};
   let stats=getStats();
   stats.wins=Number(stats.wins||0); stats.losses=Number(stats.losses||0); stats.battles=Number(stats.battles||0);
   stats.history=Array.isArray(stats.history)?stats.history:[];
@@ -87,8 +87,13 @@
     if(!lobby||lobby.started)return;
     if(lobby.players.length<2){window.arenaToast('Нужно минимум 2 игрока');return}
     lobby.started=true;clearInterval(lobbyTimer);
+    if(lobby.mode==='chaos'){
+      const shuffled=[...lobby.players].sort(()=>Math.random()-.5);
+      shuffled.forEach((p,i)=>p.team=(i%2)+1);
+      lobby.players=shuffled;
+    }
     const mode=MODE.find(x=>x.id===lobby.mode)||MODE[0];
-    battle={mode:lobby.mode,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,defense:[],log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
+    battle={mode:lobby.mode,team:getState().team||lobby.players[0]?.team||1,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,defense:[],log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
     renderBattle();
   }
   function zone(id,list){return list.find(z=>z[0]===id)?.[1]||id}
@@ -102,6 +107,7 @@
     showModal('⚔️ Arena · бой',`<div class="arena140 arena140-combat">
       <section class="arena140-fighters"><div class="arena140-fighter"><div class="big-avatar">🧔</div><b>${esc(name())}</b><small>ур. ${level()}</small><div class="arena140-hp"><i style="width:${hp1}%"></i></div><span>${Math.round(battle.playerHp)} / ${battle.maxHp} HP</span></div><div class="arena140-vs">VS</div><div class="arena140-fighter enemy"><div class="big-avatar">⚔️</div><b>${lobby?.mode==='group'?'Команда противника':'Противник'}</b><small>отряд</small><div class="arena140-hp"><i style="width:${hp2}%"></i></div><span>${Math.round(battle.enemyHp)} / ${battle.maxEnemyHp} HP</span></div></section>
       <section class="arena140-combat-top"><span>Раунд <b>${battle.round}</b></span><span>⏱️ <b>${mm}:${ss}</b></span><span>👥 ${lobby?.players.length||2}</span></section>
+      <section class="arena140-team-strip"><span>Твоя сторона: <b>Команда ${battle.team}</b></span><span>${lobby?.mode==='chaos'?'🎲 Распределение завершено':'⚔️ Тактический бой'}</span></section>
       <section class="arena140-select"><div class="arena140-step"><b>1. Атака</b><small>Выбери одну из 4 зон</small></div><div class="arena140-zones">${attacks}</div><div class="arena140-step"><b>2. Защита</b><small>Выбери до двух из 4 зон</small></div><div class="arena140-zones">${defs}</div><button class="arena140-hit" data-hit ${battle.attack&&battle.defense.length===2?'':'disabled'}>⚔️ ПОДТВЕРДИТЬ ХОД</button></section>
       <section class="arena140-log"><div class="arena140-log-head"><b>Боевой журнал</b><button data-collapse>Свернуть</button></div><div class="arena140-log-body">${logs}</div></section>
       <section class="arena140-finish"><button data-finish>Завершить бой</button><button data-extend>Продлить +5 мин</button></section>
@@ -136,7 +142,7 @@
     battle.ended=true;clearInterval(battleTimer);
     const win=result==='Победа';stats.battles++;if(win)stats.wins++;else if(result==='Поражение')stats.losses++;
     stats.history.push({mode:MODE.find(x=>x.id===battle.mode)?.title||'Бой',win,result,at:Date.now()});stats.history=stats.history.slice(-20);
-    localStorage.setItem('territory_arena_v140',JSON.stringify(stats));
+    localStorage.setItem('territory_arena_g43',JSON.stringify(stats));
     if(win){const s=getState();s.coins=Number(s.coins||0)+50;s.exp=Number(s.exp||0)+15;save()}
     lobby=null;battle=null;renderResult(result);
   }
