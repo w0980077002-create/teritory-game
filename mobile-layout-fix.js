@@ -23,10 +23,10 @@ function addStyle(){
 
   /* Transparent, correctly aligned touch targets over the artwork. */
   .territory-g20-hit{position:absolute!important;display:block!important;background:transparent!important;border:0!important;padding:0!important;margin:0!important;z-index:9000!important;pointer-events:auto!important}
-  #g20-left1{left:0;top:16%;width:14%;height:8%}
-  #g20-left2{left:0;top:24%;width:14%;height:8%}
-  #g20-left3{left:0;top:32%;width:14%;height:8%}
-  #g20-left4{left:0;top:40%;width:14%;height:8%}
+  #g20-left1{left:0;top:15.5%;width:14%;height:6.5%}
+  #g20-left2{left:0;top:21.5%;width:14%;height:6.5%}
+  #g20-left3{left:0;top:27.5%;width:14%;height:6.5%}
+  #g20-left4{left:0;top:33.5%;width:14%;height:6.5%}
   #g20-right1{right:0;top:20%;width:15%;height:8%}
   #g20-right2{right:0;top:28%;width:15%;height:8%}
   #g20-right3{right:0;top:36%;width:15%;height:8%}
