@@ -1,19 +1,18 @@
-/* Territory G34 loader — Rewards/Bonuses */
 (function(){
-"use strict";
-function load(src){return new Promise(function(resolve,reject){
- var s=document.createElement("script");s.src=src;s.onload=resolve;s.onerror=reject;
- document.head.appendChild(s);
-});}
-load("arena-core.js?v=140")
-.then(function(){return load("vip.js?v=1");})
-.then(function(){return load("equipment.js?v=1");})
-.then(function(){return load("market.js?v=1");})
-.then(function(){return load("districts.js?v=1");})
-.then(function(){return load("duke-alex.js?v=4");})
-.then(function(){return load("mobile-layout-fix.js?v=29");})
-.then(function(){return load("click-fix.js?v=1");})
-.then(function(){return load("tasks-section.js?v=33");})
-.then(function(){return load("rewards-section.js?v=34");})
-.catch(function(err){console.error("Territory G34 loader:",err);});
+  "use strict";
+  const files=[
+    "arena-core.js?v=140",
+    "vip.js?v=1",
+    "equipment.js?v=1",
+    "market.js?v=1",
+    "districts.js?v=1",
+    "duke-alex.js?v=4",
+    "mobile-layout-fix.js?v=29",
+    "click-fix.js?v=1",
+    "tasks-section.js?v=33",
+    "rewards-section.js?v=34",
+    "development-core.js?v=40"
+  ];
+  function load(src){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});}
+  files.reduce((p,f)=>p.then(()=>load(f)),Promise.resolve()).catch(e=>console.error('Territory G40 load error',e));
 })();
