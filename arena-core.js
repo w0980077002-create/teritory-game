@@ -106,7 +106,7 @@
       lobby.players=shuffled;
     }
     const mode=MODE.find(x=>x.id===lobby.mode)||MODE[0];
-    battle={mode:lobby.mode,team:getState().team||lobby.players[0]?.team||1,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,defense:[],log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
+    battle={mode:lobby.mode,team:getState().team||lobby.players[0]?.team||1,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,defense:[],targetName:'Противник',log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
     renderBattle();
   }
   function zone(id,list){return list.find(z=>z[0]===id)?.[1]||id}
@@ -121,12 +121,14 @@
       <section class="arena140-fighters"><div class="arena140-fighter"><div class="big-avatar">🧔</div><b>${esc(name())}</b><small>ур. ${level()}</small><div class="arena140-hp"><i style="width:${hp1}%"></i></div><span>${Math.round(battle.playerHp)} / ${battle.maxHp} HP</span></div><div class="arena140-vs">VS</div><div class="arena140-fighter enemy"><div class="big-avatar">⚔️</div><b>${lobby?.mode==='group'?'Команда противника':'Противник'}</b><small>отряд</small><div class="arena140-hp"><i style="width:${hp2}%"></i></div><span>${Math.round(battle.enemyHp)} / ${battle.maxEnemyHp} HP</span></div></section>
       <section class="arena140-combat-top"><span>Раунд <b>${battle.round}</b></span><span>⏱️ <b>${mm}:${ss}</b></span><span>👥 ${lobby?.players.length||2}</span></section>
       <section class="arena140-team-strip"><span>Твоя сторона: <b>Команда ${battle.team}</b></span><span>${lobby?.mode==='chaos'?'🎲 Распределение завершено':'⚔️ Тактический бой'}</span></section>
+      ${(lobby?.mode==='group'||lobby?.mode==='chaos')?`<section class="arena140-rosters"><div class="arena140-roster-title"><b>Отряды</b><small>Выбери цель</small></div><div class="arena140-roster-grid"><div><span class="roster-label team1-label">⚔️ Команда 1</span>${(lobby?.players||[]).filter(p=>p.team===1).map(p=>`<button class="arena140-target ${battle.targetName===p.name?'selected':''}" data-target-name="${esc(p.name)}">${p.bot?'⚔️':'🧔'} ${esc(p.name)}<small>ур. ${p.level}</small></button>`).join('')||'<span class="arena140-empty">нет игроков</span>'}</div><div><span class="roster-label team2-label">🛡️ Команда 2</span>${(lobby?.players||[]).filter(p=>p.team===2).map(p=>`<button class="arena140-target ${battle.targetName===p.name?'selected':''}" data-target-name="${esc(p.name)}">${p.bot?'⚔️':'🧔'} ${esc(p.name)}<small>ур. ${p.level}</small></button>`).join('')||'<span class="arena140-empty">нет игроков</span>'}</div></div></section>`:''}
       <section class="arena140-select"><div class="arena140-step"><b>1. Атака</b><small>Выбери одну из 4 зон</small></div><div class="arena140-zones">${attacks}</div><div class="arena140-step"><b>2. Защита</b><small>Выбери до двух из 4 зон</small></div><div class="arena140-zones">${defs}</div><button class="arena140-hit" data-hit ${battle.attack&&battle.defense.length===2?'':'disabled'}>⚔️ ПОДТВЕРДИТЬ ХОД</button></section>
       <section class="arena140-log"><div class="arena140-log-head"><b>Боевой журнал</b><button data-collapse>Свернуть</button></div><div class="arena140-log-body">${logs}</div></section>
       <section class="arena140-finish"><button data-finish>Завершить бой</button><button data-extend>Продлить +5 мин</button></section>
     </div>`);
     body().querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{battle.attack=b.dataset.a;renderBattle()});
     body().querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const z=b.dataset.d;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);else window.arenaToast('Можно закрыть только 2 зоны');renderBattle()});
+    body().querySelectorAll('[data-target-name]').forEach(b=>b.onclick=()=>{battle.targetName=b.dataset.targetName||'Противник';renderBattle()});
     body().querySelector('[data-hit]')?.addEventListener('click',resolveTurn);
     body().querySelector('[data-finish]')?.addEventListener('click',()=>finishBattle('Игрок завершил бой'));
     body().querySelector('[data-extend]')?.addEventListener('click',()=>{battle.endsAt+=300000;window.arenaToast('Бой продлён на 5 минут');renderBattle()});
@@ -141,7 +143,7 @@
     const enemyAttack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)][0];
     const enemyBlocked=battle.defense.includes(enemyAttack);
     battle.enemyHp=Math.max(0,battle.enemyHp-hit);
-    battle.log.push(`⚔️ Атака в «${zone(battle.attack,ATTACK_ZONES)}» нанесла −${hit} HP.`);
+    battle.log.push(`⚔️ Атака в «${zone(battle.attack,ATTACK_ZONES)}» по цели «${battle.targetName}» нанесла −${hit} HP.`);
     if(battle.enemyHp<=0){renderBattle();setTimeout(()=>finishBattle('Победа'),350);return}
     if(enemyBlocked){battle.log.push(`🛡️ Защита закрыла «${zone(enemyAttack,DEF_ZONES)}». Урон остановлен.`)}
     else{const dmg=Math.max(5,Math.round(10+Math.random()*12));battle.playerHp=Math.max(0,battle.playerHp-dmg);battle.log.push(`💥 Противник атаковал «${zone(enemyAttack,ATTACK_ZONES)}»: −${dmg} HP.`)}

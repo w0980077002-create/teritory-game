@@ -61,3 +61,7 @@
 
 /* G43 — compact team strip */
 .arena140-team-strip{display:flex;justify-content:space-between;gap:8px;margin:0 0 7px;padding:7px 9px;border:1px solid #293742;border-radius:10px;background:#18232c;color:#8fa0ab;font-size:9px}.arena140-team-strip b{color:#fff}.arena140-team-strip span:last-child{text-align:right;color:#7f909b}@media(max-width:380px){.arena140-team-strip{font-size:8px}}
+
+/* Territory G45 — squad target UI */
+.arena140-rosters{margin:8px 0;border:1px solid #293742;border-radius:13px;background:#0f171e;padding:9px}.arena140-roster-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.arena140-roster-title b{font-size:11px}.arena140-roster-title small{font-size:9px;color:#7f909c}.arena140-roster-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.arena140-roster-grid>div{min-width:0}.roster-label{display:block;font-size:9px;font-weight:800;margin-bottom:5px}.team1-label{color:#e7a39b}.team2-label{color:#9fc5ea}.arena140-target{width:100%;min-height:36px;margin-bottom:4px;border:1px solid #2f3d48;border-radius:8px;background:#18232c;color:#c9d2d8;text-align:left;padding:5px 7px;font-size:9px}.arena140-target small{display:block;color:#71828e;font-size:8px;margin-top:2px}.arena140-target.selected{border-color:#d06c48;background:#30231f;color:#fff}
+@media(max-width:380px){.arena140-roster-grid{gap:5px}.arena140-target{font-size:8px;padding:5px}.arena140-target small{font-size:7px}}
