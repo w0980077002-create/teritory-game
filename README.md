@@ -1,31 +1,9 @@
-# Territory — canonical mobile base
+# Territory G41 GLOBAL
 
-Canonical mobile frontend base for Territory / Sdolars.
+One integrated gameplay build from the verified G40 TRUE BUTTONS base.
 
-## Core systems
-- Mobile city scene for Sdolars
-- Profile and persistent player state
-- Districts
-- Equipment Market and Inventory
-- Game board with 27 cells, dice, x10 mode, rewards, tasks and jackpot preview
-- Tactical Arena based on the S98 combat implementation
-- Separate `server.js` backend for Telegram/PvP features; backend integration remains isolated from the client base
+Do not split this into small patch folders. Upload the contents of this folder to the GAME repo as one version.
 
-## Frontend
-- `index.html` — screens and UI
-- `style.css` — main mobile UI
-- `game.css` — Game board styling
-- `app.js` — core client state and systems
-- `arena.css` / `arena.js` — Arena implementation
+The City artwork is preserved. The global gameplay layer adds PvE, equipment/durability, character profile, bonuses, tavern/hunger, settings, and the Arena lobby/battle foundation in one pass.
 
-Develop new systems from this base instead of mixing older versions.
-
-
-G40 TRUE FIX: restored the complete embedded Sdolars artwork as the sole visual source on the City screen. The legacy HTML HUD/side labels are hidden on City; invisible touch hotspots remain active.
-
-
-G40 TRUE BUTTONS FIX
-- The city artwork is the approved baked visual reference.
-- Added transparent touch hit areas for top HUD controls and left/right city buttons.
-- Existing data-screen navigation is preserved for Arena, Market, Districts, Game, Inventory and bottom actions.
-- Top utility controls show a small in-game confirmation panel until their full screens are implemented.
+Next architectural step after this build: connect the Arena lobby/battle to the existing SERVER with authoritative WebSocket state and anti-cheat validation.
