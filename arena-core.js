@@ -1,4 +1,4 @@
-/* Territory G46 — Arena squad HP/tactical targeting pass from the video reference + agreed Territory rules.
+/* Territory G48 — Arena team-turn repair based on G47.
    The old S98 opponent-picker is intentionally removed.
    This file owns the Arena modal only and keeps the rest of the game state intact. */
 (()=>{
@@ -106,8 +106,8 @@
       lobby.players=shuffled;
     }
     const mode=MODE.find(x=>x.id===lobby.mode)||MODE[0];
-    const myTeam=Number(getState().team||lobby.players[0]?.team||1)||1;
-    const combatants=lobby.players.map((p,i)=>({...p,id:`${p.name}-${i}`,maxHp:120+Math.max(0,(Number(p.level)||1)-1)*5,hp:120+Math.max(0,(Number(p.level)||1)-1)*5,defeated:false}));
+    const myTeam=Number(lobby.players.find(p=>p.owner)?.team||getState().team||1)||1;
+    const combatants=lobby.players.map((p,i)=>({...p,team:p.team||(lobby.mode==='duel'?(i===0?1:2):p.team),id:`${p.name}-${i}`,maxHp:120+Math.max(0,(Number(p.level)||1)-1)*5,hp:120+Math.max(0,(Number(p.level)||1)-1)*5,defeated:false}));
     battle={mode:lobby.mode,team:myTeam,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,defense:[],targetName:null,combatants,log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
     if(lobby.mode==='duel') battle.targetName=combatants.find(p=>p.team!==myTeam)?.name||'Противник';
     else battle.targetName=combatants.find(p=>p.team&&p.team!==myTeam)?.name||null;
@@ -155,6 +155,8 @@
     const dmg=Math.max(4,Math.round(base*(0.82+Math.random()*.32)));
     battle.playerHp=Math.max(0,battle.playerHp-dmg);
     battle.log.push(`💥 ${actor.name} атакует тебя: −${dmg} HP.`);
+    const me=(battle.combatants||[]).find(p=>p.name===name() && p.team===battle.team);
+    if(me) me.hp=battle.playerHp;
   }
 
   function resolveTurn(){

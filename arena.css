@@ -71,3 +71,7 @@
 .arena140-target:disabled{opacity:.58;cursor:default}
 .arena140-target.defeated{opacity:.45;text-decoration:line-through}
 .arena140-target.selected{box-shadow:inset 0 0 0 1px rgba(238,133,91,.22)}
+
+/* G48 — mobile touch reliability */
+#arenaModal button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+#arenaModal .arena-close{position:relative;z-index:3;pointer-events:auto;}
