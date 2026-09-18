@@ -1,6 +1,6 @@
-# Territory G47 GLOBAL
+# Territory G48 GLOBAL
 
-G47 is a global PvE gameplay pass built from the verified G46 package.
+G48 is a global PvE gameplay pass built from the verified G47 package.
 
 ## PvE now follows the observed/source-defined city loop
 - City PvE is separate from Arena PvP.
@@ -29,8 +29,8 @@ G47 is a global PvE gameplay pass built from the verified G46 package.
 - Arena duel / chaos / group remains a separate PvP prototype.
 
 ## Changed files
-- `Territory_G47_GLOBAL.js`
-- `Territory_G47_GLOBAL.css`
+- `Territory_G48_GLOBAL.js`
+- `Territory_G48_GLOBAL.css`
 - `index.html`
 - `README.md`
 
@@ -46,3 +46,6 @@ G47 is a global PvE gameplay pass built from the verified G46 package.
 Cross-device multiplayer, authoritative economy, anti-cheat and server validation still require the separate SERVER/WebSocket implementation. Boss balance values in this prototype are tunable and are not claimed as final values from the reference video.
 
 Do not upload this package to the SERVER repository.
+
+
+G48: архитектурно разделены городской PvE-бой и Arena PvP. Городской «Бой» использует отдельный PvE-цикл: последовательные боты → 0–100% → отдельный босс с таймером → следующий город. PvE больше не использует командные/комнатные механики Arena. Arena оставлена отдельным PvP-модулем с собственными правилами.
