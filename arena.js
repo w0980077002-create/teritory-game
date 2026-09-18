@@ -1,4 +1,4 @@
-/* Territory G31 loader — robust Tasks button fix */
+/* Territory G32 loader — Tasks + real Battle screen */
 (function(){
 "use strict";
 function load(src){return new Promise(function(resolve,reject){
@@ -14,5 +14,6 @@ load("arena-core.js?v=140")
 .then(function(){return load("mobile-layout-fix.js?v=29");})
 .then(function(){return load("click-fix.js?v=1");})
 .then(function(){return load("tasks-fix.js?v=31");})
-.catch(function(err){console.error("Territory G31 loader:",err);});
+.then(function(){return load("battle-fix.js?v=32");})
+.catch(function(err){console.error("Territory G32 loader:",err);});
 })();
