@@ -1,4 +1,4 @@
-/* Territory G20 loader */
+/* Territory G21 loader */
 (function(){
 "use strict";
 function load(src){return new Promise(function(resolve,reject){
@@ -15,5 +15,6 @@ load("arena-core.js?v=140")
 .then(function(){return load("districts.js?v=1");})
 .then(function(){return load("duke-alex.js?v=4");})
 .then(function(){return load("mobile-layout-fix.js?v=5");})
-.catch(function(err){console.error("Territory G20 loader:",err);});
+.then(function(){return load("click-fix.js?v=1");})
+.catch(function(err){console.error("Territory G21 loader:",err);});
 })();
