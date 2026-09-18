@@ -1,31 +1,26 @@
-/* Territory G12 — fill the actual Telegram game viewport */
+/* Territory G17 — preserve full approved artwork, no crop/stretch */
 (function(){
 "use strict";
 function apply(){
- var style=document.getElementById("territoryG12Layout");
- if(!style){
-  style=document.createElement("style");
-  style.id="territoryG12Layout";
-  style.textContent=`
+ var s=document.getElementById("territoryG17Layout");
+ if(!s){
+  s=document.createElement("style");s.id="territoryG17Layout";
+  s.textContent=`
    body:has(#home.active){overflow:hidden!important;background:#07111b!important}
-   body:has(#home.active) #app,body:has(#home.active) main,body:has(#home.active) #home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
-   body:has(#home.active) .real-home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#07111b!important}
-   body:has(#home.active) .real-home-image{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;min-height:0!important;object-fit:cover!important;object-position:center center!important;margin:0!important;padding:0!important;display:block!important}
-   body:has(#home.active) .ref-hud{pointer-events:none!important}
-   body:has(#home.active) .v5-click-layer{z-index:500!important}
-   #territoryAlexButton{display:none!important}
-   #territoryAlexHit{position:absolute;left:3%;bottom:9%;width:42%;height:43%;z-index:6500;background:transparent;border:0;padding:0;margin:0}
+   body:has(#home.active) #app{max-width:none!important;width:100%!important;height:100dvh!important;background:#07111b!important}
+   body:has(#home.active) main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important}
+   body:has(#home.active) #home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;padding:0!important;margin:0!important;overflow:hidden!important}
+   body:has(#home.active) .real-home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;background:#07111b!important}
+   body:has(#home.active) .real-home-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:fill!important;object-position:center center!important;display:block!important;margin:0!important}
+   body:has(#home.active) .living-scene{display:none!important}
+   body:has(#home.active) .ref-hud{display:none!important}
+   body:has(#home.active) .hotspot{background:transparent!important;border:0!important}
+   body:has(#home.active) #territoryAlexButton{display:none!important}
   `;
-  document.head.appendChild(style);
- }
- var home=document.getElementById("home");
- if(home&&!document.getElementById("territoryAlexHit")){
-  var b=document.createElement("button");
-  b.id="territoryAlexHit";b.type="button";b.setAttribute("aria-label","Герцог Alex");
-  b.addEventListener("click",function(){if(window.TerritoryDukeAlex)window.TerritoryDukeAlex.open()});
-  home.appendChild(b);
+  document.head.appendChild(s);
  }
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",apply);else apply();
-setTimeout(apply,500);
+setTimeout(apply,300);
+setTimeout(apply,1000);
 })();
