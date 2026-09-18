@@ -197,6 +197,23 @@ body:has(#home.active) #home .living-scene{display:none!important;}
     <button id="g40-equipment" class="g40-hit" data-screen="inventory" aria-label="Экипировка"></button>
     <button id="g40-quests" class="g40-hit" data-screen="districts" aria-label="Задания"></button>
     <button id="g40-map" class="g40-hit" data-screen="districts" aria-label="Карта"></button>
+    <!-- G40 TRUE functional overlays: the artwork contains the visible controls. -->
+    <button class="g40-ui-hit" style="left:4.2%;top:1.0%;width:10.8%;height:7.0%" data-ui="profile" aria-label="Профиль"></button>
+    <button class="g40-ui-hit" style="left:39.0%;top:1.0%;width:15.0%;height:4.5%" data-ui="gems" aria-label="Алмазы"></button>
+    <button class="g40-ui-hit" style="left:57.0%;top:1.0%;width:15.0%;height:4.5%" data-ui="coins" aria-label="Монеты"></button>
+    <button class="g40-ui-hit" style="left:75.8%;top:1.0%;width:18.8%;height:4.5%" data-ui="energy" aria-label="Энергия"></button>
+    <button class="g40-ui-hit" style="left:56.0%;top:5.0%;width:10.2%;height:5.0%" data-ui="messages" aria-label="Сообщения"></button>
+    <button class="g40-ui-hit" style="left:66.0%;top:5.0%;width:10.4%;height:5.0%" data-ui="achievements" aria-label="Достижения"></button>
+    <button class="g40-ui-hit" style="left:77.0%;top:5.0%;width:10.0%;height:5.0%" data-ui="settings" aria-label="Настройки"></button>
+    <button class="g40-ui-hit" style="left:87.5%;top:5.0%;width:10.0%;height:5.0%" data-ui="language" aria-label="Язык"></button>
+    <button class="g40-ui-hit" style="left:1.0%;top:17.0%;width:12.0%;height:6.0%" data-ui="bonuses" aria-label="Бонусы"></button>
+    <button class="g40-ui-hit" style="left:1.0%;top:23.5%;width:12.0%;height:6.0%" data-ui="events" aria-label="События"></button>
+    <button class="g40-ui-hit" style="left:1.0%;top:30.0%;width:12.0%;height:6.0%" data-ui="vip" aria-label="VIP"></button>
+    <button class="g40-ui-hit" style="left:1.0%;top:36.8%;width:12.0%;height:6.0%" data-screen="game" aria-label="Game"></button>
+    <button class="g40-ui-hit" style="right:1.0%;top:24.3%;width:12.5%;height:6.5%" data-screen="inventory" aria-label="Кузница"></button>
+    <button class="g40-ui-hit" style="right:1.0%;top:31.5%;width:12.5%;height:6.5%" data-ui="tavern" aria-label="Таверна"></button>
+    <button class="g40-ui-hit" style="right:1.0%;top:38.5%;width:12.5%;height:6.5%" data-screen="market" aria-label="Магазин"></button>
+
     <div class="live-city-title" aria-label="Город Sdolars"><small>ГОРОД</small><strong>SDOLARS</strong><em>ЦЕНТРАЛЬНЫЙ КВАРТАЛ</em></div>
     <div class="live-city-time">19:42 · ВЕЧЕР <b>🌙</b></div><div id="alexQuestBadge" class="alex-quest-badge">Город</div>
     <div class="live-side-ui" aria-label="Быстрые действия">
@@ -212,6 +229,7 @@ body:has(#home.active) #home .living-scene{display:none!important;}
     <button class="hotspot hs-game" data-screen="game" aria-label="Game"></button>
     <button class="npc-label guard-label" data-screen="districts" aria-label="Alex — Лорд-командующий"><b>Alex</b><small>Лорд-командующий</small></button>
     <button class="npc-label trader-label" data-screen="market" aria-label="Торговец"><b>Торговец</b><small>Покупка / Продажа</small></button>
+    <div id="g40UiToast" class="g40-ui-toast" aria-live="polite"></div>
     <button class="hotspot hs-weapon" data-screen="market" aria-label="Оружие"></button>
     <button class="hotspot hs-city" data-screen="districts" aria-label="Центр Sdolars"></button>
     <button class="hotspot hs-bottom-home" data-screen="home" aria-label="Город"></button>

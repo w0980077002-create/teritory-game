@@ -784,3 +784,25 @@ if(jackpotCloseV79)jackpotCloseV79.onclick=gameCloseJackpotPreviewV79;
 const jackpotModalV79=$('#gameJackpotModal');
 if(jackpotModalV79)jackpotModalV79.addEventListener('click',e=>{if(e.target===jackpotModalV79)gameCloseJackpotPreviewV79()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPreviewV79()});
+
+
+/* G40 TRUE — wire the controls that are visually baked into the city artwork. */
+(function(){
+  const home=document.querySelector('#home .real-home'); if(!home)return;
+  const toast=document.getElementById('g40UiToast');
+  const labels={
+    profile:'Профиль персонажа', gems:'Алмазы', coins:'Монеты', energy:'Энергия',
+    messages:'Сообщения', achievements:'Достижения', settings:'Настройки', language:'Язык: RU / EN',
+    bonuses:'Бонусы', events:'События', vip:'VIP', tavern:'Таверна'
+  };
+  let timer=0;
+  home.addEventListener('click',function(e){
+    const b=e.target.closest('[data-ui]'); if(!b)return;
+    e.preventDefault(); e.stopPropagation();
+    const key=b.dataset.ui;
+    if(!toast)return;
+    toast.textContent=labels[key]||key;
+    toast.classList.add('show');
+    clearTimeout(timer); timer=setTimeout(()=>toast.classList.remove('show'),1800);
+  },true);
+})();

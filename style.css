@@ -1832,3 +1832,10 @@ body:has(#casino.active) #casino .reward-step{cursor:pointer!important}
 #casino.game-screen.active .task-row button{font-size:8px!important;padding:8px 10px!important;background:linear-gradient(180deg,#a66a31,#61351e)!important;border-color:#d9a15a!important;color:#ffecc2!important}
 #casino.game-screen.active .game-status{z-index:40!important}
 @media(max-height:700px){#casino.game-screen.active .game-panel-card,#casino.game-screen.active .game-tasks-card{max-height:72%!important}}
+
+
+/* G40 TRUE — functional transparent hit areas for controls baked into sdolars_clean_scene.png */
+.g40-ui-hit{position:absolute;z-index:80;display:block;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.g40-ui-hit:focus{outline:none}
+.g40-ui-toast{position:absolute;z-index:120;left:50%;bottom:15%;transform:translateX(-50%) translateY(12px);min-width:190px;max-width:82%;padding:11px 14px;border:1px solid #8190a0;border-radius:12px;background:rgba(8,18,29,.94);color:#f3f5f7;text-align:center;font-size:14px;line-height:1.25;box-shadow:0 8px 28px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:.18s ease}
+.g40-ui-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}

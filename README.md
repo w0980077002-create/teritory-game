@@ -22,3 +22,10 @@ Develop new systems from this base instead of mixing older versions.
 
 
 G40 TRUE FIX: restored the complete embedded Sdolars artwork as the sole visual source on the City screen. The legacy HTML HUD/side labels are hidden on City; invisible touch hotspots remain active.
+
+
+G40 TRUE BUTTONS FIX
+- The city artwork is the approved baked visual reference.
+- Added transparent touch hit areas for top HUD controls and left/right city buttons.
+- Existing data-screen navigation is preserved for Arena, Market, Districts, Game, Inventory and bottom actions.
+- Top utility controls show a small in-game confirmation panel until their full screens are implemented.
