@@ -84,8 +84,8 @@ function renderShop(){
 $("#shopGrid").addEventListener("click",e=>{
  const b=e.target.closest("[data-buy]"); if(!b)return;
  const w=weapons.find(x=>x.name===b.dataset.buy); const cost=Number(b.dataset.cost||w.cost);
- if((window.TerritoryEconomy? !window.TerritoryEconomy.canAfford('coins',cost):state.coins<cost)){const l=$("#merchantLog");if(l)l.textContent="Торговец: «Не хватает монет.»";return;}
- if(window.TerritoryEconomy)window.TerritoryEconomy.spend('coins',cost,'market-purchase'); else state.coins-=cost;state.weapon=w.name;state.bonusDamage=w.damage;state.inventory.push(w.icon);state.merchantRep+=1;
+ if(state.coins<cost){const l=$("#merchantLog");if(l)l.textContent="Торговец: «Не хватает монет.»";return;}
+ state.coins-=cost;state.weapon=w.name;state.bonusDamage=w.damage;state.inventory.push(w.icon);state.merchantRep+=1;
  const l=$("#merchantLog");if(l)l.textContent=`Торговец: «Хорошая покупка. ${w.name} теперь твой.» +1 репутация`;
  save();
 });
