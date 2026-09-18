@@ -1,5 +1,5 @@
 /* Territory v139 — canonical base + S98 Arena integration */
-const defaultState={coins:1000,gems:25,level:1,exp:0,maxExp:100,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
+const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
 function gameLoadState(){
   try{
     const raw=localStorage.getItem("territory_save_v1");
@@ -13,7 +13,7 @@ function gameLoadState(){
 }
 let state=gameLoadState();
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
-state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.combatStone=Math.max(0,Number(state.combatStone??0)||0); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.name||"SSS"); state.freePoints=Math.max(0,Number(state.freePoints??0)||0);
+state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.name||"SSS");
 state.gameDice=Math.max(0,Number(state.gameDice??47)||0); state.gameRolls=Math.max(0,Number(state.gameRolls??0)||0); state.gameSteps=Math.max(0,Number(state.gameSteps??0)||0); state.gameEventVersion=Number(state.gameEventVersion??1)||1; state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0); state.gameMilestones=Array.isArray(state.gameMilestones)?[...new Set(state.gameMilestones.map(Number).filter(Number.isFinite))]:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?[...new Set(state.gameTaskClaims.map(String))]:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?[...new Set(state.gamePanelClaims.map(String))]:[]; state.gameJackpotClaims=Array.isArray(state.gameJackpotClaims)?[...new Set(state.gameJackpotClaims.map(Number).filter(Number.isFinite))]:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS; state.gameSaveVersion=2;
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
@@ -30,9 +30,8 @@ function save(){
   state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
   state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0);
   state.gameSaveVersion=2; state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0);
-  saveLocalOnly();
+  try{ localStorage.setItem("territory_save_v1",JSON.stringify(state)); }catch(e){ console.warn("Territory save failed",e); }
   render();
-  scheduleTerritoryRemoteSave();
 }
 window.addEventListener("pagehide",()=>{try{state.gameMoving=false; save();}catch(e){}});
 window.addEventListener("beforeunload",()=>{try{state.gameMoving=false; save();}catch(e){}});
@@ -49,170 +48,6 @@ window.addEventListener("storage",e=>{
     }
   }catch(err){console.warn("Territory external save ignored",err);}
 });
-/* Territory v9 — Telegram player identity
-   The profile is intentionally tied to the Telegram account that opened the Mini App:
-   • photo_url -> real Telegram profile photo
-   • first_name + last_name -> Telegram display name
-   • username -> fallback when the name is unavailable
-   • profile_avatar.png -> final fallback when Telegram has no usable photo
-
-   IMPORTANT: initDataUnsafe is used only for display in this client.
-   For real account authentication and server saves, the backend must validate
-   Telegram.WebApp.initData using the bot token. Never trust the Telegram ID from the client alone.
-*/
-function getTelegramUser(){
-  try{
-    const tg=window.Telegram&&window.Telegram.WebApp;
-    if(!tg) return null;
-    try{tg.ready(); tg.expand();}catch(_e){}
-    const u=tg.initDataUnsafe&&tg.initDataUnsafe.user;
-    return u&&u.id?u:null;
-  }catch(e){return null;}
-}
-function telegramDisplayName(u){
-  if(!u)return 'Territory';
-  const first=String(u.first_name||'').trim();
-  const last=String(u.last_name||'').trim();
-  const username=String(u.username||'').trim();
-  const full=[first,last].filter(Boolean).join(' ');
-  return full || (username ? '@'+username : 'Territory');
-}
-function applyTelegramProfile(){
-  const u=getTelegramUser();
-  const nameEl=$('#profilePlayerName');
-  const avatar=$('#profileAvatar');
-
-  if(!u){
-    // Outside Telegram: keep the local game name and the safe standard avatar.
-    // We deliberately do not reuse another user's cached Telegram identity.
-    if(nameEl) nameEl.textContent=String(state.name||'Territory');
-    if(avatar){
-      avatar.src='profile_avatar.png';
-      avatar.alt='Стандартный аватар Territory';
-    }
-    return;
-  }
-
-  const name=telegramDisplayName(u);
-  const photo=String(u.photo_url||'').trim();
-
-  if(nameEl){
-    nameEl.textContent=name;
-    nameEl.title=name;
-  }
-  if(avatar){
-    avatar.onerror=()=>{
-      avatar.onerror=null;
-      avatar.src='profile_avatar.png';
-      avatar.alt=`Стандартный аватар — ${name}`;
-    };
-    avatar.src=photo || 'profile_avatar.png';
-    avatar.alt=photo ? `Фото Telegram — ${name}` : `Стандартный аватар — ${name}`;
-  }
-
-  // Keep the Telegram identity attached to this local save for the next server step.
-  state.telegramUserId=String(u.id);
-  state.telegramUsername=String(u.username||'');
-  state.telegramDisplayName=name;
-  state.name=name;
-  state.telegramPhotoUrl=photo;
-}
-
-const TERRITORY_SERVER_URL='https://territory-sdolars-server.w0660077702.workers.dev';
-let territoryServerReady=false;
-let territoryServerPromise=null;
-let territoryRemoteSaveTimer=null;
-let territoryRemoteSaveInFlight=false;
-let territoryRemoteSaveQueued=false;
-
-function getTelegramInitData(){
-  try{
-    const tg=window.Telegram&&window.Telegram.WebApp;
-    return tg&&typeof tg.initData==='string'?tg.initData:'';
-  }catch(e){return '';}
-}
-function territoryStateForServer(){
-  const copy={...state};
-  delete copy.telegramUserId;
-  delete copy.telegramUsername;
-  delete copy.telegramDisplayName;
-  delete copy.telegramPhotoUrl;
-  return copy;
-}
-async function territoryPost(path,payload){
-  const res=await fetch(TERRITORY_SERVER_URL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),cache:'no-store'});
-  let data=null;
-  try{data=await res.json();}catch(e){throw new Error('Сервер вернул неверный ответ');}
-  if(!res.ok||!data||data.ok!==true)throw new Error(data&&data.error?data.error:`HTTP ${res.status}`);
-  return data;
-}
-async function territoryServerAuth(){
-  const initData=getTelegramInitData();
-  if(!initData){return false;}
-  const localRaw=localStorage.getItem('territory_save_v1');
-  let localSnapshot=null;
-  try{localSnapshot=localRaw?JSON.parse(localRaw):null;}catch(e){localSnapshot=null;}
-  try{
-    const data=await territoryPost('/api/auth',{initData});
-    const u=getTelegramUser();
-    if(data.created){
-      const sameUser=!!(u&&localSnapshot&&String(localSnapshot.telegramUserId||'')===String(u.id));
-      if(sameUser){
-        state={...localSnapshot};
-        applyTelegramProfile();
-        saveLocalOnly();
-        await territoryPost('/api/save',{initData,state:territoryStateForServer()});
-      }else{
-        state={...data.state};
-        applyTelegramProfile();
-        saveLocalOnly();
-      }
-    }else if(data.state&&typeof data.state==='object'){
-      state={...state,...data.state};
-      applyTelegramProfile();
-      saveLocalOnly();
-    }
-    territoryServerReady=true;
-    render();
-    return true;
-  }catch(err){
-    console.warn('Territory server auth failed; local save remains active:',err);
-    territoryServerReady=false;
-    return false;
-  }
-}
-function saveLocalOnly(){
-  try{localStorage.setItem('territory_save_v1',JSON.stringify(state));}catch(e){console.warn('Territory local save failed',e);}
-}
-function scheduleTerritoryRemoteSave(){
-  if(!getTelegramInitData())return;
-  clearTimeout(territoryRemoteSaveTimer);
-  territoryRemoteSaveTimer=setTimeout(()=>territoryRemoteSave(),700);
-}
-async function territoryRemoteSave(){
-  if(!getTelegramInitData())return;
-  if(!territoryServerReady){
-    if(territoryServerPromise)await territoryServerPromise;
-    if(!territoryServerReady)return;
-  }
-  if(territoryRemoteSaveInFlight){territoryRemoteSaveQueued=true;return;}
-  territoryRemoteSaveInFlight=true;
-  try{
-    const initData=getTelegramInitData();
-    await territoryPost('/api/save',{initData,state:territoryStateForServer()});
-  }catch(err){
-    console.warn('Territory remote save failed; local save is safe:',err);
-  }finally{
-    territoryRemoteSaveInFlight=false;
-    if(territoryRemoteSaveQueued){territoryRemoteSaveQueued=false;territoryRemoteSave();}
-  }
-}
-function startTerritoryServer(){
-  if(territoryServerPromise)return territoryServerPromise;
-  territoryServerPromise=territoryServerAuth();
-  return territoryServerPromise;
-}
-
 function render(){
  const coins=$("#coins"), gems=$("#gems"), level=$("#level");
  if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
@@ -220,21 +55,45 @@ function render(){
  const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
  renderShop(); renderInventory();
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
- const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
- applyTelegramProfile();
- set("#profileLevel",state.level); set("#profileLevelText",Math.max(1,state.level));
- set("#profileExp",`${state.exp||120}/${state.maxExp||300}`);
- set("#profileGems",state.gems); set("#profileCoins",state.coins); set("#profileEnergy",`${state.energy}/200`); set("#profileStone",state.combatStone);
- set("#profileStrength",state.strength); set("#profileAgility",state.agility); set("#profileDefense",state.defense); set("#profileFreePoints",state.freePoints);
- set("#profileWeapon",state.weapon); set("#profileWeaponStats",`Урон +${state.bonusDamage}`);
- const pb=$("#profileExpBar"); if(pb)pb.style.width=Math.max(0,Math.min(100,(Number(state.exp||120)/Math.max(1,Number(state.maxExp||300)))*100))+"%";
 }
 function showScreen(id){
- document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
+ const target=document.getElementById(id);
+ if(!target)return;
+ document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x===target));
  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));
- if(id==="arena") setTimeout(()=>{ if(window.openBattle) window.openBattle(); },0);
+ // G49: Arena is a standalone PvP section. Never open it from the PvE button,
+ // and never route the city PvE button to the Game/Monopoly screen.
+ if(id==="arena") setTimeout(()=>{ if(window.openArena) window.openArena(); },0);
+ if(id==="pve") setTimeout(()=>{ if(window.pveInit) window.pveInit(); },0);
 }
-document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b)showScreen(b.dataset.screen)});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b){e.preventDefault();e.stopPropagation();showScreen(b.dataset.screen)}});
+
+/* G49 — City PvE battle: deliberately separate from Arena and Game/Monopoly. */
+(function initPVE(){
+ const A=[['head','Голова'],['chest','Грудь'],['stomach','Живот'],['legs','Ноги']];
+ let battle={enemyHp:100,maxHp:100,attack:null,defense:[],progress:0,enemy:0,ended:false};
+ const enemyData=[['👹','Разбойник у ворот'],['🧟','Городской налётчик'],['⚔️','Страж дороги'],['🐺','Дикий хищник']];
+ const $=s=>document.querySelector(s);
+ function log(t){const el=$("#pveLog");if(!el)return;const row=document.createElement('div');row.textContent=t;el.appendChild(row);el.scrollTop=el.scrollHeight;}
+ function draw(){
+   const pa=$("#pveAttackZones"),pd=$("#pveDefenseZones"),btn=$("#pveAttackBtn"); if(!pa||!pd)return;
+   pa.innerHTML=A.map(z=>`<button class="g49-zone ${battle.attack===z[0]?'sel-a':''}" data-pve-a="${z[0]}">${z[1]}</button>`).join('');
+   pd.innerHTML=A.map(z=>`<button class="g49-zone ${battle.defense.includes(z[0])?'sel-d':''}" data-pve-d="${z[0]}">${z[1]}</button>`).join('');
+   btn.disabled=!!battle.ended||!battle.attack||battle.defense.length!==2;
+   $("#pveEnemyHp").style.width=`${Math.max(0,battle.enemyHp/battle.maxHp*100)}%`; $("#pveHpText").textContent=`${Math.round(battle.enemyHp)} / ${battle.maxHp} HP`;
+   const pt=$("#pveProgress"),tt=$("#pveProgressText"); if(pt)pt.style.width=`${battle.progress}%`; if(tt)tt.textContent=battle.ended?`Путь завершён · прогресс ${battle.progress}%`:`Обычный противник · прогресс ${battle.progress}%`;
+ }
+ function resetEnemy(){const e=enemyData[battle.enemy%enemyData.length];$("#pveEnemyArt").textContent=e[0];$("#pveEnemyName").textContent=e[1];battle.enemyHp=100;battle.maxHp=100;battle.attack=null;battle.defense=[];battle.ended=false;draw();}
+ function hit(){if(battle.ended||!battle.attack||battle.defense.length!==2)return;
+   const dmg=10+Math.floor(Math.random()*9)+(battle.attack==='head'?3:0);battle.enemyHp=Math.max(0,battle.enemyHp-dmg);log(`⚔️ Ты атаковал «${A.find(x=>x[0]===battle.attack)[1]}»: −${dmg} HP.`);
+   const enemyAttack=A[Math.floor(Math.random()*A.length)][0];
+   if(battle.enemyHp<=0){battle.progress=Math.min(100,battle.progress+25);log('🏆 Противник побеждён. Путь продолжается вправо.');battle.enemy++; if(battle.progress>=100){battle.ended=true;$("#pveEnemyName").textContent='Босс Sdolars';$("#pveEnemyDesc").textContent='Следующая цель — городской босс';log('👑 Достигнут 100%. Появился БОСС.');} else resetEnemy(); draw(); return;}
+   if(battle.defense.includes(enemyAttack)){log(`🛡️ Ты заблокировал атаку в «${A.find(x=>x[0]===enemyAttack)[1]}».`);} else {log(`💥 Противник атаковал «${A.find(x=>x[0]===enemyAttack)[1]}»: −${6+Math.floor(Math.random()*7)} HP.`);}
+   battle.attack=null;battle.defense=[];draw();
+ }
+ window.pveInit=()=>{if(!$("#pveAttackZones"))return;if(!battle.started){battle.started=true;draw()}};
+ document.addEventListener('click',e=>{const a=e.target.closest('[data-pve-a]');if(a){battle.attack=a.dataset.pveA;draw();return}const d=e.target.closest('[data-pve-d]');if(d){const z=d.dataset.pveD;if(battle.defense.includes(z))battle.defense=battle.defense.filter(x=>x!==z);else if(battle.defense.length<2)battle.defense.push(z);draw();return}if(e.target.closest('#pveAttackBtn'))hit()});
+})();
 function renderShop(){
  const day=Math.floor(Date.now()/86400000);
  if(state.marketDay!==day){ state.marketDay=day; }
@@ -618,8 +477,6 @@ gameEventTimer();
 
 render();
 showScreen("home");
-applyTelegramProfile();
-startTerritoryServer();
 /* Territory v35 — живой игровой город: без навязчивого автоспама */
 (function initLivingCity(){
   const home=document.querySelector('.real-home');
@@ -927,30 +784,3 @@ if(jackpotCloseV79)jackpotCloseV79.onclick=gameCloseJackpotPreviewV79;
 const jackpotModalV79=$('#gameJackpotModal');
 if(jackpotModalV79)jackpotModalV79.addEventListener('click',e=>{if(e.target===jackpotModalV79)gameCloseJackpotPreviewV79()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPreviewV79()});
-
-
-/* Territory v6 — Profile stats */
-document.addEventListener('click',e=>{
- const b=e.target.closest('#profile [data-stat]'); if(!b)return;
- const key=b.dataset.stat;
- if(Number(state.freePoints||0)<=0)return;
- if(!['strength','agility','defense'].includes(key))return;
- state[key]=Math.max(0,Number(state[key]||0)+1); state.freePoints=Math.max(0,Number(state.freePoints||0)-1); save();
-});
-
-/* Approved City HUD actions */
-(function(){
-  const labels={messages:'Сообщения',achievements:'Достижения',settings:'Настройки',language:'Язык: English',combatstone:'Боевой камень',bonuses:'Бонусы',events:'События',vip:'VIP',forge:'Кузница',tavern:'Таверна',shop:'Магазин',gems:'Алмазы',coins:'Монеты',energy:'Энергия'};
-  function refToast(text){
-    let t=document.getElementById('refToast');
-    if(!t){t=document.createElement('div');t.id='refToast';document.body.appendChild(t);}
-    t.textContent=text;t.classList.add('show');clearTimeout(refToast._t);refToast._t=setTimeout(()=>t.classList.remove('show'),1600);
-  }
-  document.addEventListener('click',e=>{
-    const b=e.target.closest('[data-action]'); if(!b)return;
-    const a=b.dataset.action;
-    if(a==='fight'){showScreen('game');refToast('⚔️ Боевой путь: движение по городу');return;}
-    if(a==='gems'||a==='coins'||a==='energy'||a==='combatstone'){refToast(labels[a]+': '+(a==='gems'?state.gems:a==='coins'?state.coins:a==='energy'?`${state.energy}/200`:state.combatStone));return;}
-    refToast(labels[a]||'Открыто');
-  });
-})();

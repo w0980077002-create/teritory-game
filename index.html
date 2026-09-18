@@ -4,8 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#10131a">
-<title>Territory — Sdolars · LIVE v140</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>Territory — Sdolars · LIVE v139</title>
 <link rel="stylesheet" href="style.css?v=139">
 <link rel="stylesheet" href="game.css?v=139">
 <link rel="stylesheet" href="arena.css?v=139">
@@ -21,10 +20,6 @@
 .hotspot-weapon{left:5%;bottom:23%;width:27%;height:13%}
 .hotspot-market{right:5%;bottom:23%;width:27%;height:13%}
 .hotspot-center{left:30%;right:30%;bottom:31%;height:12%}
-
-/* V5 resource controls: top resource panels are real touch targets. */
-.ref-resource{pointer-events:auto!important;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-.ref-resource:active{filter:brightness(1.18);transform:scale(.985);}
 </style>
 
 <style id="territory-v23-reference-screen">
@@ -94,85 +89,73 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
 </style>
 
 
-<style id="territory-v5-single-layer">
-/* V5 — single visual layer: the approved reference image is shown once. */
-.home-real { position: relative !important; overflow: hidden !important; padding: 0 !important; margin: 0 !important; width: 100% !important; height: 100dvh !important; min-height: 0 !important; background: #07111b !important; }
-.home-real .real-home { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; overflow: hidden !important; }
-.home-real .real-home-image { position: absolute !important; inset: 0 !important; display: block !important; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; object-fit: fill !important; z-index: 1 !important; user-select: none !important; -webkit-user-drag: none !important; }
-.home-real .ref-hud, .home-real .hotspot, .home-real .npc-label, .home-real .living-scene { display: none !important; }
-body:has(#home.active) .bottom-nav { display: none !important; }
-.v5-click-layer { position: absolute !important; inset: 0 !important; z-index: 9999 !important; pointer-events: none !important; }
-.v5-zone { position: absolute !important; display: block !important; margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; opacity: 0 !important; pointer-events: auto !important; -webkit-tap-highlight-color: transparent !important; cursor: pointer !important; }
-.v5-zone:active { opacity: .08 !important; background: #fff !important; }
-.v5-profile{left:0%;top:0%;width:37%;height:10%;}
-/* 4 resources in the approved 1024x1536 reference: diamonds, coins, energy, combat stone */
-.v5-resource-gems{left:37.0%;top:0.6%;width:18.2%;height:5.0%;}
-.v5-resource-coins{left:56.2%;top:0.6%;width:18.8%;height:5.0%;}
-.v5-resource-energy{left:76.0%;top:0.6%;width:22.2%;height:5.0%;}
-.v5-resource-stone{left:38.8%;top:5.4%;width:15.8%;height:4.2%;}
-.v5-messages{left:53%;top:5%;width:12%;height:7%;}.v5-achievements{left:65%;top:5%;width:12%;height:7%;}.v5-settings{left:77%;top:5%;width:12%;height:7%;}.v5-language{left:89%;top:5%;width:11%;height:7%;}
-.v5-task{left:1%;top:10%;width:36%;height:10%;}.v5-daily{left:69%;top:12%;width:30%;height:8%;}
-.v5-left1{left:1%;top:20%;width:11%;height:9%;}.v5-left2{left:1%;top:29%;width:11%;height:9%;}.v5-left3{left:1%;top:38%;width:11%;height:9%;}.v5-left4{left:1%;top:47%;width:11%;height:9%;}
-.v5-right1{right:1%;top:30%;width:12%;height:10%;}.v5-right2{right:1%;top:40%;width:12%;height:10%;}.v5-right3{right:1%;top:50%;width:12%;height:10%;}
-.v5-bottom1{left:1%;bottom:2%;width:16%;height:12%;}.v5-bottom2{left:17%;bottom:2%;width:16%;height:12%;}.v5-bottom3{left:34%;bottom:2%;width:16%;height:12%;}.v5-bottom4{left:51%;bottom:2%;width:16%;height:12%;}.v5-bottom5{left:68%;bottom:2%;width:16%;height:12%;}.v5-bottom6{left:84%;bottom:2%;width:15%;height:12%;}
-@media (max-width: 420px) { .v5-zone:active { opacity: .12 !important; } }
-</style>
-
-<style id="territory-v61-profile">
-.profile-screen{background:linear-gradient(#07111b,#0b1722)!important;color:#fff;padding:0 12px 86px;overflow:auto}.profile-head{height:58px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(76,164,255,.25);position:sticky;top:0;background:#07111b;z-index:5}.profile-head h2{margin:0;font-size:19px;letter-spacing:1px}.profile-back{width:42px;height:42px;border-radius:12px;border:1px solid #236da6;background:#0b2234;color:#fff;font-size:32px;line-height:1}.profile-card{margin:12px 0 10px;padding:10px;border:1px solid #1878bd;border-radius:16px;background:linear-gradient(135deg,rgba(5,22,39,.98),rgba(9,34,56,.94));display:flex;align-items:center;gap:12px;box-shadow:0 0 18px rgba(0,130,255,.16)}.profile-avatar-wrap{width:104px;height:118px;position:relative;flex:none;border:3px solid #72baff;border-radius:16px;overflow:hidden;background:#102337}.profile-avatar-img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block}.profile-level{position:absolute;left:-1px;bottom:-1px;background:#071522;border:2px solid #6fbaff;border-radius:10px;padding:3px 9px;font-size:20px;font-weight:900}.profile-main{min-width:0;flex:1}.profile-name{font-family:Georgia,serif;font-size:31px;font-weight:900;text-shadow:0 2px 5px #000}.profile-chapter{font-size:16px;color:#4ee5ff;margin:2px 0 12px}.profile-exp{height:22px;border:2px solid #14618f;border-radius:13px;background:#02070d;position:relative;overflow:hidden}.profile-exp i{position:absolute;left:0;top:0;bottom:0;width:40%;background:linear-gradient(90deg,#08bfff,#2d75ff);display:block}.profile-exp b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px}.profile-resources{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.profile-resources div{padding:9px 4px;border:1px solid #216e9e;border-radius:10px;background:#081a2a;text-align:center;font-size:18px}.profile-resources b{display:block;font-size:12px;margin-top:3px}.profile-section-title{margin:16px 2px 7px;color:#52ddff;font-weight:900;letter-spacing:1px}.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.profile-stats button{border:1px solid #236d9e;border-radius:13px;background:linear-gradient(#102b42,#071522);color:#fff;padding:10px 5px;min-height:116px}.profile-stats span{font-size:25px;display:block}.profile-stats b{display:block;font-size:13px;margin-top:3px}.profile-stats strong{display:block;font-size:25px;color:#ffd45a;margin:4px}.profile-stats small{display:block;font-size:9px;color:#9fb5c7}.profile-points{margin-top:9px;padding:11px;border-radius:11px;background:#101f2b;border:1px solid #2b5874;text-align:center;color:#b7c9d6}.profile-points b{color:#ffd34d}.profile-equipment{margin-top:10px;padding:12px;border-radius:14px;border:1px solid #245f88;background:#0a1b2a;display:flex;align-items:center;justify-content:space-between;gap:8px}.profile-equipment div{display:grid;grid-template-columns:34px 1fr;column-gap:7px}.profile-equipment span{grid-row:1/3;font-size:26px}.profile-equipment b{font-size:14px}.profile-equipment small{font-size:10px;color:#a7bdcc}.profile-equipment button{border:1px solid #2b86c1;border-radius:9px;background:#0d3653;color:#fff;padding:9px 10px;font-weight:800}@media(max-width:390px){.profile-avatar-wrap{width:88px;height:105px}.profile-name{font-size:26px}.profile-chapter{font-size:13px}.profile-stats button{min-height:108px}}
+<style id="territory-g49-navigation-lock">
+/* G49: screens are isolated layers. Only the active screen can occupy the viewport. */
+#app{position:relative;overflow:hidden!important}
+#app>main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important;z-index:1!important}
+#app>main>.screen{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;display:none!important;overflow:auto!important;padding:0!important}
+#app>main>.screen.active{display:block!important}
+#app>main>#home.home-real{overflow:hidden!important}
+#app>main>#game.game-screen{overflow:hidden!important}
+/* The artwork already contains the six-button bottom bar. Use six precise invisible hit areas. */
+body:has(#home.active) .hs-bottom-battle,
+body:has(#home.active) .hs-bottom-arena6,
+body:has(#home.active) .hs-bottom-inventory6,
+body:has(#home.active) .hs-bottom-equipment6,
+body:has(#home.active) .hs-bottom-quests6,
+body:has(#home.active) .hs-bottom-map6{display:block!important;position:absolute!important;bottom:0!important;height:64px!important;z-index:240!important;background:transparent!important;border:0!important;padding:0!important}
+.hs-bottom-battle{left:0;width:16.6667%}
+.hs-bottom-arena6{left:16.6667%;width:16.6667%}
+.hs-bottom-inventory6{left:33.3334%;width:16.6667%}
+.hs-bottom-equipment6{left:50%;width:16.6667%}
+.hs-bottom-quests6{left:66.6667%;width:16.6667%}
+.hs-bottom-map6{left:83.3334%;width:16.6667%}
+body:has(#home.active) .hs-bottom-battle,
+body:has(#home.active) .hs-bottom-arena6,
+body:has(#home.active) .hs-bottom-inventory6,
+body:has(#home.active) .hs-bottom-equipment6,
+body:has(#home.active) .hs-bottom-quests6,
+body:has(#home.active) .hs-bottom-map6{height:60px!important}
+.g49-pve{min-height:100%!important;background:linear-gradient(180deg,#0c1722,#10151c 52%,#0b1016);color:#f2f4f7;padding-bottom:20px!important}
+.g49-pve-head{height:64px;display:flex;align-items:center;gap:10px;padding:8px 12px;background:linear-gradient(180deg,#182431,#101820);border-bottom:1px solid #3c4b5a;position:sticky;top:0;z-index:10}
+.g49-pve-head h2{margin:0;font-size:17px}.g49-pve-head small{display:block;color:#aab6c2;font-size:9px;margin-top:2px}
+.g49-back{width:42px;height:38px;border-radius:11px;background:#222d38;border:1px solid #566474;font-size:24px}
+.g49-path{margin:10px 10px 8px;padding:12px;border-radius:14px;border:1px solid #3f4e5b;background:linear-gradient(135deg,#17232e,#111820);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.g49-path .walker{font-size:38px;animation:g49walk 1.4s ease-in-out infinite}.g49-path b{font-size:13px}.g49-path small{display:block;color:#9ba8b5;font-size:9px;margin-top:3px}.g49-progress{height:7px;background:#252d35;border-radius:6px;overflow:hidden;margin-top:8px}.g49-progress i{display:block;width:0;height:100%;background:linear-gradient(90deg,#d69a2d,#70bd5c);transition:width .25s}
+.g49-fighter{margin:8px 10px;padding:12px;border:1px solid #465665;border-radius:14px;background:radial-gradient(circle at 70% 35%,#33434d,#141b22 72%);display:flex;align-items:center;gap:12px}.g49-enemy-art{font-size:64px;filter:drop-shadow(0 8px 5px #0008)}.g49-fighter b{font-size:15px}.g49-fighter small{display:block;color:#aab5bf;font-size:9px;margin-top:3px}.g49-hp{height:8px;width:150px;max-width:100%;background:#252b31;border-radius:5px;overflow:hidden;border:1px solid #090d11;margin-top:7px}.g49-hp i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#cf3b2e,#69bd4a);transition:width .2s}
+.g49-tactical{margin:8px 10px;padding:10px;border-radius:14px;background:#151e27;border:1px solid #3c4b58}.g49-step{font-size:11px;font-weight:900;margin:4px 0 7px}.g49-zones{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.g49-zone{padding:10px 3px;border-radius:9px;background:#202b36;border:1px solid #485867;font-size:9px;font-weight:800}.g49-zone.sel-a{background:#986518;border-color:#e0ad4e}.g49-zone.sel-d{background:#205c78;border-color:#6bc8ee}.g49-zone:disabled{opacity:.45}.g49-attack{width:100%;margin-top:9px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#d29a28,#8e5c0c);font-size:12px;font-weight:900}.g49-attack:disabled{opacity:.35}
+.g49-log{margin:8px 10px;padding:9px;border-radius:12px;background:#0c1218;border:1px solid #33424f;font-size:9px;line-height:1.45;max-height:125px;overflow:auto}.g49-log b{display:block;color:#e0b457;margin-bottom:5px}.g49-log div{padding:2px 0;border-bottom:1px solid #ffffff08}
+@keyframes g49walk{50%{transform:translateX(7px)}}
+@media(max-width:390px){.g49-pve-head{height:58px}.g49-path{padding:10px}.g49-fighter{padding:10px}.g49-enemy-art{font-size:54px}.g49-zone{padding:9px 2px;font-size:8px}.g49-attack{padding:11px}}
 </style>
 </head>
 <body>
 <div id="app">
+  <header class="hud">
+    <div class="profile">
+      <div class="avatar">⚔️</div>
+      <div>
+        <b id="playerName">SSS</b>
+        <span>Уровень <strong id="level">1</strong></span>
+      </div>
+    </div>
+    <div class="resources">
+      <div>🪙 <b id="coins">1000</b></div>
+      <div>💎 <b id="gems">25</b></div>
+    </div>
+  </header>
+
   <main>
     <section id="home" class="screen active home-real">
   <div class="real-home">
-    <img src="territory_reference_bg.png" alt="Sdolars" class="real-home-image">
-
-    <!-- V5: прозрачный слой кликов. Визуал интерфейса находится в одном фоне,
-         поэтому второй HUD больше не рисуется поверх него. -->
-    <div class="v5-click-layer" aria-label="Навигация города">
-      <button class="v5-zone v5-profile" data-screen="profile" aria-label="Профиль"></button>
-
-      <!-- Ресурсы: 4 отдельные кликабельные зоны поверх готового визуала -->
-      <button class="v5-zone v5-resource-gems" data-action="gems" aria-label="Алмазы"></button>
-      <button class="v5-zone v5-resource-coins" data-action="coins" aria-label="Монеты"></button>
-      <button class="v5-zone v5-resource-energy" data-action="energy" aria-label="Энергия"></button>
-      <button class="v5-zone v5-resource-stone" data-action="combatstone" aria-label="Боевой камень"></button>
-
-      <button class="v5-zone v5-messages" data-action="messages" aria-label="Сообщения"></button>
-      <button class="v5-zone v5-achievements" data-action="achievements" aria-label="Достижения"></button>
-      <button class="v5-zone v5-settings" data-action="settings" aria-label="Настройки"></button>
-      <button class="v5-zone v5-language" data-action="language" aria-label="Язык"></button>
-      <button class="v5-zone v5-task" data-action="forge" aria-label="Текущее задание"></button>
-      <button class="v5-zone v5-daily" data-action="bonuses" aria-label="Ежедневный бонус"></button>
-
-      <button class="v5-zone v5-left1" data-action="bonuses" aria-label="Бонусы"></button>
-      <button class="v5-zone v5-left2" data-action="events" aria-label="События"></button>
-      <button class="v5-zone v5-left3" data-action="vip" aria-label="VIP"></button>
-      <button class="v5-zone v5-left4" data-screen="game" aria-label="Game"></button>
-
-      <button class="v5-zone v5-right1" data-action="forge" aria-label="Кузница"></button>
-      <button class="v5-zone v5-right2" data-action="tavern" aria-label="Таверна"></button>
-      <button class="v5-zone v5-right3" data-action="shop" aria-label="Магазин"></button>
-
-      <button class="v5-zone v5-bottom1" data-action="fight" aria-label="Бой"></button>
-      <button class="v5-zone v5-bottom2" data-screen="arena" aria-label="Арена"></button>
-      <button class="v5-zone v5-bottom3" data-screen="inventory" aria-label="Инвентарь"></button>
-      <button class="v5-zone v5-bottom4" data-screen="profile" aria-label="Экипировка"></button>
-      <button class="v5-zone v5-bottom5" data-screen="districts" aria-label="Задания"></button>
-      <button class="v5-zone v5-bottom6" data-screen="districts" aria-label="Карта"></button>
-    </div>
-
-    <div class="ref-hud" aria-label="Игровая информация">
-      <div class="ref-profile"><div class="ref-avatar">⚔️<b id="level">5</b></div><div><strong>Territory</strong><span>Глава 5 · Уровень 3</span><i><em></em><b>120/300</b></i></div></div>
-      <div class="ref-res" aria-label="Ресурсы"><div class="ref-resource" data-action="gems" role="button" tabindex="0" aria-label="Алмазы">💎 <b id="gems">1330</b> <strong>+</strong></div><div class="ref-resource" data-action="coins" role="button" tabindex="0" aria-label="Монеты">🪙 <b id="coins">1779</b> <strong>+</strong></div><div class="ref-resource" data-action="energy" role="button" tabindex="0" aria-label="Энергия">⚡ <b id="energy">191/200</b> <strong>+</strong></div></div>
-      <div class="ref-actions"><button data-action="messages">✉️<b>Сообщения</b><i>2</i></button><button data-action="achievements">🏆<b>Достижения</b></button><button data-action="settings">⚙️<b>Настройки</b></button><button data-action="language">🇬🇧<b>EN</b></button></div>
-      <div class="ref-task"><b>Текущее задание</b><strong>Поговори с кузнецом</strong><span>📍 Кузница</span><i>›</i></div>
-      <div class="ref-daily"><span>🎁</span><b>Ежедневный бонус</b><strong>23:45:12</strong></div>
-      <div class="ref-left"><button data-action="bonuses">🎁<b>Бонусы</b><i>!</i></button><button data-action="events">📅<b>События</b><i>!</i></button><button data-action="vip">👑<b>VIP</b></button><button data-screen="game">🎮<b>Game</b></button></div>
-      <div class="ref-right"><button data-action="forge">⚒️<b>Кузница</b><i>!</i></button><button data-action="tavern">🍺<b>Таверна</b><i>!</i></button><button data-action="shop">👜<b>Магазин</b><i>!</i></button></div>
-      <div class="ref-bottom"><button data-action="fight">⚔️<b>Бой</b></button><button data-screen="arena">🚩<b>Арена</b></button><button data-screen="inventory">👜<b>Инвентарь</b></button><button data-screen="inventory">🛡️<b>Экипировка</b></button><button data-screen="districts">📜<b>Задания</b></button><button data-screen="districts">🗺️<b>Карта</b></button></div>
+    <img src="sdolars_clean_scene.png" alt="Sdolars" class="real-home-image">
+    <div class="live-city-title" aria-label="Город Sdolars"><small>ГОРОД</small><strong>SDOLARS</strong><em>ЦЕНТРАЛЬНЫЙ КВАРТАЛ</em></div>
+    <div class="live-city-time">19:42 · ВЕЧЕР <b>🌙</b></div><div id="alexQuestBadge" class="alex-quest-badge">Город</div>
+    <div class="live-side-ui" aria-label="Быстрые действия">
+      <button data-screen="arena"><span>⚔️</span><b>Арена</b><small>Бой</small></button>
+      <button data-screen="market"><span>🛒</span><b>Рынок</b><small>Торговля</small></button>
+      <button data-screen="districts"><span>🗺️</span><b>Районы</b><small>Город</small></button>
+      <button data-screen="game"><span class="game-icon-ancient">⚄⚂</span><b>Game</b><small>Кубики</small></button>
     </div>
     <button class="hotspot hs-arena" data-screen="arena" aria-label="Арена"></button>
     <button class="hotspot hs-market" data-screen="market" aria-label="Рынок"></button>
@@ -188,6 +171,12 @@ body:has(#home.active) .bottom-nav { display: none !important; }
     <button class="hotspot hs-bottom-districts" data-screen="districts" aria-label="Районы"></button>
     <button class="hotspot hs-bottom-profile" data-screen="inventory" aria-label="Профиль"></button>
     <button class="hotspot hs-bottom-shop" data-screen="market" aria-label="Магазин"></button>
+    <button class="hotspot hs-bottom-battle" data-screen="pve" aria-label="Бой"></button>
+    <button class="hotspot hs-bottom-arena6" data-screen="arena" aria-label="Арена"></button>
+    <button class="hotspot hs-bottom-inventory6" data-screen="inventory" aria-label="Инвентарь"></button>
+    <button class="hotspot hs-bottom-equipment6" data-screen="inventory" aria-label="Экипировка"></button>
+    <button class="hotspot hs-bottom-quests6" data-screen="districts" aria-label="Задания"></button>
+    <button class="hotspot hs-bottom-map6" data-screen="districts" aria-label="Карта"></button>
 
     <!-- ЖИВОЙ ИГРОВОЙ СЛОЙ: эффекты привязаны к объектам сцены, без искусственных "призраков" -->
     <div class="living-scene" aria-hidden="true">
@@ -216,36 +205,24 @@ body:has(#home.active) .bottom-nav { display: none !important; }
   </div>
 </section>
 
-    <section id="profile" class="screen profile-screen">
-      <div class="profile-head">
-        <button class="profile-back" data-screen="home">‹</button>
-        <h2>ПРОФИЛЬ</h2>
+
+    <section id="pve" class="screen g49-pve">
+      <div class="g49-pve-head">
+        <button class="g49-back" data-screen="home" aria-label="Назад">‹</button>
+        <div><h2>⚔️ ГОРОДСКОЙ БОЙ</h2><small>Sdolars · путь героя · PvE</small></div>
       </div>
-      <div class="profile-card">
-        <div class="profile-avatar-wrap">
-          <img id="profileAvatar" src="profile_avatar.png" alt="Аватар игрока" class="profile-avatar-img">
-          <span class="profile-level" id="profileLevel">5</span>
-        </div>
-        <div class="profile-main">
-          <div class="profile-name" id="profilePlayerName">Territory</div>
-          <div class="profile-chapter">Глава 5 · Уровень <span id="profileLevelText">3</span></div>
-          <div class="profile-exp"><i id="profileExpBar"></i><b id="profileExp">120/300</b></div>
-        </div>
+      <div class="g49-path">
+        <div class="walker">🧔</div><div style="flex:1"><b>Путь продолжается</b><small id="pveProgressText">Обычный противник · прогресс 0%</small><div class="g49-progress"><i id="pveProgress"></i></div></div><div>➡️</div>
       </div>
-      <div class="profile-resources">
-        <div>💎<b id="profileGems">1330</b></div><div>🪙<b id="profileCoins">1779</b></div><div>⚡<b id="profileEnergy">191/200</b></div><div>🔮<b id="profileStone">842</b></div>
+      <div class="g49-fighter">
+        <div class="g49-enemy-art" id="pveEnemyArt">👹</div><div style="flex:1"><b id="pveEnemyName">Разбойник у ворот</b><small id="pveEnemyDesc">Обычный противник Sdolars</small><div class="g49-hp"><i id="pveEnemyHp"></i></div><small id="pveHpText">100 / 100 HP</small></div>
       </div>
-      <div class="profile-section-title">ХАРАКТЕРИСТИКИ</div>
-      <div class="profile-stats">
-        <button data-stat="strength"><span>💪</span><b>Сила</b><strong id="profileStrength">5</strong><small>Урон / крит</small></button>
-        <button data-stat="agility"><span>🏃</span><b>Ловкость</b><strong id="profileAgility">5</strong><small>Уклонение</small></button>
-        <button data-stat="defense"><span>🛡️</span><b>Защита</b><strong id="profileDefense">0</strong><small>Снижение урона</small></button>
+      <div class="g49-tactical">
+        <div class="g49-step">1. Выбери зону атаки</div><div class="g49-zones" id="pveAttackZones"></div>
+        <div class="g49-step">2. Выбери две зоны защиты</div><div class="g49-zones" id="pveDefenseZones"></div>
+        <button class="g49-attack" id="pveAttackBtn" disabled>⚔️ НАНЕСТИ УДАР</button>
       </div>
-      <div class="profile-points">Свободные очки: <b id="profileFreePoints">0</b></div>
-      <div class="profile-equipment">
-        <div><span>⚔️</span><b id="profileWeapon">Кулаки</b><small id="profileWeaponStats">Урон +0</small></div>
-        <button data-screen="inventory">ИНВЕНТАРЬ</button>
-      </div>
+      <div class="g49-log" id="pveLog"><b>Боевой журнал</b><div>Ты вошёл на городской путь. Выбери атаку и две зоны защиты.</div></div>
     </section>
 
     <section id="districts" class="screen">
@@ -348,17 +325,16 @@ body:has(#home.active) .bottom-nav { display: none !important; }
     </div>
   </div>
   <div class="arena-toast" id="arenaToast" role="status" aria-live="polite"></div>
-  <div id="refToast" aria-live="polite"></div>
 
   <nav class="bottom-nav">
     <button data-screen="home">🏠<span>Город</span></button>
     <button data-screen="arena">⚔️<span>Арена</span></button>
     <button data-screen="districts">🗺️<span>Районы</span></button>
-    <button data-screen="profile">🎒<span>Профиль</span></button>
+    <button data-screen="inventory">🎒<span>Профиль</span></button>
     <button data-screen="market">🛒<span>Магазин</span></button>
   </nav>
 </div>
-<script src="app.js?v=140"></script>
-<script src="arena.js?v=140"></script>
+<script src="app.js?v=149"></script>
+<script src="arena.js?v=149"></script>
 </body>
 </html>
