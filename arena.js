@@ -1,4 +1,4 @@
-/* Territory G48.1 — Arena continuation from verified G48.
+/* Territory G46 — Arena integrated combat pass based on verified G48.
    Mechanics preserved; mobile/target-state reliability tightened.
    The old S98 opponent-picker remains removed.
    This file owns the Arena modal only and keeps the rest of the game state intact. */
@@ -20,7 +20,7 @@
   const esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\':'&#92;','"':'&quot;'}[c]));
   const getState=()=>{try{return state}catch(e){return {}}};
   const save=()=>{try{window.save?.()}catch(e){}};
-  const getStats=()=>{try{return JSON.parse(localStorage.getItem('territory_arena_g43')||'{}')}catch(e){return {}}};
+  const getStats=()=>{try{return JSON.parse(localStorage.getItem('territory_arena_g45')||localStorage.getItem('territory_arena_g43')||'{}')}catch(e){return {}}};
   let stats=getStats();
   stats.wins=Number(stats.wins||0); stats.losses=Number(stats.losses||0); stats.battles=Number(stats.battles||0);
   stats.history=Array.isArray(stats.history)?stats.history:[];
@@ -53,6 +53,7 @@
 
   function name(){return String(getState().name||'Alex').trim()||'Alex'}
   function level(){return Number(getState().level||1)}
+  function combatStats(){const s=getState(); let eq={damage:0,defense:0}; try{const items={axe:{damage:12},sword:{damage:18},helm:{defense:4},armor:{defense:7},gloves:{defense:3},boots:{defense:3}}; const slots=s.equipmentSlots||{}; Object.values(slots).forEach(id=>{const it=items[id]; if(it && Number(s.durability?.[id]??300)>0){eq.damage+=Number(it.damage||0);eq.defense+=Number(it.defense||0)}})}catch(e){} return {strength:Number(s.strength||5),agility:Number(s.agility||5),endurance:Number(s.endurance||12),defense:Number(s.defense||0),mastery:Number(s.weaponMastery||1),bonus:Number(s.bonusDamage||0),eqDamage:eq.damage,eqDefense:eq.defense};}
   function renderHome(){
     clearInterval(lobbyTimer);clearInterval(battleTimer);lobby=null;battle=null;
     const s=getState();
@@ -112,7 +113,9 @@
     const mode=MODE.find(x=>x.id===lobby.mode)||MODE[0];
     const myTeam=Number(lobby.players.find(p=>p.owner)?.team||getState().team||1)||1;
     const combatants=lobby.players.map((p,i)=>({...p,team:p.team||(lobby.mode==='duel'?(i===0?1:2):p.team),id:`${p.name}-${i}`,maxHp:120+Math.max(0,(Number(p.level)||1)-1)*5,hp:120+Math.max(0,(Number(p.level)||1)-1)*5,defeated:false}));
-    battle={mode:lobby.mode,team:myTeam,round:1,playerHp:Number(getState().hp||120),maxHp:Number(getState().maxHp||120),enemyHp:120,maxEnemyHp:120,attack:null,defense:[],targetName:null,combatants,log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
+    const cs=combatStats();
+    const playerMax=Number(getState().maxHp||120);
+    battle={mode:lobby.mode,team:myTeam,round:1,playerHp:Number(getState().hp||playerMax),maxHp:playerMax,enemyHp:120,maxEnemyHp:120,attack:null,defense:[],targetName:null,combatants,log:[`⚔️ ${mode.title}: бой начался.`,`👥 В комнате ${lobby.players.length} игроков.`],startedAt:Date.now(),endsAt:Date.now()+600000,ended:false};
     if(lobby.mode==='duel') battle.targetName=combatants.find(p=>p.team!==myTeam)?.name||'Противник';
     else battle.targetName=combatants.find(p=>p.team&&p.team!==myTeam)?.name||null;
     renderBattle();
@@ -155,8 +158,9 @@
     const foes=aliveTeam(battle.team===1?2:1);
     if(!foes.length)return;
     const actor=foes[Math.floor(Math.random()*foes.length)];
+    const cs=combatStats();
     const base=9+Math.floor((Number(actor.level)||1)*1.6);
-    const dmg=Math.max(4,Math.round(base*(0.82+Math.random()*.32)));
+    const dodge=Math.min(.45,cs.agility*.015); if(Math.random()<dodge){battle.log.push(`🌀 Ты увернулся от атаки ${actor.name}.`); return;} const endMit=Math.min(0.28,cs.endurance*.008); const raw=Math.max(0,base-cs.defense*1.2-cs.eqDefense); const dmg=Math.max(2,Math.round(raw*(1-endMit)*(0.82+Math.random()*.32)));
     battle.playerHp=Math.max(0,battle.playerHp-dmg);
     battle.log.push(`💥 ${actor.name} атакует тебя: −${dmg} HP.`);
     const me=(battle.combatants||[]).find(p=>p.name===name() && p.team===battle.team);
@@ -168,14 +172,16 @@
     const s=getState();
     const target=battle.combatants?.find(p=>p.name===battle.targetName && !p.defeated);
     if((battle.mode==='group'||battle.mode==='chaos')&&!target){window.arenaToast('Сначала выбери цель противника');return}
-    const atk=Number(s.bonusDamage||0)+Number(s.strength||5)+10;
-    const hit=Math.max(8,Math.round(atk*(0.9+Math.random()*.35)));
+    const cs=combatStats();
+    const atk=cs.bonus+cs.eqDamage+cs.strength+cs.mastery+10;
+    const crit=Math.random()<Math.min(.6,cs.strength*.02);
+    const hit=Math.max(8,Math.round(atk*(0.9+Math.random()*.35)*(crit?1.6:1)));
     const enemyAttack=ATTACK_ZONES[Math.floor(Math.random()*ATTACK_ZONES.length)][0];
     const enemyBlocked=battle.defense.includes(enemyAttack);
     if(target){
       target.hp=Math.max(0,target.hp-hit);
       battle.enemyHp=target.hp;battle.maxEnemyHp=target.maxHp;
-      battle.log.push(`⚔️ ${name()} атаковал «${target.name}» в «${zone(battle.attack,ATTACK_ZONES)}»: −${hit} HP.`);
+      battle.log.push(`⚔️ ${name()} атаковал «${target.name}» в «${zone(battle.attack,ATTACK_ZONES)}»: −${hit} HP${crit?' · КРИТ':''}.`);
       if(target.hp<=0){
         target.defeated=true;
         battle.log.push(`💀 ${target.name} повержен!`);
@@ -203,8 +209,8 @@
     battle.ended=true;clearInterval(battleTimer);
     const win=result==='Победа';stats.battles++;if(win)stats.wins++;else if(result==='Поражение')stats.losses++;
     stats.history.push({mode:MODE.find(x=>x.id===battle.mode)?.title||'Бой',win,result,at:Date.now()});stats.history=stats.history.slice(-20);
-    localStorage.setItem('territory_arena_g43',JSON.stringify(stats));
-    if(win){const s=getState();s.coins=Number(s.coins||0)+50;s.exp=Number(s.exp||0)+15;save()}
+    localStorage.setItem('territory_arena_g45',JSON.stringify(stats));
+    if(win){const s=getState();s.coins=Number(s.coins||0)+50; if(window.TerritoryCore?.addXP) window.TerritoryCore.addXP(15); else s.exp=Number(s.exp||0)+15; if(window.TerritoryCore?.markArena) window.TerritoryCore.markArena(true); save()} else if(result==='Поражение'){const s=getState();s.hunger=Math.max(0,Number(s.hunger??100)-5); if(window.TerritoryCore?.markArena) window.TerritoryCore.markArena(false);try{localStorage.setItem('territory_save_v1',JSON.stringify(s));localStorage.setItem('territory_save',JSON.stringify(s))}catch(e){}}
     lobby=null;battle=null;renderResult(result);
   }
   function renderResult(result){
