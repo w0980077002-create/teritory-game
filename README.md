@@ -1,9 +1,22 @@
-# Territory G41 GLOBAL
+# Territory G43 GLOBAL — Sdolars
 
-One integrated gameplay build from the verified G40 TRUE BUTTONS base.
+Current GAME build: G43.
 
-Do not split this into small patch folders. Upload the contents of this folder to the GAME repo as one version.
+G43 continues the verified G42 City/PvE base without changing the approved Sdolars City artwork or its transparent hit areas.
 
-The City artwork is preserved. The global gameplay layer adds PvE, equipment/durability, character profile, bonuses, tavern/hunger, settings, and the Arena lobby/battle foundation in one pass.
+## G43 pass
+- Canonical G48 Arena is restored as the Arena entry point; the old duplicate Arena shell is no longer intercepting the Arena button.
+- Arena keeps 1x1, chaos, group up to 20, 3-minute lobby, 4 attack zones, 4 defense zones, target selection, enemy response, combat log, and close-to-City navigation.
+- Equipment now has explicit slots: weapon, helmet, armor, gloves, boots.
+- Existing G42 inventory/equipment state is migrated into the slot model.
+- Equipped damage/defense is used by PvE.
+- Durability and Forge repair remain part of the gameplay loop.
+- PvE city path, progress, rewards, hunger and boss loop remain intact.
 
-Next architectural step after this build: connect the Arena lobby/battle to the existing SERVER with authoritative WebSocket state and anti-cheat validation.
+## Working files
+index.html, app.js, style.css, game.css, arena.js, arena.css, Territory_G43_GLOBAL.js, Territory_G43_GLOBAL.css plus the required City assets.
+
+## Important
+This is still a client-side prototype. Real cross-device Arena multiplayer requires the SERVER/WebSocket layer and server-side validation.
+
+SERVER repo is not changed by this GAME build.
