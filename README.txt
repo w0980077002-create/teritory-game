@@ -1,17 +1,40 @@
-TERRITORY — G87 UPLOAD
+# Territory G88 — Arena navigation fix
 
-В архиве находится готовый файл:
-- Territory_G87_MULTIPLAYER.js
+BASE: current repository version with `arena.js` + `Territory_G86_MULTIPLAYER.js`
 
-Что сделать на GitHub:
-1. Загрузить Territory_G87_MULTIPLAYER.js в корень репозитория.
-2. В index.html заменить только эту строку:
-   Territory_G86_MULTIPLAYER.js?v=860
-   на:
-   Territory_G87_MULTIPLAYER.js?v=870
+## What this fixes
 
-Важно:
-- Остальные файлы проекта не менять.
-- Город и PvE не переделываются.
-- G87 исправляет гонку авторизации WebSocket: создание/вход в комнату ждут подтверждения auth, после чего команда отправляется автоматически.
-- Схема боя G86 сохранена: 4 зоны атаки, ровно 2 зоны защиты, цель, ходы, таймер, HP и журнал.
+The City contains several working Arena hotspots with `data-screen="arena"`.
+The Arena itself is a modal (`#arenaModal`), not a `<section id="arena">`.
+
+The old `app.js` routing function first looked for `#arena`, did not find it,
+and returned before `window.openArena()` could run. Result: the Arena button
+could be pressed, but nothing opened.
+
+G88 adds a capture-phase router that opens the existing Arena modal directly.
+It does NOT replace City, PvE, the Arena battle logic, or the multiplayer
+server.
+
+## Files
+
+Upload this file to the repository root:
+
+- `Territory_G88_ARENA_ROUTER_FIX.js`
+
+Then add this script line to `index.html` AFTER `Territory_G86_MULTIPLAYER.js`:
+
+<script src="Territory_G88_ARENA_ROUTER_FIX.js?v=880"></script>
+
+Do not remove the existing Arena files.
+
+## Expected result
+
+City → Arena button → Arena Hub opens.
+
+This is the first G88 gate. Once this works, we continue building the
+full Arena instead of testing with a second player yet.
+
+## Important
+
+The GitHub integration available to this session currently returns HTTP 403
+for repository writes, so this package is prepared for manual upload.
