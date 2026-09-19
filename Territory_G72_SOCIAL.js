@@ -21,15 +21,22 @@
    :`<div class="tg72-card"><b>Уведомления</b><p class="tg72-muted">Сюда будут приходить приглашения, сообщения и события Arena.</p>${st.social.notifications.length?st.social.notifications.slice(-8).map(x=>`<div class="tg72-row">🔔 ${esc(x.text)}</div>`).join(''):'<div class="tg72-empty">Новых уведомлений нет.</div>'}</div>`;
    return `<div class="tg72-head"><div><small>S D O L A R S · SOCIAL</small><h2>Социальный центр</h2></div><button data-tg72-close>✕</button></div><nav>${[['profile','Профиль'],['friends','Друзья'],['chat','Чат'],['notifications','Уведомления']].map(x=>`<button data-tg72-tab="${x[0]}" class="${tab===x[0]?'on':''}">${x[1]}</button>`).join('')}</nav><main>${body}</main>`;
  }
+
+ function notify(text,type='system'){st.social.notifications.push({text:String(text),type,at:Date.now(),read:false});if(st.social.notifications.length>50)st.social.notifications=st.social.notifications.slice(-50);save();}
+ st.social.party=st.social.party&&typeof st.social.party==='object'?st.social.party:{id:null,name:'',members:[],invites:[]};
+ st.social.party.members=Array.isArray(st.social.party.members)?st.social.party.members:[];
+ st.social.party.invites=Array.isArray(st.social.party.invites)?st.social.party.invites:[];
+ function party(){
+   close(); const ov=document.createElement('div');ov.id='tg73-party';
+   const members=st.social.party.members; const invites=st.social.party.invites;
+   ov.innerHTML=`<div class="tg73-panel"><div class="tg73-head"><div><small>S D O L A R S · PARTY</small><h2>Группа игроков</h2></div><button data-p73-close>✕</button></div><section><div class="tg73-card"><b>${members.length?'Твоя группа':'Группа не создана'}</b><p class="tg73-muted">До 5 участников в локальном прототипе.</p>${members.length?members.map((m,i)=>`<div class="tg73-row"><span>${i===0?'👑':'🟢'} ${esc(m.name)}</span><small>ур. ${Number(m.level||1)}</small></div>`).join(''):'<div class="tg73-empty">Создай группу и приглашай игроков.</div>'}<button data-p73-create>＋ ${members.length?'Добавить тестового игрока':'Создать группу'}</button></div><div class="tg73-card"><b>Приглашения</b>${invites.length?invites.map((x,i)=>`<div class="tg73-invite"><span>👥 ${esc(x.from)} приглашает в группу</span><button data-p73-accept="${i}">Принять</button></div>`).join(''):'<div class="tg73-empty">Новых приглашений нет.</div>'}</div></section></div>`;
+   document.body.appendChild(ov);
+   ov.addEventListener('click',e=>{if(e.target.closest('[data-p73-close]')){close();return;}if(e.target.closest('[data-p73-create]')){if(!members.length){st.social.party.id='local-'+Date.now();st.social.party.name='Группа Sdolars';members.push({name:st.name||'SSS',level:levelSafe(),owner:true});notify('Группа создана','party')}else if(members.length<5){members.push({name:'Игрок '+(members.length+1),level:Math.max(1,levelSafe())});notify('В группу добавлен тестовый игрок','party')}save();party();}const a=e.target.closest('[data-p73-accept]');if(a){const i=Number(a.dataset.p73Accept);const inv=invites[i];if(!inv)return;invites.splice(i,1);if(!members.length)members.push({name:st.name||'SSS',level:levelSafe(),owner:true});notify('Приглашение принято','party');save();party();}});
+ }
  function open(tab='profile'){
    close(); const ov=document.createElement('div');ov.id='tg72-social';ov.innerHTML=render(tab);document.body.appendChild(ov);
-   ov.addEventListener('click',e=>{const b=e.target.closest('[data-tg72-tab]');if(b){ov.innerHTML=render(b.dataset.tg72Tab);return;}if(e.target.closest('[data-tg72-close]')){close();return;}const add=e.target.closest('[data-tg72-add]');if(add){st.social.friends.push({name:'Игрок Sdolars',level:Math.max(1,levelSafe())});save();ov.innerHTML=render('friends');}});
-   ov.addEventListener('submit',e=>{const f=e.target.closest('[data-tg72-chat]');if(!f)return;e.preventDefault();const input=f.querySelector('input');const text=(input?.value||'').trim();if(!text)return;addMessage(st.name||'SSS',text);ov.innerHTML=render('chat');});
+   ov.addEventListener('click',e=>{const b=e.target.closest('[data-tg72-tab]');if(b){ov.innerHTML=render(b.dataset.tg72Tab);return;}if(e.target.closest('[data-tg72-close]')){close();return;}const add=e.target.closest('[data-tg72-add]');if(add){st.social.friends.push({name:'Игрок Sdolars',level:Math.max(1,levelSafe())});notify('Новый игрок добавлен в друзья','friend');save();ov.innerHTML=render('friends');}});
+   ov.addEventListener('submit',e=>{const f=e.target.closest('[data-tg72-chat]');if(!f)return;e.preventDefault();const input=f.querySelector('input');const text=(input?.value||'').trim();if(!text)return;addMessage(st.name||'SSS',text);notify('Новое сообщение в городском чате','chat');ov.innerHTML=render('chat');});
  }
- function levelSafe(){return Number(st.level||1);}
- document.addEventListener('click',e=>{
-   const b=e.target.closest('[data-ui="profile"],[data-ui="messages"]');if(!b)return;
-   e.preventDefault();e.stopImmediatePropagation();open(b.dataset.ui==='messages'?'chat':'profile');
- },true);
- window.TerritorySocial={open,close,addMessage,state:st,version:'G72'};
-})();
+
+ window.TerritorySocial={open,close,addMessage,party,notify,state:st,version:'G73'};})();
