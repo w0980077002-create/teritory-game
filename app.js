@@ -57,13 +57,23 @@ function render(){
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
 }
 function showScreen(id){
+ // G89: Arena is a modal and intentionally has no #arena .screen.
+ // Handle it before the legacy #arena lookup, otherwise the old early return
+ // prevents the canonical window.openArena() from ever running.
+ if(id==="arena"){
+  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen==="arena"));
+  setTimeout(()=>{
+   if(typeof window.openArena==="function") window.openArena();
+   else setTimeout(()=>{ if(typeof window.openArena==="function") window.openArena(); },120);
+  },0);
+  return;
+ }
  const target=document.getElementById(id);
  if(!target)return;
  document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x===target));
  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));
  // G49: Arena is a standalone PvP section. Never open it from the PvE button,
  // and never route the city PvE button to the Game/Monopoly screen.
- if(id==="arena") setTimeout(()=>{ if(window.openArena) window.openArena(); },0);
  if(id==="pve") setTimeout(()=>{ if(window.pveInit) window.pveInit(); },0);
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-screen]");if(b){e.preventDefault();e.stopPropagation();showScreen(b.dataset.screen)}});
