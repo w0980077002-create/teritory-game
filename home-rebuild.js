@@ -159,5 +159,43 @@
     setInterval(sync,1200);
   }
 
+  // Global top-bar touch bridge: Telegram/WebView or legacy HUD layers can sit above the home DOM.
+  // Resolve the tap by the real button rectangles instead of relying on event.target.
+  let topTapAt=0;
+  function topButtonAt(x,y){
+    const root=document.getElementById('homeRebuild');
+    if(!root)return null;
+    const names=['profile','coins','gems','energy'];
+    for(const name of names){
+      const el=root.querySelector('[data-hr="'+name+'"]');
+      if(!el)continue;
+      const r=el.getBoundingClientRect();
+      if(x>=r.left && x<=r.right && y>=r.top && y<=r.bottom)return {el,name};
+    }
+    return null;
+  }
+  function topCapture(e){
+    const h=$('#home');
+    if(!h || !h.classList.contains('active'))return;
+    const p=e.changedTouches&&e.changedTouches[0] ? e.changedTouches[0] : e.touches&&e.touches[0] ? e.touches[0] : e;
+    if(!p || typeof p.clientX!=='number')return;
+    const hit=topButtonAt(p.clientX,p.clientY);
+    if(!hit)return;
+    if(e.target?.closest?.('.bottom-nav'))return;
+    e.preventDefault();
+    e.stopPropagation();
+    topTapAt=Date.now();
+    action(hit.name);
+  }
+  function suppressDuplicateClick(e){
+    if(Date.now()-topTapAt>700)return;
+    const p=e.clientX!=null?e:((e.changedTouches&&e.changedTouches[0])||null);
+    if(!p)return;
+    if(topButtonAt(p.clientX,p.clientY)){e.preventDefault();e.stopPropagation();}
+  }
+  document.addEventListener('pointerup',topCapture,true);
+  document.addEventListener('touchend',topCapture,{capture:true,passive:false});
+  document.addEventListener('click',suppressDuplicateClick,true);
+
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount,{once:true}); else mount();
 })();
