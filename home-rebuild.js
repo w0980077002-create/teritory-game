@@ -73,6 +73,7 @@
       case 'profile': go('inventory'); break;
       case 'coins': resources('coins'); break;
       case 'gems': resources('gems'); break;
+      case 'energy': modal({icon:'⚡',text:'Энергия'},'<div class="hr-big-number">'+($('#energyValue')?.textContent||$('#energy')?.textContent||'100')+'</div><p>Энергия расходуется в игровых активностях и восстанавливается со временем.</p>'); break;
       case 'quest': go('districts'); break;
       case 'bonus': dailyBonus(); break;
       case 'events': go('districts'); break;
@@ -115,9 +116,9 @@
             <span class="hr-player"><b data-hr-name>SSS</b><small>Уровень <strong data-hr-level>1</strong></small><i><em data-hr-hp style="width:100%"></em></i><small data-hr-hp-text>120/120</small></span>
           </button>
           <div class="hr-resources">
-            <button type="button" data-hr="gems">💎 <b data-hr-gems>25</b></button>
-            <button type="button" data-hr="coins">🪙 <b data-hr-coins>1000</b></button>
-            <span>⚡ <b data-hr-energy>100</b></span>
+            <button type="button" class="hr-resource" data-hr="coins" aria-label="Монеты">🪙 <b data-hr-coins>1000</b></button>
+            <button type="button" class="hr-resource" data-hr="gems" aria-label="Кристаллы">💎 <b data-hr-gems>25</b></button>
+            <button type="button" class="hr-resource" data-hr="energy" aria-label="Энергия">⚡ <b data-hr-energy>100</b></button>
           </div>
         </header>
 
@@ -144,7 +145,16 @@
 
         <div class="hr-scene-label">SDOLARS · ЦЕНТРАЛЬНЫЙ КВАРТАЛ</div>
       </div>`;
-    home.addEventListener('click',e=>{const b=e.target.closest('[data-hr]');if(b){e.preventDefault();action(b.dataset.hr);}});
+    const dispatch=(e)=>{
+      const b=e.target&&e.target.closest?e.target.closest('[data-hr]'):null;
+      if(!b||!home.contains(b))return;
+      e.preventDefault();
+      e.stopPropagation();
+      action(b.dataset.hr);
+    };
+    home.addEventListener('click',dispatch);
+    home.addEventListener('pointerup',dispatch,true);
+    home.addEventListener('touchend',dispatch,{capture:true,passive:false});
     sync();
     setInterval(sync,1200);
   }
