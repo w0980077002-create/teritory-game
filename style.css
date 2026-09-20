@@ -1832,27 +1832,3 @@ body:has(#casino.active) #casino .reward-step{cursor:pointer!important}
 #casino.game-screen.active .task-row button{font-size:8px!important;padding:8px 10px!important;background:linear-gradient(180deg,#a66a31,#61351e)!important;border-color:#d9a15a!important;color:#ffecc2!important}
 #casino.game-screen.active .game-status{z-index:40!important}
 @media(max-height:700px){#casino.game-screen.active .game-panel-card,#casino.game-screen.active .game-tasks-card{max-height:72%!important}}
-
-
-/* Territory v140 — HOME touch-layer fix
-   The old transparent scene hotspots were overlapping the mobile frame.
-   Home navigation uses the visible controls only; Arena/Clan code is untouched. */
-body:has(#home.active) .real-home > .hotspot{
-  display:none!important;
-  pointer-events:none!important;
-}
-body:has(#home.active) .real-home > .npc-label{
-  pointer-events:auto!important;
-}
-body:has(#home.active) .bottom-nav{
-  z-index:1000!important;
-  pointer-events:auto!important;
-  touch-action:manipulation!important;
-  isolation:isolate!important;
-}
-body:has(#home.active) .bottom-nav button{
-  position:relative!important;
-  z-index:1001!important;
-  pointer-events:auto!important;
-  touch-action:manipulation!important;
-}
