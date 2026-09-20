@@ -752,7 +752,7 @@ if(jackpotCloseV79)jackpotCloseV79.onclick=gameCloseJackpotPreviewV79;
 const jackpotModalV79=$('#gameJackpotModal');
 if(jackpotModalV79)jackpotModalV79.addEventListener('click',e=>{if(e.target===jackpotModalV79)gameCloseJackpotPreviewV79()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPreviewV79()});
-/* Territory G141 — HOME photo controls.
+/* Territory G145 — recalibrated HOME photo controls.\n/* Territory G141 — HOME photo controls.
    The current Sdolars artwork already contains the visual buttons.
    This layer adds transparent touch targets over those exact areas.
    Arena and Clan logic is untouched. */
@@ -814,23 +814,26 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPrev
         pointer-events:auto!important;touch-action:manipulation!important;
         -webkit-tap-highlight-color:transparent!important;
       }
-      body:has(#home.active) .g141-profile{left:0%!important;top:0%!important;width:38%!important;height:9%!important}
-      body:has(#home.active) .g141-gems{left:38%!important;top:0%!important;width:18%!important;height:7%!important}
-      body:has(#home.active) .g141-coins{left:56%!important;top:0%!important;width:19%!important;height:7%!important}
-      body:has(#home.active) .g141-energy{left:75%!important;top:0%!important;width:25%!important;height:7%!important}
-      body:has(#home.active) .g141-messages{left:56%!important;top:5%!important;width:10%!important;height:6%!important}
-      body:has(#home.active) .g141-achievements{left:66%!important;top:5%!important;width:11%!important;height:6%!important}
-      body:has(#home.active) .g141-settings{left:77%!important;top:5%!important;width:11%!important;height:6%!important}
-      body:has(#home.active) .g141-language{left:88%!important;top:5%!important;width:12%!important;height:6%!important}
-      body:has(#home.active) .g141-quest{left:1%!important;top:9%!important;width:39%!important;height:8%!important}
-      body:has(#home.active) .g141-daily{left:72%!important;top:10%!important;width:27%!important;height:8%!important}
-      body:has(#home.active) .g141-bonus{left:1%!important;top:17%!important;width:12%!important;height:8%!important}
-      body:has(#home.active) .g141-events{left:1%!important;top:24%!important;width:12%!important;height:8%!important}
-      body:has(#home.active) .g141-vip{left:1%!important;top:31%!important;width:12%!important;height:8%!important}
-      body:has(#home.active) .g141-game{left:1%!important;top:38%!important;width:12%!important;height:8%!important}
-      body:has(#home.active) .g141-blacksmith{right:1%!important;top:24%!important;width:12%!important;height:8%!important}
-      body:has(#home.active) .g141-tavern{right:1%!important;top:31%!important;width:12%!important;height:8%!important}
-      body:has(#home.active) .g141-shop{right:1%!important;top:38%!important;width:12%!important;height:9%!important}
+      /* G145: touch targets recalibrated to the actual mobile composition
+         visible in Telegram (the previous G141 map assumed the raw 941x1672
+         artwork percentages and missed the rendered/cropped scene). */
+      body:has(#home.active) .g141-profile{left:1%!important;top:1%!important;width:15%!important;height:9%!important}
+      body:has(#home.active) .g141-gems{left:87%!important;top:2%!important;width:12%!important;height:8%!important}
+      body:has(#home.active) .g141-coins{left:77%!important;top:2%!important;width:11%!important;height:8%!important}
+      body:has(#home.active) .g141-energy{left:64%!important;top:2%!important;width:12%!important;height:8%!important}
+      body:has(#home.active) .g141-messages{left:50%!important;top:1%!important;width:14%!important;height:10%!important}
+      body:has(#home.active) .g141-achievements{left:62%!important;top:1%!important;width:14%!important;height:10%!important}
+      body:has(#home.active) .g141-settings{left:74%!important;top:1%!important;width:13%!important;height:10%!important}
+      body:has(#home.active) .g141-language{left:87%!important;top:1%!important;width:12%!important;height:10%!important}
+      body:has(#home.active) .g141-quest{left:2%!important;top:24%!important;width:96%!important;height:19%!important}
+      body:has(#home.active) .g141-daily{left:70%!important;top:11%!important;width:28%!important;height:11%!important}
+      body:has(#home.active) .g141-bonus{left:2%!important;top:46%!important;width:27%!important;height:18%!important}
+      body:has(#home.active) .g141-events{left:2%!important;top:65%!important;width:27%!important;height:18%!important}
+      body:has(#home.active) .g141-vip{left:2%!important;top:83%!important;width:27%!important;height:17%!important}
+      body:has(#home.active) .g141-game{left:2%!important;top:92%!important;width:27%!important;height:8%!important}
+      body:has(#home.active) .g141-blacksmith{right:2%!important;top:46%!important;width:27%!important;height:18%!important}
+      body:has(#home.active) .g141-tavern{right:2%!important;top:65%!important;width:27%!important;height:18%!important}
+      body:has(#home.active) .g141-shop{right:2%!important;top:83%!important;width:27%!important;height:17%!important}
 
       .g141-photo-modal{
         position:fixed!important;inset:0!important;z-index:6000!important;
@@ -870,11 +873,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPrev
       const nx=(x-rect.left)/rect.width*100;
       const ny=(y-rect.top)/rect.height*100;
       const zones=[
-        ['profile',0,0,38,9],['gems',38,0,18,7],['coins',56,0,19,7],['energy',75,0,25,7],
-        ['messages',56,5,10,6],['achievements',66,5,11,6],['settings',77,5,11,6],['language',88,5,12,6],
-        ['quest',1,9,39,8],['daily',72,10,27,8],
-        ['bonus',1,17,12,8],['events',1,24,12,8],['vip',1,31,12,8],['game',1,38,12,8],
-        ['blacksmith',87,24,12,8],['tavern',87,31,12,8],['shop',87,38,12,9]
+        ['profile',1,1,15,9],['gems',87,2,12,8],['coins',77,2,11,8],['energy',64,2,12,8],
+        ['messages',50,1,14,10],['achievements',62,1,14,10],['settings',74,1,13,10],['language',87,1,12,10],
+        ['quest',2,24,96,19],['daily',70,11,28,11],
+        ['bonus',2,46,27,18],['events',2,65,27,18],['vip',2,83,27,17],['game',2,92,27,8],
+        ['blacksmith',71,46,27,18],['tavern',71,65,27,18],['shop',71,83,27,17]
       ];
       return zones.find(z=>nx>=z[1]&&nx<=z[1]+z[3]&&ny>=z[2]&&ny<=z[2]+z[4])?.[0]||null;
     };
