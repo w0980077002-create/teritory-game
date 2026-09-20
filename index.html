@@ -266,7 +266,58 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
     <button data-screen="market">🛒<span>Магазин</span></button>
   </nav>
 </div>
-<script src="app.js?v=145"></script>
+<script src="app.js?v=146"></script>
 <script src="arena.js?v=140"></script>
+
+<script>
+/* G146 — HOME BAKE TOUCH BRIDGE */
+(function(){
+  const zones=[
+    ['profile',1,0,17,10],
+    ['coins',76,0,91,10],
+    ['gems',87,0,100,10],
+    ['quest',0,20,100,42],
+    ['bonus',0,40,25,60],
+    ['events',0,57,25,77],
+    ['vip',0,74,25,94]
+  ];
+  function home(){const h=document.getElementById('home');return h&&h.classList.contains('active')}
+  function act(n){
+    if(n==='profile'&&typeof window.showScreen==='function')return window.showScreen('inventory');
+    if((n==='quest'||n==='events')&&typeof window.showScreen==='function')return window.showScreen('districts');
+    if(n==='bonus'&&typeof window.showScreen==='function')return window.showScreen('game');
+    if(n==='coins'||n==='gems'){
+      const old=document.getElementById('g146Modal');if(old)old.remove();
+      const v=n==='coins'?(document.getElementById('coins')?.textContent||'0'):(document.getElementById('gems')?.textContent||'0');
+      const m=document.createElement('div');m.id='g146Modal';
+      m.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:20px';
+      m.innerHTML='<div style="width:min(90vw,360px);padding:22px;border-radius:18px;background:#101923;border:1px solid #d7b762;color:#fff;text-align:center"><div style="font-size:32px">'+(n==='coins'?'🪙':'💎')+'</div><h3>'+(n==='coins'?'Монеты':'Кристаллы')+'</h3><p>Количество: '+v+'</p><button id="g146Close" style="padding:10px 24px;border-radius:10px;background:#5c461d;color:#fff;border:1px solid #d7b762">Понятно</button></div>';
+      document.body.appendChild(m);document.getElementById('g146Close').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+    }
+    if(n==='vip'){
+      const old=document.getElementById('g146Modal');if(old)old.remove();
+      const m=document.createElement('div');m.id='g146Modal';
+      m.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:20px';
+      m.innerHTML='<div style="width:min(90vw,360px);padding:22px;border-radius:18px;background:#101923;border:1px solid #d7b762;color:#fff;text-align:center"><div style="font-size:34px">👑</div><h3>VIP</h3><p>VIP-раздел готов к подключению функций аккаунта.</p><button id="g146Close" style="padding:10px 24px;border-radius:10px;background:#5c461d;color:#fff;border:1px solid #d7b762">Понятно</button></div>';
+      document.body.appendChild(m);document.getElementById('g146Close').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+    }
+  }
+  function on(e){
+    if(!home())return;
+    const p=e.changedTouches&&e.changedTouches[0]?e.changedTouches[0]:e;
+    if(!p)return;
+    const x=p.clientX/window.innerWidth*100,y=p.clientY/window.innerHeight*100;
+    if(e.target?.closest?.('.bottom-nav'))return;
+    for(const z of zones){
+      if(x>=z[1]&&x<=z[3]&&y>=z[2]&&y<=z[4]){
+        e.preventDefault();e.stopPropagation();act(z[0]);return;
+      }
+    }
+  }
+  document.addEventListener('pointerup',on,true);
+  document.addEventListener('touchend',on,{capture:true,passive:false});
+})();
+</script>
+
 </body>
 </html>
