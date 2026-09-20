@@ -1833,66 +1833,26 @@ body:has(#casino.active) #casino .reward-step{cursor:pointer!important}
 #casino.game-screen.active .game-status{z-index:40!important}
 @media(max-height:700px){#casino.game-screen.active .game-panel-card,#casino.game-screen.active .game-tasks-card{max-height:72%!important}}
 
-/* Territory Home V2 — mobile RPG composition reference */
-.home-v2{background:#09111d!important;padding:0!important;overflow:hidden!important}
-.home-v2-scene{position:relative;width:100%;height:100%;min-height:0;overflow:hidden;background:#101827;isolation:isolate}
-.home-v2-scene-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;display:block;user-select:none;-webkit-user-drag:none;filter:saturate(1.04) contrast(1.02)}
-.home-v2-scene:after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(4,10,20,.72) 0%,rgba(4,10,20,.12) 22%,rgba(4,10,20,0) 48%,rgba(4,8,15,.14) 72%,rgba(3,8,15,.76) 100%)}
-.home-v2-top{position:absolute;left:10px;right:10px;top:10px;z-index:10;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;pointer-events:none}
-.home-v2-profile{display:flex;align-items:center;gap:7px;min-width:0;padding:6px 9px 6px 6px;border:1px solid rgba(120,180,255,.38);border-radius:18px;background:rgba(7,16,30,.78);backdrop-filter:blur(7px);box-shadow:0 5px 18px rgba(0,0,0,.28)}
-.home-v2-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid #e7c16c;background:#18283d}
-.home-v2-profile-text{min-width:0;display:flex;flex-direction:column;gap:1px;color:#fff}
-.home-v2-profile-text strong{font-size:14px;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
-.home-v2-profile-text span{font-size:8px;color:#b7c7df;white-space:nowrap}
-.home-v2-hp{position:relative;width:112px;height:9px;margin-top:3px;border-radius:99px;overflow:hidden;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18)}
-.home-v2-hp i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#38d26f,#8bea62);border-radius:99px}
-.home-v2-hp b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6px;color:#fff;text-shadow:0 1px 2px #000}
-.home-v2-resources{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;max-width:52%;pointer-events:auto}
-.home-v2-resources span{padding:7px 9px;border:1px solid rgba(125,190,255,.3);border-radius:13px;background:rgba(8,15,28,.82);color:#f7fbff;font-size:10px;font-weight:700;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.22)}
-.home-v2-resources span b{font-variant-numeric:tabular-nums}
-.home-v2-title{position:absolute;left:50%;top:70px;z-index:8;transform:translateX(-50%);text-align:center;pointer-events:none;text-shadow:0 2px 7px #07101b,0 0 16px rgba(0,0,0,.55)}
-.home-v2-title small{display:block;color:#d6e8ff;font-size:8px;letter-spacing:3px;font-weight:800}
-.home-v2-title strong{display:block;color:#fff;font-family:Georgia,serif;font-size:26px;line-height:27px;letter-spacing:1px}
-.home-v2-title span{display:block;color:#ffd56a;font-size:9px;letter-spacing:3px;font-weight:900;margin-top:1px}
-.home-v2-quest{position:absolute;left:10px;top:78px;z-index:11;display:flex;align-items:center;gap:7px;width:min(54%,245px);min-height:44px;padding:6px 8px;border:1px solid rgba(115,181,255,.4);border-radius:14px;background:rgba(6,14,28,.83);box-shadow:0 7px 18px rgba(0,0,0,.3);color:#fff}
-.home-v2-quest .quest-icon{font-size:21px;flex:0 0 auto}
-.home-v2-quest div{min-width:0;display:flex;flex-direction:column;gap:1px}
-.home-v2-quest small{font-size:6px;color:#8fc4ff;letter-spacing:1px;font-weight:800}
-.home-v2-quest b{font-size:9px;line-height:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.home-v2-quest button{margin-left:auto;width:32px;height:32px;border:0;border-radius:10px;background:linear-gradient(145deg,#258cff,#1551c8);color:#fff;font-size:25px;line-height:1;cursor:pointer;flex:0 0 auto}
-.home-v2-bonus{position:absolute;right:10px;top:120px;z-index:11;display:flex;align-items:center;gap:6px;width:min(43%,185px);padding:7px 9px;border:1px solid rgba(255,211,86,.65);border-radius:14px;background:linear-gradient(135deg,rgba(74,18,101,.92),rgba(32,16,65,.9));color:#fff;text-align:left;box-shadow:0 7px 20px rgba(0,0,0,.3);cursor:pointer}
-.home-v2-bonus span{font-size:22px}.home-v2-bonus div{display:flex;flex-direction:column;gap:1px}.home-v2-bonus small{font-size:6px;color:#ffd85e;font-weight:800;letter-spacing:.8px}.home-v2-bonus b{font-size:10px}
-.home-v2-side{position:absolute;top:46%;z-index:12;display:flex;flex-direction:column;gap:8px}
-.home-v2-side-left{left:8px}.home-v2-side-right{right:8px}
-.home-v2-side button{width:64px;min-height:62px;padding:6px 4px;border:1px solid rgba(117,197,255,.48);border-radius:17px;background:linear-gradient(145deg,rgba(9,28,51,.92),rgba(5,13,27,.9));color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.34);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;touch-action:manipulation}
-.home-v2-side button:active{transform:scale(.96)}
-.home-v2-side button span{font-size:23px;line-height:24px}.home-v2-side button b{font-size:8px}.home-v2-side button small{font-size:6px;color:#a9c4e8}
-.dice-face-mini{font-size:27px!important;text-shadow:0 2px 3px #000}
-.home-v2-character-caption{position:absolute;left:50%;bottom:15%;z-index:9;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;text-align:center;padding:5px 10px;border-radius:12px;background:rgba(5,12,22,.62);color:#fff;backdrop-filter:blur(4px);pointer-events:none;white-space:nowrap}
-.home-v2-character-caption b{font-size:10px}.home-v2-character-caption span{font-size:6px;color:#c8d8ec;margin-top:1px}
-.home-v2-hint{position:absolute;left:50%;bottom:3%;z-index:9;transform:translateX(-50%);font-size:7px;letter-spacing:1px;color:rgba(255,255,255,.74);white-space:nowrap;pointer-events:none}
-@media(max-width:390px){
- .home-v2-top{left:7px;right:7px;top:7px}.home-v2-profile{padding:5px 7px 5px 5px}.home-v2-avatar{width:36px;height:36px}.home-v2-profile-text strong{font-size:12px}.home-v2-hp{width:96px}
- .home-v2-resources{gap:3px;max-width:48%}.home-v2-resources span{font-size:8px;padding:6px 7px;border-radius:11px}
- .home-v2-title{top:61px}.home-v2-title strong{font-size:22px}.home-v2-title small{font-size:7px}.home-v2-title span{font-size:8px}
- .home-v2-quest{left:7px;top:70px;width:52%;min-height:40px}.home-v2-quest b{font-size:8px}.home-v2-quest button{width:29px;height:29px}
- .home-v2-bonus{right:7px;top:108px;width:40%;padding:6px 7px}.home-v2-bonus span{font-size:19px}.home-v2-bonus b{font-size:8px}
- .home-v2-side{top:45%;gap:6px}.home-v2-side-left{left:5px}.home-v2-side-right{right:5px}.home-v2-side button{width:57px;min-height:57px;border-radius:15px}.home-v2-side button span{font-size:21px}.home-v2-side button b{font-size:7px}.home-v2-side button small{font-size:5px}
- .home-v2-character-caption{bottom:14%;padding:4px 8px}.home-v2-character-caption b{font-size:8px}.home-v2-character-caption span{font-size:5px}
-}
-@media(max-height:700px){
- .home-v2-title{top:58px}.home-v2-quest{top:65px}.home-v2-bonus{top:100px}.home-v2-side{top:43%}.home-v2-character-caption{bottom:13%}.home-v2-hint{display:none}
-}
-@media(min-width:600px){.home-v2-scene{max-width:540px;margin:0 auto}.home-v2-side button{width:72px}.home-v2-quest{width:250px}.home-v2-bonus{width:195px}}
 
-/* V2 replaces the old baked HUD on the home screen; keep the existing functional bottom navigation. */
-body:has(#home.active) > #app > .hud{display:none!important}
-body:has(#home.active) > #app > main{position:absolute!important;inset:0!important;height:100%!important;min-height:0!important}
-body:has(#home.active) #home.territory-home-v2{position:absolute!important;inset:0!important;height:100%!important;min-height:0!important}
-body:has(#home.active) .territory-home-v2 + .screen{display:none}
-body:has(#home.active) > #app > .bottom-nav{position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:68px!important;min-height:68px!important;z-index:80!important;padding:4px 6px max(4px,env(safe-area-inset-bottom))!important;background:rgba(5,11,21,.94)!important;border-top:1px solid rgba(119,185,255,.28)!important;backdrop-filter:blur(9px)!important}
-body:has(#home.active) > #app > .bottom-nav button{min-width:44px!important;min-height:50px!important;border-radius:13px!important;color:#d7e5f7!important;background:rgba(14,28,47,.72)!important;border:1px solid rgba(109,166,226,.22)!important;font-size:18px!important;touch-action:manipulation!important}
-body:has(#home.active) > #app > .bottom-nav button span{font-size:8px!important;line-height:10px!important;color:#b7c8df!important}
-body:has(#home.active) > #app > .bottom-nav button.active{background:linear-gradient(145deg,#174d8d,#102b52)!important;border-color:#65b7ff!important;color:#fff!important}
-body:has(#home.active) > #app > .bottom-nav button.active span{color:#fff!important}
-@media(max-width:390px){body:has(#home.active) > #app > .bottom-nav{height:62px!important;min-height:62px!important}.home-v2-scene{padding-bottom:0}}
+/* Territory v140 — HOME touch-layer fix
+   The old transparent scene hotspots were overlapping the mobile frame.
+   Home navigation uses the visible controls only; Arena/Clan code is untouched. */
+body:has(#home.active) .real-home > .hotspot{
+  display:none!important;
+  pointer-events:none!important;
+}
+body:has(#home.active) .real-home > .npc-label{
+  pointer-events:auto!important;
+}
+body:has(#home.active) .bottom-nav{
+  z-index:1000!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  isolation:isolate!important;
+}
+body:has(#home.active) .bottom-nav button{
+  position:relative!important;
+  z-index:1001!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
