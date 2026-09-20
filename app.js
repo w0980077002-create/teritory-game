@@ -51,14 +51,6 @@ window.addEventListener("storage",e=>{
 function render(){
  const coins=$("#coins"), gems=$("#gems"), level=$("#level");
  if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
- const homeName=$("#homePlayerName"), homeGems=$("#homeGems"), homeCoins=$("#homeCoins"), homeEnergy=$("#homeEnergy"), homeHpText=$("#homeHpText"), homeHpBar=$("#homeHpBar");
- if(homeName)homeName.textContent=state.name||"SSS";
- if(homeGems)homeGems.textContent=state.gems;
- if(homeCoins)homeCoins.textContent=state.coins;
- if(homeEnergy)homeEnergy.textContent=Math.max(0,Math.floor(Number(state.energy??100)));
- const hp=Math.max(0,Number(state.hp??0)||0), maxHp=Math.max(1,Number(state.maxHp??120)||120), hpPct=Math.max(0,Math.min(100,hp/maxHp*100));
- if(homeHpText)homeHpText.textContent=`${Math.floor(hp)}/${Math.floor(maxHp)}`;
- if(homeHpBar)homeHpBar.style.width=hpPct+"%";
  $("#weaponName") && ($("#weaponName").textContent=state.weapon); $("#weaponStats") && ($("#weaponStats").textContent=`Урон +${state.bonusDamage}`);
  const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
  renderShop(); renderInventory();
@@ -760,3 +752,128 @@ if(jackpotCloseV79)jackpotCloseV79.onclick=gameCloseJackpotPreviewV79;
 const jackpotModalV79=$('#gameJackpotModal');
 if(jackpotModalV79)jackpotModalV79.addEventListener('click',e=>{if(e.target===jackpotModalV79)gameCloseJackpotPreviewV79()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPreviewV79()});
+/* Territory G141 — HOME photo controls.
+   The current Sdolars artwork already contains the visual buttons.
+   This layer adds transparent touch targets over those exact areas.
+   Arena and Clan logic is untouched. */
+(function homePhotoControlsG141(){
+  function modal(title, body, actionText, action){
+    const old=document.querySelector('.g141-photo-modal'); if(old)old.remove();
+    const m=document.createElement('div');
+    m.className='g141-photo-modal';
+    m.innerHTML='<div class="g141-photo-card"><button type="button" class="g141-photo-x" aria-label="Закрыть">×</button><h3>'+title+'</h3><p>'+body+'</p><button type="button" class="g141-photo-action">'+actionText+'</button></div>';
+    document.body.appendChild(m);
+    const close=()=>m.remove();
+    m.querySelector('.g141-photo-x').onclick=close;
+    m.addEventListener('click',e=>{if(e.target===m)close()});
+    m.querySelector('.g141-photo-action').onclick=()=>{close();if(action)action()};
+  }
+
+  function mount(){
+    const home=document.getElementById('home');
+    const scene=home&&home.querySelector('.home-v2-scene');
+    if(!home||!scene||scene.querySelector('.g141-photo-controls'))return;
+
+    const layer=document.createElement('div');
+    layer.className='g141-photo-controls';
+    layer.innerHTML=[
+      '<button class="g141-zone g141-profile" aria-label="Профиль"></button>',
+      '<button class="g141-zone g141-gems" aria-label="Кристаллы"></button>',
+      '<button class="g141-zone g141-coins" aria-label="Монеты"></button>',
+      '<button class="g141-zone g141-energy" aria-label="Энергия"></button>',
+      '<button class="g141-zone g141-messages" aria-label="Сообщения"></button>',
+      '<button class="g141-zone g141-achievements" aria-label="Достижения"></button>',
+      '<button class="g141-zone g141-settings" aria-label="Настройки"></button>',
+      '<button class="g141-zone g141-language" aria-label="Язык"></button>',
+      '<button class="g141-zone g141-quest" aria-label="Текущее задание"></button>',
+      '<button class="g141-zone g141-daily" aria-label="Ежедневный бонус"></button>',
+      '<button class="g141-zone g141-bonus" aria-label="Бонусы"></button>',
+      '<button class="g141-zone g141-events" aria-label="События"></button>',
+      '<button class="g141-zone g141-vip" aria-label="VIP"></button>',
+      '<button class="g141-zone g141-game" aria-label="Game"></button>',
+      '<button class="g141-zone g141-blacksmith" aria-label="Кузница"></button>',
+      '<button class="g141-zone g141-tavern" aria-label="Таверна"></button>',
+      '<button class="g141-zone g141-shop" aria-label="Магазин"></button>'
+    ].join('');
+
+    const css=document.createElement('style');
+    css.id='territory-g141-photo-controls';
+    css.textContent=`
+      body:has(#home.active) .g141-photo-controls{
+        position:absolute!important;inset:0 0 64px 0!important;z-index:1200!important;
+        pointer-events:none!important;touch-action:manipulation!important;
+      }
+      body:has(#home.active) .g141-photo-controls .g141-zone{
+        position:absolute!important;display:block!important;box-sizing:border-box!important;
+        margin:0!important;padding:0!important;border:0!important;border-radius:12px!important;
+        background:transparent!important;box-shadow:none!important;opacity:0!important;
+        pointer-events:auto!important;touch-action:manipulation!important;
+        -webkit-tap-highlight-color:transparent!important;
+      }
+      body:has(#home.active) .g141-profile{left:0%!important;top:0%!important;width:38%!important;height:9%!important}
+      body:has(#home.active) .g141-gems{left:38%!important;top:0%!important;width:18%!important;height:7%!important}
+      body:has(#home.active) .g141-coins{left:56%!important;top:0%!important;width:19%!important;height:7%!important}
+      body:has(#home.active) .g141-energy{left:75%!important;top:0%!important;width:25%!important;height:7%!important}
+      body:has(#home.active) .g141-messages{left:56%!important;top:5%!important;width:10%!important;height:6%!important}
+      body:has(#home.active) .g141-achievements{left:66%!important;top:5%!important;width:11%!important;height:6%!important}
+      body:has(#home.active) .g141-settings{left:77%!important;top:5%!important;width:11%!important;height:6%!important}
+      body:has(#home.active) .g141-language{left:88%!important;top:5%!important;width:12%!important;height:6%!important}
+      body:has(#home.active) .g141-quest{left:1%!important;top:9%!important;width:39%!important;height:8%!important}
+      body:has(#home.active) .g141-daily{left:72%!important;top:10%!important;width:27%!important;height:8%!important}
+      body:has(#home.active) .g141-bonus{left:1%!important;top:17%!important;width:12%!important;height:8%!important}
+      body:has(#home.active) .g141-events{left:1%!important;top:24%!important;width:12%!important;height:8%!important}
+      body:has(#home.active) .g141-vip{left:1%!important;top:31%!important;width:12%!important;height:8%!important}
+      body:has(#home.active) .g141-game{left:1%!important;top:38%!important;width:12%!important;height:8%!important}
+      body:has(#home.active) .g141-blacksmith{right:1%!important;top:24%!important;width:12%!important;height:8%!important}
+      body:has(#home.active) .g141-tavern{right:1%!important;top:31%!important;width:12%!important;height:8%!important}
+      body:has(#home.active) .g141-shop{right:1%!important;top:38%!important;width:12%!important;height:9%!important}
+
+      .g141-photo-modal{
+        position:fixed!important;inset:0!important;z-index:6000!important;
+        display:flex!important;align-items:center!important;justify-content:center!important;
+        padding:20px!important;box-sizing:border-box!important;background:rgba(0,0,0,.72)!important;
+      }
+      .g141-photo-card{
+        width:min(92vw,380px)!important;box-sizing:border-box!important;padding:20px!important;
+        border-radius:18px!important;background:linear-gradient(180deg,#182635,#0b1118)!important;
+        border:1px solid rgba(215,183,98,.9)!important;color:#fff!important;
+        box-shadow:0 20px 70px rgba(0,0,0,.65)!important;text-align:center!important;
+      }
+      .g141-photo-card h3{margin:0 32px 10px!important;font-size:22px!important}
+      .g141-photo-card p{margin:8px 0!important;color:#d2d9e0!important;font-size:14px!important;line-height:1.45!important}
+      .g141-photo-card button{font:inherit}
+      .g141-photo-x{
+        position:absolute!important;top:12px!important;right:18px!important;width:40px!important;height:40px!important;
+        border:0!important;background:transparent!important;color:#fff!important;font-size:30px!important;
+      }
+      .g141-photo-action{
+        width:100%!important;margin-top:12px!important;padding:12px!important;border-radius:12px!important;
+        border:1px solid #d7b762!important;background:#5c461d!important;color:#fff!important;font-weight:800!important;
+      }
+    `;
+    document.head.appendChild(css);
+    scene.appendChild(layer);
+
+    const go=id=>showScreen(id);
+    layer.querySelector('.g141-profile').onclick=()=>go('inventory');
+    layer.querySelector('.g141-quest').onclick=()=>go('districts');
+    layer.querySelector('.g141-daily').onclick=()=>go('game');
+    layer.querySelector('.g141-bonus').onclick=()=>go('game');
+    layer.querySelector('.g141-events').onclick=()=>go('districts');
+    layer.querySelector('.g141-game').onclick=()=>go('game');
+    layer.querySelector('.g141-blacksmith').onclick=()=>go('market');
+    layer.querySelector('.g141-shop').onclick=()=>go('market');
+    layer.querySelector('.g141-tavern').onclick=()=>modal('🍺 Таверна','Здесь будет городской отдых, слухи и специальные встречи.','Понятно');
+    layer.querySelector('.g141-vip').onclick=()=>modal('👑 VIP','VIP-функции подключим к общей системе аккаунта. Здесь уже зарезервировано рабочее место для VIP.','Понятно');
+    layer.querySelector('.g141-messages').onclick=()=>modal('✉️ Сообщения','Центр сообщений готов для подключения уведомлений и событий.','Понятно');
+    layer.querySelector('.g141-achievements').onclick=()=>modal('🏆 Достижения','Сюда будут выводиться достижения героя и награды за прогресс.','Понятно');
+    layer.querySelector('.g141-settings').onclick=()=>modal('⚙️ Настройки','Настройки игры и интерфейса будут собраны здесь.','Понятно');
+    layer.querySelector('.g141-language').onclick=()=>modal('🌐 Язык','Сейчас активен русский язык.','Понятно');
+    layer.querySelector('.g141-gems').onclick=()=>modal('💎 Кристаллы','Кристаллы: '+((window.TerritoryStore&&window.TerritoryStore.state&&window.TerritoryStore.state.gems)||state.gems||0),'Понятно');
+    layer.querySelector('.g141-coins').onclick=()=>modal('🪙 Монеты','Монеты: '+((window.TerritoryStore&&window.TerritoryStore.state&&window.TerritoryStore.state.coins)||state.coins||0),'Понятно');
+    layer.querySelector('.g141-energy').onclick=()=>modal('⚡ Энергия','Энергия: '+(state.energy||0)+'/200','Понятно');
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
+  else mount();
+})();
+
