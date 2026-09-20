@@ -858,6 +858,58 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPrev
     document.head.appendChild(css);
     scene.appendChild(layer);
 
+    /* G143 — capture touch at document level.
+       Some older scene overlays can sit above the transparent DOM layer.
+       Capture-phase hit testing makes the artwork controls independent
+       from stacking contexts and old overlays. */
+    const hit=(x,y)=>{
+      if(!home.classList.contains('active'))return null;
+      const rect=scene.getBoundingClientRect();
+      if(!rect.width||!rect.height)return null;
+      if(y < rect.top || y > rect.bottom-64)return null;
+      const nx=(x-rect.left)/rect.width*100;
+      const ny=(y-rect.top)/rect.height*100;
+      const zones=[
+        ['profile',0,0,38,9],['gems',38,0,18,7],['coins',56,0,19,7],['energy',75,0,25,7],
+        ['messages',56,5,10,6],['achievements',66,5,11,6],['settings',77,5,11,6],['language',88,5,12,6],
+        ['quest',1,9,39,8],['daily',72,10,27,8],
+        ['bonus',1,17,12,8],['events',1,24,12,8],['vip',1,31,12,8],['game',1,38,12,8],
+        ['blacksmith',87,24,12,8],['tavern',87,31,12,8],['shop',87,38,12,9]
+      ];
+      return zones.find(z=>nx>=z[1]&&nx<=z[1]+z[3]&&ny>=z[2]&&ny<=z[2]+z[4])?.[0]||null;
+    };
+    const actions={
+      profile:()=>go('inventory'),
+      quest:()=>go('districts'),
+      daily:()=>go('game'),
+      bonus:()=>go('game'),
+      events:()=>go('districts'),
+      game:()=>go('game'),
+      blacksmith:()=>go('market'),
+      shop:()=>go('market'),
+      tavern:()=>modal('🍺 Таверна','Здесь будет городской отдых, слухи и специальные встречи.','Понятно'),
+      vip:()=>modal('👑 VIP','VIP-функции подключим к общей системе аккаунта. Здесь уже зарезервировано рабочее место для VIP.','Понятно'),
+      messages:()=>modal('✉️ Сообщения','Центр сообщений готов для подключения уведомлений и событий.','Понятно'),
+      achievements:()=>modal('🏆 Достижения','Сюда будут выводиться достижения героя и награды за прогресс.','Понятно'),
+      settings:()=>modal('⚙️ Настройки','Настройки игры и интерфейса будут собраны здесь.','Понятно'),
+      language:()=>modal('🌐 Язык','Сейчас активен русский язык.','Понятно'),
+      gems:()=>modal('💎 Кристаллы','Кристаллы: '+((window.TerritoryStore&&window.TerritoryStore.state&&window.TerritoryStore.state.gems)||state.gems||0),'Понятно'),
+      coins:()=>modal('🪙 Монеты','Монеты: '+((window.TerritoryStore&&window.TerritoryStore.state&&window.TerritoryStore.state.coins)||state.coins||0),'Понятно'),
+      energy:()=>modal('⚡ Энергия','Энергия: '+(state.energy||0)+'/200','Понятно')
+    };
+    const onCapture=e=>{
+      if(!home.classList.contains('active'))return;
+      const p=e.touches&&e.touches[0] ? e.touches[0] : e;
+      const name=hit(p.clientX,p.clientY);
+      if(!name||!actions[name])return;
+      if(e.target&&e.target.closest&&e.target.closest('.g141-zone'))return;
+      e.preventDefault();
+      e.stopPropagation();
+      actions[name]();
+    };
+    document.addEventListener('pointerup',onCapture,true);
+    document.addEventListener('touchend',onCapture,{capture:true,passive:false});
+
     const go=id=>showScreen(id);
     layer.querySelector('.g141-profile').onclick=()=>go('inventory');
     layer.querySelector('.g141-quest').onclick=()=>go('districts');
