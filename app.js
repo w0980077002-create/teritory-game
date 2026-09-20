@@ -772,7 +772,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPrev
   function mount(){
     const home=document.getElementById('home');
     const scene=home&&home.querySelector('.home-v2-scene');
-    if(!home||!scene||scene.querySelector('.g141-photo-controls'))return;
+    if(!home||!scene)return;
+    if(scene.querySelector('.g141-photo-controls'))return;
 
     const layer=document.createElement('div');
     layer.className='g141-photo-controls';
@@ -799,8 +800,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPrev
     const css=document.createElement('style');
     css.id='territory-g141-photo-controls';
     css.textContent=`
+      body:has(#home.active) .home-v2-scene-image{
+        pointer-events:none!important;
+      }
       body:has(#home.active) .g141-photo-controls{
-        position:absolute!important;inset:0 0 64px 0!important;z-index:1200!important;
+        position:absolute!important;inset:0 0 64px 0!important;z-index:9999!important;
         pointer-events:none!important;touch-action:manipulation!important;
       }
       body:has(#home.active) .g141-photo-controls .g141-zone{
