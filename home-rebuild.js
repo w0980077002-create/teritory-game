@@ -122,7 +122,7 @@
       case 'vip': vip(); break;
       case 'game': gameHall(); break;
       case 'arena': go('arena'); break;
-      case 'blacksmith': openForge(); break;
+      case 'blacksmith': (window.openForgeV2 ? window.openForgeV2() : openForge()); break;
       case 'tavern': go('districts'); break;
       case 'shop': go('market'); break;
       default: break;
