@@ -378,3 +378,126 @@
   overlayCloseObserver.observe(document.documentElement,{childList:true,subtree:true});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installOverlayCloseFix,{once:true});else installOverlayCloseFix();
 })();
+
+/* Territory Global Close V5 — compact Telegram-safe close controls */
+(function(){
+  'use strict';
+
+  const CLOSE_CLASS = 'territory-overlay-force-close';
+  let lastClose = 0;
+
+  function activeOverlay(){
+    const profile = document.getElementById('hrProfileOverlay');
+    if(profile) return {el:profile, kind:'profile'};
+    const forge = document.querySelector('.forge-v2-overlay');
+    if(forge) return {el:forge, kind:'forge'};
+    return null;
+  }
+
+  function closeOverlay(kind, el){
+    if(Date.now() - lastClose < 180) return;
+    lastClose = Date.now();
+
+    if(kind === 'forge' && typeof window.closeForgeV2 === 'function'){
+      window.closeForgeV2();
+      return;
+    }
+
+    if(el) el.remove();
+    if(kind === 'forge') document.body.style.overflow = '';
+  }
+
+  function installStyle(){
+    if(document.getElementById('territory-global-close-v5-style')) return;
+    const s = document.createElement('style');
+    s.id = 'territory-global-close-v5-style';
+    s.textContent = `
+      .${CLOSE_CLASS}{
+        position:fixed!important;
+        top:max(10px,env(safe-area-inset-top))!important;
+        right:10px!important;
+        z-index:2147483647!important;
+        width:40px!important;
+        height:40px!important;
+        min-width:40px!important;
+        min-height:40px!important;
+        max-width:40px!important;
+        max-height:40px!important;
+        padding:0!important;
+        margin:0!important;
+        display:grid!important;
+        place-items:center!important;
+        box-sizing:border-box!important;
+        border:1px solid #c8a552!important;
+        border-radius:11px!important;
+        background:#101a24!important;
+        color:#f5dfaa!important;
+        font:700 27px/1 Arial,sans-serif!important;
+        box-shadow:0 6px 18px rgba(0,0,0,.42)!important;
+        cursor:pointer!important;
+        pointer-events:auto!important;
+        touch-action:manipulation!important;
+        -webkit-tap-highlight-color:transparent!important;
+        user-select:none!important;
+      }
+      .${CLOSE_CLASS}:active{transform:scale(.93)!important}
+    `;
+    document.head.appendChild(s);
+  }
+
+  function bindButton(btn){
+    if(!btn || btn.dataset.closeV5 === '1') return;
+    btn.dataset.closeV5 = '1';
+
+    const run = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+      const o = activeOverlay();
+      if(o) closeOverlay(o.kind, o.el);
+    };
+
+    btn.addEventListener('pointerdown', run, {capture:true, passive:false});
+    btn.addEventListener('pointerup', run, {capture:true, passive:false});
+    btn.addEventListener('touchstart', run, {capture:true, passive:false});
+    btn.addEventListener('touchend', run, {capture:true, passive:false});
+    btn.addEventListener('click', run, {capture:true});
+  }
+
+  function scan(){
+    installStyle();
+    document.querySelectorAll('.' + CLOSE_CLASS).forEach(bindButton);
+  }
+
+  function coordinateFallback(e){
+    const o = activeOverlay();
+    if(!o) return;
+
+    const p = e.changedTouches && e.changedTouches[0]
+      ? e.changedTouches[0]
+      : e.touches && e.touches[0]
+        ? e.touches[0]
+        : e;
+
+    if(!p || typeof p.clientX !== 'number' || typeof p.clientY !== 'number') return;
+
+    /* Fixed top-right 72×72 CSS-pixel safety zone around the close button. */
+    if(p.clientX >= window.innerWidth - 72 && p.clientY <= 72){
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+      closeOverlay(o.kind, o.el);
+    }
+  }
+
+  installStyle();
+  scan();
+
+  const mo = new MutationObserver(scan);
+  mo.observe(document.documentElement, {childList:true, subtree:true});
+
+  document.addEventListener('pointerdown', coordinateFallback, {capture:true, passive:false});
+  document.addEventListener('pointerup', coordinateFallback, {capture:true, passive:false});
+  document.addEventListener('touchstart', coordinateFallback, {capture:true, passive:false});
+  document.addEventListener('touchend', coordinateFallback, {capture:true, passive:false});
+})();
