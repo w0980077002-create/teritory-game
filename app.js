@@ -760,6 +760,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPrev
    This layer adds transparent touch targets over those exact areas.
    Arena and Clan logic is untouched. */
 (function homePhotoControlsG141(){
+  /* V15: legacy photo hit-layer is disabled. The rebuilt home screen owns its controls now. */
+  return;
   function modal(title, body, actionText, action){
     const old=document.querySelector('.g141-photo-modal'); if(old)old.remove();
     const m=document.createElement('div');

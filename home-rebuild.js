@@ -88,7 +88,13 @@
     }catch(e){}
     localStorage.setItem(key,today);
     const m=modal({icon:'🎁',text:'Бонус получен'},'<div class="hr-reward"><b>+100 🪙</b><b>+1 💎</b><b>+10 ⚡</b></div><p>Награды добавлены в профиль.</p>');
-    setTimeout(()=>m&&m.remove(),3200);
+    if(m){
+      m.dataset.hrModalKind='daily';
+      const closeNow=()=>{m.remove();document.documentElement.classList.remove('territory-modal-open');document.body.classList.remove('territory-modal-open');document.body.style.overscrollBehaviorY='';document.body.style.overflow='';document.documentElement.style.overflow='';};
+      const x=m.querySelector('.hr-modal-x');
+      if(x){x.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeNow();},true);}
+      setTimeout(()=>{if(m.isConnected)closeNow();},3200);
+    }
     sync();
   }
 
@@ -625,8 +631,29 @@
       '.hr-modal,[role="dialog"],.forge-v2-overlay,#hrProfileOverlay'
     );
     if(!modal) return;
+
+    /* V15: ordinary home modals must be removed, not merely hidden.
+       A hidden full-screen modal can leave a dark/blurred touch shield in
+       Telegram WebView even though its card is no longer visible. */
+    if(modal.classList.contains('hr-modal')){
+      modal.remove();
+      document.documentElement.classList.remove('territory-modal-open');
+      document.body.classList.remove('territory-modal-open');
+      document.body.style.overscrollBehaviorY='';
+      document.body.style.overflow='';
+      document.documentElement.style.overflow='';
+      return;
+    }
+
+    if(modal.classList.contains('forge-v2-overlay') && typeof window.closeForgeV2==='function'){
+      window.closeForgeV2();
+      return;
+    }
+
     try{ modal.setAttribute('aria-hidden','true'); }catch(_e){}
     modal.style.display='none';
+    modal.style.visibility='hidden';
+    modal.style.pointerEvents='none';
     if(modal.classList.contains('forge-v2-overlay')) document.body.style.overflow='';
   }
 
@@ -817,6 +844,30 @@
   document.head.appendChild(st);
 })();
 
+
+/* Territory V15 — stale modal/shield cleanup for Telegram WebView.
+   Never touches Arena. */
+(function(){
+  'use strict';
+  const roots='.hr-modal,#hrProfileOverlay,.rp-overlay,.forge-v2-overlay,.game-modal,.game-tasks-modal,.game-jackpot-modal,.game-panel-modal,.g141-photo-modal,#gameBatchModal,#gameRewardModal';
+  const isArena=el=>!!(el&&(el.matches?.('#arenaModal,.arena-modal,[data-arena-modal]')||el.closest?.('#arenaModal,.arena-modal,[data-arena-modal]')));
+  const visible=el=>{if(!el||isArena(el))return false;const c=getComputedStyle(el);return c.display!=='none'&&c.visibility!=='hidden'&&c.opacity!=='0'&&el.getBoundingClientRect().width>0&&el.getBoundingClientRect().height>0};
+  function clean(){
+    const open=[...document.querySelectorAll(roots)].some(visible);
+    if(open)return;
+    document.documentElement.classList.remove('territory-modal-open');
+    document.body.classList.remove('territory-modal-open');
+    document.body.style.overscrollBehaviorY='';
+    document.body.style.overflow='';
+    document.documentElement.style.overflow='';
+    document.querySelectorAll('.hr-modal[style*="display: none"],.g141-photo-modal[style*="display: none"]').forEach(el=>el.remove());
+  }
+  document.addEventListener('click',()=>setTimeout(clean,0),true);
+  document.addEventListener('touchend',()=>setTimeout(clean,0),{capture:true,passive:true});
+  document.addEventListener('pointerup',()=>setTimeout(clean,0),{capture:true,passive:true});
+  new MutationObserver(()=>setTimeout(clean,0)).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','aria-hidden']});
+  clean();
+})();
 
 /* Territory Global Modal V11 — explicit-close-only policy.
    Ordinary modals no longer disappear when the user taps the darkened picture/backdrop.
