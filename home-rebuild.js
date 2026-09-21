@@ -562,3 +562,87 @@
   `;
   document.head.appendChild(s);
 })();
+
+
+/* Territory Global UI System V7 — one close style for all non-Arena windows. */
+(function(){
+  'use strict';
+  const BTN_SEL = [
+    '.territory-overlay-force-close',
+    '.hr-modal-x',
+    '.modal-close',
+    '.game-modal-close',
+    '#gameModalClose',
+    '#jackpotClose',
+    '#gameTasksClose',
+    '#gamePanelClose'
+  ].join(',');
+
+  function isArena(el){
+    return !!(el && (el.closest('#arenaModal,.arena-modal,[data-arena-modal]') || el.id === 'arenaModal'));
+  }
+
+  function style(){
+    if(document.getElementById('territory-global-ui-v7-style')) return;
+    const s=document.createElement('style');
+    s.id='territory-global-ui-v7-style';
+    s.textContent=`
+      .hr-modal-x:not(.arena-modal *),
+      .modal-close:not(.arena-modal *),
+      .game-modal-close:not(.arena-modal *),
+      #gameModalClose,#jackpotClose,#gameTasksClose,#gamePanelClose{
+        width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
+        max-width:40px!important;max-height:40px!important;padding:0!important;margin:0!important;
+        display:grid!important;place-items:center!important;box-sizing:border-box!important;
+        border:1px solid rgba(255,255,255,.18)!important;border-radius:50%!important;
+        background:#05080c!important;color:#fff!important;
+        font:700 25px/1 Arial,sans-serif!important;
+        box-shadow:0 5px 16px rgba(0,0,0,.5)!important;
+        text-shadow:none!important;cursor:pointer!important;touch-action:manipulation!important;
+        -webkit-tap-highlight-color:transparent!important;user-select:none!important;
+        flex:0 0 40px!important;
+      }
+      .hr-modal-x:active,.modal-close:active,.game-modal-close:active,
+      #gameModalClose:active,#jackpotClose:active,#gameTasksClose:active,#gamePanelClose:active{
+        transform:scale(.93)!important;
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
+  function fallbackClose(btn){
+    if(!btn || isArena(btn)) return;
+    const modal=btn.closest(
+      '.game-jackpot-modal,.game-modal,.game-tasks-modal,.game-panel-modal,'+
+      '.hr-modal,[role="dialog"],.forge-v2-overlay,#hrProfileOverlay'
+    );
+    if(!modal) return;
+    try{ modal.setAttribute('aria-hidden','true'); }catch(_e){}
+    modal.style.display='none';
+    if(modal.classList.contains('forge-v2-overlay')) document.body.style.overflow='';
+  }
+
+  function bind(root){
+    style();
+    const nodes=[];
+    if(root && root.matches && root.matches(BTN_SEL)) nodes.push(root);
+    if(root && root.querySelectorAll) nodes.push(...root.querySelectorAll(BTN_SEL));
+    else nodes.push(...document.querySelectorAll(BTN_SEL));
+    nodes.forEach(btn=>{
+      if(isArena(btn) || btn.dataset.globalUiV7==='1') return;
+      btn.dataset.globalUiV7='1';
+      const run=e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+        setTimeout(()=>fallbackClose(btn),0);
+      };
+      btn.addEventListener('pointerup',run,{capture:true,passive:false});
+      btn.addEventListener('touchend',run,{capture:true,passive:false});
+    });
+  }
+
+  style();
+  bind(document);
+  new MutationObserver(m=>m.forEach(x=>x.addedNodes.forEach(n=>bind(n)))).observe(document.documentElement,{childList:true,subtree:true});
+})();
