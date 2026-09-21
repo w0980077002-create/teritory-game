@@ -8,15 +8,10 @@
   const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
 
   function go(id){
-    const target=document.getElementById(id);
-    if(!target)return;
-    // Direct navigation first: independent of legacy app.js routing.
-    $$('.screen').forEach(x=>x.classList.toggle('active',x===target));
-    document.querySelectorAll('.bottom-nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));
-    if(id==='inventory') sync();
-    if(id==='arena' && typeof window.openBattle==='function') setTimeout(()=>window.openBattle(),0);
-    // Keep legacy router informed when it exists, but never depend on it.
-    try{ if(typeof window.showScreen==='function') window.showScreen(id); }catch(e){}
+    if(typeof window.showScreen==='function') window.showScreen(id);
+    else {
+      $$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));
+    }
   }
 
   function modal(title,body,actions){
@@ -28,6 +23,48 @@
     m.addEventListener('click',e=>{const a=e.target.closest('[data-hr-act]');if(!a)return;if(a.dataset.hrAct==='close'||a.dataset.hrAct==='ok')m.remove();});
     m.addEventListener('click',e=>{if(e.target===m)m.remove();});
     return m;
+  }
+
+  function showProfile(){
+    const old=$('#hrProfileOverlay'); if(old) old.remove();
+    const st=(window.TerritoryStore&&window.TerritoryStore.state)||{};
+    const num=(v,d)=>Number.isFinite(Number(v))?Number(v):d;
+    const name=st.name||$('#playerName')?.textContent||'SSS';
+    const level=num(st.level,1), hp=num(st.hp,120), maxHp=Math.max(1,num(st.maxHp,120));
+    const energy=num(st.energy,100), coins=num(st.coins,1000), gems=num(st.gems,25);
+    const xp=num(st.exp,0), next=Math.max(100,num(st.nextExp,100));
+    const strength=num(st.strength,5), defense=num(st.defense,0), damage=num(st.bonusDamage,0);
+    const weapon=st.weapon||'Кулаки', inventory=Array.isArray(st.inventory)?st.inventory:[];
+    const items=inventory.length?inventory.map((x,i)=>`<div class="rp-item"><span>${x}</span><b>Предмет ${i+1}</b><small>Экипировка</small></div>`).join(''):`<div class="rp-empty">Инвентарь пока пуст</div>`;
+    const o=document.createElement('div'); o.id='hrProfileOverlay'; o.className='rp-overlay';
+    o.innerHTML=`
+      <div class="rp-shell" role="dialog" aria-modal="true" aria-label="Профиль героя">
+        <header class="rp-head">
+          <button type="button" class="rp-back" data-rp="close">‹</button>
+          <div><small>ГЕРОЙ SDOLARS</small><b>ПРОФИЛЬ</b></div>
+          <button type="button" class="rp-close" data-rp="close">×</button>
+        </header>
+        <main class="rp-body">
+          <section class="rp-hero">
+            <div class="rp-avatar">⚔️</div>
+            <div class="rp-main"><b>${name}</b><span>Уровень ${level}</span><div class="rp-xp"><i style="width:${Math.max(0,Math.min(100,xp/next*100))}%"></i></div><small>${xp} / ${next} XP</small></div>
+          </section>
+          <section class="rp-res"><div><span>🪙</span><b>${coins}</b><small>Монеты</small></div><div><span>💎</span><b>${gems}</b><small>Кристаллы</small></div><div><span>⚡</span><b>${energy}</b><small>Энергия</small></div></section>
+          <section class="rp-stats"><div><span>❤️</span><b>${hp}/${maxHp}</b><small>Здоровье</small></div><div><span>⚔️</span><b>${strength}</b><small>Сила</small></div><div><span>🛡️</span><b>${defense}</b><small>Защита</small></div><div><span>💥</span><b>+${damage}</b><small>Урон</small></div></section>
+          <section class="rp-section"><div class="rp-title"><b>ЭКИПИРОВКА</b><small>Текущий комплект</small></div>
+            <div class="rp-equip"><div class="rp-equip-icon">🪓</div><div><b>${weapon}</b><span>Бонус к урону +${damage}</span></div><button type="button" data-rp="equipment">Сменить</button></div>
+          </section>
+          <section class="rp-section"><div class="rp-title"><b>ИНВЕНТАРЬ</b><small>${inventory.length} предметов</small></div><div class="rp-grid">${items}</div></section>
+        </main>
+      </div>`;
+    document.body.appendChild(o);
+    const close=()=>o.remove();
+    o.addEventListener('click',e=>{
+      const a=e.target.closest('[data-rp]'); if(!a)return;
+      if(a.dataset.rp==='close'){e.preventDefault();e.stopPropagation();close();return;}
+      if(a.dataset.rp==='equipment'){e.preventDefault();e.stopPropagation();close();action('blacksmith');}
+    });
+    o.addEventListener('click',e=>{if(e.target===o)close();});
   }
 
   function dailyBonus(){
@@ -74,9 +111,8 @@
   }
 
   function action(name){
-    if(name==='profile'){ go('inventory'); return; }
     switch(name){
-      case 'profile': go('inventory'); break;
+      case 'profile': showProfile(); break;
       case 'coins': resources('coins'); break;
       case 'gems': resources('gems'); break;
       case 'energy': modal({icon:'⚡',text:'Энергия'},'<div class="hr-big-number">'+($('#energyValue')?.textContent||$('#energy')?.textContent||'100')+'</div><p>Энергия расходуется в игровых активностях и восстанавливается со временем.</p>'); break;
@@ -216,6 +252,16 @@
   document.addEventListener('pointerup',topCapture,true);
   document.addEventListener('touchend',topCapture,{capture:true,passive:false});
   document.addEventListener('click',suppressDuplicateClick,true);
+
+  // Profile must not depend on the legacy inventory screen. Capture the bottom-nav tap and open the same new profile.
+  function profileNavCapture(e){
+    const h=$('#home'); if(!h || !h.classList.contains('active'))return;
+    const b=e.target&&e.target.closest?e.target.closest('.bottom-nav [data-screen="inventory"]'):null;
+    if(!b)return;
+    e.preventDefault(); e.stopPropagation();
+    showProfile();
+  }
+  document.addEventListener('click',profileNavCapture,true);
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount,{once:true}); else mount();
 })();
