@@ -1,13 +1,70 @@
-/* TERITORY HOME FINAL 03 — exact approved reference */
+/* TERITORY HOME FINAL 04
+   Exact approved artwork. Fit to the actual viewport so side buttons
+   never get cropped outside the screen. All interaction is transparent.
+*/
 html,body{background:#07111b!important}
 body:has(#home.home-reference-active){overflow:hidden!important;background:#07111b!important}
-body:has(#home.home-reference-active) main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;overflow:hidden!important}
-body:has(#home.home-reference-active) #home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#07111b!important}
-.home-reference-host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;background:#07111b!important}
-.home-reference-image{position:absolute!important;left:50%!important;top:0!important;width:100%!important;height:100%!important;transform:translateX(-50%)!important;object-fit:cover!important;object-position:center center!important;display:block!important;z-index:1!important;user-select:none!important;-webkit-user-drag:none!important}
-.home-hitzones{position:absolute!important;inset:0!important;z-index:10!important;pointer-events:none!important}
-.hz{position:absolute!important;display:block!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important;pointer-events:auto!important;opacity:0!important}
-.l1{left:0;top:9%;width:15%;height:11%}.l2{left:0;top:20%;width:15%;height:11%}.l3{left:0;top:31%;width:15%;height:11%}.l4{left:0;top:42%;width:15%;height:11%}.l5{left:0;top:53%;width:15%;height:11%}
-.r1{right:0;top:9%;width:15%;height:11%}.r2{right:0;top:20%;width:15%;height:11%}.r3{right:0;top:31%;width:15%;height:11%}.r4{right:0;top:42%;width:15%;height:11%}.r5{right:0;top:53%;width:15%;height:11%}
-.b1{left:0;bottom:0;width:14.3%;height:12%}.b2{left:14.3%;bottom:0;width:14.3%;height:12%}.b3{left:28.6%;bottom:0;width:14.3%;height:12%}.b4{left:42.9%;bottom:0;width:14.3%;height:14%}.b5{left:57.2%;bottom:0;width:14.3%;height:12%}.b6{left:71.5%;bottom:0;width:14.3%;height:12%}.b7{left:85.8%;bottom:0;width:14.2%;height:12%}
-body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active) .bottom-nav,body:has(#home.home-reference-active) .live-side-ui,body:has(#home.home-reference-active) .live-city-title,body:has(#home.home-reference-active) .live-city-time,body:has(#home.home-reference-active) .home-v2-scene,body:has(#home.home-reference-active) .g141-photo-controls,body:has(#home.home-reference-active) .real-home-image,body:has(#home.home-reference-active) .home-v2-scene-image{display:none!important}
+body:has(#home.home-reference-active) main{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  margin:0!important;padding:0!important;overflow:hidden!important;
+}
+body:has(#home.home-reference-active) #home{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  margin:0!important;padding:0!important;overflow:hidden!important;background:#07111b!important;
+}
+.home-reference-host{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  overflow:hidden!important;background:#07111b!important;
+}
+.home-reference-image{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  transform:none!important;object-fit:fill!important;object-position:center!important;
+  display:block!important;z-index:1!important;user-select:none!important;
+  -webkit-user-drag:none!important;
+}
+.home-hitzones{position:absolute!important;inset:0!important;z-index:20!important;pointer-events:none!important}
+.hz{
+  position:absolute!important;display:block!important;box-sizing:border-box!important;
+  padding:0!important;margin:0!important;border:0!important;background:transparent!important;
+  pointer-events:auto!important;opacity:0!important;border-radius:8px!important;
+  touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;
+}
+.hz:focus{outline:none!important}
+
+.tr4-modal{
+  position:fixed!important;inset:0!important;z-index:99999!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  padding:20px!important;box-sizing:border-box!important;background:rgba(0,0,0,.72)!important;
+}
+.tr4-card{
+  position:relative!important;width:min(90vw,380px)!important;padding:22px!important;
+  box-sizing:border-box!important;border-radius:18px!important;
+  background:linear-gradient(180deg,#172838,#0b1118)!important;
+  border:1px solid rgba(215,183,98,.9)!important;color:#fff!important;
+  text-align:center!important;box-shadow:0 20px 70px rgba(0,0,0,.65)!important;
+}
+.tr4-card h3{margin:0 30px 10px!important;font-size:21px!important}
+.tr4-card p{margin:8px 0 14px!important;color:#d7dee6!important;line-height:1.4!important}
+.tr4-x{
+  position:absolute!important;right:10px!important;top:7px!important;width:38px!important;height:38px!important;
+  border:0!important;background:transparent!important;color:#fff!important;font-size:28px!important;
+}
+.tr4-ok{
+  width:100%!important;padding:11px!important;border-radius:12px!important;
+  border:1px solid #d7b762!important;background:#5c461d!important;color:#fff!important;font-weight:800!important;
+}
+
+/* Remove every legacy visual layer while this HOME is active. */
+body:has(#home.home-reference-active) .hud,
+body:has(#home.home-reference-active) .bottom-nav,
+body:has(#home.home-reference-active) .live-side-ui,
+body:has(#home.home-reference-active) .live-city-title,
+body:has(#home.home-reference-active) .live-city-time,
+body:has(#home.home-reference-active) .home-v2-scene,
+body:has(#home.home-reference-active) .g141-photo-controls,
+body:has(#home.home-reference-active) .real-home-image,
+body:has(#home.home-reference-active) .home-v2-scene-image{display:none!important}
+
+@media(max-width:430px){
+  .home-reference-image{object-fit:fill!important}
+}
