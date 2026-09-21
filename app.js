@@ -889,7 +889,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPrev
       bonus:()=>go('game'),
       events:()=>go('districts'),
       game:()=>go('game'),
-      blacksmith:()=>go('market'),
+      blacksmith:()=> (window.openForgeV2 ? window.openForgeV2() : go('market')),
       shop:()=>go('market'),
       tavern:()=>modal('🍺 Таверна','Здесь будет городской отдых, слухи и специальные встречи.','Понятно'),
       vip:()=>modal('👑 VIP','VIP-функции подключим к общей системе аккаунта. Здесь уже зарезервировано рабочее место для VIP.','Понятно'),
@@ -921,7 +921,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPrev
     layer.querySelector('.g141-bonus').onclick=()=>go('game');
     layer.querySelector('.g141-events').onclick=()=>go('districts');
     layer.querySelector('.g141-game').onclick=()=>go('game');
-    layer.querySelector('.g141-blacksmith').onclick=()=>go('market');
+    layer.querySelector('.g141-blacksmith').onclick=()=> (window.openForgeV2 ? window.openForgeV2() : go('market'));
     layer.querySelector('.g141-shop').onclick=()=>go('market');
     layer.querySelector('.g141-tavern').onclick=()=>modal('🍺 Таверна','Здесь будет городской отдых, слухи и специальные встречи.','Понятно');
     layer.querySelector('.g141-vip').onclick=()=>modal('👑 VIP','VIP-функции подключим к общей системе аккаунта. Здесь уже зарезервировано рабочее место для VIP.','Понятно');
