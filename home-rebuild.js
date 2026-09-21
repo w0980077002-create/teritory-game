@@ -8,10 +8,15 @@
   const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
 
   function go(id){
-    if(typeof window.showScreen==='function') window.showScreen(id);
-    else {
-      $$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));
-    }
+    const target=document.getElementById(id);
+    if(!target)return;
+    // Direct navigation first: independent of legacy app.js routing.
+    $$('.screen').forEach(x=>x.classList.toggle('active',x===target));
+    document.querySelectorAll('.bottom-nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));
+    if(id==='inventory') sync();
+    if(id==='arena' && typeof window.openBattle==='function') setTimeout(()=>window.openBattle(),0);
+    // Keep legacy router informed when it exists, but never depend on it.
+    try{ if(typeof window.showScreen==='function') window.showScreen(id); }catch(e){}
   }
 
   function modal(title,body,actions){
@@ -69,6 +74,7 @@
   }
 
   function action(name){
+    if(name==='profile'){ go('inventory'); return; }
     switch(name){
       case 'profile': go('inventory'); break;
       case 'coins': resources('coins'); break;
