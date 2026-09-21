@@ -1,26 +1,27 @@
-/* TERITORY — EXACT REFERENCE HOME CSS
-   One full-screen artwork. HTML only supplies transparent hit zones.
-*/
-html,body{margin:0!important;padding:0!important;background:#07111b!important}
-body:has(#home.reference-home-active){overflow:hidden!important;background:#07111b!important}
-body:has(#home.reference-home-active) .hud{display:none!important}
-body:has(#home.reference-home-active) .bottom-nav{display:none!important}
-body:has(#home.reference-home-active) main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
-body:has(#home.reference-home-active) #home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#07111b!important}
-.reference-home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;background:#07111b!important;touch-action:manipulation!important}
-.reference-art{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;object-position:center center!important;z-index:1!important;user-select:none!important;-webkit-user-drag:none!important}
-.reference-hotspots{position:absolute!important;inset:0!important;z-index:5!important;pointer-events:none!important}
-.reference-hotspots .z{position:absolute!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;outline:0!important;pointer-events:auto!important;touch-action:manipulation!important}
-/* Reference artwork is 866×1536. Coordinates are proportional so it stays exact at any viewport. */
-.z-profile{left:0%;top:0%;width:28%;height:8.5%}
-.z-coins{left:28%;top:0%;width:17%;height:5.8%}
-.z-gems{left:45%;top:0%;width:15%;height:5.8%}
-.z-l1,.z-l2,.z-l3,.z-l4,.z-l5{left:0%;width:14%;height:10.1%}
-.z-l1{top:8.8%}.z-l2{top:18.9%}.z-l3{top:29.1%}.z-l4{top:39.2%}.z-l5{top:49.3%}
-.z-r1,.z-r2,.z-r3,.z-r4,.z-r5{right:0%;width:14%;height:10.1%}
-.z-r1{top:8.8%}.z-r2{top:18.9%}.z-r3{top:29.1%}.z-r4{top:39.2%}.z-r5{top:49.3%}
-.z-b1,.z-b2,.z-b3,.z-b4,.z-b5,.z-b6{bottom:0%;height:10.8%}
-.z-b1{left:0%;width:15.2%}.z-b2{left:15.2%;width:15.2%}.z-b3{left:30.4%;width:18.5%}.z-b4{left:48.9%;width:16.8%}.z-b5{left:65.7%;width:17%}.z-b6{right:0%;width:17.3%}
-.rh-modal{position:fixed!important;inset:0!important;z-index:100000!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,.68)!important;padding:20px!important;box-sizing:border-box!important}
-.rh-card{position:relative!important;width:min(360px,92vw)!important;padding:24px 20px 20px!important;border:1px solid #c89545!important;border-radius:16px!important;background:linear-gradient(180deg,#2b2118,#11191d)!important;color:#fff!important;box-shadow:0 15px 40px #000c!important;text-align:center!important;font-family:Arial,sans-serif!important}
-.rh-card h3{margin:5px 0 10px!important;color:#f0cf91!important;font:700 20px Georgia,serif!important}.rh-card p{margin:0;color:#d8d0c2;font-size:13px}.rh-icon{font-size:30px}.rh-close{position:absolute!important;right:10px!important;top:10px!important;width:38px!important;height:38px!important;border-radius:50%!important;border:1px solid #80633f!important;background:#0b1014!important;color:#fff!important;font-size:25px!important;line-height:1!important}
+/* TERITORY HOME FINAL 02 — exact baked reference */
+html,body{background:#07111b!important}
+body:has(#home.home-reference-active){overflow:hidden!important;background:#07111b!important}
+body:has(#home.home-reference-active) main{position:absolute!important;inset:0!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+body:has(#home.home-reference-active) #home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#07111b!important}
+.home-reference-host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;background:#07111b!important}
+.home-reference-image{position:absolute!important;left:50%!important;top:0!important;width:100%!important;height:100%!important;transform:translateX(-50%)!important;object-fit:cover!important;object-position:center center!important;display:block!important;z-index:1!important;user-select:none!important;-webkit-user-drag:none!important}
+.home-hitzones{position:absolute!important;inset:0!important;z-index:10!important;pointer-events:none!important}
+.home-hit zones{}
+.hz{position:absolute!important;display:block!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important;pointer-events:auto!important;border-radius:10px!important;opacity:0!important}
+/* proportions are based on the 942x1670 reference artwork */
+.hz-left-1{left:0;top:7%;width:14%;height:11%}.hz-left-2{left:0;top:18%;width:14%;height:11%}.hz-left-3{left:0;top:28%;width:14%;height:11%}.hz-left-4{left:0;top:39%;width:14%;height:11%}.hz-left-5{left:0;top:49%;width:14%;height:11%}
+.hz-right-1{right:0;top:8%;width:14%;height:10%}.hz-right-2{right:0;top:18%;width:14%;height:11%}.hz-right-3{right:0;top:29%;width:14%;height:11%}.hz-right-4{right:0;top:40%;width:14%;height:11%}.hz-right-5{right:0;top:50%;width:14%;height:10%}
+.hz-bottom-1{left:0;bottom:0;width:14.3%;height:11%}.hz-bottom-2{left:14.3%;bottom:0;width:14.3%;height:11%}.hz-bottom-3{left:28.6%;bottom:0;width:14.3%;height:11%}.hz-bottom-4{left:42.9%;bottom:0;width:14.3%;height:13%}.hz-bottom-5{left:57.2%;bottom:0;width:14.3%;height:11%}.hz-bottom-6{left:71.5%;bottom:0;width:14.3%;height:11%}.hz-bottom-7{left:85.8%;bottom:0;width:14.2%;height:11%}
+/* Absolutely no duplicate visual HUD/navigation over the baked reference. */
+body:has(#home.home-reference-active) .hud,
+body:has(#home.home-reference-active) .bottom-nav,
+body:has(#home.home-reference-active) .live-side-ui,
+body:has(#home.home-reference-active) .live-city-title,
+body:has(#home.home-reference-active) .live-city-time,
+body:has(#home.home-reference-active) .home-v2-scene,
+body:has(#home.home-reference-active) .g141-photo-controls,
+body:has(#home.home-reference-active) .real-home-image,
+body:has(#home.home-reference-active) .real-home:not(#homeReferenceHost){display:none!important}
+@media(max-width:430px){
+  .home-reference-image{object-fit:cover!important;object-position:center center!important}
+}
