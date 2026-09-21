@@ -1,145 +1,237 @@
-/* TERITORY HOME FINAL 04
-   Exact approved HOME artwork + real transparent interaction map.
-   The artwork remains the single visual source; this file only adds
-   invisible hit areas and connects them to the existing game screens.
+/* TERITORY HOME FINAL 05
+   Approved HOME artwork + reliable mobile interaction map.
+   No legacy HOME controls are rendered on top of the artwork.
 */
-(function(){
-  'use strict';
+(function () {
+  "use strict";
 
-  const $=(s,r=document)=>r.querySelector(s);
-  const homeActions={};
+  const $ = (s, r = document) => r.querySelector(s);
 
-  function go(id){
-    if(typeof window.showScreen==='function') window.showScreen(id);
+  function go(id) {
+    if (typeof window.showScreen === "function") {
+      window.showScreen(id);
+      return true;
+    }
+    return false;
   }
 
-  function modal(title,body){
-    document.querySelector('.tr4-modal')?.remove();
-    const m=document.createElement('div');
-    m.className='tr4-modal';
-    m.innerHTML='<div class="tr4-card"><button class="tr4-x" type="button">×</button><h3></h3><p></p><button class="tr4-ok" type="button">Понятно</button></div>';
-    m.querySelector('h3').textContent=title;
-    m.querySelector('p').textContent=body;
+  function modal(title, body) {
+    document.querySelector(".tr5-modal")?.remove();
+    const m = document.createElement("div");
+    m.className = "tr5-modal";
+    m.innerHTML = `
+      <div class="tr5-card" role="dialog" aria-modal="true">
+        <button class="tr5-x" type="button" aria-label="Закрыть">×</button>
+        <h3></h3><p></p>
+        <button class="tr5-ok" type="button">Понятно</button>
+      </div>`;
+    $("h3", m).textContent = title;
+    $("p", m).textContent = body;
     document.body.appendChild(m);
-    const close=()=>m.remove();
-    m.querySelector('.tr4-x').onclick=close;
-    m.querySelector('.tr4-ok').onclick=close;
-    m.addEventListener('click',e=>{if(e.target===m)close()});
+    const close = () => m.remove();
+    $(".tr5-x", m).onclick = close;
+    $(".tr5-ok", m).onclick = close;
+    m.addEventListener("click", e => { if (e.target === m) close(); });
   }
 
-  function run(name){
-    switch(name){
-      case 'profile': go('inventory'); break;
-      case 'coins': modal('🪙 Монеты','Раздел ресурсов готов.'); break;
-      case 'gems': modal('💎 Кристаллы','Раздел ресурсов готов.'); break;
-      case 'redgems': modal('♦️ Ресурс','Раздел ресурсов готов.'); break;
-      case 'energy': modal('⚡ Энергия','Энергия героя.'); break;
-      case 'trophy': modal('🏆 Достижения','Раздел достижений готов для подключения.'); break;
-      case 'messages': modal('✉️ Сообщения','Центр сообщений.'); break;
-      case 'settings': modal('⚙️ Настройки','Настройки игры.'); break;
+  function action(name) {
+    switch (name) {
+      // top HUD
+      case "profile": return go("inventory");
+      case "coins": return modal("🪙 Монеты", "Ресурс героя.");
+      case "gems": return modal("💎 Кристаллы", "Ресурс героя.");
+      case "redgems": return modal("♦️ Ресурс", "Ресурс героя.");
+      case "energy": return modal("⚡ Энергия", "Энергия героя.");
+      case "trophy": return modal("🏆 Достижения", "Раздел достижений.");
+      case "messages": return modal("✉️ Сообщения", "Центр сообщений.");
+      case "settings": return modal("⚙️ Настройки", "Настройки игры.");
+      case "chapter": return modal("🗺️ Глава 2", "Северные земли 2-7.");
 
-      case 'events': case 'daily': case 'quests': case 'challenges': case 'streets':
-        go('districts'); break;
-      case 'friends': modal('👥 Друзья','Раздел приглашений друзей.'); break;
-      case 'sea': modal('⛵ Морской набор','Раздел морских событий.'); break;
-      case 'shop': go('market'); break;
-      case 'forge': if(window.openForgeV2) window.openForgeV2(); else go('market'); break;
-      case 'arena': go('arena'); break;
+      // left side
+      case "events": return go("districts");
+      case "daily": return go("game");
+      case "quests": return go("districts");
+      case "friends": return modal("👥 Друзья", "Раздел приглашений друзей.");
+      case "sea": return modal("⛵ Морской набор", "Морские события.");
 
-      case 'equipment': case 'inventory': case 'hero':
-        go('inventory'); break;
-      case 'consumable': modal('🧪 Предмет','Предмет можно использовать из инвентаря.'); break;
-      case 'locked': modal('🔒 Заблокировано','Этот слот откроется по мере развития героя.'); break;
-      case 'quest': go('districts'); break;
+      // right side
+      case "shop": return go("market");
+      case "forge":
+        if (typeof window.openForgeV2 === "function") window.openForgeV2();
+        else return go("market");
+        return;
+      case "challenges": return go("arena");
+      case "streets": return go("districts");
+      case "arena": return go("arena");
 
-      case 'speed': modal('⏩ Скорость боя','Переключатель скорости боя.'); break;
-      case 'refresh': modal('🔄 Бой','Обновление/повтор действия боя.'); break;
-      case 'crown': modal('👑 Награда','Боевые награды.'); break;
-      case 'star': modal('⭐ Бонус','Боевой бонус.'); break;
+      // lower gameplay
+      case "hp": return modal("❤️ Здоровье", "Здоровье героя.");
+      case "equipment": return go("inventory");
+      case "consumable": return go("inventory");
+      case "locked": return modal("🔒 Заблокировано", "Этот слот откроется по мере развития героя.");
+      case "quest": return go("districts");
+      case "speed": return modal("⏩ Скорость", "Переключатель скорости боя.");
+      case "refresh": return go("arena");
+      case "crown": return modal("👑 Награды", "Боевые награды.");
+      case "star": return modal("⭐ Бонус", "Боевой бонус.");
 
-      case 'home': go('home'); break;
-      case 'battle': go('districts'); break;
-      case 'game': go('game'); break;
-      case 'clan': modal('🏰 Клан','Раздел клана.'); break;
-      case 'chapter': modal('🗺️ Глава 2','Северные земли 2-7.'); break;
+      // bottom navigation
+      case "home": return go("home");
+      case "inventory": return go("inventory");
+      case "hero": return go("inventory");
+      case "battle": return go("arena");
+      case "game": return go("game");
+      case "clan": return modal("🏰 Клан", "Раздел клана готов для подключения.");
     }
   }
 
-  function hideLegacy(){
-    document.querySelectorAll(
-      '.hud,.bottom-nav,.live-side-ui,.live-city-title,.live-city-time,'+
-      '.home-v2-scene,.g141-photo-controls,.home-v2-scene-image,.real-home-image'
-    ).forEach(el=>{
-      el.style.setProperty('display','none','important');
-      el.style.setProperty('visibility','hidden','important');
-      el.style.setProperty('pointer-events','none','important');
+  // x, y, width, height as percentages of the approved 942×1670 artwork.
+  // Zones do not overlap except where an element is intentionally one button.
+  const ZONES = [
+    ["profile",   0.5,  0.5, 25.5,  8.0],
+    ["coins",    25.5,  0.5, 20.0,  6.8],
+    ["gems",     45.5,  0.5, 16.5,  6.8],
+    ["redgems",  62.0,  0.5, 16.0,  6.8],
+    ["trophy",   78.0,  0.5,  8.5,  6.8],
+    ["messages", 86.5,  0.5,  7.0,  6.8],
+    ["settings", 93.5,  0.5,  6.0,  6.8],
+    ["energy",   27.0,  6.5, 31.0,  6.2],
+    ["chapter",  20.0, 10.0, 60.0,  9.0],
+
+    ["events",    0.2,  8.5, 11.8, 10.5],
+    ["daily",     0.2, 19.3, 11.8, 10.5],
+    ["quests",    0.2, 30.1, 11.8, 10.5],
+    ["friends",   0.2, 40.9, 11.8, 10.5],
+    ["sea",       0.2, 51.7, 11.8, 10.5],
+
+    ["shop",     88.0,  8.5, 11.8, 10.5],
+    ["forge",    88.0, 19.3, 11.8, 10.5],
+    ["challenges",88.0,30.1,11.8,10.5],
+    ["streets",  88.0, 40.9,11.8,10.5],
+    ["arena",    88.0, 51.7,11.8,10.5],
+
+    ["hp",        0.0, 60.0, 16.5,  9.0],
+    ["equipment",16.5,59.5,67.0,  9.5],
+    ["energy",   83.5,60.0,16.5,  9.0],
+
+    ["consumable", 0.5,69.0,11.7,8.7],
+    ["consumable",12.7,69.0,11.7,8.7],
+    ["consumable",24.9,69.0,11.7,8.7],
+    ["consumable",37.1,69.0,11.7,8.7],
+    ["locked",    49.3,69.0,16.0,8.7],
+    ["locked",    66.0,69.0,16.0,8.7],
+    ["locked",    82.7,69.0,16.8,8.7],
+
+    ["quest",      0.5,77.5,49.0,6.8],
+    ["speed",     61.0,77.2,10.0,7.0],
+    ["refresh",   71.5,77.2,10.0,7.0],
+    ["crown",     82.0,77.2,8.7,7.0],
+    ["star",      91.0,77.2,8.7,7.0],
+
+    ["home",       0.0,88.0,14.28,12.0],
+    ["inventory", 14.28,88.0,14.28,12.0],
+    ["hero",      28.56,88.0,14.28,12.0],
+    ["battle",    42.84,87.0,14.32,13.0],
+    ["quests",    57.16,88.0,14.28,12.0],
+    ["game",      71.44,88.0,14.28,12.0],
+    ["clan",      85.72,88.0,14.28,12.0]
+  ];
+
+  function buildZones(host) {
+    const layer = document.createElement("div");
+    layer.className = "home-hitzones";
+    layer.setAttribute("aria-label", "Кнопки HOME");
+
+    ZONES.forEach((z, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "hz";
+      b.dataset.hz = z[0];
+      b.dataset.zoneIndex = String(i);
+      b.setAttribute("aria-label", z[0]);
+      b.style.left = z[1] + "%";
+      b.style.top = z[2] + "%";
+      b.style.width = z[3] + "%";
+      b.style.height = z[4] + "%";
+      layer.appendChild(b);
+    });
+
+    host.appendChild(layer);
+
+    // One delegated click handler is more reliable on Android than many
+    // individual listeners and prevents old document handlers from winning.
+    layer.addEventListener("click", e => {
+      const b = e.target.closest(".hz");
+      if (!b) return;
+      e.preventDefault();
+      e.stopPropagation();
+      action(b.dataset.hz);
+    }, true);
+
+    // Telegram/Android can occasionally suppress click after a touch.
+    // touchend is a fallback, guarded against double activation.
+    let lastTouch = 0;
+    layer.addEventListener("touchend", e => {
+      const b = e.target.closest(".hz");
+      if (!b) return;
+      const now = Date.now();
+      if (now - lastTouch < 500) return;
+      lastTouch = now;
+      e.preventDefault();
+      e.stopPropagation();
+      action(b.dataset.hz);
+    }, {capture:true, passive:false});
+
+    return layer;
+  }
+
+  function hideLegacy() {
+    const selectors = [
+      ".hud", ".bottom-nav", ".live-side-ui", ".live-city-title",
+      ".live-city-time", ".home-v2-scene", ".g141-photo-controls",
+      ".home-v2-scene-image", ".real-home-image"
+    ];
+    document.querySelectorAll(selectors.join(",")).forEach(el => {
+      el.style.setProperty("display", "none", "important");
+      el.style.setProperty("visibility", "hidden", "important");
+      el.style.setProperty("pointer-events", "none", "important");
     });
   }
 
-  // Coordinates are percentages of the 942x1670 approved artwork.
-  // The image is stretched to the exact HOME viewport so these never drift
-  // outside the phone screen.
-  const zones=[
-    ['profile',0,0,27,8],
-    ['coins',27,0,20,6.5],['gems',47,0,17,6.5],['redgems',64,0,16,6.5],
-    ['trophy',80,0,9,7],['messages',89,0,6,7],['settings',95,0,5,7],
-    ['energy',27,6.5,34,6.5],['chapter',22,10,56,9],
+  function mount() {
+    const home = $("#home");
+    if (!home) return;
 
-    ['events',0,8.5,12,11],['daily',0,19.5,12,11],['quests',0,30.5,12,11],
-    ['friends',0,41.5,12,11],['sea',0,52.5,12,11],
-    ['shop',88,8.5,12,11],['forge',88,19.5,12,11],['challenges',88,30.5,12,11],
-    ['streets',88,41.5,12,11],['arena',88,52.5,12,11],
-
-    ['hp',0,60,17,10],['energy',83,60,17,10],
-    ['equipment',17,60,66,9],
-    ['equipment',17,60,11,9],['equipment',28,60,11,9],['equipment',39,60,11,9],
-    ['equipment',50,60,11,9],['equipment',61,60,11,9],['equipment',72,60,11,9],
-
-    ['consumable',0,69,12,9],['consumable',12,69,12,9],['consumable',24,69,12,9],
-    ['consumable',36,69,12,9],['locked',48,69,17,9],['locked',65,69,17,9],
-    ['locked',82,69,18,9],
-
-    ['quest',0,77.5,50,7],['speed',62,77,10,7],['refresh',72,77,10,7],
-    ['crown',82,77,9,7],['star',91,77,9,7],
-
-    ['home',0,88,14.3,12],['inventory',14.3,88,14.3,12],['hero',28.6,88,14.3,12],
-    ['battle',42.9,87,14.3,13],['quests',57.2,88,14.3,12],['game',71.5,88,14.3,12],
-    ['clan',85.8,88,14.2,12]
-  ];
-
-  function mount(){
-    const home=$('#home');
-    if(!home) return;
-
-    home.classList.add('home-reference-active');
-    home.innerHTML=`
-      <div id="homeReferenceHost" class="home-reference-host" aria-label="Teritory Game HOME">
-        <img class="home-reference-image" src="territory_reference_bg.png?v=FINAL04" alt="Teritory Game">
-        <div class="home-hitzones" aria-hidden="false">
-          ${zones.map((z,i)=>`<button class="hz hz-${i}" data-hz="${z[0]}" style="left:${z[1]}%;top:${z[2]}%;width:${z[3]}%;height:${z[4]}%" aria-label="${z[0]}"></button>`).join('')}
-        </div>
+    home.classList.add("home-reference-active");
+    home.innerHTML = `
+      <div id="homeReferenceHost" class="home-reference-host">
+        <img class="home-reference-image"
+             src="territory_reference_bg.png?v=FINAL05"
+             alt="Teritory Game HOME"
+             draggable="false">
       </div>`;
 
-    home.addEventListener('click',e=>{
-      const b=e.target.closest('[data-hz]');
-      if(!b || !home.contains(b)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      run(b.dataset.hz);
-    },true);
-
+    const host = $("#homeReferenceHost");
+    buildZones(host);
     hideLegacy();
 
-    if(window.Telegram?.WebApp){
-      try{
-        Telegram.WebApp.expand();
-        Telegram.WebApp.setHeaderColor('#07111b');
-        Telegram.WebApp.setBackgroundColor('#07111b');
-      }catch(e){}
+    if (window.Telegram?.WebApp) {
+      try {
+        window.Telegram.WebApp.expand();
+        window.Telegram.WebApp.setHeaderColor("#07111b");
+        window.Telegram.WebApp.setBackgroundColor("#07111b");
+      } catch (_) {}
     }
   }
 
-  function boot(){ mount(); hideLegacy(); }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
+  function boot() {
+    mount();
+    hideLegacy();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, {once:true});
+  } else {
+    boot();
+  }
 })();
