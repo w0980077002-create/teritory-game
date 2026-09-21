@@ -29,7 +29,6 @@
       if(!a)return;
       if(a.dataset.hrAct==='close'||a.dataset.hrAct==='ok') { e.preventDefault(); e.stopPropagation(); m.remove(); }
     });
-    m.addEventListener('click',e=>{if(e.target===m)m.remove();});
     return m;
   }
 
@@ -72,7 +71,6 @@
       if(a.dataset.rp==='close'){e.preventDefault();e.stopPropagation();close();return;}
       if(a.dataset.rp==='equipment'){e.preventDefault();e.stopPropagation();close();action('blacksmith');}
     });
-    o.addEventListener('click',e=>{if(e.target===o)close();});
   }
 
   function dailyBonus(){
@@ -293,8 +291,6 @@
       action(b.dataset.hr);
     };
     home.addEventListener('click',dispatch);
-    home.addEventListener('pointerup',dispatch,true);
-    home.addEventListener('touchend',dispatch,{capture:true,passive:false});
     sync();
     setInterval(sync,1200);
     const equipBtn=document.getElementById('profileEquipBtn');
@@ -307,638 +303,145 @@
   /* V18: remove legacy global coordinate hit-testing. Native button events are authoritative. */
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount,{once:true}); else mount();
 
-  /* Territory UI close buttons V4: always visible for profile + forge overlays. */
-  function installOverlayCloseFix(){
-    if(!document.getElementById('territory-overlay-close-fix-style')){
+  /* Territory V19 — clean interaction core.
+     One click pipeline for ordinary UI. No coordinate hit-testing, no touch/click duplication,
+     no backdrop closing, and no Arena changes. */
+  (function(){
+    'use strict';
+
+    const CLOSE_SELECTORS = [
+      '.territory-overlay-force-close', '.hr-modal-x', '.rp-close',
+      '.modal-close', '.game-close', '.game-modal-close', '#gameBatchClose',
+      '#gameModalClose', '#jackpotClose', '#gameTasksClose', '#gamePanelClose'
+    ].join(',');
+
+    const isArena = el => !!(el && (
+      el.matches?.('#arenaModal,.arena-modal,[data-arena-modal]') ||
+      el.closest?.('#arenaModal,.arena-modal,[data-arena-modal]')
+    ));
+
+    function unlockOrdinaryModalState(){
+      document.documentElement.classList.remove('territory-modal-open');
+      document.body.classList.remove('territory-modal-open');
+      document.documentElement.style.overflow='';
+      document.body.style.overflow='';
+      document.documentElement.style.overscrollBehaviorY='';
+      document.body.style.overscrollBehaviorY='';
+      document.documentElement.style.pointerEvents='';
+      document.body.style.pointerEvents='';
+    }
+
+    function closeFromButton(btn){
+      if(!btn || isArena(btn)) return;
+      const forge=btn.closest?.('.forge-v2-overlay');
+      if(forge){
+        if(typeof window.closeForgeV2==='function') window.closeForgeV2();
+        else forge.remove();
+        unlockOrdinaryModalState();
+        return;
+      }
+
+      const profile=btn.closest?.('#hrProfileOverlay');
+      if(profile){ profile.remove(); unlockOrdinaryModalState(); return; }
+
+      const modalRoot=btn.closest?.(
+        '.hr-modal,.rp-overlay,.game-modal,.game-tasks-modal,.game-jackpot-modal,'+
+        '.game-panel-modal,.g141-photo-modal,#gameBatchModal,#gameRewardModal'
+      );
+      if(modalRoot && !isArena(modalRoot)) modalRoot.remove();
+      unlockOrdinaryModalState();
+    }
+
+    function installCloseStyle(){
+      if(document.getElementById('territory-v19-close-style')) return;
       const st=document.createElement('style');
-      st.id='territory-overlay-close-fix-style';
+      st.id='territory-v19-close-style';
       st.textContent=`
-        .territory-overlay-force-close{
-          position:fixed!important;top:14px!important;right:14px!important;
-          z-index:999999!important;width:48px!important;height:48px!important;
-          min-width:48px!important;min-height:48px!important;display:grid!important;
-          place-items:center!important;box-sizing:border-box!important;padding:0!important;margin:0!important;
-          border:1px solid #c8a552!important;border-radius:14px!important;
-          background:#101a24!important;color:#f5dfaa!important;
-          font:700 31px/1 Arial,sans-serif!important;
-          box-shadow:0 8px 24px rgba(0,0,0,.5)!important;
+        .territory-overlay-force-close,
+        .hr-modal-x,
+        .rp-close,
+        .modal-close,
+        .game-close,
+        .game-modal-close,
+        #gameBatchClose,
+        #gameModalClose,
+        #jackpotClose,
+        #gameTasksClose,
+        #gamePanelClose{
+          width:40px!important;height:40px!important;
+          min-width:40px!important;min-height:40px!important;
+          max-width:40px!important;max-height:40px!important;
+          box-sizing:border-box!important;padding:0!important;
+          border:1px solid rgba(255,255,255,.18)!important;
+          border-radius:50%!important;background:#05080c!important;
+          color:#fff!important;display:grid!important;place-items:center!important;
+          font:700 25px/1 Arial,sans-serif!important;
+          box-shadow:0 5px 16px rgba(0,0,0,.5)!important;
           cursor:pointer!important;touch-action:manipulation!important;
+          -webkit-tap-highlight-color:transparent!important;user-select:none!important;
+          opacity:1!important;
+        }
+        .territory-overlay-force-close:active,
+        .hr-modal-x:active,
+        .rp-close:active,
+        .modal-close:active,
+        .game-close:active,
+        .game-modal-close:active,
+        #gameBatchClose:active,
+        #gameModalClose:active,
+        #jackpotClose:active,
+        #gameTasksClose:active,
+        #gamePanelClose:active{transform:scale(.92)!important;}
+        .hr-modal .hr-modal-card{position:relative!important;}
+        .hr-modal .hr-modal-x{position:absolute!important;right:10px!important;top:10px!important;z-index:20!important;}
+        .hr-modal-actions:empty{display:none!important;}
+        .hr-modal,.rp-overlay,.forge-v2-overlay,.game-modal,.game-tasks-modal,
+        .game-jackpot-modal,.game-panel-modal,.g141-photo-modal,#gameBatchModal,#gameRewardModal{
           -webkit-tap-highlight-color:transparent!important;
         }
-        .territory-overlay-force-close:active{transform:scale(.94)!important}
+        .hr-modal-actions button,
+        .rp-shell [data-rp="equipment"],
+        .forge-v2-overlay [data-buy],
+        .forge-v2-overlay [data-equip]{
+          min-height:44px!important;border-radius:14px!important;
+          touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;
+        }
       `;
       document.head.appendChild(st);
     }
-    const profile=document.getElementById('hrProfileOverlay');
-    if(profile && !profile.querySelector('.territory-overlay-force-close')){
-      const b=document.createElement('button');
-      b.type='button';b.className='territory-overlay-force-close';
-      b.setAttribute('aria-label','Закрыть профиль');b.textContent='×';
-      b.addEventListener('click',e=>{
-        e.preventDefault();e.stopPropagation();profile.remove();
-      },{capture:true});
-      profile.appendChild(b);
-    }
-    const forge=document.querySelector('.forge-v2-overlay');
-    if(forge && !forge.querySelector('.territory-overlay-force-close')){
-      const b=document.createElement('button');
-      b.type='button';b.className='territory-overlay-force-close';
-      b.setAttribute('aria-label','Закрыть кузницу');b.textContent='×';
-      b.addEventListener('click',e=>{
-        e.preventDefault();e.stopPropagation();
-        if(typeof window.closeForgeV2==='function')window.closeForgeV2();else forge.remove();
-      },{capture:true});
-      forge.appendChild(b);
-    }
-  }
-  const overlayCloseObserver=new MutationObserver(installOverlayCloseFix);
-  overlayCloseObserver.observe(document.documentElement,{childList:true,subtree:true});
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installOverlayCloseFix,{once:true});else installOverlayCloseFix();
-})();
 
-/* Territory Global Close V5 — compact Telegram-safe close controls */
-(function(){
-  'use strict';
-
-  const CLOSE_CLASS = 'territory-overlay-force-close';
-  let lastClose = 0;
-
-  function activeOverlay(){
-    const profile = document.getElementById('hrProfileOverlay');
-    if(profile) return {el:profile, kind:'profile'};
-    const forge = document.querySelector('.forge-v2-overlay');
-    if(forge) return {el:forge, kind:'forge'};
-    return null;
-  }
-
-  function closeOverlay(kind, el){
-    if(Date.now() - lastClose < 180) return;
-    lastClose = Date.now();
-
-    if(kind === 'forge' && typeof window.closeForgeV2 === 'function'){
-      window.closeForgeV2();
-      return;
-    }
-
-    if(el) el.remove();
-    if(kind === 'forge') document.body.style.overflow = '';
-  }
-
-  function installStyle(){
-    if(document.getElementById('territory-global-close-v5-style')) return;
-    const s = document.createElement('style');
-    s.id = 'territory-global-close-v5-style';
-    s.textContent = `
-      .${CLOSE_CLASS}{
-        position:fixed!important;
-        top:max(10px,env(safe-area-inset-top))!important;
-        right:10px!important;
-        z-index:2147483647!important;
-        width:40px!important;
-        height:40px!important;
-        min-width:40px!important;
-        min-height:40px!important;
-        max-width:40px!important;
-        max-height:40px!important;
-        padding:0!important;
-        margin:0!important;
-        display:grid!important;
-        place-items:center!important;
-        box-sizing:border-box!important;
-        border:1px solid #c8a552!important;
-        border-radius:11px!important;
-        background:#101a24!important;
-        color:#f5dfaa!important;
-        font:700 27px/1 Arial,sans-serif!important;
-        box-shadow:0 6px 18px rgba(0,0,0,.42)!important;
-        cursor:pointer!important;
-        pointer-events:auto!important;
-        touch-action:manipulation!important;
-        -webkit-tap-highlight-color:transparent!important;
-        user-select:none!important;
+    function ensureLegacyCloseButtons(){
+      installCloseStyle();
+      const profile=document.getElementById('hrProfileOverlay');
+      if(profile && !profile.querySelector('.territory-overlay-force-close')){
+        const b=document.createElement('button');
+        b.type='button'; b.className='territory-overlay-force-close';
+        b.setAttribute('aria-label','Закрыть профиль'); b.textContent='×';
+        profile.appendChild(b);
       }
-      .${CLOSE_CLASS}:active{transform:scale(.93)!important}
-    `;
-    document.head.appendChild(s);
-  }
+      const forge=document.querySelector('.forge-v2-overlay');
+      if(forge && !forge.querySelector('.territory-overlay-force-close')){
+        const b=document.createElement('button');
+        b.type='button'; b.className='territory-overlay-force-close';
+        b.setAttribute('aria-label','Закрыть кузницу'); b.textContent='×';
+        forge.appendChild(b);
+      }
+    }
 
-  function bindButton(btn){
-    if(!btn || btn.dataset.closeV5 === '1') return;
-    btn.dataset.closeV5 = '1';
+    installCloseStyle();
+    ensureLegacyCloseButtons();
 
-    const run = function(e){
+    /* ONE global input path for ordinary close buttons. */
+    document.addEventListener('click', e=>{
+      const btn=e.target?.closest?.(CLOSE_SELECTORS);
+      if(!btn || isArena(btn)) return;
       e.preventDefault();
       e.stopPropagation();
       if(e.stopImmediatePropagation) e.stopImmediatePropagation();
-      const o = activeOverlay();
-      if(o) closeOverlay(o.kind, o.el);
-    };
+      closeFromButton(btn);
+    }, true);
 
-    btn.addEventListener('pointerdown', run, {capture:true, passive:false});
-    btn.addEventListener('pointerup', run, {capture:true, passive:false});
-    btn.addEventListener('touchstart', run, {capture:true, passive:false});
-    btn.addEventListener('touchend', run, {capture:true, passive:false});
-    btn.addEventListener('click', run, {capture:true});
-  }
-
-  function scan(){
-    installStyle();
-    document.querySelectorAll('.' + CLOSE_CLASS).forEach(bindButton);
-  }
-
-  function coordinateFallback(e){
-    const o = activeOverlay();
-    if(!o) return;
-
-    const p = e.changedTouches && e.changedTouches[0]
-      ? e.changedTouches[0]
-      : e.touches && e.touches[0]
-        ? e.touches[0]
-        : e;
-
-    if(!p || typeof p.clientX !== 'number' || typeof p.clientY !== 'number') return;
-
-    /* Fixed top-right 72×72 CSS-pixel safety zone around the close button. */
-    if(p.clientX >= window.innerWidth - 72 && p.clientY <= 72){
-      e.preventDefault();
-      e.stopPropagation();
-      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
-      closeOverlay(o.kind, o.el);
-    }
-  }
-
-  installStyle();
-  scan();
-
-  const mo = new MutationObserver(scan);
-  mo.observe(document.documentElement, {childList:true, subtree:true});
-
-  document.addEventListener('pointerdown', coordinateFallback, {capture:true, passive:false});
-  document.addEventListener('pointerup', coordinateFallback, {capture:true, passive:false});
-  document.addEventListener('touchstart', coordinateFallback, {capture:true, passive:false});
-  document.addEventListener('touchend', coordinateFallback, {capture:true, passive:false});
-})();
-
-
-/* Territory Global Close V6 — one universal black circle + white X style.
-   Visual-only normalization for all non-Arena close controls. */
-(function(){
-  'use strict';
-  if(document.getElementById('territory-global-close-v6-style')) return;
-  const s=document.createElement('style');
-  s.id='territory-global-close-v6-style';
-  s.textContent=`
-    /* Universal close appearance. Arena is intentionally excluded. */
-    .territory-overlay-force-close,
-    .hr-modal-x,
-    .rp-close,
-    .game-close,
-    .game-modal-close,
-    #gameBatchClose,
-    .g141-photo-x,
-    #jackpotClose{
-      width:40px!important;
-      height:40px!important;
-      min-width:40px!important;
-      min-height:40px!important;
-      max-width:40px!important;
-      max-height:40px!important;
-      box-sizing:border-box!important;
-      padding:0!important;
-      border:1px solid rgba(255,255,255,.28)!important;
-      border-radius:50%!important;
-      background:#05090d!important;
-      color:#fff!important;
-      display:grid!important;
-      place-items:center!important;
-      font:700 27px/1 Arial,sans-serif!important;
-      text-align:center!important;
-      box-shadow:0 5px 16px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.04)!important;
-      cursor:pointer!important;
-      touch-action:manipulation!important;
-      -webkit-tap-highlight-color:transparent!important;
-      user-select:none!important;
-      opacity:1!important;
-    }
-    .territory-overlay-force-close:active,
-    .hr-modal-x:active,
-    .rp-close:active,
-    .game-close:active,
-    .game-modal-close:active,
-    #gameBatchClose:active,
-    .g141-photo-x:active,
-    #jackpotClose:active{transform:scale(.92)!important}
-
-    /* Keep modal close buttons inside their existing cards; only appearance changes. */
-    .hr-modal-x,.rp-close,.game-modal-close,#gameBatchClose,.g141-photo-x,#jackpotClose{
-      position:absolute!important;
-    }
-
-    /* Game main-screen close keeps its existing layout position. */
-    .game-close{position:relative!important;}
-  `;
-  document.head.appendChild(s);
-})();
-
-
-/* Territory Global UI System V7 — one close style for all non-Arena windows. */
-(function(){
-  'use strict';
-  const BTN_SEL = [
-    '.territory-overlay-force-close',
-    '.hr-modal-x',
-    '.modal-close',
-    '.game-modal-close',
-    '#gameModalClose',
-    '#jackpotClose',
-    '#gameTasksClose',
-    '#gamePanelClose'
-  ].join(',');
-
-  function isArena(el){
-    return !!(el && (el.closest('#arenaModal,.arena-modal,[data-arena-modal]') || el.id === 'arenaModal'));
-  }
-
-  function style(){
-    if(document.getElementById('territory-global-ui-v7-style')) return;
-    const s=document.createElement('style');
-    s.id='territory-global-ui-v7-style';
-    s.textContent=`
-      .hr-modal-x:not(.arena-modal *),
-      .modal-close:not(.arena-modal *),
-      .game-modal-close:not(.arena-modal *),
-      #gameModalClose,#jackpotClose,#gameTasksClose,#gamePanelClose{
-        width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
-        max-width:40px!important;max-height:40px!important;padding:0!important;margin:0!important;
-        display:grid!important;place-items:center!important;box-sizing:border-box!important;
-        border:1px solid rgba(255,255,255,.18)!important;border-radius:50%!important;
-        background:#05080c!important;color:#fff!important;
-        font:700 25px/1 Arial,sans-serif!important;
-        box-shadow:0 5px 16px rgba(0,0,0,.5)!important;
-        text-shadow:none!important;cursor:pointer!important;touch-action:manipulation!important;
-        -webkit-tap-highlight-color:transparent!important;user-select:none!important;
-        flex:0 0 40px!important;
-      }
-      .hr-modal-x:active,.modal-close:active,.game-modal-close:active,
-      #gameModalClose:active,#jackpotClose:active,#gameTasksClose:active,#gamePanelClose:active{
-        transform:scale(.93)!important;
-      }
-    `;
-    document.head.appendChild(s);
-  }
-
-  function fallbackClose(btn){
-    if(!btn || isArena(btn)) return;
-    const modal=btn.closest(
-      '.game-jackpot-modal,.game-modal,.game-tasks-modal,.game-panel-modal,'+
-      '.hr-modal,[role="dialog"],.forge-v2-overlay,#hrProfileOverlay'
-    );
-    if(!modal) return;
-
-    /* V15: ordinary home modals must be removed, not merely hidden.
-       A hidden full-screen modal can leave a dark/blurred touch shield in
-       Telegram WebView even though its card is no longer visible. */
-    if(modal.classList.contains('hr-modal')){
-      modal.remove();
-      document.documentElement.classList.remove('territory-modal-open');
-      document.body.classList.remove('territory-modal-open');
-      document.body.style.overscrollBehaviorY='';
-      document.body.style.overflow='';
-      document.documentElement.style.overflow='';
-      return;
-    }
-
-    if(modal.classList.contains('forge-v2-overlay') && typeof window.closeForgeV2==='function'){
-      window.closeForgeV2();
-      return;
-    }
-
-    try{ modal.setAttribute('aria-hidden','true'); }catch(_e){}
-    modal.style.display='none';
-    modal.style.visibility='hidden';
-    modal.style.pointerEvents='none';
-    if(modal.classList.contains('forge-v2-overlay')) document.body.style.overflow='';
-  }
-
-  function bind(root){
-    style();
-    const nodes=[];
-    if(root && root.matches && root.matches(BTN_SEL)) nodes.push(root);
-    if(root && root.querySelectorAll) nodes.push(...root.querySelectorAll(BTN_SEL));
-    else nodes.push(...document.querySelectorAll(BTN_SEL));
-    nodes.forEach(btn=>{
-      if(isArena(btn) || btn.dataset.globalUiV7==='1') return;
-      btn.dataset.globalUiV7='1';
-      const run=e=>{
-        e.preventDefault();
-        e.stopPropagation();
-        if(e.stopImmediatePropagation) e.stopImmediatePropagation();
-        setTimeout(()=>fallbackClose(btn),0);
-      };
-      btn.addEventListener('pointerup',run,{capture:true,passive:false});
-      btn.addEventListener('touchend',run,{capture:true,passive:false});
-    });
-  }
-
-  style();
-  bind(document);
-  new MutationObserver(m=>m.forEach(x=>x.addedNodes.forEach(n=>bind(n)))).observe(document.documentElement,{childList:true,subtree:true});
-})();
-
-
-/* Territory Global Modal System V8 — one safe behavior for ordinary windows.
-   Arena is explicitly excluded. This layer does not redesign modal content. */
-(function(){
-  'use strict';
-  const ROOTS = [
-    '.hr-modal', '#hrProfileOverlay', '.rp-overlay', '.forge-v2-overlay',
-    '.game-modal', '.game-tasks-modal', '.game-jackpot-modal',
-    '.game-panel-modal', '.g141-photo-modal', '#gameBatchModal',
-    '#gameRewardModal', '#homeRebuildModal'
-  ].join(',');
-
-  function isArena(el){
-    return !!(el && (el.matches && el.matches('#arenaModal,.arena-modal,[data-arena-modal]') ||
-      (el.closest && el.closest('#arenaModal,.arena-modal,[data-arena-modal]'))));
-  }
-
-  function visible(el){
-    if(!el || isArena(el)) return false;
-    const cs=getComputedStyle(el);
-    return cs.display!=='none' && cs.visibility!=='hidden' && cs.opacity!=='0';
-  }
-
-  function syncBodyLock(){
-    const open=[...document.querySelectorAll(ROOTS)].some(visible);
-    document.documentElement.classList.toggle('territory-modal-open',open);
-    document.body.classList.toggle('territory-modal-open',open);
-    document.body.style.overscrollBehaviorY=open?'none':'';
-  }
-
-  function prepare(root){
-    if(!root || isArena(root)) return;
-    root.setAttribute('data-territory-modal-v8','1');
-    root.style.overscrollBehavior='contain';
-    if(root.classList.contains('forge-v2-overlay') || root.classList.contains('rp-overlay')){
-      root.style.paddingTop='max(0px, env(safe-area-inset-top))';
-      root.style.paddingBottom='max(0px, env(safe-area-inset-bottom))';
-    }
-  }
-
-  function scan(){
-    document.querySelectorAll(ROOTS).forEach(prepare);
-    syncBodyLock();
-  }
-
-  if(!document.getElementById('territory-global-modal-v8-style')){
-    const st=document.createElement('style');
-    st.id='territory-global-modal-v8-style';
-    st.textContent=`
-      html.territory-modal-open,body.territory-modal-open{
-        overscroll-behavior-y:none!important;
-      }
-      .hr-modal,.rp-overlay,.forge-v2-overlay,
-      .game-modal,.game-tasks-modal,.game-jackpot-modal,
-      .game-panel-modal,.g141-photo-modal{
-        overscroll-behavior:contain!important;
-        -webkit-overflow-scrolling:touch!important;
-      }
-      .territory-modal-open #arenaModal,
-      .territory-modal-open .arena-modal{
-        overscroll-behavior:auto!important;
-      }
-    `;
-    document.head.appendChild(st);
-  }
-
-  scan();
-  /* IMPORTANT: do not observe `style` here. `prepare()` writes styles, and
-     observing style creates a MutationObserver feedback loop in Telegram WebView. */
-  new MutationObserver(scan).observe(document.documentElement,{
-    childList:true,
-    subtree:true,
-    attributes:true,
-    attributeFilter:['class','aria-hidden']
-  });
-  window.addEventListener('resize',scan,{passive:true});
-})();
-
-/* Territory Global Modal System V9 — stable observer / no WebView feedback loop. */
-(function(){
-  'use strict';
-  const NON_ARENA_CLOSE = [
-    '.territory-overlay-force-close', '.hr-modal-x', '.rp-close',
-    '.modal-close', '.game-modal-close', '#gameBatchClose',
-    '.g141-photo-x', '#jackpotClose'
-  ].join(',');
-
-  function isArena(el){
-    return !!(el && (el.matches?.('#arenaModal,.arena-modal,[data-arena-modal]') ||
-      el.closest?.('#arenaModal,.arena-modal,[data-arena-modal]')));
-  }
-
-  function unlock(){
-    document.documentElement.classList.remove('territory-modal-open');
-    document.body.classList.remove('territory-modal-open');
-    document.body.style.overscrollBehaviorY='';
-    document.body.style.overflow='';
-    document.documentElement.style.overflow='';
-    document.querySelectorAll(
-      '.hr-modal[aria-hidden="true"],#hrProfileOverlay[aria-hidden="true"],.rp-overlay[aria-hidden="true"],'+
-      '.game-modal[aria-hidden="true"],.game-tasks-modal[aria-hidden="true"],'+
-      '.game-jackpot-modal[aria-hidden="true"],.game-panel-modal[aria-hidden="true"],'+
-      '.g141-photo-modal[aria-hidden="true"],#gameBatchModal[aria-hidden="true"],#gameRewardModal[aria-hidden="true"]'
-    ).forEach(el=>{
-      el.style.display='none';
-      el.style.visibility='hidden';
-      el.style.pointerEvents='none';
-      el.style.backdropFilter='none';
-      el.style.webkitBackdropFilter='none';
-    });
-  }
-
-  function afterClose(btn){
-    if(!btn || isArena(btn)) return;
-    /* Let the original close handler run first, then clean the global lock. */
-    setTimeout(unlock,0);
-    setTimeout(unlock,80);
-  }
-
-  document.addEventListener('click',e=>{
-    const b=e.target?.closest?.(NON_ARENA_CLOSE);
-    if(b) afterClose(b);
-  },true);
-  document.addEventListener('pointerup',e=>{
-    const b=e.target?.closest?.(NON_ARENA_CLOSE);
-    if(b) afterClose(b);
-  },true);
-  document.addEventListener('touchend',e=>{
-    const b=e.target?.closest?.(NON_ARENA_CLOSE);
-    if(b) afterClose(b);
-  },true);
-})();
-
-
-/* Territory Global Modal V10 — one close button only.
-   No automatic bottom "Закрыть" buttons on ordinary home modals. */
-(function(){
-  'use strict';
-  if(document.getElementById('territory-global-modal-v10-style')) return;
-  const st=document.createElement('style');
-  st.id='territory-global-modal-v10-style';
-  st.textContent=`
-    .hr-modal{
-      -webkit-tap-highlight-color:transparent!important;
-    }
-    .hr-modal .hr-modal-card{position:relative!important;}
-    .hr-modal .hr-modal-x{
-      position:absolute!important;right:10px!important;top:10px!important;
-      width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
-      padding:0!important;margin:0!important;display:grid!important;place-items:center!important;
-      box-sizing:border-box!important;border:1px solid rgba(255,255,255,.18)!important;
-      border-radius:50%!important;background:#05080c!important;color:#fff!important;
-      font:700 25px/1 Arial,sans-serif!important;box-shadow:0 5px 16px rgba(0,0,0,.5)!important;
-      z-index:20!important;cursor:pointer!important;touch-action:manipulation!important;
-      pointer-events:auto!important;-webkit-tap-highlight-color:transparent!important;
-    }
-    .hr-modal .hr-modal-x:active{transform:scale(.93)!important;}
-    .hr-modal .hr-modal-actions:empty{display:none!important;}
-  `;
-  document.head.appendChild(st);
-})();
-
-
-/* Territory V15 — stale modal/shield cleanup for Telegram WebView.
-   Never touches Arena. */
-(function(){
-  'use strict';
-  const roots='.hr-modal,#hrProfileOverlay,.rp-overlay,.forge-v2-overlay,.game-modal,.game-tasks-modal,.game-jackpot-modal,.game-panel-modal,.g141-photo-modal,#gameBatchModal,#gameRewardModal';
-  const isArena=el=>!!(el&&(el.matches?.('#arenaModal,.arena-modal,[data-arena-modal]')||el.closest?.('#arenaModal,.arena-modal,[data-arena-modal]')));
-  const visible=el=>{if(!el||isArena(el))return false;const c=getComputedStyle(el);return c.display!=='none'&&c.visibility!=='hidden'&&c.opacity!=='0'&&el.getBoundingClientRect().width>0&&el.getBoundingClientRect().height>0};
-  function clean(){
-    const open=[...document.querySelectorAll(roots)].some(visible);
-    if(open)return;
-    document.documentElement.classList.remove('territory-modal-open');
-    document.body.classList.remove('territory-modal-open');
-    document.body.style.overscrollBehaviorY='';
-    document.body.style.overflow='';
-    document.documentElement.style.overflow='';
-    document.querySelectorAll('.hr-modal[style*="display: none"],.g141-photo-modal[style*="display: none"]').forEach(el=>el.remove());
-  }
-  document.addEventListener('click',()=>setTimeout(clean,0),true);
-  document.addEventListener('touchend',()=>setTimeout(clean,0),{capture:true,passive:true});
-  document.addEventListener('pointerup',()=>setTimeout(clean,0),{capture:true,passive:true});
-  new MutationObserver(()=>setTimeout(clean,0)).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','aria-hidden']});
-  clean();
-})();
-
-/* Territory Global Modal V11 — explicit-close-only policy.
-   Ordinary modals no longer disappear when the user taps the darkened picture/backdrop.
-   Closing is performed by the universal black-circle X (or a real action button).
-   Arena is intentionally excluded. */
-(function(){
-  'use strict';
-  const ROOTS = [
-    '#homeRebuildModal', '#hrProfileOverlay', '.rp-overlay', '.forge-v2-overlay',
-    '.game-modal', '.game-jackpot-modal', '.game-tasks-modal', '.game-panel-modal',
-    '.g141-photo-modal', '#gameBatchModal', '#gameRewardModal'
-  ].join(',');
-  function isArena(el){
-    return !!(el && (el.matches?.('#arenaModal,.arena-modal,[data-arena-modal]') ||
-      el.closest?.('#arenaModal,.arena-modal,[data-arena-modal]')));
-  }
-  function onBackdrop(e){
-    const root=e.target?.closest?.(ROOTS);
-    if(!root || isArena(root)) return;
-    /* Only intercept a click whose target is the modal root itself.
-       Clicks on the card/content/buttons keep their normal behavior. */
-    if(e.target===root){
-      e.preventDefault();
-      e.stopPropagation();
-      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
-    }
-  }
-  document.addEventListener('pointerdown',onBackdrop,{capture:true,passive:false});
-  document.addEventListener('touchstart',onBackdrop,{capture:true,passive:false});
-  document.addEventListener('click',onBackdrop,{capture:true,passive:false});
-})();
-
-/* Territory Global Action V11 — consistent primary action buttons for ordinary modals.
-   No behavior changes; only visual normalization. Arena excluded. */
-(function(){
-  'use strict';
-  if(document.getElementById('territory-global-action-v11-style')) return;
-  const st=document.createElement('style');
-  st.id='territory-global-action-v11-style';
-  st.textContent=`
-    .hr-modal-actions button,
-    .hr-modal .hr-modal-actions button,
-    .rp-shell [data-rp="equipment"],
-    .forge-v2-overlay [data-buy],
-    .forge-v2-overlay [data-equip]{
-      min-height:44px!important;
-      border-radius:14px!important;
-      font:700 15px/1.1 Arial,sans-serif!important;
-      touch-action:manipulation!important;
-      -webkit-tap-highlight-color:transparent!important;
-    }
-    .hr-modal-actions button:active,
-    .rp-shell [data-rp="equipment"]:active,
-    .forge-v2-overlay [data-buy]:active,
-    .forge-v2-overlay [data-equip]:active{transform:scale(.97)!important;}
-  `;
-  document.head.appendChild(st);
-})();
-
-
-/* Territory V16 — hard release for daily-bonus modal + guaranteed energy HUD. */
-(function(){
-  'use strict';
-  function releaseHomeModal(target){
-    if(!target || target.closest?.('#arenaModal,.arena-modal,[data-arena-modal]')) return;
-    const modal=target.closest?.('.hr-modal');
-    if(!modal) return;
-    /* The daily/ordinary home modal is disposable. Remove it synchronously so
-       Telegram WebView never gets left with a full-screen touch shield. */
-    modal.remove();
-    document.documentElement.classList.remove('territory-modal-open');
-    document.body.classList.remove('territory-modal-open');
-    document.documentElement.style.overflow='';
-    document.body.style.overflow='';
-    document.documentElement.style.overscrollBehaviorY='';
-    document.body.style.overscrollBehaviorY='';
-    document.documentElement.style.pointerEvents='';
-    document.body.style.pointerEvents='';
-  }
-
-  function bindClose(e){
-    const b=e.target?.closest?.('.hr-modal-x');
-    if(!b) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if(e.stopImmediatePropagation) e.stopImmediatePropagation();
-    releaseHomeModal(b);
-  }
-  document.addEventListener('pointerdown',bindClose,{capture:true,passive:false});
-  document.addEventListener('touchstart',bindClose,{capture:true,passive:false});
-  document.addEventListener('pointerup',bindClose,{capture:true,passive:false});
-  document.addEventListener('touchend',bindClose,{capture:true,passive:false});
-  document.addEventListener('click',bindClose,{capture:true,passive:false});
-
-  /* Never allow a stale hidden home modal to survive. Arena is excluded. */
-  setInterval(()=>{
-    document.querySelectorAll('.hr-modal').forEach(m=>{
-      if(m.getAttribute('aria-hidden')==='true' || m.style.display==='none' || m.style.visibility==='hidden') m.remove();
-    });
-  },1000);
-
-  /* Energy is a HUD status item, not a button. Force the visible value from
-     the same store used by the profile, without opening any modal. */
-  function energySync(){
-    const st=window.TerritoryStore&&window.TerritoryStore.state;
-    const value=st?.energy ?? 100;
-    document.querySelectorAll('[data-hr-energy]').forEach(el=>el.textContent=value);
-  }
-  energySync();
-  setInterval(energySync,1000);
+    /* Watch DOM creation only. Never watch style/class attributes and never run touch/pointer duplicates. */
+    new MutationObserver(()=>ensureLegacyCloseButtons()).observe(document.documentElement,{childList:true,subtree:true});
+  })();
 })();
