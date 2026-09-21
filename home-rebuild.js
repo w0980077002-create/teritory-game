@@ -1,13 +1,20 @@
-/* Sdolars — FINAL HOME FOUNDATION v1
-   Visual foundation only. Loaded after home-rebuild.js.
-   Arena/Clan logic is not modified; this script only owns the HOME presentation
-   and the bottom navigation labels/routes.
+/* Sdolars — FINAL HOME FOUNDATION v2
+   Drop-in replacement for the existing home-rebuild.js.
+   Keeps the approved HOME foundation and suppresses legacy HOME renderers.
 */
 (function(){
   'use strict';
 
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+  function hideLegacyHome(){
+    $$('.real-home,.home-v2-scene,.home-v2-scene-image,.g141-photo-controls').forEach(el=>{
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('pointer-events','none','important');
+    });
+  }
 
   function go(id){
     if(typeof window.showScreen==='function') window.showScreen(id);
@@ -182,6 +189,7 @@
     home.addEventListener('click',click);
     rebuildBottomNav();
     updateState();
+    hideLegacyHome();
     if(window.Telegram?.WebApp){
       try{window.Telegram.WebApp.expand();window.Telegram.WebApp.setHeaderColor('#10131a');window.Telegram.WebApp.setBackgroundColor('#07111b');}catch(e){}
     }
@@ -201,8 +209,24 @@
   }
 
   function boot(){
+    hideLegacyHome();
     installCloseCore();
     mount();
+    hideLegacyHome();
+  }
+
+  // Expose the boot function for compatibility/diagnostics.
+  window.__sdolarsHomeFoundationBoot=boot;
+
+  // If a legacy renderer tries to add its HOME nodes later, hide them again.
+  if(!window.__sdolarsHomeLegacyObserver){
+    window.__sdolarsHomeLegacyObserver=new MutationObserver(hideLegacyHome);
+    const startObserver=()=>{
+      if(document.documentElement) window.__sdolarsHomeLegacyObserver.observe(document.documentElement,{childList:true,subtree:true});
+      hideLegacyHome();
+    };
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',startObserver,{once:true});
+    else startObserver();
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
