@@ -139,11 +139,23 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
       <div class="merchant-log" id="merchantLog">Торговец ждёт сделки.</div>
     </section>
 
-    <section id="inventory" class="screen">
-      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>ИНВЕНТАРЬ</h2></div>
-      <div class="equipment-card">
-        <div class="equip-art">🪓</div><div><b id="weaponName">Кулаки</b><span id="weaponStats">Урон +0</span></div>
+    <section id="inventory" class="screen profile-screen">
+      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>ПРОФИЛЬ ГЕРОЯ</h2></div>
+      <div class="profile-hero-card">
+        <div class="profile-avatar-big">⚔️</div>
+        <div class="profile-main"><b id="profileName">SSS</b><span>Уровень <strong id="profileLevel">1</strong></span><div class="profile-xp"><i id="profileXpBar"></i></div><small id="profileXpText">0 / 100 XP</small></div>
       </div>
+      <div class="profile-stats-grid">
+        <div><span>❤️</span><b id="profileHp">120 / 120</b><small>Здоровье</small></div>
+        <div><span>⚡</span><b id="profileEnergy">100 / 200</b><small>Энергия</small></div>
+        <div><span>⚔️</span><b id="profileStrength">5</b><small>Сила</small></div>
+        <div><span>🛡️</span><b id="profileDefense">0</b><small>Защита</small></div>
+      </div>
+      <div class="profile-section-title"><b>ЭКИПИРОВКА</b><small>Текущий комплект</small></div>
+      <div class="equipment-card profile-equipment">
+        <div class="equip-art">🪓</div><div><b id="weaponName">Кулаки</b><span id="weaponStats">Урон +0</span></div><button type="button" id="profileEquipBtn">Сменить</button>
+      </div>
+      <div class="profile-section-title"><b>ИНВЕНТАРЬ</b><small>Предметы героя</small></div>
       <div class="inventory-grid" id="inventoryGrid"></div>
     </section>
 

@@ -98,6 +98,15 @@
     $$('[data-hr-gems]').forEach(x=>x.textContent=gems);
     $$('[data-hr-level]').forEach(x=>x.textContent=level);
     $$('[data-hr-name]').forEach(x=>x.textContent=name);
+    const xp=Number(st?.exp??0), xpNext=Math.max(100,Number(st?.nextExp??100));
+    const profileName=$('#profileName'); if(profileName)profileName.textContent=name;
+    const profileLevel=$('#profileLevel'); if(profileLevel)profileLevel.textContent=level;
+    const profileXpBar=$('#profileXpBar'); if(profileXpBar)profileXpBar.style.width=Math.max(0,Math.min(100,xp/xpNext*100))+'%';
+    const profileXpText=$('#profileXpText'); if(profileXpText)profileXpText.textContent=`${xp} / ${xpNext} XP`;
+    const profileHp=$('#profileHp'); if(profileHp)profileHp.textContent=`${hp} / ${max}`;
+    const profileEnergy=$('#profileEnergy'); if(profileEnergy)profileEnergy.textContent=`${st?.energy??100} / 200`;
+    const profileStrength=$('#profileStrength'); if(profileStrength)profileStrength.textContent=st?.strength??5;
+    const profileDefense=$('#profileDefense'); if(profileDefense)profileDefense.textContent=st?.defense??0;
     const hpText=`${hp}/${max}`; $$('[data-hr-hp-text]').forEach(x=>x.textContent=hpText);
     $$('[data-hr-hp]').forEach(x=>x.style.width=Math.max(0,Math.min(100,hp/max*100))+'%');
     $$('[data-hr-energy]').forEach(x=>x.textContent=st?.energy??100);
@@ -157,6 +166,11 @@
     home.addEventListener('touchend',dispatch,{capture:true,passive:false});
     sync();
     setInterval(sync,1200);
+    const equipBtn=document.getElementById('profileEquipBtn');
+    if(equipBtn) equipBtn.addEventListener('click',()=>{
+      const inv=document.getElementById('inventoryGrid');
+      if(inv){ inv.scrollIntoView({behavior:'smooth',block:'center'}); }
+    });
   }
 
   // Global top-bar touch bridge: Telegram/WebView or legacy HUD layers can sit above the home DOM.
