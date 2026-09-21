@@ -61,14 +61,31 @@ body:has(#home.active){overflow:hidden!important}.hud{display:none!important}
 @media(min-width:650px){.forge-grid{grid-template-columns:1fr 1fr}}
 
 
-/* Territory V17 — home header isolation. Keep HUD inside its own row so it cannot
-   drift into the city action buttons; only actual HUD controls receive touches. */
-.hr-top{left:10px!important;right:10px!important;top:10px!important;width:auto!important;box-sizing:border-box!important;pointer-events:none!important;z-index:100!important;}
-.hr-top>.hr-profile,.hr-top>.hr-resources{pointer-events:auto!important;}
-.hr-profile{flex:0 1 auto!important;width:auto!important;max-width:min(44%,260px)!important;box-sizing:border-box!important;}
-.hr-resources{margin-left:auto!important;flex:0 0 auto!important;position:relative!important;z-index:101!important;}
-.hr-resources .hr-resource{pointer-events:auto!important;}
-@media(max-width:390px){
-  .hr-top{left:8px!important;right:8px!important;}
-  .hr-profile{max-width:43%!important;}
+
+/* Territory V18 — canonical home HUD layout + no global hit-test bridge. */
+.hr-top{
+  position:absolute!important;left:10px!important;right:10px!important;top:10px!important;
+  width:auto!important;max-width:none!important;display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;
+  gap:6px!important;box-sizing:border-box!important;pointer-events:none!important;
+  z-index:100!important;
 }
+.hr-top>.hr-profile{pointer-events:auto!important;min-width:0!important;width:auto!important;
+  max-width:none!important;flex:none!important;box-sizing:border-box!important;overflow:hidden!important;}
+.hr-top>.hr-resources{pointer-events:none!important;margin:0!important;display:flex!important;
+  flex:0 0 auto!important;gap:4px!important;position:relative!important;z-index:101!important;}
+.hr-top>.hr-resources .hr-resource{pointer-events:auto!important;flex:0 0 auto!important;}
+.hr-profile{max-width:none!important;}
+.hr-player{min-width:0!important;overflow:hidden!important;}
+.hr-player b,.hr-player small{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+@media(max-width:390px){
+  .hr-top{left:8px!important;right:8px!important;gap:4px!important;}
+  .hr-avatar{width:36px!important;height:36px!important;}
+  .hr-player b{font-size:12px!important;}
+  .hr-player small{font-size:7px!important;}
+  .hr-resources{gap:3px!important;}
+  .hr-resource{min-width:40px!important;min-height:40px!important;padding:6px 4px!important;}
+}
+/* Arena is completely inert unless explicitly opened. */
+.arena-modal:not(.show){display:none!important;visibility:hidden!important;pointer-events:none!important;opacity:0!important;}
+.arena-modal.show{display:flex!important;visibility:visible!important;pointer-events:auto!important;opacity:1!important;}

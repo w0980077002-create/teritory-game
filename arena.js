@@ -2,7 +2,7 @@
 window.arenaToast=function(text){
  const t=document.getElementById('arenaToast'); if(!t)return; t.textContent=text; t.classList.add('show'); clearTimeout(window._arenaToastTimer); window._arenaToastTimer=setTimeout(()=>t.classList.remove('show'),1500);
 };
-window.closeArenaModal=function(){clearTimeout(window.s98AutoTimer);const m=document.getElementById('arenaModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');}};
+window.closeArenaModal=function(){clearTimeout(window.s98AutoTimer);const m=document.getElementById('arenaModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');m.style.display='none';m.style.pointerEvents='none';}};
 
 (()=>{
  const Z=[['head','Голова'],['chest','Грудь'],['stomach','Живот'],['waist','Пояс'],['legs','Ноги']];
@@ -23,7 +23,7 @@ window.closeArenaModal=function(){clearTimeout(window.s98AutoTimer);const m=docu
  const arenaStats=()=>{try{return JSON.parse(localStorage.getItem('territory_s98_arena')||'{}')}catch(e){return {}}};
  const saveArena=x=>localStorage.setItem('territory_s98_arena',JSON.stringify(x));
  let stats=arenaStats();stats.wins=Number(stats.wins||0);stats.losses=Number(stats.losses||0);stats.streak=Number(stats.streak||0);stats.best=Number(stats.best||0);stats.history=Array.isArray(stats.history)?stats.history:[];saveArena(stats);
- function modal(title,html){const t=document.getElementById('arenaModalTitle'),b=document.getElementById('arenaModalBody');if(!t||!b)return; t.textContent=title;b.innerHTML=html;document.getElementById('arenaModal')?.classList.add('show')}
+ function modal(title,html){const t=document.getElementById('arenaModalTitle'),b=document.getElementById('arenaModalBody'),m=document.getElementById('arenaModal');if(!t||!b||!m)return; t.textContent=title;b.innerHTML=html;m.setAttribute('aria-hidden','false');m.style.display='flex';m.style.pointerEvents='auto';m.classList.add('show')}
  function currentPlayerName(){return state?.name||'SSS'}
  function chooseEnemy(){const lv=Number(state?.level||1),idx=Math.min(enemies.length-1,Math.max(0,Math.floor((lv-1)/2)+Math.min(2,stats.wins)));return {...enemies[idx],maxHp:enemies[idx].hp}}
  function arenaHome(){

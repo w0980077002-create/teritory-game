@@ -58,6 +58,13 @@ function render(){
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
 }
 function showScreen(id){
+ const arena=document.getElementById("arenaModal");
+ if(id!=="arena" && arena){
+   arena.classList.remove("show");
+   arena.setAttribute("aria-hidden","true");
+   arena.style.display="none";
+   arena.style.pointerEvents="none";
+ }
  document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));
  if(id==="arena") setTimeout(()=>{ if(window.openBattle) window.openBattle(); },0);
