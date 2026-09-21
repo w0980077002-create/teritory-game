@@ -130,13 +130,21 @@ body:has(#home.active) .bottom-nav{position:absolute!important;left:0!important;
       <div class="district-log" id="districtLog">Городская карта открыта.</div>
     </section>
 
-    <section id="market" class="screen">
-      <div class="subhead"><button class="back" data-screen="home">‹</button><h2>РЫНОК СНАРЯЖЕНИЯ</h2></div>
-      <div class="merchant merchant-live"><div class="merchant-face">🧔‍♂️</div><div><b>ТОРГОВЕЦ</b><span id="merchantMood">«Сегодня хороший товар.»</span></div><em id="merchantRep">Репутация 0</em></div>
-      <div class="merchant-stock-head"><b>ТОВАРЫ ДНЯ</b><small id="marketReset">Ассортимент обновится позже</small></div>
-      <div class="shop-grid" id="shopGrid"></div>
-      <div class="sell-panel"><div><b>Продать предмет</b><small>Торговец покупает найденные предметы</small></div><button id="sellItemBtn">Продать случайный предмет · 40 🪙</button></div>
-      <div class="merchant-log" id="merchantLog">Торговец ждёт сделки.</div>
+    <section id="market" class="screen market-v12">
+      <div class="market-head-v12">
+        <button class="market-back-v12" data-screen="home" aria-label="Назад">‹</button>
+        <div><small>SDOLARS · ТОРГОВЕЦ</small><h2>РЫНОК СНАРЯЖЕНИЯ</h2></div>
+        <div class="market-wallet-v12"><span>🪙 <b id="marketCoins">0</b></span><span>💎 <b id="marketGems">0</b></span></div>
+      </div>
+      <div class="merchant-card-v12">
+        <div class="merchant-avatar-v12">🧔‍♂️</div>
+        <div class="merchant-main-v12"><b>ТОРГОВЕЦ</b><span id="merchantMood">«Сегодня хороший товар.»</span></div>
+        <div class="merchant-rep-v12"><small>РЕПУТАЦИЯ</small><b id="merchantRep">0</b></div>
+      </div>
+      <div class="market-section-title-v12"><b>ТОВАРЫ ДНЯ</b><small id="marketReset">Ассортимент обновится позже</small></div>
+      <div class="shop-grid shop-grid-v12" id="shopGrid"></div>
+      <div class="sell-panel sell-panel-v12"><div><b>Продать найденный предмет</b><small>Торговец покупает случайный предмет из инвентаря.</small></div><button id="sellItemBtn" class="tg-action">Продать · 40 🪙</button></div>
+      <div class="merchant-log merchant-log-v12" id="merchantLog">Торговец ждёт сделки.</div>
     </section>
 
     <section id="inventory" class="screen profile-screen">

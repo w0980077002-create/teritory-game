@@ -70,9 +70,11 @@ function renderShop(){
  const stock=[0,1,2,3].map((_,i)=>weapons[(i+shift)%weapons.length]).map((w,i)=>({...w,cost:Math.max(180,w.cost+(i%2?50:-30))}));
  const mood=state.merchantRep>=5?'«Для тебя цена будет лучше.»':state.merchantRep>=2?'«Мы уже знаем друг друга.»':'«Сегодня хороший товар.»';
  const moodEl=$("#merchantMood"); if(moodEl)moodEl.textContent=mood;
- const repEl=$("#merchantRep"); if(repEl)repEl.textContent=`Репутация ${state.merchantRep}`;
- const resetEl=$("#marketReset"); if(resetEl){const left=86400000-(Date.now()%86400000);resetEl.textContent=`Новый ассортимент примерно через ${Math.max(1,Math.ceil(left/3600000))} ч.`;}
- $("#shopGrid").innerHTML=stock.map(w=>{const finalCost=state.merchantRep>=5?Math.floor(w.cost*.9):state.merchantRep>=2?Math.floor(w.cost*.95):w.cost;return `<div class="item"><div class="pic">${w.icon}</div><b>${w.name}</b><span>Урон +${w.damage}</span><button data-buy="${w.name}" data-cost="${finalCost}">${finalCost} 🪙 · КУПИТЬ</button></div>`}).join('');
+ const repEl=$("#merchantRep"); if(repEl)repEl.textContent=String(state.merchantRep);
+ const coinsEl=$("#marketCoins"); if(coinsEl)coinsEl.textContent=String(Number(state.coins||0));
+ const gemsEl=$("#marketGems"); if(gemsEl)gemsEl.textContent=String(Number(state.gems||0));
+ const resetEl=$("#marketReset"); if(resetEl){const left=86400000-(Date.now()%86400000);resetEl.textContent=`Обновление через ${Math.max(1,Math.ceil(left/3600000))} ч.`;}
+ $("#shopGrid").innerHTML=stock.map(w=>{const finalCost=state.merchantRep>=5?Math.floor(w.cost*.9):state.merchantRep>=2?Math.floor(w.cost*.95):w.cost;return `<article class="market-item-v12"><div class="market-item-icon-v12">${w.icon}</div><div class="market-item-info-v12"><b>${w.name}</b><small>Оружие · Урон +${w.damage}</small><span>${finalCost} 🪙</span></div><button class="tg-action market-buy-v12" data-buy="${w.name}" data-cost="${finalCost}">Купить</button></article>`}).join('');
 }
 
 $("#shopGrid").addEventListener("click",e=>{
