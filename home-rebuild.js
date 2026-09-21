@@ -501,3 +501,64 @@
   document.addEventListener('touchstart', coordinateFallback, {capture:true, passive:false});
   document.addEventListener('touchend', coordinateFallback, {capture:true, passive:false});
 })();
+
+
+/* Territory Global Close V6 — one universal black circle + white X style.
+   Visual-only normalization for all non-Arena close controls. */
+(function(){
+  'use strict';
+  if(document.getElementById('territory-global-close-v6-style')) return;
+  const s=document.createElement('style');
+  s.id='territory-global-close-v6-style';
+  s.textContent=`
+    /* Universal close appearance. Arena is intentionally excluded. */
+    .territory-overlay-force-close,
+    .hr-modal-x,
+    .rp-close,
+    .game-close,
+    .game-modal-close,
+    #gameBatchClose,
+    .g141-photo-x,
+    #jackpotClose{
+      width:40px!important;
+      height:40px!important;
+      min-width:40px!important;
+      min-height:40px!important;
+      max-width:40px!important;
+      max-height:40px!important;
+      box-sizing:border-box!important;
+      padding:0!important;
+      border:1px solid rgba(255,255,255,.28)!important;
+      border-radius:50%!important;
+      background:#05090d!important;
+      color:#fff!important;
+      display:grid!important;
+      place-items:center!important;
+      font:700 27px/1 Arial,sans-serif!important;
+      text-align:center!important;
+      box-shadow:0 5px 16px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.04)!important;
+      cursor:pointer!important;
+      touch-action:manipulation!important;
+      -webkit-tap-highlight-color:transparent!important;
+      user-select:none!important;
+      opacity:1!important;
+    }
+    .territory-overlay-force-close:active,
+    .hr-modal-x:active,
+    .rp-close:active,
+    .game-close:active,
+    .game-modal-close:active,
+    #gameBatchClose:active,
+    .g141-photo-x:active,
+    #jackpotClose:active{transform:scale(.92)!important}
+
+    /* Keep modal close buttons inside their existing cards; only appearance changes. */
+    .hr-modal-x,.rp-close,.game-modal-close,#gameBatchClose,.g141-photo-x,#jackpotClose{
+      position:absolute!important;
+    }
+
+    /* Game main-screen close keeps its existing layout position. */
+    .game-close{position:relative!important;}
+  `;
+  document.head.appendChild(s);
+})();
