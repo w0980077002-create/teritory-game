@@ -122,12 +122,77 @@
       case 'vip': vip(); break;
       case 'game': gameHall(); break;
       case 'arena': go('arena'); break;
-      case 'blacksmith': go('market'); break;
+      case 'blacksmith': openForge(); break;
       case 'tavern': go('districts'); break;
       case 'shop': go('market'); break;
       default: break;
     }
   }
+
+  const FORGE_ITEMS=[
+    {id:'axe',name:'Боевой топор',icon:'🪓',damage:12,cost:300,rarity:'Обычный'},
+    {id:'sword',name:'Стальной меч',icon:'⚔️',damage:18,cost:650,rarity:'Редкий'},
+    {id:'hammer',name:'Молот кузнеца',icon:'🔨',damage:25,cost:1000,rarity:'Эпический'},
+    {id:'crossbow',name:'Арбалет охотника',icon:'🏹',damage:31,cost:1500,rarity:'Легендарный'}
+  ];
+  function forgeState(){
+    const s=window.TerritoryStore&&window.TerritoryStore.state;
+    if(!s)return null;
+    s.forgeInventory=Array.isArray(s.forgeInventory)?s.forgeInventory:[];
+    s.equipment=s.equipment&&typeof s.equipment==='object'?s.equipment:{};
+    return s;
+  }
+  function forgeSave(){
+    const st=forgeState(); if(!st)return;
+    if(window.TerritoryStore&&typeof window.TerritoryStore.save==='function') window.TerritoryStore.save();
+    else try{localStorage.setItem('territory_save_v1',JSON.stringify(st));}catch(e){}
+    sync();
+  }
+  function forgeScreen(){
+    let sec=document.getElementById('forge');
+    if(sec)return sec;
+    sec=document.createElement('section'); sec.id='forge'; sec.className='screen forge-screen';
+    sec.innerHTML=`<div class="forge-wrap">
+      <div class="forge-head"><button type="button" class="forge-back" data-forge-back>‹</button><div><small>SDOLARS · КУЗНИЦА</small><h2>КУЗНИЦА ГЕРОЯ</h2></div><div class="forge-wallet"><span>🪙 <b data-fg-coins>0</b></span><span>💎 <b data-fg-gems>0</b></span></div></div>
+      <div class="forge-hero"><div class="forge-anvil">⚒️</div><div><b>Кузнец</b><span>Выбирай оружие, покупай его и сразу экипируй.</span></div></div>
+      <div class="forge-section"><div class="forge-title"><b>ОРУЖИЕ</b><small>Характеристики применяются к бою</small></div><div class="forge-grid" id="forgeGrid"></div></div>
+      <div class="forge-section"><div class="forge-title"><b>МОЙ АРСЕНАЛ</b><small id="forgeOwnedCount">0 предметов</small></div><div id="forgeOwned" class="forge-owned"></div></div>
+      <div class="forge-note" id="forgeNote">Покупка добавляет предмет в инвентарь. Экипированный предмет влияет на урон героя.</div>
+    </div>`;
+    document.querySelector('main')?.appendChild(sec);
+    sec.addEventListener('click',e=>{
+      const back=e.target.closest('[data-forge-back]'); if(back){go('inventory');return;}
+      const buy=e.target.closest('[data-forge-buy]'); if(buy){forgeBuy(buy.dataset.forgeBuy);return;}
+      const equip=e.target.closest('[data-forge-equip]'); if(equip){forgeEquip(equip.dataset.forgeEquip);return;}
+    });
+    return sec;
+  }
+  function forgeBuy(id){
+    const st=forgeState(), item=FORGE_ITEMS.find(x=>x.id===id); if(!st||!item)return;
+    if(Number(st.coins||0)<item.cost){const n=document.getElementById('forgeNote');if(n)n.textContent='Кузнец: «Не хватает монет для этой покупки.»';return;}
+    st.coins-=item.cost;
+    st.forgeInventory.push(item.id);
+    st.inventory=Array.isArray(st.inventory)?st.inventory:[]; st.inventory.push(item.icon);
+    const n=document.getElementById('forgeNote');if(n)n.textContent=`Получен предмет: ${item.name}. Теперь его можно экипировать.`;
+    forgeSave();
+  }
+  function forgeEquip(id){
+    const st=forgeState(), item=FORGE_ITEMS.find(x=>x.id===id); if(!st||!item)return;
+    if(!st.forgeInventory.includes(id)){const n=document.getElementById('forgeNote');if(n)n.textContent='Сначала получи этот предмет.';return;}
+    st.weapon=item.name; st.bonusDamage=item.damage; st.equipment.weapon={...item};
+    const n=document.getElementById('forgeNote');if(n)n.textContent=`Экипировано: ${item.name}. Урон героя +${item.damage}.`;
+    forgeSave();
+  }
+  window.renderForgeUI=function(){
+    const sec=document.getElementById('forge'); if(!sec)return;
+    const st=forgeState(); if(!st)return;
+    sec.querySelector('[data-fg-coins]').textContent=st.coins||0; sec.querySelector('[data-fg-gems]').textContent=st.gems||0;
+    sec.querySelector('#forgeGrid').innerHTML=FORGE_ITEMS.map(x=>`<article class="forge-item"><div class="forge-item-icon">${x.icon}</div><div class="forge-item-main"><b>${x.name}</b><small>${x.rarity}</small><span>💥 Урон +${x.damage}</span></div><button type="button" data-forge-buy="${x.id}">${x.cost} 🪙</button></article>`).join('');
+    const owned=[...new Set(st.forgeInventory||[])].map(id=>FORGE_ITEMS.find(x=>x.id===id)).filter(Boolean);
+    sec.querySelector('#forgeOwnedCount').textContent=`${owned.length} предметов`;
+    sec.querySelector('#forgeOwned').innerHTML=owned.length?owned.map(x=>`<article class="forge-owned-item ${st.equipment?.weapon?.id===x.id?'equipped':''}"><span>${x.icon}</span><div><b>${x.name}</b><small>Урон +${x.damage}</small></div><button type="button" data-forge-equip="${x.id}">${st.equipment?.weapon?.id===x.id?'Экипировано':'Экипировать'}</button></article>`).join(''):'<div class="forge-empty">Арсенал пока пуст.<br><small>Купи первое оружие у кузнеца.</small></div>';
+  };
+  function openForge(){forgeScreen(); window.renderForgeUI(); go('forge');}
 
   function sync(){
     const st=window.TerritoryStore&&window.TerritoryStore.state;
