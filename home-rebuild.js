@@ -100,7 +100,7 @@
     home.classList.add('home-rebuild-host','home-foundation-active');
     home.innerHTML=`
       <div id="homeRebuild" class="home-rebuild home-foundation" aria-label="Sdolars — главный экран">
-        <img class="hr-bg" src="sdolars_home_bg.png" alt="Sdolars">
+        <img class="hr-bg" src="territory_reference_bg.png" alt="Sdolars">
         <div class="hr-vignette"></div>
 
         <header class="hf-top">
@@ -115,7 +115,7 @@
         </header>
 
         <div class="hf-stage">
-          <small>ГЛАВА 1</small>
+          <small>ГЛАВА 2</small>
           <b>Северные земли 2-7</b>
           <div><i></i><i></i><i class="on"></i><i></i><i></i><span>☠</span></div>
         </div>
