@@ -17,10 +17,18 @@
   function modal(title,body,actions){
     const old=$('#homeRebuildModal'); if(old) old.remove();
     const m=document.createElement('div'); m.id='homeRebuildModal'; m.className='hr-modal';
-    const buttons=(actions||[{id:'close',text:'Закрыть'}]).map(a=>`<button type="button" data-hr-act="${a.id}">${a.text}</button>`).join('');
-    m.innerHTML=`<div class="hr-modal-card" role="dialog" aria-modal="true"><button class="hr-modal-x" type="button" data-hr-act="close">×</button><div class="hr-modal-icon">${title.icon||'✦'}</div><h3>${title.text||title}</h3><div class="hr-modal-body">${body}</div><div class="hr-modal-actions">${buttons}</div></div>`;
+    /* Global rule: every ordinary modal has ONE close control — the small black circle.
+       A bottom "Закрыть" button is never generated automatically. Other explicit actions remain. */
+    const safeActions=Array.isArray(actions)?actions.filter(a=>a && a.id!=='close' && a.text):[];
+    const buttons=safeActions.map(a=>`<button type="button" data-hr-act="${a.id}">${a.text}</button>`).join('');
+    const actionBlock=buttons?`<div class="hr-modal-actions">${buttons}</div>`:'';
+    m.innerHTML=`<div class="hr-modal-card" role="dialog" aria-modal="true"><button class="hr-modal-x" type="button" data-hr-act="close" aria-label="Закрыть">×</button><div class="hr-modal-icon">${title.icon||'✦'}</div><h3>${title.text||title}</h3><div class="hr-modal-body">${body}</div>${actionBlock}</div>`;
     document.body.appendChild(m);
-    m.addEventListener('click',e=>{const a=e.target.closest('[data-hr-act]');if(!a)return;if(a.dataset.hrAct==='close'||a.dataset.hrAct==='ok')m.remove();});
+    m.addEventListener('click',e=>{
+      const a=e.target.closest('[data-hr-act]');
+      if(!a)return;
+      if(a.dataset.hrAct==='close'||a.dataset.hrAct==='ok') { e.preventDefault(); e.stopPropagation(); m.remove(); }
+    });
     m.addEventListener('click',e=>{if(e.target===m)m.remove();});
     return m;
   }
@@ -714,6 +722,156 @@
   }
 
   scan();
-  new MutationObserver(scan).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','aria-hidden']});
+  /* IMPORTANT: do not observe `style` here. `prepare()` writes styles, and
+     observing style creates a MutationObserver feedback loop in Telegram WebView. */
+  new MutationObserver(scan).observe(document.documentElement,{
+    childList:true,
+    subtree:true,
+    attributes:true,
+    attributeFilter:['class','aria-hidden']
+  });
   window.addEventListener('resize',scan,{passive:true});
+})();
+
+/* Territory Global Modal System V9 — stable observer / no WebView feedback loop. */
+(function(){
+  'use strict';
+  const NON_ARENA_CLOSE = [
+    '.territory-overlay-force-close', '.hr-modal-x', '.rp-close',
+    '.modal-close', '.game-modal-close', '#gameBatchClose',
+    '.g141-photo-x', '#jackpotClose'
+  ].join(',');
+
+  function isArena(el){
+    return !!(el && (el.matches?.('#arenaModal,.arena-modal,[data-arena-modal]') ||
+      el.closest?.('#arenaModal,.arena-modal,[data-arena-modal]')));
+  }
+
+  function unlock(){
+    document.documentElement.classList.remove('territory-modal-open');
+    document.body.classList.remove('territory-modal-open');
+    document.body.style.overscrollBehaviorY='';
+    document.body.style.overflow='';
+    document.documentElement.style.overflow='';
+    document.querySelectorAll(
+      '.hr-modal[aria-hidden="true"],#hrProfileOverlay[aria-hidden="true"],.rp-overlay[aria-hidden="true"],'+
+      '.game-modal[aria-hidden="true"],.game-tasks-modal[aria-hidden="true"],'+
+      '.game-jackpot-modal[aria-hidden="true"],.game-panel-modal[aria-hidden="true"],'+
+      '.g141-photo-modal[aria-hidden="true"],#gameBatchModal[aria-hidden="true"],#gameRewardModal[aria-hidden="true"]'
+    ).forEach(el=>{
+      el.style.display='none';
+      el.style.visibility='hidden';
+      el.style.pointerEvents='none';
+      el.style.backdropFilter='none';
+      el.style.webkitBackdropFilter='none';
+    });
+  }
+
+  function afterClose(btn){
+    if(!btn || isArena(btn)) return;
+    /* Let the original close handler run first, then clean the global lock. */
+    setTimeout(unlock,0);
+    setTimeout(unlock,80);
+  }
+
+  document.addEventListener('click',e=>{
+    const b=e.target?.closest?.(NON_ARENA_CLOSE);
+    if(b) afterClose(b);
+  },true);
+  document.addEventListener('pointerup',e=>{
+    const b=e.target?.closest?.(NON_ARENA_CLOSE);
+    if(b) afterClose(b);
+  },true);
+  document.addEventListener('touchend',e=>{
+    const b=e.target?.closest?.(NON_ARENA_CLOSE);
+    if(b) afterClose(b);
+  },true);
+})();
+
+
+/* Territory Global Modal V10 — one close button only.
+   No automatic bottom "Закрыть" buttons on ordinary home modals. */
+(function(){
+  'use strict';
+  if(document.getElementById('territory-global-modal-v10-style')) return;
+  const st=document.createElement('style');
+  st.id='territory-global-modal-v10-style';
+  st.textContent=`
+    .hr-modal{
+      -webkit-tap-highlight-color:transparent!important;
+    }
+    .hr-modal .hr-modal-card{position:relative!important;}
+    .hr-modal .hr-modal-x{
+      position:absolute!important;right:10px!important;top:10px!important;
+      width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
+      padding:0!important;margin:0!important;display:grid!important;place-items:center!important;
+      box-sizing:border-box!important;border:1px solid rgba(255,255,255,.18)!important;
+      border-radius:50%!important;background:#05080c!important;color:#fff!important;
+      font:700 25px/1 Arial,sans-serif!important;box-shadow:0 5px 16px rgba(0,0,0,.5)!important;
+      z-index:20!important;cursor:pointer!important;touch-action:manipulation!important;
+      pointer-events:auto!important;-webkit-tap-highlight-color:transparent!important;
+    }
+    .hr-modal .hr-modal-x:active{transform:scale(.93)!important;}
+    .hr-modal .hr-modal-actions:empty{display:none!important;}
+  `;
+  document.head.appendChild(st);
+})();
+
+
+/* Territory Global Modal V11 — explicit-close-only policy.
+   Ordinary modals no longer disappear when the user taps the darkened picture/backdrop.
+   Closing is performed by the universal black-circle X (or a real action button).
+   Arena is intentionally excluded. */
+(function(){
+  'use strict';
+  const ROOTS = [
+    '#homeRebuildModal', '#hrProfileOverlay', '.rp-overlay', '.forge-v2-overlay',
+    '.game-modal', '.game-jackpot-modal', '.game-tasks-modal', '.game-panel-modal',
+    '.g141-photo-modal', '#gameBatchModal', '#gameRewardModal'
+  ].join(',');
+  function isArena(el){
+    return !!(el && (el.matches?.('#arenaModal,.arena-modal,[data-arena-modal]') ||
+      el.closest?.('#arenaModal,.arena-modal,[data-arena-modal]')));
+  }
+  function onBackdrop(e){
+    const root=e.target?.closest?.(ROOTS);
+    if(!root || isArena(root)) return;
+    /* Only intercept a click whose target is the modal root itself.
+       Clicks on the card/content/buttons keep their normal behavior. */
+    if(e.target===root){
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+  }
+  document.addEventListener('pointerdown',onBackdrop,{capture:true,passive:false});
+  document.addEventListener('touchstart',onBackdrop,{capture:true,passive:false});
+  document.addEventListener('click',onBackdrop,{capture:true,passive:false});
+})();
+
+/* Territory Global Action V11 — consistent primary action buttons for ordinary modals.
+   No behavior changes; only visual normalization. Arena excluded. */
+(function(){
+  'use strict';
+  if(document.getElementById('territory-global-action-v11-style')) return;
+  const st=document.createElement('style');
+  st.id='territory-global-action-v11-style';
+  st.textContent=`
+    .hr-modal-actions button,
+    .hr-modal .hr-modal-actions button,
+    .rp-shell [data-rp="equipment"],
+    .forge-v2-overlay [data-buy],
+    .forge-v2-overlay [data-equip]{
+      min-height:44px!important;
+      border-radius:14px!important;
+      font:700 15px/1.1 Arial,sans-serif!important;
+      touch-action:manipulation!important;
+      -webkit-tap-highlight-color:transparent!important;
+    }
+    .hr-modal-actions button:active,
+    .rp-shell [data-rp="equipment"]:active,
+    .forge-v2-overlay [data-buy]:active,
+    .forge-v2-overlay [data-equip]:active{transform:scale(.97)!important;}
+  `;
+  document.head.appendChild(st);
 })();
