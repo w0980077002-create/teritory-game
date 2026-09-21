@@ -646,3 +646,74 @@
   bind(document);
   new MutationObserver(m=>m.forEach(x=>x.addedNodes.forEach(n=>bind(n)))).observe(document.documentElement,{childList:true,subtree:true});
 })();
+
+
+/* Territory Global Modal System V8 — one safe behavior for ordinary windows.
+   Arena is explicitly excluded. This layer does not redesign modal content. */
+(function(){
+  'use strict';
+  const ROOTS = [
+    '.hr-modal', '#hrProfileOverlay', '.rp-overlay', '.forge-v2-overlay',
+    '.game-modal', '.game-tasks-modal', '.game-jackpot-modal',
+    '.game-panel-modal', '.g141-photo-modal', '#gameBatchModal',
+    '#gameRewardModal', '#homeRebuildModal'
+  ].join(',');
+
+  function isArena(el){
+    return !!(el && (el.matches && el.matches('#arenaModal,.arena-modal,[data-arena-modal]') ||
+      (el.closest && el.closest('#arenaModal,.arena-modal,[data-arena-modal]'))));
+  }
+
+  function visible(el){
+    if(!el || isArena(el)) return false;
+    const cs=getComputedStyle(el);
+    return cs.display!=='none' && cs.visibility!=='hidden' && cs.opacity!=='0';
+  }
+
+  function syncBodyLock(){
+    const open=[...document.querySelectorAll(ROOTS)].some(visible);
+    document.documentElement.classList.toggle('territory-modal-open',open);
+    document.body.classList.toggle('territory-modal-open',open);
+    document.body.style.overscrollBehaviorY=open?'none':'';
+  }
+
+  function prepare(root){
+    if(!root || isArena(root)) return;
+    root.setAttribute('data-territory-modal-v8','1');
+    root.style.overscrollBehavior='contain';
+    if(root.classList.contains('forge-v2-overlay') || root.classList.contains('rp-overlay')){
+      root.style.paddingTop='max(0px, env(safe-area-inset-top))';
+      root.style.paddingBottom='max(0px, env(safe-area-inset-bottom))';
+    }
+  }
+
+  function scan(){
+    document.querySelectorAll(ROOTS).forEach(prepare);
+    syncBodyLock();
+  }
+
+  if(!document.getElementById('territory-global-modal-v8-style')){
+    const st=document.createElement('style');
+    st.id='territory-global-modal-v8-style';
+    st.textContent=`
+      html.territory-modal-open,body.territory-modal-open{
+        overscroll-behavior-y:none!important;
+      }
+      .hr-modal,.rp-overlay,.forge-v2-overlay,
+      .game-modal,.game-tasks-modal,.game-jackpot-modal,
+      .game-panel-modal,.g141-photo-modal{
+        overscroll-behavior:contain!important;
+        -webkit-overflow-scrolling:touch!important;
+      }
+      .territory-modal-open #arenaModal,
+      .territory-modal-open .arena-modal{
+        overscroll-behavior:auto!important;
+      }
+    `;
+    document.head.appendChild(st);
+  }
+
+  scan();
+  new MutationObserver(scan).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','aria-hidden']});
+  window.addEventListener('resize',scan,{passive:true});
+})();
