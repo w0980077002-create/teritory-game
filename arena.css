@@ -10,3 +10,14 @@
 .arena-sheet{width:min(100%,520px);max-height:100%;overflow:auto;background:linear-gradient(180deg,rgba(5,25,39,.98),rgba(3,15,24,.99));border:1px solid #1596d4;border-radius:16px;padding:10px;box-shadow:0 12px 35px rgba(0,0,0,.6);color:#fff}
 .arena-modal-head{display:flex;align-items:center;gap:8px;margin-bottom:7px}.arena-modal-head h2{margin:0;color:#ffd83d;font-size:17px;flex:1}.arena-close{background:#16415b;border:1px solid #2c8db6;border-radius:9px;padding:7px 10px;font-size:10px;font-weight:900}.arena-toast{position:absolute;z-index:600;left:50%;bottom:82px;transform:translateX(-50%) translateY(15px);opacity:0;pointer-events:none;background:rgba(2,17,28,.96);border:1px solid #36b8ed;border-radius:10px;padding:9px 14px;font-weight:800;font-size:11px;transition:.2s;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis}.arena-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(max-width:390px){.arena-modal{padding-left:6px;padding-right:6px}.arena-sheet{padding:8px}.arena-modal-head h2{font-size:15px}}
+
+
+/* Territory V17 — Arena viewport isolation. Arena is a full-screen layer and
+   must not inherit/compete with the home HUD or bottom navigation hit areas. */
+.arena-modal{position:fixed!important;inset:0!important;z-index:200000!important;
+  width:100vw!important;height:100dvh!important;max-width:none!important;
+  box-sizing:border-box!important;pointer-events:auto!important;}
+.arena-sheet{position:relative!important;z-index:200001!important;}
+.arena-modal[aria-hidden="true"]{display:none!important;}
+.arena-modal.show{display:flex!important;}
+.arena-close{position:relative!important;z-index:200002!important;pointer-events:auto!important;touch-action:manipulation!important;}

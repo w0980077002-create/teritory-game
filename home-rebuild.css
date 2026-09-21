@@ -59,3 +59,16 @@ body:has(#home.active){overflow:hidden!important}.hud{display:none!important}
 .forge-section{margin-top:20px}.forge-title{display:flex;justify-content:space-between;align-items:end;margin:0 2px 10px}.forge-title b{font-size:17px;letter-spacing:1px}.forge-title small{color:#7f8d99}
 .forge-grid{display:grid;gap:10px}.forge-item,.forge-owned-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #273746;border-radius:16px;background:#0f1b26}.forge-item-icon{width:52px;height:52px;display:grid;place-items:center;border-radius:14px;background:#172837;font-size:29px}.forge-item-main{flex:1;min-width:0}.forge-item-main b,.forge-owned-item b{display:block}.forge-item-main small{display:block;color:#b99a4d;margin:2px 0}.forge-item-main span,.forge-owned-item small{display:block;color:#aeb8c1;font-size:13px}.forge-item button,.forge-owned-item button{border:1px solid #c7a653;background:#201b10;color:#f0dfaa;border-radius:12px;padding:10px 11px;font-weight:800}.forge-owned{display:grid;gap:9px}.forge-owned-item.equipped{border-color:#c7a653;box-shadow:0 0 0 1px rgba(199,166,83,.15) inset}.forge-owned-item>span{font-size:28px;width:40px;text-align:center}.forge-owned-item div{flex:1}.forge-empty{padding:28px;text-align:center;border:1px dashed #314352;border-radius:16px;color:#7f8d99}.forge-note{margin-top:16px;padding:12px;border-radius:13px;background:#0d1822;border:1px solid #1f303e;color:#9eabb6;font-size:13px;text-align:center}
 @media(min-width:650px){.forge-grid{grid-template-columns:1fr 1fr}}
+
+
+/* Territory V17 — home header isolation. Keep HUD inside its own row so it cannot
+   drift into the city action buttons; only actual HUD controls receive touches. */
+.hr-top{left:10px!important;right:10px!important;top:10px!important;width:auto!important;box-sizing:border-box!important;pointer-events:none!important;z-index:100!important;}
+.hr-top>.hr-profile,.hr-top>.hr-resources{pointer-events:auto!important;}
+.hr-profile{flex:0 1 auto!important;width:auto!important;max-width:min(44%,260px)!important;box-sizing:border-box!important;}
+.hr-resources{margin-left:auto!important;flex:0 0 auto!important;position:relative!important;z-index:101!important;}
+.hr-resources .hr-resource{pointer-events:auto!important;}
+@media(max-width:390px){
+  .hr-top{left:8px!important;right:8px!important;}
+  .hr-profile{max-width:43%!important;}
+}
