@@ -1,4 +1,4 @@
-/* TERITORY HOME FINAL 05
+/* TERITORY HOME BUTTON CLEANUP 08
    Approved HOME artwork + reliable mobile interaction map.
    No legacy HOME controls are rendered on top of the artwork.
 */
@@ -86,12 +86,6 @@
     const s=store(), inv=Array.isArray(s.inventory)?s.inventory:[];
     panel('Расходники','БОЕВЫЕ СЛОТЫ',`<div class="tr6-resource"><b>🧪 Расходники</b><span>В текущем состоянии игры отдельные зелья ещё не заведены. Здесь будет их полноценная панель, когда система расходников появится.</span></div><div class="tr6-resource"><b>Инвентарь: ${inv.length} предметов</b><span>Открой Инвентарь, чтобы увидеть уже полученные предметы.</span></div><button class="tr6-main" data-inv>Открыть Инвентарь</button>`,p=>p.querySelector('[data-inv]').onclick=()=>{p.remove();go('inventory')});
   }
-  function openExtraEquipment(){
-    const s=store(), eq=s.equipment&&typeof s.equipment==='object'?s.equipment:{};
-    const rows=[['Штаны',eq.legs],['Пояс',eq.waist],['Талисман',eq.talisman],['Обувь',eq.boots]];
-    panel('Дополнительная экипировка','СКРЫТЫЕ СЛОТЫ',rows.map(r=>`<div class="tr6-row"><b>🛡️</b><span>${r[0]}<small>${r[1]?(r[1].name||'Экипировано'):'Слот пока пуст'}</small></span></div>`).join(''));
-  }
-
   function action(name) {
     switch (name) {
       // top HUD
@@ -106,8 +100,6 @@
       case "settings": return openSettings();
       case "chapter": return openChapter();
       case "boss": return openBoss();
-      case "extraSide": return openExtraSide();
-      case "extraEquipment": return openExtraEquipment();
 
       // left side
       case "events": return panel("События","ГОРОДСКИЕ СОБЫТИЯ",`<div class="tr6-resource"><b>Городские события</b><span>События и награды города доступны через карту районов.</span></div><button class="tr6-main" data-go-districts>Открыть события города</button>`,p=>p.querySelector("[data-go-districts]").onclick=()=>{p.remove();go("districts")});
@@ -161,8 +153,6 @@
     ["energy",   27.0,  6.5, 31.0,  6.2],
     ["chapter",  20.0,10.0, 60.0,  9.0],
     ["boss",     55.0,18.7, 10.0,  6.0],
-    ["extraSide",91.0,  5.0,  9.0,  7.0],
-    ["extraEquipment",78.0,58.0,  7.0,  5.5],
 
     ["events",    0.2,  8.5, 11.8, 10.5],
     ["daily",     0.2, 19.3, 11.8, 10.5],
@@ -224,28 +214,32 @@
 
     host.appendChild(layer);
 
-    // One delegated click handler is more reliable on Android than many
-    // individual listeners and prevents old document handlers from winning.
+    // Coordinate dispatcher: when transparent hit zones touch each other,
+    // use the smallest matching zone (the most specific button) instead of
+    // whichever invisible DOM layer happens to be on top. This prevents old
+    // or broad zones from stealing taps on mobile.
+    const pickZone = e => {
+      const r = host.getBoundingClientRect();
+      if (!r.width || !r.height) return null;
+      const x = ((e.clientX - r.left) / r.width) * 100;
+      const y = ((e.clientY - r.top) / r.height) * 100;
+      const hits = ZONES.map((z,i)=>({z,i,area:z[3]*z[4]}))
+        .filter(o=>x>=o.z[1]&&x<=o.z[1]+o.z[3]&&y>=o.z[2]&&y<=o.z[2]+o.z[4])
+        .sort((a,b)=>a.area-b.area);
+      return hits[0]?.z?.[0] || null;
+    };
     layer.addEventListener("click", e => {
-      const b = e.target.closest(".hz");
-      if (!b) return;
-      e.preventDefault();
-      e.stopPropagation();
-      action(b.dataset.hz);
+      const name=pickZone(e);
+      if(!name)return;
+      e.preventDefault(); e.stopPropagation(); action(name);
     }, true);
 
-    // Telegram/Android can occasionally suppress click after a touch.
-    // touchend is a fallback, guarded against double activation.
     let lastTouch = 0;
     layer.addEventListener("touchend", e => {
-      const b = e.target.closest(".hz");
-      if (!b) return;
-      const now = Date.now();
-      if (now - lastTouch < 500) return;
-      lastTouch = now;
-      e.preventDefault();
-      e.stopPropagation();
-      action(b.dataset.hz);
+      const t=e.changedTouches?.[0]; if(!t)return;
+      const now=Date.now(); if(now-lastTouch<500)return; lastTouch=now;
+      const name=pickZone(t); if(!name)return;
+      e.preventDefault(); e.stopPropagation(); action(name);
     }, {capture:true, passive:false});
 
     return layer;
