@@ -90,7 +90,17 @@
     const m=modal({icon:'🎁',text:'Бонус получен'},'<div class="hr-reward"><b>+100 🪙</b><b>+1 💎</b><b>+10 ⚡</b></div><p>Награды добавлены в профиль.</p>');
     if(m){
       m.dataset.hrModalKind='daily';
-      const closeNow=()=>{m.remove();document.documentElement.classList.remove('territory-modal-open');document.body.classList.remove('territory-modal-open');document.body.style.overscrollBehaviorY='';document.body.style.overflow='';document.documentElement.style.overflow='';};
+      const closeNow=()=>{
+        /* V16: daily bonus must release every possible home modal/shield. */
+        document.querySelectorAll('.hr-modal').forEach(x=>x.remove());
+        document.documentElement.classList.remove('territory-modal-open');
+        document.body.classList.remove('territory-modal-open');
+        document.body.style.overscrollBehaviorY='';
+        document.body.style.overflow='';
+        document.documentElement.style.overflow='';
+        document.body.style.pointerEvents='';
+        document.documentElement.style.pointerEvents='';
+      };
       const x=m.querySelector('.hr-modal-x');
       if(x){x.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeNow();},true);}
       setTimeout(()=>{if(m.isConnected)closeNow();},3200);
@@ -925,4 +935,57 @@
     .forge-v2-overlay [data-equip]:active{transform:scale(.97)!important;}
   `;
   document.head.appendChild(st);
+})();
+
+
+/* Territory V16 — hard release for daily-bonus modal + guaranteed energy HUD. */
+(function(){
+  'use strict';
+  function releaseHomeModal(target){
+    if(!target || target.closest?.('#arenaModal,.arena-modal,[data-arena-modal]')) return;
+    const modal=target.closest?.('.hr-modal');
+    if(!modal) return;
+    /* The daily/ordinary home modal is disposable. Remove it synchronously so
+       Telegram WebView never gets left with a full-screen touch shield. */
+    modal.remove();
+    document.documentElement.classList.remove('territory-modal-open');
+    document.body.classList.remove('territory-modal-open');
+    document.documentElement.style.overflow='';
+    document.body.style.overflow='';
+    document.documentElement.style.overscrollBehaviorY='';
+    document.body.style.overscrollBehaviorY='';
+    document.documentElement.style.pointerEvents='';
+    document.body.style.pointerEvents='';
+  }
+
+  function bindClose(e){
+    const b=e.target?.closest?.('.hr-modal-x');
+    if(!b) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    releaseHomeModal(b);
+  }
+  document.addEventListener('pointerdown',bindClose,{capture:true,passive:false});
+  document.addEventListener('touchstart',bindClose,{capture:true,passive:false});
+  document.addEventListener('pointerup',bindClose,{capture:true,passive:false});
+  document.addEventListener('touchend',bindClose,{capture:true,passive:false});
+  document.addEventListener('click',bindClose,{capture:true,passive:false});
+
+  /* Never allow a stale hidden home modal to survive. Arena is excluded. */
+  setInterval(()=>{
+    document.querySelectorAll('.hr-modal').forEach(m=>{
+      if(m.getAttribute('aria-hidden')==='true' || m.style.display==='none' || m.style.visibility==='hidden') m.remove();
+    });
+  },1000);
+
+  /* Energy is a HUD status item, not a button. Force the visible value from
+     the same store used by the profile, without opening any modal. */
+  function energySync(){
+    const st=window.TerritoryStore&&window.TerritoryStore.state;
+    const value=st?.energy ?? 100;
+    document.querySelectorAll('[data-hr-energy]').forEach(el=>el.textContent=value);
+  }
+  energySync();
+  setInterval(energySync,1000);
 })();
