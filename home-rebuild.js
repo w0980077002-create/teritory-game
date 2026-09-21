@@ -123,7 +123,7 @@
       case 'profile': showProfile(); break;
       case 'coins': resources('coins'); break;
       case 'gems': resources('gems'); break;
-      case 'energy': modal({icon:'⚡',text:'Энергия'},'<div class="hr-big-number">'+($('#energyValue')?.textContent||$('#energy')?.textContent||'100')+'</div><p>Энергия расходуется в игровых активностях и восстанавливается со временем.</p>'); break;
+      case 'energy': return; // Energy is HUD-only: never open a modal from the top resource bar.
       case 'quest': go('districts'); break;
       case 'bonus': dailyBonus(); break;
       case 'events': go('districts'); break;
@@ -242,7 +242,7 @@
           <div class="hr-resources">
             <button type="button" class="hr-resource" data-hr="coins" aria-label="Монеты">🪙 <b data-hr-coins>1000</b></button>
             <button type="button" class="hr-resource" data-hr="gems" aria-label="Кристаллы">💎 <b data-hr-gems>25</b></button>
-            <button type="button" class="hr-resource" data-hr="energy" aria-label="Энергия">⚡ <b data-hr-energy>100</b></button>
+            <div class="hr-resource hr-energy-display" data-hr="energy" aria-label="Энергия" role="status">⚡ <b data-hr-energy>100</b></div>
           </div>
         </header>
 
@@ -294,7 +294,7 @@
   function topButtonAt(x,y){
     const root=document.getElementById('homeRebuild');
     if(!root)return null;
-    const names=['profile','coins','gems','energy'];
+    const names=['profile','coins','gems'];
     for(const name of names){
       const el=root.querySelector('[data-hr="'+name+'"]');
       if(!el)continue;
