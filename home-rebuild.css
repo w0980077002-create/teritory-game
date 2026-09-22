@@ -150,3 +150,23 @@ body:has(.tr10-main-menu) .bottom-nav{display:none!important;pointer-events:none
   color:transparent!important;
   text-shadow:none!important;
 }
+
+/* UNIFIED 15: exact persistent bottom menu artwork from the approved screenshot. */
+#tr10-main-menu{
+  background:#07111b url("home-main-menu.png?v=UNIFIED15") center bottom / 100% 100% no-repeat!important;
+  background-size:100% 100%!important;
+  border-top:0!important;
+  box-shadow:none!important;
+}
+#tr10-main-menu .tr10-menu-btn{
+  color:transparent!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
+}
+#tr10-main-menu .tr10-menu-icon,
+#tr10-main-menu .tr10-menu-btn b{display:none!important}
+#tr10-main-menu .tr10-menu-btn.is-battle{background:transparent!important;box-shadow:none!important;transform:none!important}
+
+#tr10-main-menu{background-image:url("home-main-menu.png?v=UNIFIED15")!important;background-size:100% 100%!important;}

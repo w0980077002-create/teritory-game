@@ -218,7 +218,7 @@
       b.dataset.busy="1";
       setTimeout(()=>{b.dataset.busy="0"},500);
       const target=b.dataset.menu;
-      if(target==="home") return go("home");
+      if(target==="home") return go("districts");
       if(target==="inventory") return go("inventory");
       if(target==="hero") return go("inventory");
       if(target==="battle") return go("arena");
@@ -237,7 +237,7 @@
   function syncPersistentMenu(){
     const nav=mountPersistentMenu();
     const home=$("#home");
-    nav.classList.toggle("on-home",!!(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel"))); nav.style.display=(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel"))?"none":"grid";
+    const hideOnHome=!!(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel")); nav.classList.toggle("on-home",hideOnHome); nav.style.display=hideOnHome?"none":"grid";
   }
 
   function boot(){mount();hideLegacy();mountPersistentMenu();syncPersistentMenu();

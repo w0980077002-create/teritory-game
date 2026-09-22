@@ -1,15 +1,22 @@
-TERITORY HOME FINAL 06
+TERITORY HOME UNIFIED 15
 
-Заменить только:
-1) home-rebuild.js
-2) home-rebuild.css
+Replace/add ONLY these files:
+- home-rebuild.js
+- home-rebuild.css
+- home-main-menu.png
 
-territory_reference_bg.png НЕ менять.
-
-Зафиксировано:
-- №5 VIP: окно уровней VIP и доступов; неизвестное оставлено пустым.
-- №9: окно из 10 точек ветки босса; контент неизвестных веток не придуман.
-- Стрелка рядом с №9: отдельное выдвижное окно с 3 дополнительными пустыми кнопками.
-- Баннер главы — информационный; вход в главу выполняет зона черепа.
-- Между экипировкой и энергией добавлена маленькая зелёная кнопка дополнительной экипировки; открывает штаны/пояс/талисман/доп. слот, пока пустые.
-- Существующий экран/арт HOME не изменён.
+IMPORTANT:
+- The bottom 42-48 menu now uses the exact menu artwork supplied in the conversation.
+- No duplicate emoji/text menu is drawn.
+- The HTML buttons are invisible hit zones over the exact artwork.
+- On HOME with no popup, the menu already inside the reference HOME remains.
+- When any popup opens, the exact same menu artwork appears at the bottom.
+- On non-HOME screens, the exact same menu artwork remains at the bottom.
+- 42 Город -> real districts/city screen.
+- 43 Инвентарь -> inventory.
+- 44 Герой -> current hero/inventory screen.
+- 45 Бой -> arena.
+- 46 Квесты -> quests.
+- 47 Игры -> game.
+- 48 Клан -> clan panel.
+- Legacy .bottom-nav stays disabled.
