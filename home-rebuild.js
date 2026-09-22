@@ -518,7 +518,37 @@
     window.__homeRealHudTimer=setInterval(render,500);
   }
 
-  function boot(){mount();hideLegacy();mountRealHud();initTelegramIdentity();
+  function installCleanValueLayer(){
+    const host=document.getElementById("homeReferenceHost");
+    if(!host)return;
+    let style=document.getElementById("territoryHomeCleanV2");
+    if(!style){
+      style=document.createElement("style");
+      style.id="territoryHomeCleanV2";
+      style.textContent=`
+        /* HOME CLEAN V2: remove baked dynamic captions without touching artwork or 42-48. */
+        #homeRealHud .rhud-item{height:1.45%!important;background:rgba(10,16,22,.92)!important;border-radius:2px!important;box-shadow:none!important;}
+        #homeRealHud .rhud-item span{font-size:clamp(8px,1.55vw,13px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
+        #homeRealHud .rhud-cons{height:1.55%!important;background:rgba(9,15,21,.90)!important;border-radius:2px!important;box-shadow:none!important;}
+        #homeRealHud .rhud-cons span{font-size:clamp(8px,1.55vw,13px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
+        #homeRealHud .rhud-xp{background:rgba(7,18,27,.92)!important;}
+        #homeRealHud .rhud-bottom-level{background:rgba(7,18,27,.92)!important;}
+        #homeRealHud .rhud-hp{background:rgba(72,0,0,.88)!important;}
+        #homeRealHud .rhud-bottom-energy{background:rgba(0,42,92,.88)!important;}
+        #homeRealHud .rhud-energy{background:#07151b!important;}
+        #telegramBakedProfileCleaner{position:absolute!important;left:13.7%!important;top:.8%!important;width:13.2%!important;height:6.35%!important;z-index:110!important;pointer-events:none!important;background:rgba(17,31,44,.96)!important;border-radius:3px!important;box-shadow:none!important;}
+        #telegramLiveProfile{z-index:120!important;}
+      `;
+      document.head.appendChild(style);
+    }
+    if(!host.querySelector("#telegramBakedProfileCleaner")){
+      const cleaner=document.createElement("div");
+      cleaner.id="telegramBakedProfileCleaner";
+      host.appendChild(cleaner);
+    }
+  }
+
+  function boot(){mount();hideLegacy();mountRealHud();installCleanValueLayer();initTelegramIdentity();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
