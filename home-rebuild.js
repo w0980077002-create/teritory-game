@@ -263,14 +263,22 @@
   }
 
 
-  /* REAL HOME HUD v45
-     The artwork remains the source of truth. These tiny text layers only
-     replace the baked values with the current TerritoryStore values.
-     IMPORTANT: BOTTOM 42-48 is deliberately untouched. */
+  /* REAL HOME HUD v46
+     The reference artwork is immutable. Only the values that are truly
+     stored in TerritoryStore are painted over the baked demo values.
+     Bottom 42-48 is intentionally outside this system and is LOCKED. */
   function mountRealHud(){
-    const home=$("#home");
-    const host=$("#homeReferenceHost",home);
+    const home=$("#home"), host=$("#homeReferenceHost",home);
     if(!home||!host)return;
+
+    let fx=$("#homeSceneFx",host);
+    if(!fx){
+      fx=document.createElement("div");
+      fx.id="homeSceneFx";
+      fx.innerHTML=`<i class="scene-mist mist-a"></i><i class="scene-mist mist-b"></i><i class="scene-spark spark-a"></i><i class="scene-spark spark-b"></i><i class="scene-spark spark-c"></i><i class="scene-water-glow"></i>`;
+      host.appendChild(fx);
+    }
+
     let hud=$("#homeRealHud",host);
     if(!hud){
       hud=document.createElement("div");
@@ -285,37 +293,44 @@
         <div class="rhud-field rhud-vip"><span></span></div>`;
       host.appendChild(hud);
     }
+
+    // These rectangles are only value plates. They deliberately do not touch
+    // the artwork outside the original text/value areas.
     const compact=v=>{
-      const n=Number(v||0);
+      const n=Math.max(0,Number(v)||0);
       if(n>=1000000000)return (n/1000000000).toFixed(n%1000000000?1:0)+"B";
       if(n>=1000000)return (n/1000000).toFixed(n%1000000?1:0)+"M";
       if(n>=1000)return (n/1000).toFixed(n%1000?1:0)+"K";
-      return String(n);
+      return String(Math.floor(n));
     };
+    const has=(s,...keys)=>keys.some(k=>s[k]!==undefined&&s[k]!==null&&s[k]!=="");
     const render=()=>{
       const s=store();
       const set=(cls,value)=>{const e=$(`.${cls} span`,hud);if(e)e.textContent=value};
+
+      // Profile is real: use the saved player name and level. Never invent a
+      // VIP level if the save does not contain one.
       set("rhud-name",String(s.name||"SSS"));
       set("rhud-level","Lv. "+Math.max(1,Number(s.level||1)));
+
+      // Counters are always read from the same save used by the game.
       set("rhud-coins",compact(s.coins));
       set("rhud-gems",compact(s.gems));
       set("rhud-redgems",compact(s.redGems));
-      const energyMax=Number(s.maxEnergy||200);
+
+      const energyMax=Math.max(1,Number(s.maxEnergy||200));
       set("rhud-energy",`${Math.max(0,Number(s.energy||0))}/${energyMax}`);
+
       const vipRaw=s.vipLevel??s.vip;
       const vipEl=$(".rhud-vip",hud);
-      if(vipRaw!==undefined&&vipRaw!==null&&vipRaw!==""){
-        vipEl.style.display="flex";
-        set("rhud-vip","VIP "+Math.max(0,Number(vipRaw)||0));
-      }else vipEl.style.display="none";
+      vipEl.style.display="flex";
+      set("rhud-vip",has(s,"vipLevel","vip") ? ("VIP "+Math.max(0,Number(vipRaw)||0)) : "");
     };
     render();
     clearInterval(window.__homeRealHudTimer);
-    window.__homeRealHudTimer=setInterval(render,500);
+    window.__homeRealHudTimer=setInterval(render,350);
   }
 
-
-  function boot(){mount();hideLegacy();mountRealHud();
-  }
+  function boot(){mount();hideLegacy();mountRealHud();}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
