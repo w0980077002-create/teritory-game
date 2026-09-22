@@ -169,12 +169,18 @@ function renderInventory(){
   const byName=n=>heroWeapons.find(w=>w.name===n)||heroWeapons[0];
   const escHero=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
   function syncOwnedWeapons(){
-    state.ownedWeapons=Array.isArray(state.ownedWeapons)?state.ownedWeapons.map(String):[];
-    const iconMap={"🪓":"Боевой топор","⚔️":"Стальной меч","🔨":"Молот","🏹":"Арбалет"};
-    for(const x of state.inventory||[]){const n=typeof x==="object"?x.name:iconMap[String(x)];if(n&&!state.ownedWeapons.includes(n))state.ownedWeapons.push(n)}
-    if(state.weapon&&!state.ownedWeapons.includes(state.weapon))state.ownedWeapons.push(state.weapon);
-    if(!state.ownedWeapons.length)state.ownedWeapons=["Кулаки"];
-    if(!state.ownedWeapons.includes("Кулаки"))state.ownedWeapons.unshift("Кулаки");
+    const iconMap={"🪓":"Боевой топор","⚔️":"Стальной меч","🔨":"Молот","🏹":"Арбалет","✊":"Кулаки"};
+    const raw=Array.isArray(state.ownedWeapons)?state.ownedWeapons:[];
+    const names=[];
+    const add=n=>{
+      n=String(n||"").trim();
+      if(n && heroWeapons.some(w=>w.name===n) && !names.includes(n)) names.push(n);
+    };
+    raw.forEach(x=>add(typeof x==="object"?x.name:x));
+    (state.inventory||[]).forEach(x=>add(typeof x==="object"?x.name:iconMap[String(x)]));
+    add(state.weapon);
+    if(!names.includes("Кулаки")) names.unshift("Кулаки");
+    state.ownedWeapons=names;
   }
   function heroStats(){
     syncOwnedWeapons();
