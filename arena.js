@@ -17,15 +17,19 @@
     duelist:{name:'Дуэлянт',icon:'⚔️',hp:118,atk:1.08,def:1.02,crit:.14,dodge:.12},
     support:{name:'Поддержка',icon:'✨',hp:128,atk:.88,def:1.06,crit:.09,dodge:.08}
   };
+  // Public opponent pool: 70% English full names, 30% Russian/CIS full names.
+  // Exactly 2 of 40 profiles (5%) use female names.
   const NAMES=[
-    'Валера','Людмила','Сергей','Андрей','Олег','Дима','Саша','Настя',
-    'Катя','Миша','Артём','Игорь','Максим','Вика','Алина','Рома',
-    'Женя','Кирилл','Влад','Таня','Наташа','Павел','Денис','Юля',
-    'Егор','Марина','Руслан','Кристина','Антон','Лера','Стас','Маша',
-    'Никита','Полина','Вадим','Света','Глеб','Оксана','Роман','Тимур',
-    'Алексей','Елена','Виталий','Ирина','Богдан','Диана','Артур','Лиза',
-    'Иван','Ольга','Марк','Вероника','Данил','Ксюша','Марат','Яна',
-    'Wei','Alex','Omar','Luca','Yuki','Sofia','Daniel','Noah'
+    'Michael Carter','Валера Соколов','James Anderson','Андрей Кузнецов',
+    'Robert Mitchell','Sarah Williams','Олег Морозов','David Thompson',
+    'Daniel Brooks','Сергей Волков','Christopher Reed','Максим Орлов',
+    'Andrew Walker','Thomas Bennett','Дмитрий Павлов','Kevin Parker',
+    'Matthew Collins','Виктор Смирнов','Ryan Cooper','Jason Morgan',
+    'Joshua Turner','Никита Ковалёв','Emily Johnson','Anthony Foster',
+    'William Scott','Артём Беляев','Jonathan King','Steven Adams',
+    'Benjamin Wright','Роман Мельников','Nicholas Green','Саша Крылов',
+    'Samuel Baker','Игорь Фёдоров','Jacob Hall','Тимур Захаров',
+    'Ethan Brooks','Алексей Новиков','Christopher Young','Иван Климов'
   ];
   const STYLES=['Агрессивный','Баланс','Защитный','Контратакующий'];
   const $=(s,r=document)=>r.querySelector(s);
@@ -67,7 +71,7 @@
     const n=NAMES[i%NAMES.length], keys=Object.keys(CLASSES), k=keys[i%keys.length];
     const level=3+(i*7%23);
     return {
-      id:'op-'+i,name:n[0],level,class:k,
+      id:'op-'+i,name:n,level,class:k,
       style:STYLES[i%STYLES.length],rating:760+(i*97%790),
       wins:12+(i*17%180),losses:3+(i*9%90),online:true,
       hp:CLASSES[k].hp+level*4,maxHp:CLASSES[k].hp+level*4
@@ -93,13 +97,23 @@
     window._at=setTimeout(()=>x.classList.remove('show'),1800);
   };
 
-  function frame(title,body,back=true){
+  function frame(title,body,exitToGame=false){
     shell();
     const m=$('#arenaModalBody'),h=$('#arenaModalTitle');
     if(h)h.textContent=title;
     if(m)m.innerHTML=`<div class="arena-v30">${body}</div>`;
     const close=$('#arenaClose');
-    if(close){close.textContent=back?'✕':'Закрыть';close.onclick=()=>{window.closeArenaModal(); if(typeof showScreen==='function')showScreen('home')}}
+    if(close){
+      close.textContent='✕';
+      close.onclick=()=>{
+        if(exitToGame){
+          window.closeArenaModal();
+          if(typeof showScreen==='function')showScreen('home');
+        }else{
+          home();
+        }
+      };
+    }
     return m;
   }
   function playerMini(){
@@ -134,9 +148,9 @@
       </div>
       <div class="ar-live"><i></i><b>Сервер активен</b><span>Онлайн ${live} · В бою ${fighting} · В очереди ${queue}</span></div>
       <section class="ar-section"><h3>Выбери режим</h3>
-        <button class="ar-mode" data-mode="1v1"><b>⚔️ 1 × 1</b><span>Один соперник · быстрый личный бой</span><strong>10 ⚡</strong></button>
-        <button class="ar-mode" data-mode="3v3"><b>🛡️ 3 × 3</b><span>Командная арена · 3 бойца против 3</span><strong>15 ⚡</strong></button>
-        <button class="ar-mode ar-chaos" data-mode="chaos"><b>🔥 CHAOS</b><span>Свободный режим · динамические бои</span><strong>20 ⚡</strong></button>
+        <button class="ar-mode" data-mode="1v1"><b>⚔️ 1 × 1</b><span>Один соперник · быстрый личный бой</span><strong>⚔️ БОЙ · 10 ⚡</strong></button>
+        <button class="ar-mode" data-mode="3v3"><b>🛡️ 3 × 3</b><span>Командная арена · 3 бойца против 3</span><strong>⚔️ БОЙ · 15 ⚡</strong></button>
+        <button class="ar-mode ar-chaos" data-mode="chaos"><b>🔥 CHAOS</b><span>Свободный режим · динамические бои</span><strong>⚔️ БОЙ · 20 ⚡</strong></button>
       </section>
       <section class="ar-section"><h3>Игроки арены</h3>${opponents.slice(0,5).map(x=>opponentCard(x,false)).join('')}</section>
       <section class="ar-section ar-grid2">
@@ -145,7 +159,7 @@
         <button data-view="rules">📖<b>Правила</b><small>Как работает арена</small></button>
         <button data-view="profile">👤<b>Профиль</b><small>Статистика</small></button>
       </section>
-    `);
+    `, true);
     $$('.ar-mode').forEach(b=>b.onclick=()=>queue(b.dataset.mode));
     $$('[data-view]').forEach(b=>b.onclick=()=>views(b.dataset.view));
   }
@@ -194,8 +208,8 @@
     frame('🔎 Поиск соперников',`<div class="ar-queue-screen">
       <div class="ar-radar">⚔️</div><h2>${mode==='1v1'?'1 × 1':mode==='3v3'?'3 × 3':'CHAOS'}</h2>
       <p id="arQueueText">Ищем соперника… ${queueLeft}с</p><div class="ar-bar"><i id="arBar"></i></div>
-      <div class="ar-queue-info">🟢 Ищем подходящего соперника</div>
-      <div class="ar-queue-info">${mode==='chaos'?'🔥 В этом режиме соперники отключены':'⚔️ Подбираем соперника по уровню и рейтингу'}</div>
+      <div class="ar-queue-info">🟢 Подбираем соперника</div>
+      <div class="ar-queue-info">${mode==='chaos'?'🔥 В этом режиме соперники отключены':'⚔️ Подбор по уровню и рейтингу'}</div>
       <button class="ar-secondary" id="arCancel">Отмена</button>
     </div>`);
     let elapsed=0;clearInterval(queueTimer);
@@ -255,7 +269,7 @@
   }
   function renderBattle(){
     if(!battle)return;
-    const me=battle.teams[0][0],enemy=alive(battle.teams[1])[0];
+    const me=alive(battle.teams[0])[0],enemy=alive(battle.teams[1])[0];
     frame(`⚔️ ${battle.mode.toUpperCase()}`,`
       <div class="ar-battle-top"><span>Бой #${String(battle.id).slice(-6)}</span><span>Раунд ${battle.round}</span><span>Ход ${seq}</span></div>
       <div class="ar-teams"><div><h4>🟦 ТВОЯ КОМАНДА</h4>${battle.teams[0].map(unitCard).join('')}</div><div><h4>🟥 СОПЕРНИК</h4>${battle.teams[1].map(unitCard).join('')}</div></div>
@@ -274,8 +288,8 @@
     if(!battle||battle.locked)return;
     if(!battle.attack||battle.def.length!==2){arenaToast('🎯 Выбери атаку и 2 зоны защиты');return}
     battle.locked=true;action++;seq++;battle.lastAction=action;
-    const me=battle.teams[0][0],target=alive(battle.teams[1])[0];
-    if(!target){finish(true);return}
+    const me=alive(battle.teams[0])[0],target=alive(battle.teams[1])[0];
+    if(!me||!target){finish(!!me);return}
     const m=stats(me),plan=ai(target);
     let msg='';
     if(plan.def.includes(battle.attack))msg=`🛡️ ${target.name} заблокировал «${label(battle.attack)}»`;
@@ -288,19 +302,40 @@
     }
     battle.log.push(msg);
     if(!alive(battle.teams[1]).length){renderBattle();setTimeout(()=>finish(true),300);return}
+
+    // In 3×3 the two teammates make their own automatic attacks before the enemy team responds.
+    if(battle.mode==='3v3'){
+      const allies=alive(battle.teams[0]).slice(1);
+      for(const ally of allies){
+        const enemy=alive(battle.teams[1])[0];
+        if(!enemy)break;
+        const st=stats(ally), plan2=ai(enemy);
+        if(plan2.def.includes('chest')) battle.log.push(`🛡️ ${enemy.name} выдержал атаку ${ally.name}`);
+        else {const dmg=Math.max(2,Math.round(st.atk-stats(enemy).def*.35));enemy.hp=Math.max(0,enemy.hp-dmg);battle.log.push(`⚔️ ${ally.name} → ${enemy.name}: −${dmg} HP`)}
+      }
+      if(!alive(battle.teams[1]).length){renderBattle();setTimeout(()=>finish(true),300);return}
+    }
     renderBattle();setTimeout(enemyTurn,650);
   }
   function enemyTurn(){
     if(!battle)return;
-    const me=battle.teams[0][0],enemy=alive(battle.teams[1])[0];
-    if(!me||!enemy){finish(!me);return}
-    const p=ai(enemy),m=stats(enemy);
-    let msg='';
-    if(battle.def.includes(p.attack))msg=`🛡️ ${me.name} заблокировал атаку «${label(p.attack)}»`;
-    else if(Math.random()<stats(me).dodge*.5)msg=`💨 ${me.name} увернулся`;
-    else{let dmg=Math.max(2,Math.round(m.atk-stats(me).def*.45));if(Math.random()<m.crit)dmg=Math.round(dmg*1.45);me.hp=Math.max(0,me.hp-dmg);msg=`☠️ ${enemy.name} → ${me.name}: −${dmg} HP`}
-    battle.log.push(msg);battle.round++;battle.attack=null;battle.def=[];battle.locked=false;
-    if(me.hp<=0){finish(false);return}renderBattle();
+    const target=alive(battle.teams[0])[0];
+    const enemies=alive(battle.teams[1]);
+    if(!target||!enemies.length){finish(!!target);return}
+    for(const enemy of enemies){
+      const me=alive(battle.teams[0])[0];
+      if(!me)break;
+      const p=ai(enemy),m=stats(enemy);
+      let msg='';
+      if(battle.def.includes(p.attack))msg=`🛡️ ${me.name} заблокировал атаку «${label(p.attack)}»`;
+      else if(Math.random()<stats(me).dodge*.5)msg=`💨 ${me.name} увернулся от ${enemy.name}`;
+      else{let dmg=Math.max(2,Math.round(m.atk-stats(me).def*.45));if(Math.random()<m.crit)dmg=Math.round(dmg*1.45);me.hp=Math.max(0,me.hp-dmg);msg=`☠️ ${enemy.name} → ${me.name}: −${dmg} HP`}
+      battle.log.push(msg);
+      if(me.hp<=0)break;
+    }
+    battle.round++;battle.attack=null;battle.def=[];battle.locked=false;
+    if(!alive(battle.teams[0]).length){finish(false);return}
+    renderBattle();
   }
   function label(x){return ZONES.find(z=>z[0]===x)?.[1]||x}
   function finish(win){
@@ -318,21 +353,29 @@
     battle=null;
   }
 
+  function openArenaNow(){
+    document.querySelectorAll('.tr10-panel').forEach(p=>p.remove());
+    home();
+    // Some Telegram WebView event paths create the legacy panel after the tap.
+    // Kill it again on the next turns of the event loop.
+    [0,30,100,250].forEach(ms=>setTimeout(()=>{
+      document.querySelectorAll('.tr10-panel').forEach(p=>p.remove());
+      home();
+    },ms));
+  }
+
   function killArenaIntermediate(){
     const scan=()=>{
       document.querySelectorAll('.tr10-panel').forEach(p=>{
         const text=(p.textContent||'').toLowerCase();
-        if(text.includes('арена') && text.includes('открыть арену')){
-          p.remove();
-          setTimeout(()=>home(),0);
-        }
+        if(text.includes('арена') && text.includes('открыть арену'))p.remove();
       });
     };
     scan();
     if(window.MutationObserver){
       const mo=new MutationObserver(scan);
       mo.observe(document.body,{childList:true,subtree:true});
-      setTimeout(()=>mo.disconnect(),15000);
+      window._arenaPanelGuard=mo;
     }
   }
 
@@ -351,7 +394,7 @@
       const isBottomArena=screen&&screen.dataset.screen==='arena';
       if(!isArena&&!isBottomArena)return;
       e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
-      home();
+      openArenaNow();
     };
     document.addEventListener('click',direct,true);
     document.addEventListener('pointerdown',direct,true);
