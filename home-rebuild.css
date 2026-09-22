@@ -170,3 +170,10 @@ body:has(.tr10-main-menu) .bottom-nav{display:none!important;pointer-events:none
 #tr10-main-menu .tr10-menu-btn.is-battle{background:transparent!important;box-shadow:none!important;transform:none!important}
 
 #tr10-main-menu{background-image:url("home-main-menu.png?v=UNIFIED15")!important;background-size:100% 100%!important;}
+
+/* UNIFIED 16: menu image is the menu only (Android system bar removed).
+   Hit areas sit directly over the visible seven buttons. */
+.home-bottom-zones{height:13%!important;bottom:0!important;z-index:2147483001!important;pointer-events:auto!important;}
+.home-bottom-zones .home-bottom-hz{z-index:2!important;}
+#tr10-main-menu{height:clamp(82px,10.8vh,118px)!important;min-height:82px!important;z-index:2147483000!important;pointer-events:auto!important;background-image:url("home-main-menu.png?v=UNIFIED16")!important;background-size:100% 100%!important;}
+#tr10-main-menu .tr10-menu-btn{position:relative!important;z-index:2147483002!important;display:block!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;}

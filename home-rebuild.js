@@ -198,7 +198,11 @@
     layer.addEventListener("click",handle,true);bottom.addEventListener("click",handle,true);
     let last=0;
     const touch=e=>{const b=e.target.closest(".hz");if(!b)return;const n=Date.now();if(n-last<450)return;last=n;e.preventDefault();e.stopPropagation();action(b.dataset.hz)};
-    layer.addEventListener("touchend",touch,{capture:true,passive:false});bottom.addEventListener("touchend",touch,{capture:true,passive:false});
+    layer.addEventListener("touchstart",touch,{capture:true,passive:false});
+    bottom.addEventListener("touchstart",touch,{capture:true,passive:false});
+    layer.addEventListener("touchend",touch,{capture:true,passive:false});
+    bottom.addEventListener("touchend",touch,{capture:true,passive:false});
+    bottom.addEventListener("pointerdown",e=>{const b=e.target.closest(".hz");if(!b)return;e.preventDefault();e.stopPropagation();action(b.dataset.hz)},{capture:true});
     hideLegacy();
     if(window.Telegram?.WebApp){try{Telegram.WebApp.expand();Telegram.WebApp.setHeaderColor("#07111b");Telegram.WebApp.setBackgroundColor("#07111b")}catch(_){}}
   }
@@ -229,7 +233,9 @@
 
     nav.querySelectorAll(".tr10-menu-btn").forEach(b=>{
       b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();run(b)},false);
+      b.addEventListener("touchstart",e=>{e.preventDefault();e.stopPropagation();run(b)}, {passive:false});
       b.addEventListener("touchend",e=>{e.preventDefault();e.stopPropagation();run(b)}, {passive:false});
+      b.addEventListener("pointerdown",e=>{e.preventDefault();e.stopPropagation();if(e.pointerType!=="mouse")run(b)},false);
       b.addEventListener("pointerup",e=>{if(e.pointerType!=="touch"){e.preventDefault();e.stopPropagation();run(b)}},false);
     });
     return nav;
