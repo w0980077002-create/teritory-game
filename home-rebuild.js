@@ -194,17 +194,72 @@
     const layer=$(".home-hitzones",home), bottom=$(".home-bottom-zones",home);
     Z.forEach((z,i)=>addZone(layer,z,i));
     BOTTOM.forEach((z,i)=>addZone(bottom,z,42+i,"home-bottom-hz"));
-    const handle=e=>{const b=e.target.closest(".hz");if(!b)return;e.preventDefault();e.stopPropagation();action(b.dataset.hz)};
-    layer.addEventListener("click",handle,true);bottom.addEventListener("click",handle,true);
+
+    // HOME controls: keep the artwork untouched and put transparent hit zones
+    // directly on top. The document-level fallback below is intentional: some
+    // Telegram Android WebViews can ignore pointer events on transparent
+    // children when an older overlay/stacking context is present.
+    const fire=(name,e)=>{
+      if(!name)return false;
+      e.preventDefault();
+      e.stopPropagation();
+      action(name);
+      return true;
+    };
+    const handle=e=>{const b=e.target.closest?.(".hz");if(!b)return;fire(b.dataset.hz,e)};
+    layer.addEventListener("click",handle,true);
+    bottom.addEventListener("click",handle,true);
+
     let last=0;
-    const touch=e=>{const b=e.target.closest(".hz");if(!b)return;const n=Date.now();if(n-last<450)return;last=n;e.preventDefault();e.stopPropagation();action(b.dataset.hz)};
+    const touch=e=>{
+      const b=e.target.closest?.(".hz");
+      if(!b)return;
+      const now=Date.now();
+      if(now-last<450)return;
+      last=now;
+      fire(b.dataset.hz,e);
+    };
     layer.addEventListener("touchstart",touch,{capture:true,passive:false});
     bottom.addEventListener("touchstart",touch,{capture:true,passive:false});
-    layer.addEventListener("touchend",touch,{capture:true,passive:false});
-    bottom.addEventListener("touchend",touch,{capture:true,passive:false});
-    bottom.addEventListener("pointerdown",e=>{const b=e.target.closest(".hz");if(!b)return;e.preventDefault();e.stopPropagation();action(b.dataset.hz)},{capture:true});
+
+    // Hard fallback for the bottom 42-48 buttons. It does not depend on the
+    // transparent button being the browser's event target.
+    const bottomHit=(clientX,clientY)=>{
+      if(!home.classList.contains("active"))return null;
+      const rect=home.getBoundingClientRect();
+      if(!rect.width||!rect.height)return null;
+      const x=(clientX-rect.left)/rect.width*100;
+      const y=(clientY-rect.top)/rect.height*100;
+      if(x<0||x>100||y<89.5||y>100)return null;
+      for(const z of BOTTOM){
+        if(x>=z[1]&&x<=z[1]+z[3]&&y>=z[2]&&y<=z[2]+z[4])return z[0];
+      }
+      return null;
+    };
+    const globalPointer=e=>{
+      if(e.__teritoryBottomHandled)return;
+      const name=bottomHit(e.clientX,e.clientY);
+      if(!name)return;
+      e.__teritoryBottomHandled=true;
+      fire(name,e);
+    };
+    const globalTouch=e=>{
+      if(e.__teritoryBottomHandled)return;
+      const t=e.changedTouches?.[0];
+      if(!t)return;
+      const name=bottomHit(t.clientX,t.clientY);
+      if(!name)return;
+      e.__teritoryBottomHandled=true;
+      const now=Date.now();
+      if(now-last<450)return;
+      last=now;
+      fire(name,e);
+    };
+    document.addEventListener("pointerup",globalPointer,true);
+    document.addEventListener("touchend",globalTouch,{capture:true,passive:false});
+
     hideLegacy();
-    if(window.Telegram?.WebApp){try{Telegram.WebApp.expand();Telegram.WebApp.setHeaderColor("#07111b");Telegram.WebApp.setBackgroundColor("#07111b")}catch(_){}}
+    if(window.Telegram?.WebApp){try{Telegram.WebApp.expand();Telegram.WebApp.setHeaderColor("#07111b");Telegram.WebApp.setBackgroundColor("#07111b")}catch(_) {}}
   }
 
 
@@ -237,7 +292,6 @@
       set("hl-gems",String(n(s.gems)));
       set("hl-redgems",String(n(s.redGems)));
       set("hl-energy-top",`${n(s.energy)}/200`);
-      set("hl-level-bottom","Lv. "+n(s.level,1));
       set("hl-hp",`${n(s.hp)}/${n(s.maxHp)}`);
       set("hl-energy-bottom",`${n(s.energy)}/200`);
     };

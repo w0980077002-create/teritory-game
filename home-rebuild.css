@@ -5,8 +5,8 @@ body:has(#home.home-reference-active) main{position:absolute!important;inset:0!i
 body:has(#home.home-reference-active) #home{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#07111b!important}
 .home-reference-host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;background:#07111b!important}
 .home-reference-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:fill!important;display:block!important;z-index:1!important;user-select:none!important;-webkit-user-drag:none!important}
-.home-hitzones{position:absolute!important;inset:0!important;z-index:80!important;pointer-events:none!important;touch-action:manipulation!important}
-.home-bottom-zones{position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:10%!important;z-index:90!important;pointer-events:none!important;touch-action:manipulation!important}
+.home-hitzones{position:absolute!important;inset:0!important;z-index:80!important;pointer-events:auto!important;touch-action:manipulation!important}
+.home-bottom-zones{position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:10%!important;z-index:9999!important;pointer-events:auto!important;touch-action:manipulation!important}
 .hz{position:absolute!important;display:block!important;box-sizing:border-box!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;opacity:0!important;pointer-events:auto!important;border-radius:8px!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;appearance:none!important}
 .hz:focus,.hz:active{outline:none!important;background:transparent!important}
 body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active) .bottom-nav,body:has(#home.home-reference-active) .live-side-ui,body:has(#home.home-reference-active) .live-city-title,body:has(#home.home-reference-active) .live-city-time,body:has(#home.home-reference-active) .home-v2-scene,body:has(#home.home-reference-active) .g141-photo-controls,body:has(#home.home-reference-active) .home-v2-scene-image,body:has(#home.home-reference-active) .real-home-image,body:has(#home.home-reference-active) .scene-hotspots,body:has(#home.home-reference-active) .home-v2-scene-overlay{display:none!important;pointer-events:none!important;visibility:hidden!important}
@@ -68,10 +68,6 @@ body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active)
 #homeLiveHud .hl-energy-top{
  left:42.6%!important;top:6.0%!important;width:11.0%!important;height:3.1%!important;
  background:#0b7b28!important;
-}
-#homeLiveHud .hl-level-bottom{
- left:65.0%!important;top:65.9%!important;width:11.5%!important;height:3.0%!important;
- background:#111d29!important;
 }
 #homeLiveHud .hl-hp{
  left:3.8%!important;top:74.0%!important;width:13.0%!important;height:3.0%!important;
