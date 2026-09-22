@@ -55,7 +55,7 @@
   function makePlayer(){
     const s=state(), level=Number(s.level||1);
     return {
-      id:'player',name:s.name||'SSS',flag:'🇺🇦',level,
+      id:'player',name:s.name||'SSS',level,
       class:'duelist',rating:data.rating,player:true,
       hp:120+level*3,maxHp:120+level*3,wins:data.wins,losses:data.losses
     };
@@ -64,7 +64,7 @@
     const n=NAMES[i%NAMES.length], keys=Object.keys(CLASSES), k=keys[i%keys.length];
     const level=3+(i*7%23);
     return {
-      id:'op-'+i,name:n[0],flag:n[1],level,class:k,
+      id:'op-'+i,name:n[0],level,class:k,
       style:STYLES[i%STYLES.length],rating:760+(i*97%790),
       wins:12+(i*17%180),losses:3+(i*9%90),online:true,
       hp:CLASSES[k].hp+level*4,maxHp:CLASSES[k].hp+level*4
@@ -102,14 +102,14 @@
   function playerMini(){
     const p=makePlayer(),r=rank(data.rating);
     return `<div class="ar-player">
-      <div class="ar-avatar">⚔️</div><div class="ar-player-main"><b>${esc(p.flag)} ${esc(p.name)}</b><span>ур. ${p.level} · ${r[1]} ${r[0]}</span></div>
+      <div class="ar-avatar">⚔️</div><div class="ar-player-main"><b>${esc(p.name)}</b><span>ур. ${p.level} · ${r[1]} ${r[0]}</span></div>
       <strong>${data.rating}</strong>
     </div>`;
   }
   function opponentCard(o,click){
     const c=CLASSES[o.class],r=rank(o.rating);
     return `<button class="ar-op" ${click?`data-op="${o.id}"`:''}>
-      <span class="ar-op-icon">${c.icon}</span><span class="ar-op-main"><b>${esc(o.flag)} ${esc(o.name)}</b>
+      <span class="ar-op-icon">${c.icon}</span><span class="ar-op-main"><b>${esc(o.name)}</b>
       <small>ур. ${o.level} · ${c.name} · ${r[1]} ${r[0]}</small><em>🏆 ${o.wins} · 💀 ${o.losses} · ${o.style}</em></span>
       <strong>${o.rating}</strong>
     </button>`;
@@ -157,7 +157,7 @@
     const p=makePlayer();
     const rows=[p,...opponents].sort((a,b)=>b.rating-a.rating).slice(0,15);
     frame('🏆 Рейтинг',`<div class="ar-back" data-back>← Арена</div><div class="ar-section"><h3>Сезон ${data.season}</h3>${rows.map((x,i)=>`
-      <div class="ar-rank"><b>${i+1}</b><span>${x.player?'🧔':CLASSES[x.class].icon}</span><div><strong>${esc(x.name)}</strong><small>${esc(x.flag)} · ур. ${x.level} · ${CLASSES[x.class].name}</small></div><em>${x.rating}</em></div>`).join('')}</div>`);
+      <div class="ar-rank"><b>${i+1}</b><span>${x.player?'🧔':CLASSES[x.class].icon}</span><div><strong>${esc(x.name)}</strong><small>ур. ${x.level} · ${CLASSES[x.class].name}</small></div><em>${x.rating}</em></div>`).join('')}</div>`);
     $('[data-back]').onclick=home;
   }
   function history(){
@@ -168,7 +168,7 @@
   function profile(){
     const p=makePlayer(),r=rank(data.rating);
     frame('👤 Профиль бойца',`<div class="ar-back" data-back>← Арена</div>
-      <div class="ar-profile"><div class="ar-big-avatar">⚔️</div><h2>${esc(p.name)}</h2><p>${p.flag} · уровень ${p.level} · ${r[1]} ${r[0]}</p><strong>${data.rating}</strong></div>
+      <div class="ar-profile"><div class="ar-big-avatar">⚔️</div><h2>${esc(p.name)}</h2><p>уровень ${p.level} · ${r[1]} ${r[0]}</p><strong>${data.rating}</strong></div>
       <div class="ar-stat-list"><div>Победы <b>${data.wins}</b></div><div>Поражения <b>${data.losses}</b></div><div>Лучшая серия <b>${data.best}</b></div><div>Боев всего <b>${data.wins+data.losses}</b></div></div>`);
     $('[data-back]').onclick=home;
   }
@@ -219,7 +219,7 @@
     return {teams:[[makePlayer(),unit(pool[0]),unit(pool[1])],[unit(pool[2]),unit(pool[3]),unit(pool[4])]]};
   }
   function buildLive(){
-    const fake={id:'live-search',name:'Игрок из очереди',flag:'🌐',level:Math.max(1,Number(state().level||1)),class:'duelist',rating:data.rating+8,wins:20,losses:11,style:'Баланс'};
+    const fake={id:'live-search',name:'Игрок из очереди',level:Math.max(1,Number(state().level||1)),class:'duelist',rating:data.rating+8,wins:20,losses:11,style:'Баланс'};
     return {teams:[[makePlayer()],[unit(fake)]]};
   }
   function unit(o){
@@ -248,7 +248,7 @@
   }
   function unitCard(u){
     const c=CLASSES[u.class]||CLASSES.duelist;
-    return `<div class="ar-unit ${u.hp<=0?'dead':''}"><span>${c.icon}</span><div><b>${esc(u.flag)} ${esc(u.name)}</b><small>ур. ${u.level} · ${c.name} · ⭐ ${u.rating||0}</small><div class="ar-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div></div><strong>${Math.max(0,Math.ceil(u.hp))}</strong></div>`
+    return `<div class="ar-unit ${u.hp<=0?'dead':''}"><span>${c.icon}</span><div><b>${esc(u.name)}</b><small>ур. ${u.level} · ${c.name} · ⭐ ${u.rating||0}</small><div class="ar-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div></div><strong>${Math.max(0,Math.ceil(u.hp))}</strong></div>`
   }
   function renderBattle(){
     if(!battle)return;
