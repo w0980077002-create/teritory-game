@@ -149,7 +149,7 @@
       case"consumable1":return consumable(0); case"consumable2":return consumable(1); case"consumable3":return consumable(2); case"consumable4":return consumable(3);
       case"lock1":return locked("Слот · уровень 90"); case"lock2":return locked("Слот · Арена"); case"lock3":return locked("Слот · позже");
       case"quest":return quests(); case"speed":return speed(); case"refresh":return combat(); case"crown":return combat(); case"star":return star();
-      case"home":return go("home");
+      case"home":return go("districts");
       case"inventory":return launch("Инвентарь","ГЕРОЙ","🎒","Предметы и экипировка","Открыть инвентарь",()=>go("inventory"));
       case"hero":return launch("Герой","ГЕРОЙ","🛡️","Характеристики и экипировка","Открыть героя",()=>go("inventory"));
       case"battle":return launch("Бой","БОЙ","⚔️","Арена и боевой экран","Открыть бой",()=>go("arena"));
@@ -212,9 +212,9 @@
     if(nav) return nav;
     nav=document.createElement("nav");
     nav.id="tr10-main-menu";
-    nav.className="tr10-main-menu";
+    nav.className="tr10-main-menu tr10-hit-only-menu";
     nav.setAttribute("aria-label","Главное меню");
-    nav.innerHTML=MAIN_MENU.map((x,i)=>`<button type="button" class="tr10-menu-btn ${i===3?"is-battle":""}" data-menu="${x[0]}" aria-label="${esc(x[2])}"><span class="tr10-menu-icon">${x[1]}</span><b>${esc(x[2])}</b></button>`).join("");
+    nav.innerHTML=MAIN_MENU.map((x,i)=>`<button type="button" class="tr10-menu-btn ${i===3?"is-battle":""}" data-menu="${x[0]}" aria-label="${esc(x[2])}"></button>`).join("");
     document.body.appendChild(nav);
 
     const run=(b)=>{
@@ -232,18 +232,19 @@
     };
 
     nav.querySelectorAll(".tr10-menu-btn").forEach(b=>{
-      b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();run(b)},false);
-      b.addEventListener("touchstart",e=>{e.preventDefault();e.stopPropagation();run(b)}, {passive:false});
-      b.addEventListener("touchend",e=>{e.preventDefault();e.stopPropagation();run(b)}, {passive:false});
-      b.addEventListener("pointerdown",e=>{e.preventDefault();e.stopPropagation();if(e.pointerType!=="mouse")run(b)},false);
-      b.addEventListener("pointerup",e=>{if(e.pointerType!=="touch"){e.preventDefault();e.stopPropagation();run(b)}},false);
+      const fire=e=>{e.preventDefault();e.stopPropagation();run(b)};
+      b.addEventListener("click",fire,false);
+      b.addEventListener("touchend",fire,{passive:false});
+      b.addEventListener("pointerup",e=>{if(e.pointerType!=="mouse")fire(e)},false);
     });
     return nav;
   }
   function syncPersistentMenu(){
     const nav=mountPersistentMenu();
     const home=$("#home");
-    const hideOnHome=!!(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel")); nav.classList.toggle("on-home",hideOnHome); nav.style.display=hideOnHome?"none":"grid";
+    const hideOnHome=!!(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel"));
+    nav.classList.toggle("on-home",hideOnHome);
+    nav.style.display=hideOnHome?"none":"grid";
   }
 
   function boot(){mount();hideLegacy();mountPersistentMenu();syncPersistentMenu();
