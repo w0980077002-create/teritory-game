@@ -1,5 +1,5 @@
-/* Territory v141 — unified player state + Stage 3 hero profile */
-const TERRITORY_STATE_VERSION=3;
+/* Territory v142 — canonical player state foundation + Stage 3 hero profile */
+const TERRITORY_STATE_VERSION=4;
 const defaultState={
   schemaVersion:TERRITORY_STATE_VERSION,
   profile:{displayName:"",telegramId:"",username:"",firstName:"",lastName:"",photoUrl:"",languageCode:"",platform:"unknown",premium:false},
@@ -7,7 +7,7 @@ const defaultState={
   level:1,exp:0,expToNext:100,
   hp:120,maxHp:120,energy:100,maxEnergy:200,enemyHp:100,
   strength:5,agility:5,defense:0,endurance:12,weaponMastery:1,freePoints:0,
-  weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],equipment:[],consumables:[],
+  weapon:"Кулаки",bonusDamage:0,ownedWeapons:["Кулаки"],inventory:[],equipment:[{slot:"weapon",name:"Кулаки",icon:"✊",damage:0}],consumables:[],
   quests:{alex:0,cityRep:0,merchantRep:0},alexQuest:0,cityRep:0,merchantRep:0,
   arena:{rating:1000,wins:0,losses:0,battles:0,history:[]},
   gameDice:47,gameRolls:0,gameSteps:0,gameEventVersion:1,gameTaskProgress:0,
@@ -27,7 +27,26 @@ function normalizeTerritoryState(raw){
   s.enemyHp=n(s.enemyHp,100); s.strength=Math.max(1,Math.floor(n(s.strength,5,1))); s.agility=Math.max(1,Math.floor(n(s.agility,5,1))); s.defense=n(s.defense,0);
   s.endurance=Math.max(1,Math.floor(n(s.endurance,12,1))); s.weaponMastery=Math.max(1,Math.floor(n(s.weaponMastery,1,1))); s.freePoints=n(s.freePoints,0);
   s.bonusDamage=n(s.bonusDamage,0); s.weapon=String(s.weapon||"Кулаки");
-  s.inventory=Array.isArray(s.inventory)?s.inventory:[]; s.equipment=Array.isArray(s.equipment)?s.equipment:[]; s.consumables=Array.isArray(s.consumables)?s.consumables:[];
+  const weaponCatalog={"Кулаки":{icon:"✊",damage:0},"Боевой топор":{icon:"🪓",damage:12},"Стальной меч":{icon:"⚔️",damage:18},"Молот":{icon:"🔨",damage:25},"Арбалет":{icon:"🏹",damage:31}};
+  if(!weaponCatalog[s.weapon])s.weapon="Кулаки";
+  s.ownedWeapons=Array.isArray(s.ownedWeapons)?s.ownedWeapons:[];
+  const legacyWeaponNames={"🪓":"Боевой топор","⚔️":"Стальной меч","🔨":"Молот","🏹":"Арбалет","✊":"Кулаки"};
+  const owned=[];
+  const addWeapon=n=>{n=String(n||"").trim();if(weaponCatalog[n]&&!owned.includes(n))owned.push(n)};
+  s.ownedWeapons.forEach(addWeapon);
+  const rawInventory=Array.isArray(s.inventory)?s.inventory:[];
+  const cleanInventory=[];
+  rawInventory.forEach(item=>{
+    const legacy=typeof item==="object"?item.name:legacyWeaponNames[String(item)];
+    if(legacy&&weaponCatalog[legacy])addWeapon(legacy); else cleanInventory.push(item);
+  });
+  addWeapon(s.weapon); if(!owned.includes("Кулаки"))owned.unshift("Кулаки");
+  s.ownedWeapons=owned; s.inventory=cleanInventory;
+  s.bonusDamage=weaponCatalog[s.weapon].damage;
+  s.equipment=Array.isArray(s.equipment)?s.equipment.filter(x=>x&&typeof x==="object"):[];
+  s.equipment=s.equipment.filter(x=>x.slot!=="weapon");
+  s.equipment.unshift({slot:"weapon",name:s.weapon,icon:weaponCatalog[s.weapon].icon,damage:weaponCatalog[s.weapon].damage});
+  s.consumables=Array.isArray(s.consumables)?s.consumables:[];
   s.quests={...defaultState.quests,...(s.quests&&typeof s.quests==="object"?s.quests:{})};
   s.alexQuest=n(s.alexQuest??s.quests.alex,0); s.cityRep=n(s.cityRep??s.quests.cityRep,0); s.merchantRep=n(s.merchantRep??s.quests.merchantRep,0);
   s.quests.alex=s.alexQuest; s.quests.cityRep=s.cityRep; s.quests.merchantRep=s.merchantRep;
@@ -37,8 +56,7 @@ function normalizeTerritoryState(raw){
   for(const k of ["gameMilestones","gameTaskClaims","gamePanelClaims","gameJackpotClaims"]){s[k]=Array.isArray(s[k])?[...new Set(s[k])]:[];}
   s.gameGiftDate=String(s.gameGiftDate||""); s.gameEndsAt=Math.floor(n(s.gameEndsAt,0)); s.gameSaveVersion=2;
   const cells=27; s.gameLap=Math.max(0,Math.floor(s.gameSteps/cells)); s.gamePos=((s.gameSteps%cells)+cells)%cells;
-  if(!s.name && s.profile.displayName)s.name=s.profile.displayName;
-  s.name=String(s.name||"SSS");
+  s.name=String(s.profile.displayName||s.name||"Игрок");
   s.telegramUserId=String(s.telegramUserId||s.profile.telegramId||""); s.telegramUsername=String(s.telegramUsername||s.profile.username||"");
   s.telegramFirstName=String(s.telegramFirstName||s.profile.firstName||""); s.telegramLastName=String(s.telegramLastName||s.profile.lastName||"");
   s.telegramPhotoUrl=String(s.telegramPhotoUrl||s.profile.photoUrl||""); s.telegramLanguageCode=String(s.telegramLanguageCode||s.profile.languageCode||"");
@@ -67,12 +85,17 @@ window.TerritoryStore={
     try{window.dispatchEvent(new CustomEvent("territory:stateChanged",{detail:{reason}}));}catch(_){}
     return state;
   },
-  patch(patch={}){state=normalizeTerritoryState({...state,...patch});return this.saveNow("patch");},
+  patch(patch={}){
+    const next={...state,...patch};
+    if(patch.profile&&typeof patch.profile==="object")next.profile={...state.profile,...patch.profile};
+    if(patch.arena&&typeof patch.arena==="object")next.arena={...state.arena,...patch.arena};
+    state=normalizeTerritoryState(next);return this.saveNow("patch");
+  },
   save(){return this.saveNow("legacy-save");},
   render(){if(typeof window.render==="function")window.render();}
 };
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
-state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.name||"SSS");
+state.energy=Math.max(0,Math.min(state.maxEnergy||200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.profile?.displayName||state.name||"Игрок");
 state.gameDice=Math.max(0,Number(state.gameDice??47)||0); state.gameRolls=Math.max(0,Number(state.gameRolls??0)||0); state.gameSteps=Math.max(0,Number(state.gameSteps??0)||0); state.gameEventVersion=Number(state.gameEventVersion??1)||1; state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0); state.gameMilestones=Array.isArray(state.gameMilestones)?[...new Set(state.gameMilestones.map(Number).filter(Number.isFinite))]:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?[...new Set(state.gameTaskClaims.map(String))]:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?[...new Set(state.gamePanelClaims.map(String))]:[]; state.gameJackpotClaims=Array.isArray(state.gameJackpotClaims)?[...new Set(state.gameJackpotClaims.map(Number).filter(Number.isFinite))]:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS; state.gameSaveVersion=2;
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
@@ -136,23 +159,25 @@ function renderShop(){
 
 $("#shopGrid").addEventListener("click",e=>{
  const b=e.target.closest("[data-buy]"); if(!b)return;
- const w=weapons.find(x=>x.name===b.dataset.buy); const cost=Number(b.dataset.cost||w.cost);
+ const w=weapons.find(x=>x.name===b.dataset.buy); if(!w)return; const cost=Number(b.dataset.cost||w.cost);
+ if(Array.isArray(state.ownedWeapons)&&state.ownedWeapons.includes(w.name)){const l=$("#merchantLog");if(l)l.textContent=`Торговец: «${w.name} уже у тебя.»`;return;}
  if(state.coins<cost){const l=$("#merchantLog");if(l)l.textContent="Торговец: «Не хватает монет.»";return;}
- state.coins-=cost;state.weapon=w.name;state.bonusDamage=w.damage;state.inventory.push(w.icon);state.merchantRep+=1;
+ state.coins-=cost; state.ownedWeapons=Array.isArray(state.ownedWeapons)?state.ownedWeapons:["Кулаки"]; state.ownedWeapons.push(w.name); state.weapon=w.name;state.bonusDamage=w.damage;state.equipment=[{slot:"weapon",name:w.name,icon:w.icon,damage:w.damage}];state.merchantRep+=1;
  const l=$("#merchantLog");if(l)l.textContent=`Торговец: «Хорошая покупка. ${w.name} теперь твой.» +1 репутация`;
  save();
 });
 const sellBtn=$("#sellItemBtn");
 if(sellBtn)sellBtn.onclick=()=>{
  if(!state.inventory.length){$("#merchantLog").textContent='Торговец: «У тебя пока нечего продавать.»';return;}
- const icon=state.inventory.pop(); const price=40+Math.floor(Math.random()*41)+(state.merchantRep>=5?15:0);
+ const item=state.inventory.pop(); const icon=typeof item==="object"?String(item.icon||item.name||"📦"):String(item); const price=40+Math.floor(Math.random()*41)+(state.merchantRep>=5?15:0);
  state.coins+=price;state.merchantRep+=1;
  $("#merchantLog").textContent=`Торговец купил предмет ${icon}: +${price} 🪙 · +1 репутация`;
  save();
 };
 
 function renderInventory(){
- $("#inventoryGrid").innerHTML=state.inventory.map((x,i)=>`<div class="item"><div class="pic">${x}</div><b>Предмет ${i+1}</b><span>Экипировка</span></div>`).join("");
+ const grid=$("#inventoryGrid"); if(!grid)return;
+ grid.innerHTML=state.inventory.map((x,i)=>{const icon=typeof x==="object"?String(x.icon||"📦"):String(x);const name=typeof x==="object"?String(x.name||`Предмет ${i+1}`):`Предмет ${i+1}`;return `<div class="item"><div class="pic">${icon}</div><b>${name}</b><span>Предмет</span></div>`}).join("");
 }
 
 /* Territory Stage 3 — unified hero/combat profile.
@@ -177,7 +202,6 @@ function renderInventory(){
       if(n && heroWeapons.some(w=>w.name===n) && !names.includes(n)) names.push(n);
     };
     raw.forEach(x=>add(typeof x==="object"?x.name:x));
-    (state.inventory||[]).forEach(x=>add(typeof x==="object"?x.name:iconMap[String(x)]));
     add(state.weapon);
     if(!names.includes("Кулаки")) names.unshift("Кулаки");
     state.ownedWeapons=names;
