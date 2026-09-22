@@ -186,7 +186,7 @@
   function mount(){
     const home=$("#home");if(!home)return;
     home.classList.add("home-reference-active");
-    home.innerHTML=`<div class="home-reference-host" id="homeReferenceHost"><img class="home-reference-image" src="territory_reference_bg.png?v=UNIFIED10" alt="Teritory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones" aria-label="Нижнее меню 42-48"></div></div>`;
+    home.innerHTML=`<div class="home-reference-host" id="homeReferenceHost"><img class="home-reference-image" src="territory_reference_bg.png?v=PROFILE02" alt="Teritory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones" aria-label="Нижнее меню 42-48"></div></div>`;
     const layer=$(".home-hitzones",home), bottom=$(".home-bottom-zones",home);
     Z.forEach((z,i)=>addZone(layer,z,i));
     BOTTOM.forEach((z,i)=>addZone(bottom,z,42+i,"home-bottom-hz"));
@@ -274,6 +274,23 @@
       script.onerror=reject;
       document.head.appendChild(script);
     });
+    const parseInitUser=tg=>{
+      try{
+        const raw=String(tg?.initData||"");
+        const match=raw.match(/(?:^|&)user=([^&]+)/);
+        if(!match)return null;
+        const parsed=JSON.parse(decodeURIComponent(match[1]));
+        return parsed&&parsed.id?parsed:null;
+      }catch(_){return null}
+    };
+    const getUser=async tg=>{
+      for(let i=0;i<8;i++){
+        const u=tg?.initDataUnsafe?.user||parseInitUser(tg);
+        if(u?.id)return u;
+        await new Promise(r=>setTimeout(r,250));
+      }
+      return null;
+    };
     try{
       const tg=await loadTelegram();
       if(!tg)return;
@@ -283,8 +300,12 @@
         tg.setHeaderColor("#07111b");
         tg.setBackgroundColor("#07111b");
       }catch(_){}
-      const u=tg.initDataUnsafe?.user;
-      if(!u?.id)return;
+
+      const u=await getUser(tg);
+      if(!u?.id){
+        console.warn("Telegram user data is unavailable; profile was not overwritten.");
+        return;
+      }
 
       const id=String(u.id);
       const key=`territory_profile_v1_${id}`;
@@ -303,8 +324,7 @@
             Object.keys(current).forEach(k=>delete current[k]);
             Object.assign(current,saved);
           }
-        }else if(current.telegramUserId && String(current.telegramUserId)!==id){
-          Object.keys(current).forEach(k=>delete current[k]);
+        }else{
           Object.assign(current,defaults);
         }
       }catch(_){}
@@ -366,6 +386,52 @@
           el.style.backgroundPosition="center";
           el.style.backgroundRepeat="no-repeat";
         });
+      }
+
+      // Direct HOME overlay: this is intentionally independent of the
+      // legacy profile DOM/CSS, so the baked "S$$/SSS" cannot win the stack.
+      const host=document.getElementById("homeReferenceHost");
+      if(host){
+        let profile=host.querySelector("#telegramLiveProfile");
+        if(!profile){
+          profile=document.createElement("div");
+          profile.id="telegramLiveProfile";
+          profile.innerHTML='<div data-tg-photo></div><div data-tg-name></div><div data-tg-level></div>';
+          Object.assign(profile.style,{
+            position:"absolute",left:"1.4%",top:"0.55%",width:"25.5%",height:"7.0%",
+            zIndex:"120",pointerEvents:"none",fontFamily:"Arial,sans-serif",
+            color:"#fff",fontWeight:"900",textShadow:"0 1px 2px #000,0 0 3px #000",
+            display:"block"
+          });
+          const photo=profile.querySelector("[data-tg-photo]");
+          Object.assign(photo.style,{
+            position:"absolute",left:"0",top:"0",width:"25%",height:"100%",
+            borderRadius:"12%",background:"#172433 center/cover no-repeat",
+            boxShadow:"0 1px 4px rgba(0,0,0,.8)"
+          });
+          const name=profile.querySelector("[data-tg-name]");
+          Object.assign(name.style,{
+            position:"absolute",left:"29%",top:"9%",right:"0",height:"34%",
+            display:"flex",alignItems:"center",overflow:"hidden",whiteSpace:"nowrap",
+            fontSize:"clamp(10px,2.6vw,18px)"
+          });
+          const lvl=profile.querySelector("[data-tg-level]");
+          Object.assign(lvl.style,{
+            position:"absolute",left:"29%",top:"48%",right:"0",height:"27%",
+            display:"flex",alignItems:"center",overflow:"hidden",whiteSpace:"nowrap",
+            fontSize:"clamp(9px,2.1vw,15px)"
+          });
+          host.appendChild(profile);
+        }
+        const photo=profile.querySelector("[data-tg-photo]");
+        const name=profile.querySelector("[data-tg-name]");
+        const lvl=profile.querySelector("[data-tg-level]");
+        if(photo){
+          if(avatarUrl)photo.style.backgroundImage=`url("${avatarUrl.replace(/"/g,"%22")}")`;
+          else photo.style.backgroundImage="none";
+        }
+        if(name)name.textContent=display;
+        if(lvl)lvl.textContent=`Lv. ${Math.max(1,Number(current.level)||1)}`;
       }
 
       if(typeof window.TerritoryStore?.render==="function")window.TerritoryStore.render();
