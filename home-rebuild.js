@@ -575,7 +575,8 @@
         #homeRealHud .rhud-energy{background:#07151b!important;}
         /* Only erase the baked text part of the profile. The live Telegram
            layer sits above this patch and keeps the real photo/name visible. */
-        #telegramBakedProfileCleaner{position:absolute!important;left:13.2%!important;top:.7%!important;width:13.8%!important;height:6.7%!important;z-index:110!important;pointer-events:none!important;background:#111f2c!important;opacity:1!important;border-radius:3px!important;box-shadow:none!important;mix-blend-mode:normal!important;}
+        #telegramBakedProfileCleaner{position:absolute!important;left:13.2%!important;top:.7%!important;width:13.8%!important;height:6.7%!important;z-index:110!important;pointer-events:none!important;background:transparent!important;opacity:1!important;border-radius:3px!important;box-shadow:none!important;mix-blend-mode:normal!important;overflow:hidden!important;}
+        #telegramBakedProfileCleaner:before{content:""!important;position:absolute!important;left:0!important;top:0!important;width:724.64%!important;height:1492.54%!important;background-image:url("territory_reference_bg.png?v=PROFILE02")!important;background-repeat:no-repeat!important;background-size:100% 100%!important;background-position:left top!important;transform:translate(-95.65%,-10.45%)!important;pointer-events:none!important;}
         #telegramLiveProfile{z-index:120!important;}
       `;
       document.head.appendChild(style);
