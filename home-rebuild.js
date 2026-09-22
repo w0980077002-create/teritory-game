@@ -207,47 +207,47 @@
     if(window.Telegram?.WebApp){try{Telegram.WebApp.expand();Telegram.WebApp.setHeaderColor("#07111b");Telegram.WebApp.setBackgroundColor("#07111b")}catch(_){}}
   }
 
-  function mountPersistentMenu(){
-    let nav=document.getElementById("tr10-main-menu");
-    if(nav) return nav;
-    nav=document.createElement("nav");
-    nav.id="tr10-main-menu";
-    nav.className="tr10-main-menu";
-    nav.setAttribute("aria-label","Главное меню");
-    nav.innerHTML=MAIN_MENU.map((x,i)=>`<button type="button" class="tr10-menu-btn ${i===3?"is-battle":""}" data-menu="${x[0]}" aria-label="${esc(x[2])}"><span class="tr10-menu-icon">${x[1]}</span><b>${esc(x[2])}</b></button>`).join("");
-    document.body.appendChild(nav);
 
-    const run=(b)=>{
-      if(!b || b.dataset.busy==="1") return;
-      b.dataset.busy="1";
-      setTimeout(()=>{b.dataset.busy="0"},500);
-      const target=b.dataset.menu;
-      if(target==="home") return go("districts");
-      if(target==="inventory") return go("inventory");
-      if(target==="hero") return go("inventory");
-      if(target==="battle") return go("arena");
-      if(target==="bottomQuests") return quests();
-      if(target==="game") return go("game");
-      if(target==="clan") return clan();
+  function mountLiveHud(){
+    const home=$("#home"); if(!home) return;
+    const host=$(".home-reference-host",home); if(!host) return;
+
+    let hud=$("#homeLiveHud",home);
+    if(!hud){
+      hud=document.createElement("div");
+      hud.id="homeLiveHud";
+      hud.innerHTML=`
+        <div class="hl-mask hl-vip"><span class="hl-value"></span></div>
+        <div class="hl-mask hl-coins"><span class="hl-value"></span></div>
+        <div class="hl-mask hl-gems"><span class="hl-value"></span></div>
+        <div class="hl-mask hl-redgems"><span class="hl-value"></span></div>
+        <div class="hl-mask hl-energy"><span class="hl-value"></span></div>
+        <div class="hl-mask hl-level"><span class="hl-value"></span></div>
+        <div class="hl-mask hl-hp"><span class="hl-value"></span></div>
+        <div class="hl-mask hl-bottom-energy"><span class="hl-value"></span></div>`;
+      host.appendChild(hud);
+    }
+
+    const renderHud=()=>{
+      const s=store();
+      const val=(cls,text)=>{
+        const e=$(`.${cls} .hl-value`,hud); if(e)e.textContent=text;
+      };
+      val("hl-vip","VIP "+Math.max(0,Number(s.vipLevel||0)));
+      val("hl-coins",String(Math.max(0,Number(s.coins||0))));
+      val("hl-gems",String(Math.max(0,Number(s.gems||0))));
+      val("hl-redgems",String(Math.max(0,Number(s.redGems||0))));
+      val("hl-energy",`${Math.max(0,Number(s.energy||0))}/200`);
+      val("hl-level",String(Math.max(1,Number(s.level||1))));
+      val("hl-hp",`${Math.max(0,Number(s.hp||0))}/${Math.max(0,Number(s.maxHp||0))}`);
+      val("hl-bottom-energy",String(Math.max(0,Number(s.energy||0))));
     };
-
-    nav.querySelectorAll(".tr10-menu-btn").forEach(b=>{
-      b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();run(b)},false);
-      b.addEventListener("touchstart",e=>{e.preventDefault();e.stopPropagation();run(b)}, {passive:false});
-      b.addEventListener("touchend",e=>{e.preventDefault();e.stopPropagation();run(b)}, {passive:false});
-      b.addEventListener("pointerdown",e=>{e.preventDefault();e.stopPropagation();if(e.pointerType!=="mouse")run(b)},false);
-      b.addEventListener("pointerup",e=>{if(e.pointerType!=="touch"){e.preventDefault();e.stopPropagation();run(b)}},false);
-    });
-    return nav;
-  }
-  function syncPersistentMenu(){
-    const nav=mountPersistentMenu();
-    const home=$("#home");
-    const hideOnHome=!!(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel")); nav.classList.toggle("on-home",hideOnHome); nav.style.display=hideOnHome?"none":"grid";
+    renderHud();
+    clearInterval(window.__homeHudTimer);
+    window.__homeHudTimer=setInterval(renderHud,350);
   }
 
-  function boot(){mount();hideLegacy();mountPersistentMenu();syncPersistentMenu();
-    const mo=new MutationObserver(syncPersistentMenu); mo.observe(document.body,{subtree:true,attributes:true,attributeFilter:["class"]});
+  function boot(){mount();hideLegacy();mountLiveHud();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();

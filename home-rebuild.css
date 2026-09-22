@@ -33,170 +33,31 @@ body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active)
 .tr10-card button:disabled{opacity:.5!important}
 @media(max-width:390px){.tr10-card{width:96vw!important;max-height:88vh!important;padding:11px!important}.tr10-head h2{font-size:18px!important}}
 
-/* UNIFIED 11: persistent main menu on every non-HOME screen and popup. */
-.tr10-main-menu{
-  position:fixed!important;
-  left:0!important;
-  right:0!important;
-  bottom:0!important;
-  height:clamp(76px,10vh,112px)!important;
-  min-height:76px!important;
-  z-index:100001!important;
-  display:grid!important;
-  grid-template-columns:repeat(7,1fr)!important;
-  align-items:stretch!important;
-  box-sizing:border-box!important;
-  padding:0!important;
-  margin:0!important;
-  background:#07111b url("territory_reference_bg.png?v=UNIFIED14") center bottom / 100% 1000% no-repeat!important;
-  border-top:1px solid rgba(180,150,90,.45)!important;
-  box-shadow:0 -8px 25px rgba(0,0,0,.38)!important;
-}
-.tr10-main-menu.on-home{display:none!important}
-.tr10-menu-btn{
-  position:relative!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:1px!important;
-  min-width:0!important;
-  min-height:100%!important;
-  padding:3px 1px 2px!important;
-  margin:0!important;
-  border:0!important;
-  border-left:1px solid rgba(115,130,145,.22)!important;
-  border-right:1px solid rgba(0,0,0,.18)!important;
-  background:rgba(6,14,23,.30)!important;
-  color:#fff!important;
-  text-shadow:0 2px 3px #000!important;
-  touch-action:manipulation!important;
-  -webkit-tap-highlight-color:transparent!important;
-}
-.tr10-menu-icon{font-size:clamp(24px,7vw,48px)!important;line-height:1!important;filter:drop-shadow(0 2px 2px #000)!important}
-.tr10-menu-btn b{font:800 clamp(9px,2.7vw,16px)/1.05 Arial,sans-serif!important;white-space:nowrap!important}
-.tr10-menu-btn.is-battle{
-  transform:translateY(-5px)!important;
-  border-radius:18px 18px 10px 10px!important;
-  background:rgba(18,48,72,.65)!important;
-  box-shadow:0 0 0 2px rgba(155,184,215,.5) inset,0 -4px 14px rgba(0,0,0,.25)!important;
-}
-.tr10-main-menu + .tr10-panel{padding-bottom:clamp(86px,11vh,122px)!important}
-@media(max-width:390px){
-  .tr10-main-menu{height:78px!important;min-height:78px!important}
-  .tr10-menu-icon{font-size:27px!important}
-  .tr10-menu-btn b{font-size:9px!important}
-}
-body:has(.tr10-main-menu) .bottom-nav{display:none!important;pointer-events:none!important}
 
-.tr10-panel .tr10-card{margin-bottom:clamp(82px,10vh,116px)!important}
-
-/* UNIFIED 12: main menu is visible over every HOME popup and every other screen. */
-.tr10-main-menu{z-index:100002!important;visibility:visible!important;opacity:1!important}
-.tr10-panel{z-index:100000!important}
-.tr10-panel .tr10-card{margin-bottom:clamp(82px,10vh,116px)!important}
-
-/* UNIFIED 13: hard-enable the persistent 42-48 menu hit area. */
-#tr10-main-menu{
-  position:fixed!important;
-  left:0!important;
-  right:0!important;
-  bottom:0!important;
-  width:100%!important;
-  height:clamp(78px,10vh,112px)!important;
-  min-height:78px!important;
-  z-index:2147483000!important;
-  pointer-events:auto!important;
-  touch-action:manipulation!important;
-  user-select:none!important;
-  -webkit-user-select:none!important;
-  visibility:visible!important;
-  opacity:1!important;
+/* HOME REAL HUD v40 — live values only; canonical artwork and 42–48 hit zones remain unchanged. */
+#homeLiveHud{
+  position:absolute!important;inset:0!important;z-index:70!important;
+  pointer-events:none!important;font-family:Arial,sans-serif!important;
 }
-#tr10-main-menu .tr10-menu-btn{
-  pointer-events:auto!important;
-  touch-action:manipulation!important;
-  cursor:pointer!important;
-}
-#tr10-main-menu.on-home{display:none!important}
-.tr10-panel{z-index:100000!important;pointer-events:auto!important}
-
-/* UNIFIED 14: one bottom menu only. The reference artwork supplies the visuals;
-   HTML buttons are invisible hit zones, so no duplicate emoji/menu can appear. */
-#tr10-main-menu{
-  background-color:#07111b!important;
-  background-image:url("territory_reference_bg.png?v=UNIFIED14")!important;
-  background-repeat:no-repeat!important;
-  background-position:center bottom!important;
-  background-size:100% 1000%!important;
+#homeLiveHud .hl-mask{
+  position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;background:rgba(7,22,37,.90)!important;border-radius:5px!important;
   overflow:hidden!important;
 }
-#tr10-main-menu .tr10-menu-btn{
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
-  text-shadow:none!important;
-  color:transparent!important;
-  transform:none!important;
+#homeLiveHud .hl-value{
+  display:block!important;color:#fff!important;font-weight:900!important;
+  font-size:clamp(10px,2.25vw,18px)!important;line-height:1!important;
+  text-shadow:0 1px 2px #000!important;white-space:nowrap!important;
 }
-#tr10-main-menu .tr10-menu-btn.is-battle{
-  background:transparent!important;
-  box-shadow:none!important;
-  transform:none!important;
-}
-#tr10-main-menu .tr10-menu-icon,
-#tr10-main-menu .tr10-menu-btn b{
-  opacity:0!important;
-  color:transparent!important;
-  text-shadow:none!important;
-}
-
-/* UNIFIED 15: exact persistent bottom menu artwork from the approved screenshot. */
-#tr10-main-menu{
-  background:#07111b url("home-main-menu.png?v=UNIFIED15") center bottom / 100% 100% no-repeat!important;
-  background-size:100% 100%!important;
-  border-top:0!important;
-  box-shadow:none!important;
-}
-#tr10-main-menu .tr10-menu-btn{
-  color:transparent!important;
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
-  text-shadow:none!important;
-}
-#tr10-main-menu .tr10-menu-icon,
-#tr10-main-menu .tr10-menu-btn b{display:none!important}
-#tr10-main-menu .tr10-menu-btn.is-battle{background:transparent!important;box-shadow:none!important;transform:none!important}
-
-#tr10-main-menu{background-image:url("home-main-menu.png?v=UNIFIED15")!important;background-size:100% 100%!important;}
-
-/* UNIFIED 16: menu image is the menu only (Android system bar removed).
-   Hit areas sit directly over the visible seven buttons. */
-.home-bottom-zones{height:13%!important;bottom:0!important;z-index:2147483001!important;pointer-events:auto!important;}
-.home-bottom-zones .home-bottom-hz{z-index:2!important;}
-#tr10-main-menu{height:clamp(82px,10.8vh,118px)!important;min-height:82px!important;z-index:2147483000!important;pointer-events:auto!important;background-image:url("home-main-menu.png?v=UNIFIED16")!important;background-size:100% 100%!important;}
-#tr10-main-menu .tr10-menu-btn{position:relative!important;z-index:2147483002!important;display:block!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;}
-
-
-/* HOME REAL HUD v39 — live values over the reference artwork.
-   The small masks hide only the painted numbers; icons/art remain unchanged. */
-#homeLiveHud{position:absolute!important;inset:0!important;z-index:70!important;pointer-events:none!important;font-family:Arial,sans-serif!important}
-#homeLiveHud .hl-mask{position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;background:rgba(7,22,37,.92)!important;border-radius:5px!important;overflow:hidden!important}
-#homeLiveHud .hl-value{display:block!important;color:#fff!important;font-weight:900!important;font-size:clamp(10px,2.25vw,18px)!important;line-height:1!important;text-shadow:0 1px 2px #000!important;white-space:nowrap!important}
 #homeLiveHud .hl-vip{left:16.2%!important;top:12.9%!important;width:5.9%!important;height:2.8%!important;justify-content:flex-start!important}
 #homeLiveHud .hl-vip .hl-value{color:#ffd84d!important;font-size:clamp(8px,1.9vw,15px)!important}
 #homeLiveHud .hl-coins{left:28.1%!important;top:11.15%!important;width:6.2%!important;height:2.25%!important}
 #homeLiveHud .hl-gems{left:43.2%!important;top:11.15%!important;width:6.1%!important;height:2.25%!important}
 #homeLiveHud .hl-redgems{left:58.7%!important;top:11.15%!important;width:5.9%!important;height:2.25%!important}
 #homeLiveHud .hl-energy{left:32.1%!important;top:14.35%!important;width:12.4%!important;height:2.55%!important}
-#homeLiveHud .hl-energy .hl-value{color:#fff!important}
 #homeLiveHud .hl-level{left:53.2%!important;top:68.25%!important;width:6.9%!important;height:2.35%!important}
-#homeLiveHud .hl-level .hl-value{font-size:clamp(9px,2vw,16px)!important}
 #homeLiveHud .hl-hp{left:3.9%!important;top:74.9%!important;width:9.8%!important;height:2.5%!important;background:rgba(45,0,0,.72)!important}
-#homeLiveHud .hl-hp .hl-value{font-size:clamp(8px,1.7vw,14px)!important}
 #homeLiveHud .hl-bottom-energy{left:82.6%!important;top:74.9%!important;width:10.1%!important;height:2.5%!important;background:rgba(0,20,45,.72)!important}
-#homeLiveHud .hl-bottom-energy .hl-value{font-size:clamp(8px,1.7vw,14px)!important}
 @media(max-width:430px){
   #homeLiveHud .hl-value{font-size:11px!important}
   #homeLiveHud .hl-vip .hl-value{font-size:9px!important}
