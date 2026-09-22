@@ -154,3 +154,42 @@ body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active)
   #homeRealHud .rhud-xp span,#homeRealHud .rhud-bottom-level span,
   #homeRealHud .rhud-hp span,#homeRealHud .rhud-bottom-energy span{font-size:9px!important}
 }
+
+
+/* v52 — true HUD skins: decorative UI is extracted 1:1 from the canonical artwork; values are separate live layers. */
+#homeRealHud{z-index:72!important;pointer-events:none!important;overflow:visible!important}
+#homeRealHud .rhud-skin{position:absolute!important;display:block!important;margin:0!important;padding:0!important;border:0!important;max-width:none!important;pointer-events:none!important;user-select:none!important;-webkit-user-drag:none!important;object-fit:fill!important}
+#homeRealHud .rhud-skin-top{left:0!important;top:0!important;width:100%!important;height:8.138021%!important;z-index:1!important}
+#homeRealHud .rhud-skin-xp{left:19.630485%!important;top:64.778646%!important;width:58.891455%!important;height:4.557292%!important;z-index:2!important}
+#homeRealHud .rhud-skin-orbs{left:0!important;top:68.359375%!important;width:100%!important;height:9.114583%!important;z-index:3!important}
+
+#homeRealHud .rhud-field{z-index:10!important;background:transparent!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;color:#fff!important;text-shadow:0 1px 2px #000,0 0 3px #000!important;font-weight:900!important;line-height:1!important}
+#homeRealHud .rhud-field span{font-size:clamp(9px,2.05vw,17px)!important}
+
+/* top skin value windows — coordinates are in the original 866x1536 artwork */
+#homeRealHud .rhud-name{left:15.01%!important;top:1.78%!important;width:9.0%!important;height:2.05%!important;justify-content:flex-start!important}
+#homeRealHud .rhud-level{left:15.01%!important;top:3.72%!important;width:9.0%!important;height:1.95%!important;justify-content:flex-start!important}
+#homeRealHud .rhud-coins{left:33.72%!important;top:1.56%!important;width:11.78%!important;height:2.48%!important}
+#homeRealHud .rhud-gems{left:51.97%!important;top:2.02%!important;width:6.58%!important;height:2.02%!important}
+#homeRealHud .rhud-redgems{left:64.09%!important;top:2.02%!important;width:10.06%!important;height:2.02%!important}
+#homeRealHud .rhud-energy{left:31.29%!important;top:4.69%!important;width:25.63%!important;height:2.73%!important;justify-content:center!important}
+#homeRealHud .rhud-energy i{position:absolute!important;left:0!important;top:0!important;width:var(--energy-fill,0%)!important;height:100%!important;background:linear-gradient(180deg,#31f43b,#0dbb24)!important;border-radius:4px!important;box-shadow:inset 0 1px rgba(255,255,255,.22)!important;z-index:0!important}
+#homeRealHud .rhud-energy span{position:relative!important;z-index:1!important}
+#homeRealHud .rhud-vip{left:15.01%!important;top:5.03%!important;width:9.0%!important;height:2.1%!important;justify-content:flex-start!important;color:#ffd84d!important}
+#homeRealHud .rhud-vip span{color:#ffd84d!important}
+
+/* XP skin: the original EXP diamond/frame is an image; only fill + text are live. */
+#homeRealHud .rhud-xpbar{left:24.51%!important;top:65.99%!important;width:41.0%!important;height:2.67%!important;justify-content:flex-start!important;background:transparent!important;z-index:11!important}
+#homeRealHud .rhud-xpbar i{display:block!important;width:var(--xp-fill,0%)!important;height:100%!important;background:linear-gradient(180deg,#35f53f,#0ebd25)!important;border-radius:2px!important;box-shadow:inset 0 1px rgba(255,255,255,.24)!important}
+#homeRealHud .rhud-xp{left:27.5%!important;top:66.05%!important;width:42.0%!important;height:2.25%!important;justify-content:center!important;z-index:12!important}
+#homeRealHud .rhud-bottom-level{left:66.0%!important;top:66.03%!important;width:10.6%!important;height:2.3%!important;justify-content:center!important;z-index:12!important}
+
+/* Orb value windows. The original orb/equipment art stays untouched; only the numbers are live. */
+#homeRealHud .rhud-hp{left:3.6%!important;top:73.10%!important;width:15.2%!important;height:2.25%!important;justify-content:center!important;z-index:12!important}
+#homeRealHud .rhud-bottom-energy{left:85.0%!important;top:73.10%!important;width:11.7%!important;height:2.25%!important;justify-content:center!important;z-index:12!important}
+#homeRealHud .rhud-xp span,#homeRealHud .rhud-bottom-level span,#homeRealHud .rhud-hp span,#homeRealHud .rhud-bottom-energy span{font-size:clamp(9px,1.75vw,15px)!important}
+@media(max-width:430px){
+  #homeRealHud .rhud-field span{font-size:9px!important}
+  #homeRealHud .rhud-name span,#homeRealHud .rhud-level span,#homeRealHud .rhud-vip span{font-size:9px!important}
+  #homeRealHud .rhud-xp span,#homeRealHud .rhud-bottom-level span,#homeRealHud .rhud-hp span,#homeRealHud .rhud-bottom-energy span{font-size:9px!important}
+}

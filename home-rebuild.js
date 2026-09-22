@@ -283,6 +283,9 @@
       hud=document.createElement("div");
       hud.id="homeRealHud";
       hud.innerHTML=`
+        <img class="rhud-skin rhud-skin-top" src="home-hud-top.png" alt="" draggable="false">
+        <img class="rhud-skin rhud-skin-xp" src="home-hud-xp.png" alt="" draggable="false">
+        <img class="rhud-skin rhud-skin-orbs" src="home-hud-orbs.png" alt="" draggable="false">
         <div class="rhud-field rhud-name"><span></span></div>
         <div class="rhud-field rhud-level"><span></span></div>
         <div class="rhud-field rhud-coins"><span></span></div>
