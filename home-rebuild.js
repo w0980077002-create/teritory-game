@@ -23,7 +23,7 @@
     document.body.appendChild(p);
     const mainMenu=document.getElementById("tr10-main-menu");
     if(mainMenu) mainMenu.classList.remove("on-home");
-    const done=()=>{p.remove(); syncPersistentMenu()};
+    const done=()=>{p.remove()};
     $(".tr10-x",p).onclick=done;
     p.addEventListener("click",e=>{if(e.target===p)done()});
     if(after)after(p,done);
@@ -87,7 +87,7 @@
       p=>{$("[data-stage-go]",p).onclick=()=>{p.remove();go("arena")}}
     );
   }
-  function combat(){launch("Бой","БОЕВОЙ ЭКРАН","⚔️","Текущий боевой режим","Открыть бой",()=>go("arena"))}
+  function combat(){return go("arena")}
   function streets(){
     const s=store(), day=new Date().toISOString().slice(0,10);
     s.streetClaims=s.streetClaims&&typeof s.streetClaims==="object"?s.streetClaims:{};
@@ -142,9 +142,9 @@
       case"daily":return daily(); case"quests":return quests(); case"friends":return friends(); case"sea":return sea();
       case"shop":return launch("Магазин","ТОРГОВЛЯ","🛒","Магазин снаряжения","Открыть магазин",()=>go("market"));
       case"forge":return launch("Кузница","СНАРЯЖЕНИЕ","🔨","Покупка и экипировка оружия", "Открыть кузницу",()=>{if(typeof window.openForgeV2==="function")window.openForgeV2();else go("market")});
-      case"challenges":return launch("Испытания","БОЙ","🏆","Боевые испытания","Открыть испытания",()=>go("arena"));
+      case"challenges":return go("arena");
       case"streets":return streets();
-      case"arena":return launch("Арена","БОЙ","⚔️","Арена и сражения","Открыть арену",()=>go("arena"));
+      case"arena":return go("arena");
       case"hp":return resourceInfo("hp"); case"equipment":return launch("Экипировка","ГЕРОЙ","🛡️","Текущий комплект героя","Открыть героя",()=>go("inventory"));
       case"consumable1":return consumable(0); case"consumable2":return consumable(1); case"consumable3":return consumable(2); case"consumable4":return consumable(3);
       case"lock1":return locked("Слот · уровень 90"); case"lock2":return locked("Слот · Арена"); case"lock3":return locked("Слот · позже");
@@ -152,7 +152,7 @@
       case"home":return go("home");
       case"inventory":return launch("Инвентарь","ГЕРОЙ","🎒","Предметы и экипировка","Открыть инвентарь",()=>go("inventory"));
       case"hero":return launch("Герой","ГЕРОЙ","🛡️","Характеристики и экипировка","Открыть героя",()=>go("inventory"));
-      case"battle":return launch("Бой","БОЙ","⚔️","Арена и боевой экран","Открыть бой",()=>go("arena"));
+      case"battle":return go("arena");
       case"bottomQuests":return quests();
       case"game":return launch("Игры","СОБЫТИЕ","🎲","Монополия · зимнее событие","Открыть игры",()=>go("game"));
       case"clan":return clan();
