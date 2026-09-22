@@ -144,14 +144,7 @@
       case"forge":return launch("Кузница","СНАРЯЖЕНИЕ","🔨","Покупка и экипировка оружия", "Открыть кузницу",()=>{if(typeof window.openForgeV2==="function")window.openForgeV2();else go("market")});
       case"challenges":return go("arena");
       case"streets":return streets();
-      case"arena":{
-        /* TEST ACCESS: keep the real saved resource model, but never let a
-           depleted test account block Arena while we are building the game. */
-        const s=store();
-        const maxEnergy=Math.max(1,Number(s.maxEnergy||120));
-        if(Number(s.energy||0)<20){s.energy=maxEnergy;save();}
-        return go("arena");
-      }
+      case"arena":return go("arena");
       case"hp":return resourceInfo("hp"); case"equipment":return launch("Экипировка","ГЕРОЙ","🛡️","Текущий комплект героя","Открыть героя",()=>go("inventory"));
       case"consumable1":return consumable(0); case"consumable2":return consumable(1); case"consumable3":return consumable(2); case"consumable4":return consumable(3);
       case"lock1":return locked("Слот · уровень 90"); case"lock2":return locked("Слот · Арена"); case"lock3":return locked("Слот · позже");
@@ -197,7 +190,7 @@
   function mount(){
     const home=$("#home");if(!home)return;
     home.classList.add("home-reference-active");
-    home.innerHTML=`<div class="home-reference-host" id="homeReferenceHost"><img class="home-reference-image" src="territory_reference_bg.png?v=LIVEHUD51" alt="Teritory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones" aria-label="Нижнее меню 42-48"></div></div>`;
+    home.innerHTML=`<div class="home-reference-host" id="homeReferenceHost"><img class="home-reference-image" src="territory_reference_bg.png?v=UNIFIED10" alt="Teritory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones" aria-label="Нижнее меню 42-48"></div></div>`;
     const layer=$(".home-hitzones",home), bottom=$(".home-bottom-zones",home);
     Z.forEach((z,i)=>addZone(layer,z,i));
     BOTTOM.forEach((z,i)=>addZone(bottom,z,42+i,"home-bottom-hz"));
@@ -270,99 +263,97 @@
   }
 
 
-  /* REAL HOME HUD v46
-     The reference artwork is immutable. Only the values that are truly
-     stored in TerritoryStore are painted over the baked demo values.
-     Bottom 42-48 is intentionally outside this system and is LOCKED. */
+  /* REAL HOME HUD v45
+     The artwork remains the source of truth. These tiny text layers only
+     replace the baked values with the current TerritoryStore values.
+     IMPORTANT: BOTTOM 42-48 is deliberately untouched. */
   function mountRealHud(){
-    const home=$("#home"), host=$("#homeReferenceHost",home);
+    const home=$("#home");
+    const host=$("#homeReferenceHost",home);
     if(!home||!host)return;
-
     let hud=$("#homeRealHud",host);
     if(!hud){
       hud=document.createElement("div");
       hud.id="homeRealHud";
       hud.innerHTML=`
-        <img class="rhud-skin rhud-skin-top" src="home-hud-top.png" alt="" draggable="false">
-        <img class="rhud-skin rhud-skin-xp" src="home-hud-xp.png" alt="" draggable="false">
-        <img class="rhud-skin rhud-skin-orbs" src="home-hud-orbs.png" alt="" draggable="false">
         <div class="rhud-field rhud-name"><span></span></div>
         <div class="rhud-field rhud-level"><span></span></div>
         <div class="rhud-field rhud-coins"><span></span></div>
         <div class="rhud-field rhud-gems"><span></span></div>
         <div class="rhud-field rhud-redgems"><span></span></div>
-        <div class="rhud-field rhud-energy"><i></i><span></span></div>
+        <div class="rhud-field rhud-energy"><span></span></div>
         <div class="rhud-field rhud-vip"><span></span></div>
         <div class="rhud-field rhud-xp"><span></span></div>
         <div class="rhud-field rhud-xpbar"><i></i></div>
         <div class="rhud-field rhud-bottom-level"><span></span></div>
         <div class="rhud-field rhud-hp"><span></span></div>
-        <div class="rhud-field rhud-bottom-energy"><span></span></div>`;
+        <div class="rhud-field rhud-bottom-energy"><span></span></div>
+        <div class="rhud-field rhud-item i1"><span></span></div>
+        <div class="rhud-field rhud-item i2"><span></span></div>
+        <div class="rhud-field rhud-item i3"><span></span></div>
+        <div class="rhud-field rhud-item i4"><span></span></div>
+        <div class="rhud-field rhud-item i5"><span></span></div>
+        <div class="rhud-field rhud-item i6"><span></span></div>
+        <div class="rhud-field rhud-cons c1"><span></span></div>
+        <div class="rhud-field rhud-cons c2"><span></span></div>
+        <div class="rhud-field rhud-cons c3"><span></span></div>
+        <div class="rhud-field rhud-cons c4"><span></span></div>`;
       host.appendChild(hud);
     }
-
-    // These rectangles are only value plates. They deliberately do not touch
-    // the artwork outside the original text/value areas.
     const compact=v=>{
-      const n=Math.max(0,Number(v)||0);
+      const n=Number(v||0);
       if(n>=1000000000)return (n/1000000000).toFixed(n%1000000000?1:0)+"B";
       if(n>=1000000)return (n/1000000).toFixed(n%1000000?1:0)+"M";
       if(n>=1000)return (n/1000).toFixed(n%1000?1:0)+"K";
-      return String(Math.floor(n));
+      return String(n);
     };
-    const has=(s,...keys)=>keys.some(k=>s[k]!==undefined&&s[k]!==null&&s[k]!=="");
     const render=()=>{
       const s=store();
       const set=(cls,value)=>{const e=$(`.${cls} span`,hud);if(e)e.textContent=value};
-
-      // Profile is real: use the saved player name and level. Never invent a
-      // VIP level if the save does not contain one.
+      const num=(v,d=0)=>Number.isFinite(Number(v))?Number(v):d;
+      const compact=v=>{
+        const n=Math.max(0,num(v));
+        if(n>=1e9)return (n/1e9).toFixed(n%1e9?1:0)+"B";
+        if(n>=1e6)return (n/1e6).toFixed(n%1e6?1:0)+"M";
+        if(n>=1e3)return (n/1e3).toFixed(n%1e3?1:0)+"K";
+        return String(Math.floor(n));
+      };
       set("rhud-name",String(s.name||"SSS"));
-      set("rhud-level","Lv. "+Math.max(1,Number(s.level||1)));
-
-      // Counters are always read from the same save used by the game.
+      set("rhud-level","Lv. "+Math.max(1,num(s.level,1)));
       set("rhud-coins",compact(s.coins));
       set("rhud-gems",compact(s.gems));
       set("rhud-redgems",compact(s.redGems));
-
-      const energyMax=Math.max(1,Number(s.maxEnergy||200));
-      const energyNow=Math.max(0,Math.min(energyMax,Number(s.energy||0)));
+      const energyMax=Math.max(1,num(s.maxEnergy,200));
+      const energyNow=Math.max(0,Math.min(energyMax,num(s.energy,0)));
       set("rhud-energy",`${Math.floor(energyNow)}/${Math.floor(energyMax)}`);
-      const energyBar=$(".rhud-energy",hud);
-      if(energyBar){
-        energyBar.style.setProperty("--energy-fill",((energyNow/energyMax)*100).toFixed(2)+"%");
-      }
-
-      // Keep the baked VIP badge when the save has no VIP field. If the save
-      // contains a real VIP value, the badge becomes live automatically.
       const vipRaw=s.vipLevel??s.vip;
       const vipEl=$(".rhud-vip",hud);
-      const hasVip=has(s,"vipLevel","vip");
-      vipEl.style.display=hasVip?"flex":"none";
-      if(hasVip)set("rhud-vip","VIP "+Math.max(0,Number(vipRaw)||0));
-
-      // Bottom HUD is live: XP, level, HP and energy all read the same state
-      // that the battle/shop/game systems use. No hard-coded screenshot values.
-      const level=Math.max(1,Number(s.level||1));
-      const xp=Math.max(0,Number(s.exp||0));
-      const xpNeeded=Math.max(1,Number(s.expToNext??s.maxExp??100));
-      const hp=Math.max(0,Number(s.hp||0));
-      const hpMax=Math.max(1,Number(s.maxHp||120));
+      if(vipRaw!==undefined&&vipRaw!==null&&vipRaw!==""){vipEl.style.display="flex";set("rhud-vip","VIP "+Math.max(0,num(vipRaw)));}
+      else vipEl.style.display="none";
+      const xp=Math.max(0,num(s.exp,0));
+      const xpNeeded=Math.max(1,num(s.expToNext??s.maxExp,100));
+      const level=Math.max(1,num(s.level,1));
+      const hpMax=Math.max(1,num(s.maxHp,120));
+      const hp=Math.max(0,Math.min(hpMax,num(s.hp,0)));
       set("rhud-xp",`${Math.floor(xp).toLocaleString("ru-RU")}/${Math.floor(xpNeeded).toLocaleString("ru-RU")}`);
       set("rhud-bottom-level",`Lv.${level}`);
       set("rhud-hp",`${Math.floor(hp).toLocaleString("ru-RU")} / ${Math.floor(hpMax).toLocaleString("ru-RU")}`);
       set("rhud-bottom-energy",`${Math.floor(energyNow).toLocaleString("ru-RU")} / ${Math.floor(energyMax).toLocaleString("ru-RU")}`);
-      const xpBar=$(".rhud-xpbar",hud);
-      if(xpBar){
-        const fill=Math.max(0,Math.min(1,xp/xpNeeded));
-        xpBar.style.setProperty("--xp-fill",(fill*100).toFixed(2)+"%");
-      }
+      const xpb=$(".rhud-xpbar",hud);if(xpb)xpb.style.setProperty("--xp-fill",Math.max(0,Math.min(1,xp/xpNeeded))*100+"%");
+      const inv=Array.isArray(s.inventory)?s.inventory:[];
+      const items=Array.isArray(s.equipment)?s.equipment:[];
+      const itemValue=i=>{const x=items[i]??inv[i];if(x==null)return "—";if(typeof x==="object")return x.level!=null?`Lv.${Math.max(1,num(x.level))}`:(x.name||"—");return String(x)};
+      for(let i=0;i<6;i++)set(`i${i+1}`,itemValue(i));
+      const counts=Array.isArray(s.consumables)?s.consumables:[];
+      for(let i=0;i<4;i++){const x=counts[i];set(`c${i+1}`,x==null?"—":String(typeof x==="object"?(x.count??"—"):x));}
     };
     render();
     clearInterval(window.__homeRealHudTimer);
-    window.__homeRealHudTimer=setInterval(render,350);
+    window.__homeRealHudTimer=setInterval(render,500);
   }
 
-  function boot(){mount();hideLegacy();mountRealHud();}
+
+  function boot(){mount();hideLegacy();mountRealHud();
+  }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
