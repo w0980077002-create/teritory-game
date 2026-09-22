@@ -1,21 +1,79 @@
-/* Territory v139 — canonical base + S98 Arena integration */
-const defaultState={coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0};
+/* Territory v140 — unified player state foundation */
+const TERRITORY_STATE_VERSION=3;
+const defaultState={
+  schemaVersion:TERRITORY_STATE_VERSION,
+  profile:{displayName:"",telegramId:"",username:"",firstName:"",lastName:"",photoUrl:"",languageCode:"",platform:"unknown",premium:false},
+  coins:1000,gems:25,redGems:0,
+  level:1,exp:0,expToNext:100,
+  hp:120,maxHp:120,energy:100,maxEnergy:200,enemyHp:100,
+  strength:5,agility:5,defense:0,endurance:12,weaponMastery:1,freePoints:0,
+  weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],equipment:[],consumables:[],
+  quests:{alex:0,cityRep:0,merchantRep:0},alexQuest:0,cityRep:0,merchantRep:0,
+  arena:{rating:1000,wins:0,losses:0,battles:0,history:[]},
+  gameDice:47,gameRolls:0,gameSteps:0,gameEventVersion:1,gameTaskProgress:0,
+  gameMilestones:[],gameTaskClaims:[],gamePanelClaims:[],gameJackpotClaims:[],gameGiftDate:"",gameEndsAt:0,gameLap:0,gamePos:0,gameSaveVersion:2
+};
+function cloneState(v){return JSON.parse(JSON.stringify(v));}
+function normalizeTerritoryState(raw){
+  const s={...cloneState(defaultState),...(raw&&typeof raw==="object"?raw:{})};
+  s.schemaVersion=TERRITORY_STATE_VERSION;
+  s.profile={...defaultState.profile,...(s.profile&&typeof s.profile==="object"?s.profile:{})};
+  const n=(v,d,min=0)=>Math.max(min,Number.isFinite(Number(v))?Number(v):d);
+  s.coins=n(s.coins,1000); s.gems=n(s.gems,25); s.redGems=n(s.redGems,0);
+  s.level=Math.max(1,Math.floor(n(s.level,1,1)));
+  s.exp=n(s.exp,0); s.expToNext=Math.max(100,Math.floor(n(s.expToNext??s.maxExp,100)));
+  s.maxHp=Math.max(1,Math.floor(n(s.maxHp,120,1))); s.hp=Math.min(s.maxHp,n(s.hp,s.maxHp));
+  s.maxEnergy=Math.max(1,Math.floor(n(s.maxEnergy,200,1))); s.energy=Math.min(s.maxEnergy,n(s.energy,100));
+  s.enemyHp=n(s.enemyHp,100); s.strength=Math.max(1,Math.floor(n(s.strength,5,1))); s.agility=Math.max(1,Math.floor(n(s.agility,5,1))); s.defense=n(s.defense,0);
+  s.endurance=Math.max(1,Math.floor(n(s.endurance,12,1))); s.weaponMastery=Math.max(1,Math.floor(n(s.weaponMastery,1,1))); s.freePoints=n(s.freePoints,0);
+  s.bonusDamage=n(s.bonusDamage,0); s.weapon=String(s.weapon||"Кулаки");
+  s.inventory=Array.isArray(s.inventory)?s.inventory:[]; s.equipment=Array.isArray(s.equipment)?s.equipment:[]; s.consumables=Array.isArray(s.consumables)?s.consumables:[];
+  s.quests={...defaultState.quests,...(s.quests&&typeof s.quests==="object"?s.quests:{})};
+  s.alexQuest=n(s.alexQuest??s.quests.alex,0); s.cityRep=n(s.cityRep??s.quests.cityRep,0); s.merchantRep=n(s.merchantRep??s.quests.merchantRep,0);
+  s.quests.alex=s.alexQuest; s.quests.cityRep=s.cityRep; s.quests.merchantRep=s.merchantRep;
+  s.arena={...defaultState.arena,...(s.arena&&typeof s.arena==="object"?s.arena:{})};
+  s.arena.rating=Math.max(0,Math.floor(n(s.arena.rating,1000))); s.arena.wins=Math.floor(n(s.arena.wins,0)); s.arena.losses=Math.floor(n(s.arena.losses,0)); s.arena.battles=Math.floor(n(s.arena.battles,0)); s.arena.history=Array.isArray(s.arena.history)?s.arena.history.slice(-30):[];
+  s.gameDice=Math.floor(n(s.gameDice,47)); s.gameRolls=Math.floor(n(s.gameRolls,0)); s.gameSteps=Math.floor(n(s.gameSteps,0)); s.gameEventVersion=Math.max(1,Math.floor(n(s.gameEventVersion,1))); s.gameTaskProgress=Math.floor(n(s.gameTaskProgress,s.gameRolls));
+  for(const k of ["gameMilestones","gameTaskClaims","gamePanelClaims","gameJackpotClaims"]){s[k]=Array.isArray(s[k])?[...new Set(s[k])]:[];}
+  s.gameGiftDate=String(s.gameGiftDate||""); s.gameEndsAt=Math.floor(n(s.gameEndsAt,0)); s.gameSaveVersion=2;
+  const cells=27; s.gameLap=Math.max(0,Math.floor(s.gameSteps/cells)); s.gamePos=((s.gameSteps%cells)+cells)%cells;
+  if(!s.name && s.profile.displayName)s.name=s.profile.displayName;
+  s.name=String(s.name||"SSS");
+  s.telegramUserId=String(s.telegramUserId||s.profile.telegramId||""); s.telegramUsername=String(s.telegramUsername||s.profile.username||"");
+  s.telegramFirstName=String(s.telegramFirstName||s.profile.firstName||""); s.telegramLastName=String(s.telegramLastName||s.profile.lastName||"");
+  s.telegramPhotoUrl=String(s.telegramPhotoUrl||s.profile.photoUrl||""); s.telegramLanguageCode=String(s.telegramLanguageCode||s.profile.languageCode||"");
+  s.telegramPlatform=String(s.telegramPlatform||s.profile.platform||"unknown"); s.telegramPremium=Boolean(s.telegramPremium??s.profile.premium);
+  s.profile={...s.profile,telegramId:s.telegramUserId,username:s.telegramUsername,firstName:s.telegramFirstName,lastName:s.telegramLastName,photoUrl:s.telegramPhotoUrl,languageCode:s.telegramLanguageCode,platform:s.telegramPlatform,premium:s.telegramPremium,displayName:String(s.name||s.profile.displayName||"")};
+  return s;
+}
 function gameLoadState(){
   try{
     const raw=localStorage.getItem("territory_save_v1");
-    if(!raw)return structuredClone(defaultState);
-    const parsed=JSON.parse(raw);
-    return parsed&&typeof parsed==="object"?parsed:structuredClone(defaultState);
+    if(!raw)return normalizeTerritoryState();
+    return normalizeTerritoryState(JSON.parse(raw));
   }catch(e){
-    console.warn("Territory save is damaged; using safe defaults",e);
-    return structuredClone(defaultState);
+    console.warn("Territory save is damaged; using normalized defaults",e);
+    return normalizeTerritoryState();
   }
 }
 let state=gameLoadState();
+window.TerritoryStore={
+  get state(){return state;},
+  setState(next){state=normalizeTerritoryState(next);return state;},
+  normalize:normalizeTerritoryState,
+  saveNow(reason="manual"){
+    state=normalizeTerritoryState(state);
+    try{localStorage.setItem("territory_save_v1",JSON.stringify(state));}catch(e){console.warn("TerritoryStore save failed",e);}
+    try{window.dispatchEvent(new CustomEvent("territory:stateChanged",{detail:{reason}}));}catch(_){}
+    return state;
+  },
+  patch(patch={}){state=normalizeTerritoryState({...state,...patch});return this.saveNow("patch");},
+  save(){return this.saveNow("legacy-save");},
+  render(){if(typeof window.render==="function")window.render();}
+};
 state.alexQuest=Number(state.alexQuest||0); state.cityRep=Number(state.cityRep||0); state.merchantRep=Number(state.merchantRep||0); state.marketDay=Number(state.marketDay||Math.floor(Date.now()/86400000));
 state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0); state.name=String(state.name||"SSS");
 state.gameDice=Math.max(0,Number(state.gameDice??47)||0); state.gameRolls=Math.max(0,Number(state.gameRolls??0)||0); state.gameSteps=Math.max(0,Number(state.gameSteps??0)||0); state.gameEventVersion=Number(state.gameEventVersion??1)||1; state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0); state.gameMilestones=Array.isArray(state.gameMilestones)?[...new Set(state.gameMilestones.map(Number).filter(Number.isFinite))]:[]; state.gameTaskClaims=Array.isArray(state.gameTaskClaims)?[...new Set(state.gameTaskClaims.map(String))]:[]; state.gamePanelClaims=Array.isArray(state.gamePanelClaims)?[...new Set(state.gamePanelClaims.map(String))]:[]; state.gameJackpotClaims=Array.isArray(state.gameJackpotClaims)?[...new Set(state.gameJackpotClaims.map(Number).filter(Number.isFinite))]:[]; state.gameGiftDate=String(state.gameGiftDate||""); state.gameEndsAt=Number(state.gameEndsAt||0); if(!state.gameEndsAt)state.gameEndsAt=Date.now()+2*86400000+14*3600000+45*60000; const GAME_TRACK_CELLS=27; state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS)); state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS; state.gameSaveVersion=2;
-window.TerritoryStore={get state(){return state;}, save, render};
 const zones=["head","chest","stomach","waist","legs"];
 const names={head:"Голова",chest:"Грудь",stomach:"Живот",waist:"Пояс",legs:"Ноги"};
 const weapons=[
@@ -31,7 +89,7 @@ function save(){
   state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
   state.gameTaskProgress=Math.max(0,Number(state.gameTaskProgress??state.gameRolls??0)||0);
   state.gameSaveVersion=2; state.energy=Math.max(0,Math.min(200,Number(state.energy??100)||0)); state.strength=Math.max(1,Number(state.strength??5)||5); state.agility=Math.max(1,Number(state.agility??5)||5); state.defense=Math.max(0,Number(state.defense??0)||0);
-  try{ localStorage.setItem("territory_save_v1",JSON.stringify(state)); }catch(e){ console.warn("Territory save failed",e); }
+  window.TerritoryStore.saveNow("game-save");
   render();
 }
 window.addEventListener("pagehide",()=>{try{state.gameMoving=false; save();}catch(e){}});
@@ -41,7 +99,8 @@ window.addEventListener("storage",e=>{
   try{
     const incoming=JSON.parse(e.newValue);
     if(incoming&&typeof incoming==="object"){
-      state={...state,...incoming};
+      window.TerritoryStore.setState({...state,...incoming});
+      state=window.TerritoryStore.state;
       state.gameSteps=Math.max(0,Number(state.gameSteps)||0);
       state.gameLap=Math.max(0,Math.floor(state.gameSteps/GAME_TRACK_CELLS));
       state.gamePos=((state.gameSteps%GAME_TRACK_CELLS)+GAME_TRACK_CELLS)%GAME_TRACK_CELLS;
@@ -54,17 +113,10 @@ function render(){
  if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
  $("#weaponName") && ($("#weaponName").textContent=state.weapon); $("#weaponStats") && ($("#weaponStats").textContent=`Урон +${state.bonusDamage}`);
  const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
- renderShop(); renderInventory(); if(typeof window.renderForgeUI==="function")window.renderForgeUI();
+ renderShop(); renderInventory();
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
 }
 function showScreen(id){
- const arena=document.getElementById("arenaModal");
- if(id!=="arena" && arena){
-   arena.classList.remove("show");
-   arena.setAttribute("aria-hidden","true");
-   arena.style.display="none";
-   arena.style.pointerEvents="none";
- }
  document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
  document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));
  if(id==="arena") setTimeout(()=>{ if(window.openBattle) window.openBattle(); },0);
@@ -77,11 +129,9 @@ function renderShop(){
  const stock=[0,1,2,3].map((_,i)=>weapons[(i+shift)%weapons.length]).map((w,i)=>({...w,cost:Math.max(180,w.cost+(i%2?50:-30))}));
  const mood=state.merchantRep>=5?'«Для тебя цена будет лучше.»':state.merchantRep>=2?'«Мы уже знаем друг друга.»':'«Сегодня хороший товар.»';
  const moodEl=$("#merchantMood"); if(moodEl)moodEl.textContent=mood;
- const repEl=$("#merchantRep"); if(repEl)repEl.textContent=String(state.merchantRep);
- const coinsEl=$("#marketCoins"); if(coinsEl)coinsEl.textContent=String(Number(state.coins||0));
- const gemsEl=$("#marketGems"); if(gemsEl)gemsEl.textContent=String(Number(state.gems||0));
- const resetEl=$("#marketReset"); if(resetEl){const left=86400000-(Date.now()%86400000);resetEl.textContent=`Обновление через ${Math.max(1,Math.ceil(left/3600000))} ч.`;}
- $("#shopGrid").innerHTML=stock.map(w=>{const finalCost=state.merchantRep>=5?Math.floor(w.cost*.9):state.merchantRep>=2?Math.floor(w.cost*.95):w.cost;return `<article class="market-item-v12"><div class="market-item-icon-v12">${w.icon}</div><div class="market-item-info-v12"><b>${w.name}</b><small>Оружие · Урон +${w.damage}</small><span>${finalCost} 🪙</span></div><button class="tg-action market-buy-v12" data-buy="${w.name}" data-cost="${finalCost}">Купить</button></article>`}).join('');
+ const repEl=$("#merchantRep"); if(repEl)repEl.textContent=`Репутация ${state.merchantRep}`;
+ const resetEl=$("#marketReset"); if(resetEl){const left=86400000-(Date.now()%86400000);resetEl.textContent=`Новый ассортимент примерно через ${Math.max(1,Math.ceil(left/3600000))} ч.`;}
+ $("#shopGrid").innerHTML=stock.map(w=>{const finalCost=state.merchantRep>=5?Math.floor(w.cost*.9):state.merchantRep>=2?Math.floor(w.cost*.95):w.cost;return `<div class="item"><div class="pic">${w.icon}</div><b>${w.name}</b><span>Урон +${w.damage}</span><button data-buy="${w.name}" data-cost="${finalCost}">${finalCost} 🪙 · КУПИТЬ</button></div>`}).join('');
 }
 
 $("#shopGrid").addEventListener("click",e=>{
@@ -762,189 +812,3 @@ if(jackpotCloseV79)jackpotCloseV79.onclick=gameCloseJackpotPreviewV79;
 const jackpotModalV79=$('#gameJackpotModal');
 if(jackpotModalV79)jackpotModalV79.addEventListener('click',e=>{if(e.target===jackpotModalV79)gameCloseJackpotPreviewV79()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')gameCloseJackpotPreviewV79()});
-/* Territory G145 — recalibrated HOME photo controls.\n/* Territory G141 — HOME photo controls.
-   The current Sdolars artwork already contains the visual buttons.
-   This layer adds transparent touch targets over those exact areas.
-   Arena and Clan logic is untouched. */
-(function homePhotoControlsG141(){
-  /* V15: legacy photo hit-layer is disabled. The rebuilt home screen owns its controls now. */
-  return;
-  function modal(title, body, actionText, action){
-    const old=document.querySelector('.g141-photo-modal'); if(old)old.remove();
-    const m=document.createElement('div');
-    m.className='g141-photo-modal';
-    m.innerHTML='<div class="g141-photo-card"><button type="button" class="g141-photo-x" aria-label="Закрыть">×</button><h3>'+title+'</h3><p>'+body+'</p><button type="button" class="g141-photo-action">'+actionText+'</button></div>';
-    document.body.appendChild(m);
-    const close=()=>m.remove();
-    m.querySelector('.g141-photo-x').onclick=close;
-    m.addEventListener('click',e=>{if(e.target===m)close()});
-    m.querySelector('.g141-photo-action').onclick=()=>{close();if(action)action()};
-  }
-
-  function mount(){
-    const home=document.getElementById('home');
-    const scene=home&&home.querySelector('.home-v2-scene');
-    if(!home||!scene)return;
-    if(scene.querySelector('.g141-photo-controls'))return;
-
-    const layer=document.createElement('div');
-    layer.className='g141-photo-controls';
-    layer.innerHTML=[
-      '<button class="g141-zone g141-profile" aria-label="Профиль"></button>',
-      '<button class="g141-zone g141-gems" aria-label="Кристаллы"></button>',
-      '<button class="g141-zone g141-coins" aria-label="Монеты"></button>',
-      '<button class="g141-zone g141-energy" aria-label="Энергия"></button>',
-      '<button class="g141-zone g141-messages" aria-label="Сообщения"></button>',
-      '<button class="g141-zone g141-achievements" aria-label="Достижения"></button>',
-      '<button class="g141-zone g141-settings" aria-label="Настройки"></button>',
-      '<button class="g141-zone g141-language" aria-label="Язык"></button>',
-      '<button class="g141-zone g141-quest" aria-label="Текущее задание"></button>',
-      '<button class="g141-zone g141-daily" aria-label="Ежедневный бонус"></button>',
-      '<button class="g141-zone g141-bonus" aria-label="Бонусы"></button>',
-      '<button class="g141-zone g141-events" aria-label="События"></button>',
-      '<button class="g141-zone g141-vip" aria-label="VIP"></button>',
-      '<button class="g141-zone g141-game" aria-label="Game"></button>',
-      '<button class="g141-zone g141-blacksmith" aria-label="Кузница"></button>',
-      '<button class="g141-zone g141-tavern" aria-label="Таверна"></button>',
-      '<button class="g141-zone g141-shop" aria-label="Магазин"></button>'
-    ].join('');
-
-    const css=document.createElement('style');
-    css.id='territory-g141-photo-controls';
-    css.textContent=`
-      body:has(#home.active) .home-v2-scene-image{
-        pointer-events:none!important;
-      }
-      body:has(#home.active) .g141-photo-controls{
-        position:absolute!important;inset:0 0 64px 0!important;z-index:9999!important;
-        pointer-events:none!important;touch-action:manipulation!important;
-      }
-      body:has(#home.active) .g141-photo-controls .g141-zone{
-        position:absolute!important;display:block!important;box-sizing:border-box!important;
-        margin:0!important;padding:0!important;border:0!important;border-radius:12px!important;
-        background:transparent!important;box-shadow:none!important;opacity:0!important;
-        pointer-events:auto!important;touch-action:manipulation!important;
-        -webkit-tap-highlight-color:transparent!important;
-      }
-      /* G145: touch targets recalibrated to the actual mobile composition
-         visible in Telegram (the previous G141 map assumed the raw 941x1672
-         artwork percentages and missed the rendered/cropped scene). */
-      body:has(#home.active) .g141-profile{left:1%!important;top:1%!important;width:15%!important;height:9%!important}
-      body:has(#home.active) .g141-gems{left:87%!important;top:2%!important;width:12%!important;height:8%!important}
-      body:has(#home.active) .g141-coins{left:77%!important;top:2%!important;width:11%!important;height:8%!important}
-      body:has(#home.active) .g141-energy{left:64%!important;top:2%!important;width:12%!important;height:8%!important}
-      body:has(#home.active) .g141-messages{left:50%!important;top:1%!important;width:14%!important;height:10%!important}
-      body:has(#home.active) .g141-achievements{left:62%!important;top:1%!important;width:14%!important;height:10%!important}
-      body:has(#home.active) .g141-settings{left:74%!important;top:1%!important;width:13%!important;height:10%!important}
-      body:has(#home.active) .g141-language{left:87%!important;top:1%!important;width:12%!important;height:10%!important}
-      body:has(#home.active) .g141-quest{left:2%!important;top:24%!important;width:96%!important;height:19%!important}
-      body:has(#home.active) .g141-daily{left:70%!important;top:11%!important;width:28%!important;height:11%!important}
-      body:has(#home.active) .g141-bonus{left:2%!important;top:46%!important;width:27%!important;height:18%!important}
-      body:has(#home.active) .g141-events{left:2%!important;top:65%!important;width:27%!important;height:18%!important}
-      body:has(#home.active) .g141-vip{left:2%!important;top:83%!important;width:27%!important;height:17%!important}
-      body:has(#home.active) .g141-game{left:2%!important;top:92%!important;width:27%!important;height:8%!important}
-      body:has(#home.active) .g141-blacksmith{right:2%!important;top:46%!important;width:27%!important;height:18%!important}
-      body:has(#home.active) .g141-tavern{right:2%!important;top:65%!important;width:27%!important;height:18%!important}
-      body:has(#home.active) .g141-shop{right:2%!important;top:83%!important;width:27%!important;height:17%!important}
-
-      .g141-photo-modal{
-        position:fixed!important;inset:0!important;z-index:6000!important;
-        display:flex!important;align-items:center!important;justify-content:center!important;
-        padding:20px!important;box-sizing:border-box!important;background:rgba(0,0,0,.72)!important;
-      }
-      .g141-photo-card{
-        width:min(92vw,380px)!important;box-sizing:border-box!important;padding:20px!important;
-        border-radius:18px!important;background:linear-gradient(180deg,#182635,#0b1118)!important;
-        border:1px solid rgba(215,183,98,.9)!important;color:#fff!important;
-        box-shadow:0 20px 70px rgba(0,0,0,.65)!important;text-align:center!important;
-      }
-      .g141-photo-card h3{margin:0 32px 10px!important;font-size:22px!important}
-      .g141-photo-card p{margin:8px 0!important;color:#d2d9e0!important;font-size:14px!important;line-height:1.45!important}
-      .g141-photo-card button{font:inherit}
-      .g141-photo-x{
-        position:absolute!important;top:12px!important;right:18px!important;width:40px!important;height:40px!important;
-        border:0!important;background:transparent!important;color:#fff!important;font-size:30px!important;
-      }
-      .g141-photo-action{
-        width:100%!important;margin-top:12px!important;padding:12px!important;border-radius:12px!important;
-        border:1px solid #d7b762!important;background:#5c461d!important;color:#fff!important;font-weight:800!important;
-      }
-    `;
-    document.head.appendChild(css);
-    scene.appendChild(layer);
-
-    /* G143 — capture touch at document level.
-       Some older scene overlays can sit above the transparent DOM layer.
-       Capture-phase hit testing makes the artwork controls independent
-       from stacking contexts and old overlays. */
-    const hit=(x,y)=>{
-      if(!home.classList.contains('active'))return null;
-      const rect=scene.getBoundingClientRect();
-      if(!rect.width||!rect.height)return null;
-      if(y < rect.top || y > rect.bottom-64)return null;
-      const nx=(x-rect.left)/rect.width*100;
-      const ny=(y-rect.top)/rect.height*100;
-      const zones=[
-        ['profile',1,1,15,9],['gems',87,2,12,8],['coins',77,2,11,8],['energy',64,2,12,8],
-        ['messages',50,1,14,10],['achievements',62,1,14,10],['settings',74,1,13,10],['language',87,1,12,10],
-        ['quest',2,24,96,19],['daily',70,11,28,11],
-        ['bonus',2,46,27,18],['events',2,65,27,18],['vip',2,83,27,17],['game',2,92,27,8],
-        ['blacksmith',71,46,27,18],['tavern',71,65,27,18],['shop',71,83,27,17]
-      ];
-      return zones.find(z=>nx>=z[1]&&nx<=z[1]+z[3]&&ny>=z[2]&&ny<=z[2]+z[4])?.[0]||null;
-    };
-    const actions={
-      profile:()=>go('inventory'),
-      quest:()=>go('districts'),
-      daily:()=>go('game'),
-      bonus:()=>go('game'),
-      events:()=>go('districts'),
-      game:()=>go('game'),
-      blacksmith:()=> (window.openForgeV2 ? window.openForgeV2() : go('market')),
-      shop:()=>go('market'),
-      tavern:()=>modal('🍺 Таверна','Здесь будет городской отдых, слухи и специальные встречи.','Понятно'),
-      vip:()=>modal('👑 VIP','VIP-функции подключим к общей системе аккаунта. Здесь уже зарезервировано рабочее место для VIP.','Понятно'),
-      messages:()=>modal('✉️ Сообщения','Центр сообщений готов для подключения уведомлений и событий.','Понятно'),
-      achievements:()=>modal('🏆 Достижения','Сюда будут выводиться достижения героя и награды за прогресс.','Понятно'),
-      settings:()=>modal('⚙️ Настройки','Настройки игры и интерфейса будут собраны здесь.','Понятно'),
-      language:()=>modal('🌐 Язык','Сейчас активен русский язык.','Понятно'),
-      gems:()=>modal('💎 Кристаллы','Кристаллы: '+((window.TerritoryStore&&window.TerritoryStore.state&&window.TerritoryStore.state.gems)||state.gems||0),'Понятно'),
-      coins:()=>modal('🪙 Монеты','Монеты: '+((window.TerritoryStore&&window.TerritoryStore.state&&window.TerritoryStore.state.coins)||state.coins||0),'Понятно'),
-      energy:()=>modal('⚡ Энергия','Энергия: '+(state.energy||0)+'/200','Понятно')
-    };
-    const onCapture=e=>{
-      if(!home.classList.contains('active'))return;
-      const p=e.touches&&e.touches[0] ? e.touches[0] : e;
-      const name=hit(p.clientX,p.clientY);
-      if(!name||!actions[name])return;
-      if(e.target&&e.target.closest&&e.target.closest('.g141-zone'))return;
-      e.preventDefault();
-      e.stopPropagation();
-      actions[name]();
-    };
-    document.addEventListener('pointerup',onCapture,true);
-    document.addEventListener('touchend',onCapture,{capture:true,passive:false});
-
-    const go=id=>showScreen(id);
-    layer.querySelector('.g141-profile').onclick=()=>go('inventory');
-    layer.querySelector('.g141-quest').onclick=()=>go('districts');
-    layer.querySelector('.g141-daily').onclick=()=>go('game');
-    layer.querySelector('.g141-bonus').onclick=()=>go('game');
-    layer.querySelector('.g141-events').onclick=()=>go('districts');
-    layer.querySelector('.g141-game').onclick=()=>go('game');
-    layer.querySelector('.g141-blacksmith').onclick=()=> (window.openForgeV2 ? window.openForgeV2() : go('market'));
-    layer.querySelector('.g141-shop').onclick=()=>go('market');
-    layer.querySelector('.g141-tavern').onclick=()=>modal('🍺 Таверна','Здесь будет городской отдых, слухи и специальные встречи.','Понятно');
-    layer.querySelector('.g141-vip').onclick=()=>modal('👑 VIP','VIP-функции подключим к общей системе аккаунта. Здесь уже зарезервировано рабочее место для VIP.','Понятно');
-    layer.querySelector('.g141-messages').onclick=()=>modal('✉️ Сообщения','Центр сообщений готов для подключения уведомлений и событий.','Понятно');
-    layer.querySelector('.g141-achievements').onclick=()=>modal('🏆 Достижения','Сюда будут выводиться достижения героя и награды за прогресс.','Понятно');
-    layer.querySelector('.g141-settings').onclick=()=>modal('⚙️ Настройки','Настройки игры и интерфейса будут собраны здесь.','Понятно');
-    layer.querySelector('.g141-language').onclick=()=>modal('🌐 Язык','Сейчас активен русский язык.','Понятно');
-    layer.querySelector('.g141-gems').onclick=()=>modal('💎 Кристаллы','Кристаллы: '+((window.TerritoryStore&&window.TerritoryStore.state&&window.TerritoryStore.state.gems)||state.gems||0),'Понятно');
-    layer.querySelector('.g141-coins').onclick=()=>modal('🪙 Монеты','Монеты: '+((window.TerritoryStore&&window.TerritoryStore.state&&window.TerritoryStore.state.coins)||state.coins||0),'Понятно');
-    layer.querySelector('.g141-energy').onclick=()=>modal('⚡ Энергия','Энергия: '+(state.energy||0)+'/200','Понятно');
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
-  else mount();
-})();
-
