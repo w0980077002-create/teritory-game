@@ -171,9 +171,11 @@
     ["lock1",58,76.2,13.5,8],["lock2",72,76.2,13.5,8],["lock3",86,76.2,14,8],
     ["quest",0,84.2,51,7.2],["speed",61,83.7,8.5,7],["refresh",70.5,83.7,8.5,7],["crown",80,83.7,8.5,7],["star",89.5,83.7,10.5,7]
   ];
+  /* Bottom menu: the hit layer itself is already anchored to the bottom.
+     Therefore these coordinates are LOCAL to that layer, not 91% of the page. */
   const BOTTOM=[
-    ["home",0,91,14.28,9],["inventory",14.28,91,14.28,9],["hero",28.56,91,14.28,9],
-    ["battle",42.84,90,14.32,10],["bottomQuests",57.16,91,14.28,9],["game",71.44,91,14.28,9],["clan",85.72,91,14.28,9]
+    ["home",0,0,14.28,100],["inventory",14.28,0,14.28,100],["hero",28.56,0,14.28,100],
+    ["battle",42.84,0,14.32,100],["bottomQuests",57.16,0,14.28,100],["game",71.44,0,14.28,100],["clan",85.72,0,14.28,100]
   ];
   const MAIN_MENU=[
     ["home","🏰","Город"],["inventory","👜","Инвентарь"],["hero","🛡️","Герой"],["battle","⚔️","Бой"],
