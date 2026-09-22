@@ -149,7 +149,7 @@
       case"consumable1":return consumable(0); case"consumable2":return consumable(1); case"consumable3":return consumable(2); case"consumable4":return consumable(3);
       case"lock1":return locked("Слот · уровень 90"); case"lock2":return locked("Слот · Арена"); case"lock3":return locked("Слот · позже");
       case"quest":return quests(); case"speed":return speed(); case"refresh":return combat(); case"crown":return combat(); case"star":return star();
-      case"home":return go("districts");
+      case"home":return go("home");
       case"inventory":return launch("Инвентарь","ГЕРОЙ","🎒","Предметы и экипировка","Открыть инвентарь",()=>go("inventory"));
       case"hero":return launch("Герой","ГЕРОЙ","🛡️","Характеристики и экипировка","Открыть героя",()=>go("inventory"));
       case"battle":return launch("Бой","БОЙ","⚔️","Арена и боевой экран","Открыть бой",()=>go("arena"));
@@ -171,11 +171,9 @@
     ["lock1",58,76.2,13.5,8],["lock2",72,76.2,13.5,8],["lock3",86,76.2,14,8],
     ["quest",0,84.2,51,7.2],["speed",61,83.7,8.5,7],["refresh",70.5,83.7,8.5,7],["crown",80,83.7,8.5,7],["star",89.5,83.7,10.5,7]
   ];
-  /* Bottom menu: the hit layer itself is already anchored to the bottom.
-     Therefore these coordinates are LOCAL to that layer, not 91% of the page. */
   const BOTTOM=[
-    ["home",0,0,14.28,100],["inventory",14.28,0,14.28,100],["hero",28.56,0,14.28,100],
-    ["battle",42.84,0,14.32,100],["bottomQuests",57.16,0,14.28,100],["game",71.44,0,14.28,100],["clan",85.72,0,14.28,100]
+    ["home",0,91,14.28,9],["inventory",14.28,91,14.28,9],["hero",28.56,91,14.28,9],
+    ["battle",42.84,90,14.32,10],["bottomQuests",57.16,91,14.28,9],["game",71.44,91,14.28,9],["clan",85.72,91,14.28,9]
   ];
   const MAIN_MENU=[
     ["home","🏰","Город"],["inventory","👜","Инвентарь"],["hero","🛡️","Герой"],["battle","⚔️","Бой"],
@@ -209,12 +207,47 @@
     if(window.Telegram?.WebApp){try{Telegram.WebApp.expand();Telegram.WebApp.setHeaderColor("#07111b");Telegram.WebApp.setBackgroundColor("#07111b")}catch(_){}}
   }
 
-  function boot(){
-    mount();
-    hideLegacy();
-    // No secondary/persistent menu is created here.
-    // Buttons 42-48 are the original buttons drawn inside territory_reference_bg.png.
-    // The transparent hit zones mounted in #home are the only click layer for HOME.
+  function mountPersistentMenu(){
+    let nav=document.getElementById("tr10-main-menu");
+    if(nav) return nav;
+    nav=document.createElement("nav");
+    nav.id="tr10-main-menu";
+    nav.className="tr10-main-menu";
+    nav.setAttribute("aria-label","Главное меню");
+    nav.innerHTML=MAIN_MENU.map((x,i)=>`<button type="button" class="tr10-menu-btn ${i===3?"is-battle":""}" data-menu="${x[0]}" aria-label="${esc(x[2])}"><span class="tr10-menu-icon">${x[1]}</span><b>${esc(x[2])}</b></button>`).join("");
+    document.body.appendChild(nav);
+
+    const run=(b)=>{
+      if(!b || b.dataset.busy==="1") return;
+      b.dataset.busy="1";
+      setTimeout(()=>{b.dataset.busy="0"},500);
+      const target=b.dataset.menu;
+      if(target==="home") return go("districts");
+      if(target==="inventory") return go("inventory");
+      if(target==="hero") return go("inventory");
+      if(target==="battle") return go("arena");
+      if(target==="bottomQuests") return quests();
+      if(target==="game") return go("game");
+      if(target==="clan") return clan();
+    };
+
+    nav.querySelectorAll(".tr10-menu-btn").forEach(b=>{
+      b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();run(b)},false);
+      b.addEventListener("touchstart",e=>{e.preventDefault();e.stopPropagation();run(b)}, {passive:false});
+      b.addEventListener("touchend",e=>{e.preventDefault();e.stopPropagation();run(b)}, {passive:false});
+      b.addEventListener("pointerdown",e=>{e.preventDefault();e.stopPropagation();if(e.pointerType!=="mouse")run(b)},false);
+      b.addEventListener("pointerup",e=>{if(e.pointerType!=="touch"){e.preventDefault();e.stopPropagation();run(b)}},false);
+    });
+    return nav;
+  }
+  function syncPersistentMenu(){
+    const nav=mountPersistentMenu();
+    const home=$("#home");
+    const hideOnHome=!!(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel")); nav.classList.toggle("on-home",hideOnHome); nav.style.display=hideOnHome?"none":"grid";
+  }
+
+  function boot(){mount();hideLegacy();mountPersistentMenu();syncPersistentMenu();
+    const mo=new MutationObserver(syncPersistentMenu); mo.observe(document.body,{subtree:true,attributes:true,attributeFilter:["class"]});
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
