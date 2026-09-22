@@ -175,10 +175,6 @@
     ["home",0,91,14.28,9],["inventory",14.28,91,14.28,9],["hero",28.56,91,14.28,9],
     ["battle",42.84,90,14.32,10],["bottomQuests",57.16,91,14.28,9],["game",71.44,91,14.28,9],["clan",85.72,91,14.28,9]
   ];
-  const MAIN_MENU=[
-    ["home","🏰","Город"],["inventory","👜","Инвентарь"],["hero","🛡️","Герой"],["battle","⚔️","Бой"],
-    ["bottomQuests","📜","Квесты"],["game","🎲","Игры"],["clan","🚩","Клан"]
-  ];
   function hideLegacy(){
     const sels=[".hud",".live-side-ui",".live-city-title",".live-city-time",".home-v2-scene",".g141-photo-controls",".home-v2-scene-image",".real-home-image",".scene-hotspots",".home-v2-scene-overlay"];
     document.querySelectorAll(sels.join(",")).forEach(e=>{e.style.setProperty("display","none","important");e.style.setProperty("pointer-events","none","important");e.style.setProperty("visibility","hidden","important")});
@@ -195,10 +191,6 @@
     Z.forEach((z,i)=>addZone(layer,z,i));
     BOTTOM.forEach((z,i)=>addZone(bottom,z,42+i,"home-bottom-hz"));
 
-    // HOME controls: keep the artwork untouched and put transparent hit zones
-    // directly on top. The document-level fallback below is intentional: some
-    // Telegram Android WebViews can ignore pointer events on transparent
-    // children when an older overlay/stacking context is present.
     const fire=(name,e)=>{
       if(!name)return false;
       e.preventDefault();
@@ -222,8 +214,6 @@
     layer.addEventListener("touchstart",touch,{capture:true,passive:false});
     bottom.addEventListener("touchstart",touch,{capture:true,passive:false});
 
-    // Hard fallback for the bottom 42-48 buttons. It does not depend on the
-    // transparent button being the browser's event target.
     const bottomHit=(clientX,clientY)=>{
       if(!home.classList.contains("active"))return null;
       const rect=home.getBoundingClientRect();
@@ -263,10 +253,127 @@
   }
 
 
-  /* REAL HOME HUD v45
-     The artwork remains the source of truth. These tiny text layers only
-     replace the baked values with the current TerritoryStore values.
-     IMPORTANT: BOTTOM 42-48 is deliberately untouched. */
+  /* Telegram identity foundation.
+     Uses Telegram Mini App user data for the local player profile.
+     Server-side authentication is intentionally deferred to the backend stage:
+     initDataUnsafe is display/local-state input only here. */
+  async function initTelegramIdentity(){
+    const loadTelegram=()=>new Promise((resolve,reject)=>{
+      if(window.Telegram?.WebApp)return resolve(window.Telegram.WebApp);
+      const existing=document.querySelector('script[data-teritory-telegram-sdk]');
+      if(existing){
+        existing.addEventListener("load",()=>resolve(window.Telegram?.WebApp||null),{once:true});
+        existing.addEventListener("error",reject,{once:true});
+        return;
+      }
+      const script=document.createElement("script");
+      script.src="https://telegram.org/js/telegram-web-app.js?63";
+      script.async=true;
+      script.dataset.teritoryTelegramSdk="1";
+      script.onload=()=>resolve(window.Telegram?.WebApp||null);
+      script.onerror=reject;
+      document.head.appendChild(script);
+    });
+    try{
+      const tg=await loadTelegram();
+      if(!tg)return;
+      try{
+        tg.ready();
+        tg.expand();
+        tg.setHeaderColor("#07111b");
+        tg.setBackgroundColor("#07111b");
+      }catch(_){}
+      const u=tg.initDataUnsafe?.user;
+      if(!u?.id)return;
+
+      const id=String(u.id);
+      const key=`territory_profile_v1_${id}`;
+      const current=store();
+      const defaults={
+        coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,
+        weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0,
+        energy:100,strength:5,agility:5,defense:0
+      };
+
+      try{
+        const raw=localStorage.getItem(key);
+        if(raw){
+          const saved=JSON.parse(raw);
+          if(saved&&typeof saved==="object"){
+            Object.keys(current).forEach(k=>delete current[k]);
+            Object.assign(current,saved);
+          }
+        }else if(current.telegramUserId && String(current.telegramUserId)!==id){
+          Object.keys(current).forEach(k=>delete current[k]);
+          Object.assign(current,defaults);
+        }
+      }catch(_){}
+
+      const display=[u.first_name,u.last_name].filter(Boolean).join(" ").trim()
+        || (u.username?`@${u.username}`:"Игрок");
+
+      current.telegramUserId=id;
+      current.telegramUsername=String(u.username||"");
+      current.telegramFirstName=String(u.first_name||"");
+      current.telegramLastName=String(u.last_name||"");
+      current.telegramPhotoUrl=String(u.photo_url||"");
+      current.telegramLanguageCode=String(u.language_code||"");
+      current.telegramPlatform=String(tg.platform||"unknown");
+      current.telegramPremium=Boolean(u.is_premium);
+      current.name=display;
+
+      window.TerritoryIdentity={
+        id,
+        username:current.telegramUsername,
+        displayName:display,
+        photoUrl:current.telegramPhotoUrl,
+        platform:current.telegramPlatform,
+        initData:tg.initData||""
+      };
+
+      if(!window.__territoryTelegramSaveWrapped){
+        const original=window.TerritoryStore?.save;
+        if(typeof original==="function"){
+          window.__territoryTelegramSaveWrapped=true;
+          window.TerritoryStore.save=function(){
+            const result=original.apply(this,arguments);
+            try{
+              const activeId=window.TerritoryIdentity?.id;
+              if(activeId)localStorage.setItem(`territory_profile_v1_${activeId}`,JSON.stringify(store()));
+            }catch(_){}
+            return result;
+          };
+        }
+      }
+
+      try{
+        localStorage.setItem(key,JSON.stringify(current));
+        localStorage.setItem("territory_active_profile",id);
+      }catch(_){}
+
+      const setText=(selector,value)=>{
+        document.querySelectorAll(selector).forEach(el=>el.textContent=value);
+      };
+      setText("#playerName",display);
+      setText("#profileName",display);
+
+      const avatarUrl=current.telegramPhotoUrl;
+      if(avatarUrl){
+        document.querySelectorAll(".profile-avatar-big,.avatar").forEach(el=>{
+          el.textContent="";
+          el.style.backgroundImage=`url("${avatarUrl.replace(/"/g,"%22")}")`;
+          el.style.backgroundSize="cover";
+          el.style.backgroundPosition="center";
+          el.style.backgroundRepeat="no-repeat";
+        });
+      }
+
+      if(typeof window.TerritoryStore?.render==="function")window.TerritoryStore.render();
+    }catch(err){
+      console.warn("Telegram profile init failed",err);
+    }
+  }
+
   function mountRealHud(){
     const home=$("#home");
     const host=$("#homeReferenceHost",home);
@@ -300,13 +407,6 @@
         <div class="rhud-field rhud-cons c4"><span></span></div>`;
       host.appendChild(hud);
     }
-    const compact=v=>{
-      const n=Number(v||0);
-      if(n>=1000000000)return (n/1000000000).toFixed(n%1000000000?1:0)+"B";
-      if(n>=1000000)return (n/1000000).toFixed(n%1000000?1:0)+"M";
-      if(n>=1000)return (n/1000).toFixed(n%1000?1:0)+"K";
-      return String(n);
-    };
     const render=()=>{
       const s=store();
       const set=(cls,value)=>{const e=$(`.${cls} span`,hud);if(e)e.textContent=value};
@@ -352,8 +452,7 @@
     window.__homeRealHudTimer=setInterval(render,500);
   }
 
-
-  function boot(){mount();hideLegacy();mountRealHud();
+  function boot(){mount();hideLegacy();mountRealHud();initTelegramIdentity();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
