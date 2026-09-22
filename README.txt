@@ -1,18 +1,16 @@
-TERITORY GAME — ARENA BATTLES v36
+TERITORY — COMBAT ITEMS FOUNDATION v12
 
-ЗАМЕНИТЬ:
-- arena.js
+Replace/add ONLY these files:
+- arena.js (replace existing)
+- combat-items.js (add new file)
+
+Do NOT change:
+- index.html
+- app.js
+- home-rebuild.js
+- style.css
 - arena.css
+- territory_reference_bg.png
+- bottom navigation 42–48
 
-Что исправлено:
-- Арена открывается напрямую, без окна «Открыть арену»; есть дополнительный guard против старого popup.
-- Крестик внутри рейтинга/истории/профиля/поиска/боя/результата возвращает на главный экран Арены.
-- Только крестик главного экрана Арены выходит в HOME игры.
-- 40 полных имён: 70% английские, 30% русские/СНГ; 2 женских профиля = 5%.
-- Имена больше не превращаются в одну букву.
-- 1×1 запускает бой.
-- 3×3 запускает командный бой: союзники и противники реально ходят в бою.
-- CHAOS запускает отдельный бой.
-- Сохранены рейтинг, история, награды, классы и мобильная верстка.
-
-HOME-файл не трогать.
+This stage adds the shared consumable foundation and item-detail modal without changing HOME artwork.
