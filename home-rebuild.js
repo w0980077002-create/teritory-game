@@ -552,10 +552,22 @@
       style.id="territoryHomeCleanV2";
       style.textContent=`
         /* HOME CLEAN V2: remove baked dynamic captions without touching artwork or 42-48. */
-        #homeRealHud .rhud-item{top:74.15%!important;height:2.05%!important;background:rgba(10,16,22,.96)!important;border-radius:2px!important;box-shadow:none!important;}
-        #homeRealHud .rhud-item span{font-size:clamp(8px,1.55vw,13px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
-        #homeRealHud .rhud-cons{top:80.45%!important;height:2.35%!important;background:rgba(9,15,21,.96)!important;border-radius:2px!important;box-shadow:none!important;}
-        #homeRealHud .rhud-cons span{font-size:clamp(8px,1.55vw,13px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
+        /* Narrow label windows: never create one continuous black strip across the six item cards. */
+        #homeRealHud .rhud-item{top:74.55%!important;height:1.15%!important;background:rgba(10,16,22,.78)!important;border-radius:2px!important;box-shadow:none!important;padding:0!important;}
+        #homeRealHud .rhud-item.i1{left:19.7%!important;width:6.5%!important}
+        #homeRealHud .rhud-item.i2{left:30.5%!important;width:6.5%!important}
+        #homeRealHud .rhud-item.i3{left:41.5%!important;width:6.5%!important}
+        #homeRealHud .rhud-item.i4{left:52.5%!important;width:6.5%!important}
+        #homeRealHud .rhud-item.i5{left:63.5%!important;width:6.5%!important}
+        #homeRealHud .rhud-item.i6{left:74.5%!important;width:6.5%!important}
+        #homeRealHud .rhud-item span{font-size:clamp(7px,1.25vw,11px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
+        /* Consumable counts are small badges, not full-width masks. */
+        #homeRealHud .rhud-cons{top:80.9%!important;height:1.35%!important;background:rgba(9,15,21,.78)!important;border-radius:2px!important;box-shadow:none!important;padding:0!important;}
+        #homeRealHud .rhud-cons.c1{left:9.1%!important;width:3.4%!important}
+        #homeRealHud .rhud-cons.c2{left:22.2%!important;width:3.4%!important}
+        #homeRealHud .rhud-cons.c3{left:35.4%!important;width:3.4%!important}
+        #homeRealHud .rhud-cons.c4{left:48.5%!important;width:3.4%!important}
+        #homeRealHud .rhud-cons span{font-size:clamp(7px,1.25vw,11px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
         #homeRealHud .rhud-xp{background:rgba(7,18,27,.92)!important;}
         #homeRealHud .rhud-bottom-level{background:rgba(7,18,27,.92)!important;}
         #homeRealHud .rhud-hp{background:rgba(72,0,0,.88)!important;}
