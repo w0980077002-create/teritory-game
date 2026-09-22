@@ -21,7 +21,9 @@
       <div class="tr10-body">${body}</div>
     </div>`;
     document.body.appendChild(p);
-    const done=()=>p.remove();
+    const mainMenu=document.getElementById("tr10-main-menu");
+    if(mainMenu) mainMenu.classList.remove("on-home");
+    const done=()=>{p.remove(); syncPersistentMenu()};
     $(".tr10-x",p).onclick=done;
     p.addEventListener("click",e=>{if(e.target===p)done()});
     if(after)after(p,done);
@@ -210,28 +212,32 @@
     nav.setAttribute("aria-label","Главное меню");
     nav.innerHTML=MAIN_MENU.map((x,i)=>`<button type="button" class="tr10-menu-btn ${i===3?"is-battle":""}" data-menu="${x[0]}" aria-label="${esc(x[2])}"><span class="tr10-menu-icon">${x[1]}</span><b>${esc(x[2])}</b></button>`).join("");
     document.body.appendChild(nav);
-    nav.addEventListener("click",e=>{
-      const b=e.target.closest("[data-menu]");
-      if(!b)return;
-      e.preventDefault(); e.stopPropagation();
-      action(b.dataset.menu);
-    },true);
-    let last=0;
-    nav.addEventListener("touchend",e=>{
-      const b=e.target.closest("[data-menu]");
-      if(!b)return;
-      const now=Date.now();
-      if(now-last<450)return;
-      last=now;
-      e.preventDefault(); e.stopPropagation();
-      action(b.dataset.menu);
-    },{capture:true,passive:false});
+
+    const run=(b)=>{
+      if(!b || b.dataset.busy==="1") return;
+      b.dataset.busy="1";
+      setTimeout(()=>{b.dataset.busy="0"},500);
+      const target=b.dataset.menu;
+      if(target==="home") return go("home");
+      if(target==="inventory") return go("inventory");
+      if(target==="hero") return go("inventory");
+      if(target==="battle") return go("arena");
+      if(target==="bottomQuests") return quests();
+      if(target==="game") return go("game");
+      if(target==="clan") return clan();
+    };
+
+    nav.querySelectorAll(".tr10-menu-btn").forEach(b=>{
+      b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();run(b)},false);
+      b.addEventListener("touchend",e=>{e.preventDefault();e.stopPropagation();run(b)}, {passive:false});
+      b.addEventListener("pointerup",e=>{if(e.pointerType!=="touch"){e.preventDefault();e.stopPropagation();run(b)}},false);
+    });
     return nav;
   }
   function syncPersistentMenu(){
     const nav=mountPersistentMenu();
     const home=$("#home");
-    nav.classList.toggle("on-home",!!(home&&home.classList.contains("active")));
+    nav.classList.toggle("on-home",!!(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel"))); nav.style.display=(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel"))?"none":"grid";
   }
 
   function boot(){mount();hideLegacy();mountPersistentMenu();syncPersistentMenu();
