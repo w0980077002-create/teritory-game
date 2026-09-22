@@ -51,6 +51,22 @@
   data.history=Array.isArray(data.history)?data.history:[];
   data.season=Number(data.season||1);
   const persist=()=>localStorage.setItem(KEY,JSON.stringify(data));
+  const TEST_BOOST_KEY='arena_test_boost_at';
+  function applyTestBoost(){
+    const now=Date.now(), last=Number(localStorage.getItem(TEST_BOOST_KEY)||0);
+    const HOUR=60*60*1000;
+    if(now-last < HOUR) return false;
+    const s=state();
+    s.coins=Math.max(Number(s.coins||0),10000)+5000;
+    s.gems=Math.max(Number(s.gems||0),1000)+500;
+    s.energy=200;
+    s.vipLevel=Math.max(Number(s.vipLevel||0),6);
+    s.vipUntil=now+24*60*60*1000;
+    s.arenaTestBoostAt=now;
+    localStorage.setItem(TEST_BOOST_KEY,String(now));
+    save();
+    return true;
+  }
 
   function rank(r){
     if(r<900)return ['Бронза','🥉'];
@@ -134,6 +150,8 @@
 
   function home(){
     clearInterval(queueTimer);
+    const boosted=applyTestBoost();
+
     const s=state(), energy=Number(s.energy??100);
     const live=rnd(18,72), fighting=rnd(8,34), queue=rnd(2,16);
     frame('⚔️ Арена',`
@@ -160,6 +178,7 @@
         <button data-view="profile">👤<b>Профиль</b><small>Статистика</small></button>
       </section>
     `, true);
+    if(boosted) setTimeout(()=>arenaToast('🎁 Тестовый набор обновлён'),80);
     $$('.ar-mode').forEach(b=>b.onclick=()=>queue(b.dataset.mode));
     $$('[data-view]').forEach(b=>b.onclick=()=>views(b.dataset.view));
   }
