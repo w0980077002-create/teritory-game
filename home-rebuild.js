@@ -292,16 +292,41 @@
       return null;
     };
     try{
-      const tg=await loadTelegram();
-      if(!tg)return;
-      try{
-        tg.ready();
-        tg.expand();
-        tg.setHeaderColor("#07111b");
-        tg.setBackgroundColor("#07111b");
-      }catch(_){}
+      let tg=null;
+      try{tg=await loadTelegram();}catch(_){}
+      if(tg){
+        try{
+          tg.ready();
+          tg.expand();
+          tg.setHeaderColor("#07111b");
+          tg.setBackgroundColor("#07111b");
+        }catch(_){}
+      }
 
-      const u=await getUser(tg);
+      // Fast local fallback: after the first successful Telegram login, the
+      // player's own profile is already stored under their Telegram ID.
+      // This prevents a cached/slow WebView SDK from exposing the baked S$$/SSS.
+      let u=null;
+      let savedId="";
+      try{
+        savedId=String(localStorage.getItem("territory_active_profile")||"");
+        if(savedId){
+          const raw=localStorage.getItem(`territory_profile_v1_${savedId}`);
+          const saved=raw?JSON.parse(raw):null;
+          if(saved?.telegramUserId){
+            u={
+              id:saved.telegramUserId,
+              username:saved.telegramUsername||"",
+              first_name:saved.telegramFirstName||saved.name||"Игрок",
+              last_name:saved.telegramLastName||"",
+              photo_url:saved.telegramPhotoUrl||"",
+              language_code:saved.telegramLanguageCode||"",
+              is_premium:Boolean(saved.telegramPremium)
+            };
+          }
+        }
+      }catch(_){}
+      if(!u?.id && tg)u=await getUser(tg);
       if(!u?.id){
         console.warn("Telegram user data is unavailable; profile was not overwritten.");
         return;
@@ -527,16 +552,18 @@
       style.id="territoryHomeCleanV2";
       style.textContent=`
         /* HOME CLEAN V2: remove baked dynamic captions without touching artwork or 42-48. */
-        #homeRealHud .rhud-item{height:1.45%!important;background:rgba(10,16,22,.92)!important;border-radius:2px!important;box-shadow:none!important;}
+        #homeRealHud .rhud-item{top:74.15%!important;height:2.05%!important;background:rgba(10,16,22,.96)!important;border-radius:2px!important;box-shadow:none!important;}
         #homeRealHud .rhud-item span{font-size:clamp(8px,1.55vw,13px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
-        #homeRealHud .rhud-cons{height:1.55%!important;background:rgba(9,15,21,.90)!important;border-radius:2px!important;box-shadow:none!important;}
+        #homeRealHud .rhud-cons{top:80.45%!important;height:2.35%!important;background:rgba(9,15,21,.96)!important;border-radius:2px!important;box-shadow:none!important;}
         #homeRealHud .rhud-cons span{font-size:clamp(8px,1.55vw,13px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
         #homeRealHud .rhud-xp{background:rgba(7,18,27,.92)!important;}
         #homeRealHud .rhud-bottom-level{background:rgba(7,18,27,.92)!important;}
         #homeRealHud .rhud-hp{background:rgba(72,0,0,.88)!important;}
         #homeRealHud .rhud-bottom-energy{background:rgba(0,42,92,.88)!important;}
         #homeRealHud .rhud-energy{background:#07151b!important;}
-        #telegramBakedProfileCleaner{position:absolute!important;left:13.7%!important;top:.8%!important;width:13.2%!important;height:6.35%!important;z-index:110!important;pointer-events:none!important;background:rgba(17,31,44,.96)!important;border-radius:3px!important;box-shadow:none!important;}
+        /* Only erase the baked text part of the profile. The live Telegram
+           layer sits above this patch and keeps the real photo/name visible. */
+        #telegramBakedProfileCleaner{position:absolute!important;left:13.2%!important;top:.7%!important;width:13.8%!important;height:6.7%!important;z-index:110!important;pointer-events:none!important;background:rgba(17,31,44,.97)!important;border-radius:3px!important;box-shadow:none!important;}
         #telegramLiveProfile{z-index:120!important;}
       `;
       document.head.appendChild(style);
