@@ -34,33 +34,36 @@ body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active)
 @media(max-width:390px){.tr10-card{width:96vw!important;max-height:88vh!important;padding:11px!important}.tr10-head h2{font-size:18px!important}}
 
 
-/* HOME REAL HUD v40 — live values only; canonical artwork and 42–48 hit zones remain unchanged. */
-#homeLiveHud{
-  position:absolute!important;inset:0!important;z-index:70!important;
-  pointer-events:none!important;font-family:Arial,sans-serif!important;
+
+/* HOME REAL HUD v41 — precise live values, no giant masks and no center overlays. */
+#homeLiveHud{position:absolute!important;inset:0!important;z-index:70!important;pointer-events:none!important;font-family:Arial,sans-serif!important}
+#homeLiveHud .hl-live{
+ position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;
+ box-sizing:border-box!important;pointer-events:none!important;overflow:hidden!important;
+ background:rgba(12,24,35,.96)!important;border-radius:4px!important;
+ color:#fff!important;text-shadow:0 1px 2px #000!important;font-weight:900!important;line-height:1!important;
+ white-space:nowrap!important;
 }
-#homeLiveHud .hl-mask{
-  position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;
-  box-sizing:border-box!important;background:rgba(7,22,37,.90)!important;border-radius:5px!important;
-  overflow:hidden!important;
-}
-#homeLiveHud .hl-value{
-  display:block!important;color:#fff!important;font-weight:900!important;
-  font-size:clamp(10px,2.25vw,18px)!important;line-height:1!important;
-  text-shadow:0 1px 2px #000!important;white-space:nowrap!important;
-}
-#homeLiveHud .hl-vip{left:16.2%!important;top:12.9%!important;width:5.9%!important;height:2.8%!important;justify-content:flex-start!important}
-#homeLiveHud .hl-vip .hl-value{color:#ffd84d!important;font-size:clamp(8px,1.9vw,15px)!important}
-#homeLiveHud .hl-coins{left:28.1%!important;top:11.15%!important;width:6.2%!important;height:2.25%!important}
-#homeLiveHud .hl-gems{left:43.2%!important;top:11.15%!important;width:6.1%!important;height:2.25%!important}
-#homeLiveHud .hl-redgems{left:58.7%!important;top:11.15%!important;width:5.9%!important;height:2.25%!important}
-#homeLiveHud .hl-energy{left:32.1%!important;top:14.35%!important;width:12.4%!important;height:2.55%!important}
-#homeLiveHud .hl-level{left:53.2%!important;top:68.25%!important;width:6.9%!important;height:2.35%!important}
-#homeLiveHud .hl-hp{left:3.9%!important;top:74.9%!important;width:9.8%!important;height:2.5%!important;background:rgba(45,0,0,.72)!important}
-#homeLiveHud .hl-bottom-energy{left:82.6%!important;top:74.9%!important;width:10.1%!important;height:2.5%!important;background:rgba(0,20,45,.72)!important}
+#homeLiveHud .hl-live span{font-size:clamp(9px,2.2vw,16px)!important}
+#homeLiveHud .hl-level-top{left:9.8%!important;top:6.1%!important;width:8.6%!important;height:3.5%!important;justify-content:flex-start!important;background:rgba(12,24,35,.88)!important}
+#homeLiveHud .hl-level-top span{font-size:clamp(8px,1.8vw,13px)!important}
+#homeLiveHud .hl-vip{left:23.5%!important;top:9.5%!important;width:11%!important;height:3.3%!important;justify-content:flex-start!important;background:rgba(12,24,35,.90)!important;color:#ffd84d!important}
+#homeLiveHud .hl-vip span{color:#ffd84d!important;font-size:clamp(8px,1.9vw,14px)!important}
+#homeLiveHud .hl-coins{left:34.2%!important;top:1.7%!important;width:7.0%!important;height:3.8%!important}
+#homeLiveHud .hl-gems{left:51.5%!important;top:1.7%!important;width:7.2%!important;height:3.8%!important}
+#homeLiveHud .hl-redgems{left:69.0%!important;top:1.7%!important;width:5.5%!important;height:3.8%!important}
+#homeLiveHud .hl-energy-top{left:41.5%!important;top:6.9%!important;width:9.7%!important;height:3.4%!important;background:rgba(0,65,18,.88)!important}
+#homeLiveHud .hl-energy-top span{font-size:clamp(8px,1.8vw,14px)!important}
+#homeLiveHud .hl-level-bottom{left:66.0%!important;top:66.0%!important;width:11.5%!important;height:3.0%!important;background:rgba(15,24,31,.93)!important}
+#homeLiveHud .hl-level-bottom span{font-size:clamp(9px,2vw,15px)!important}
+#homeLiveHud .hl-hp{left:3.4%!important;top:74.1%!important;width:13.6%!important;height:3.3%!important;background:rgba(72,0,0,.82)!important}
+#homeLiveHud .hl-hp span{font-size:clamp(8px,1.8vw,13px)!important}
+#homeLiveHud .hl-energy-bottom{left:83.2%!important;top:74.1%!important;width:11.8%!important;height:3.3%!important;background:rgba(0,28,62,.82)!important}
+#homeLiveHud .hl-energy-bottom span{font-size:clamp(8px,1.8vw,13px)!important}
 @media(max-width:430px){
-  #homeLiveHud .hl-value{font-size:11px!important}
-  #homeLiveHud .hl-vip .hl-value{font-size:9px!important}
-  #homeLiveHud .hl-level .hl-value{font-size:10px!important}
-  #homeLiveHud .hl-hp .hl-value,#homeLiveHud .hl-bottom-energy .hl-value{font-size:9px!important}
+ #homeLiveHud .hl-coins{width:7.4%!important}
+ #homeLiveHud .hl-gems{width:7.5%!important}
+ #homeLiveHud .hl-redgems{width:6%!important}
+ #homeLiveHud .hl-level-top span,#homeLiveHud .hl-vip span,#homeLiveHud .hl-energy-top span{font-size:9px!important}
+ #homeLiveHud .hl-level-bottom span,#homeLiveHud .hl-hp span,#homeLiveHud .hl-energy-bottom span{font-size:9px!important}
 }

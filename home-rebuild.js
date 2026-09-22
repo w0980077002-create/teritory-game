@@ -211,40 +211,39 @@
   function mountLiveHud(){
     const home=$("#home"); if(!home) return;
     const host=$(".home-reference-host",home); if(!host) return;
-
     let hud=$("#homeLiveHud",home);
     if(!hud){
       hud=document.createElement("div");
       hud.id="homeLiveHud";
       hud.innerHTML=`
-        <div class="hl-mask hl-vip"><span class="hl-value"></span></div>
-        <div class="hl-mask hl-coins"><span class="hl-value"></span></div>
-        <div class="hl-mask hl-gems"><span class="hl-value"></span></div>
-        <div class="hl-mask hl-redgems"><span class="hl-value"></span></div>
-        <div class="hl-mask hl-energy"><span class="hl-value"></span></div>
-        <div class="hl-mask hl-level"><span class="hl-value"></span></div>
-        <div class="hl-mask hl-hp"><span class="hl-value"></span></div>
-        <div class="hl-mask hl-bottom-energy"><span class="hl-value"></span></div>`;
+        <div class="hl-live hl-level-top"><span></span></div>
+        <div class="hl-live hl-vip"><span></span></div>
+        <div class="hl-live hl-coins"><span></span></div>
+        <div class="hl-live hl-gems"><span></span></div>
+        <div class="hl-live hl-redgems"><span></span></div>
+        <div class="hl-live hl-energy-top"><span></span></div>
+        <div class="hl-live hl-level-bottom"><span></span></div>
+        <div class="hl-live hl-hp"><span></span></div>
+        <div class="hl-live hl-energy-bottom"><span></span></div>`;
       host.appendChild(hud);
     }
-
-    const renderHud=()=>{
+    const render=()=>{
       const s=store();
-      const val=(cls,text)=>{
-        const e=$(`.${cls} .hl-value`,hud); if(e)e.textContent=text;
-      };
-      val("hl-vip","VIP "+Math.max(0,Number(s.vipLevel||0)));
-      val("hl-coins",String(Math.max(0,Number(s.coins||0))));
-      val("hl-gems",String(Math.max(0,Number(s.gems||0))));
-      val("hl-redgems",String(Math.max(0,Number(s.redGems||0))));
-      val("hl-energy",`${Math.max(0,Number(s.energy||0))}/200`);
-      val("hl-level",String(Math.max(1,Number(s.level||1))));
-      val("hl-hp",`${Math.max(0,Number(s.hp||0))}/${Math.max(0,Number(s.maxHp||0))}`);
-      val("hl-bottom-energy",String(Math.max(0,Number(s.energy||0))));
+      const n=(v,d=0)=>Math.max(d,Number(v||0));
+      const set=(cls,v)=>{const e=$(`.${cls} span`,hud);if(e)e.textContent=v};
+      set("hl-level-top","Lv. "+n(s.level,1));
+      set("hl-vip","VIP "+n(s.vipLevel,0));
+      set("hl-coins",String(n(s.coins)));
+      set("hl-gems",String(n(s.gems)));
+      set("hl-redgems",String(n(s.redGems)));
+      set("hl-energy-top",`${n(s.energy)}/200`);
+      set("hl-level-bottom","Lv. "+n(s.level,1));
+      set("hl-hp",`${n(s.hp)}/${n(s.maxHp)}`);
+      set("hl-energy-bottom",`${n(s.energy)}/200`);
     };
-    renderHud();
+    render();
     clearInterval(window.__homeHudTimer);
-    window.__homeHudTimer=setInterval(renderHud,350);
+    window.__homeHudTimer=setInterval(render,350);
   }
 
   function boot(){mount();hideLegacy();mountLiveHud();
