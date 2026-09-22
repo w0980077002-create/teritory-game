@@ -48,7 +48,7 @@ body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active)
   box-sizing:border-box!important;
   padding:0!important;
   margin:0!important;
-  background:#07111b url("territory_reference_bg.png?v=UNIFIED11") center bottom / 100% auto no-repeat!important;
+  background:#07111b url("territory_reference_bg.png?v=UNIFIED14") center bottom / 100% 1000% no-repeat!important;
   border-top:1px solid rgba(180,150,90,.45)!important;
   box-shadow:0 -8px 25px rgba(0,0,0,.38)!important;
 }
@@ -120,3 +120,33 @@ body:has(.tr10-main-menu) .bottom-nav{display:none!important;pointer-events:none
 }
 #tr10-main-menu.on-home{display:none!important}
 .tr10-panel{z-index:100000!important;pointer-events:auto!important}
+
+/* UNIFIED 14: one bottom menu only. The reference artwork supplies the visuals;
+   HTML buttons are invisible hit zones, so no duplicate emoji/menu can appear. */
+#tr10-main-menu{
+  background-color:#07111b!important;
+  background-image:url("territory_reference_bg.png?v=UNIFIED14")!important;
+  background-repeat:no-repeat!important;
+  background-position:center bottom!important;
+  background-size:100% 1000%!important;
+  overflow:hidden!important;
+}
+#tr10-main-menu .tr10-menu-btn{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
+  color:transparent!important;
+  transform:none!important;
+}
+#tr10-main-menu .tr10-menu-btn.is-battle{
+  background:transparent!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+#tr10-main-menu .tr10-menu-icon,
+#tr10-main-menu .tr10-menu-btn b{
+  opacity:0!important;
+  color:transparent!important;
+  text-shadow:none!important;
+}
