@@ -204,12 +204,19 @@
   function queue(mode){
     const s=state(),cost=energyCost(mode);
     if(Number(s.energy??100)<cost){arenaToast(`⚡ Нужно ${cost} энергии`);return}
-    currentMode=mode;queueLeft=mode==='chaos'?15:5;
+    currentMode=mode;
+    // TEST/PLAY BUILD: entering a mode starts a battle immediately.
+    // Matchmaking remains represented by the selected opponent/team; no extra queue screen blocks testing.
+    if(mode==='chaos') startMatch('chaos',buildLive());
+    else startMatch(mode,buildFallback(mode));
+    return;
+    /* legacy queue UI kept below for later server matchmaking */
+    queueLeft=mode==='chaos'?15:5;
     frame('🔎 Поиск соперников',`<div class="ar-queue-screen">
       <div class="ar-radar">⚔️</div><h2>${mode==='1v1'?'1 × 1':mode==='3v3'?'3 × 3':'CHAOS'}</h2>
       <p id="arQueueText">Ищем соперника… ${queueLeft}с</p><div class="ar-bar"><i id="arBar"></i></div>
       <div class="ar-queue-info">🟢 Подбираем соперника</div>
-      <div class="ar-queue-info">${mode==='chaos'?'🔥 В этом режиме соперники отключены':'⚔️ Подбор по уровню и рейтингу'}</div>
+      <div class="ar-queue-info">⚔️ Подбор по уровню и рейтингу</div>
       <button class="ar-secondary" id="arCancel">Отмена</button>
     </div>`);
     let elapsed=0;clearInterval(queueTimer);
@@ -236,7 +243,7 @@
     return {teams:[[makePlayer(),unit(pool[0]),unit(pool[1])],[unit(pool[2]),unit(pool[3]),unit(pool[4])]]};
   }
   function buildLive(){
-    const fake={id:'live-search',name:'Игрок из очереди',level:Math.max(1,Number(state().level||1)),class:'duelist',rating:data.rating+8,wins:20,losses:11,style:'Баланс'};
+    const fake={id:'live-search',name:NAMES[rnd(0,NAMES.length-1)],level:Math.max(1,Number(state().level||1)),class:'duelist',rating:data.rating+8,wins:20,losses:11,style:'Баланс'};
     return {teams:[[makePlayer()],[unit(fake)]]};
   }
   function unit(o){
@@ -276,7 +283,7 @@
       <div class="ar-stage"><div class="ar-fighter">${CLASSES[me.class].icon}<b>${esc(me.name)}</b><small>HP ${Math.ceil(me.hp)}/${me.maxHp}</small></div><strong>VS</strong><div class="ar-fighter">${enemy?CLASSES[enemy.class].icon:'💀'}<b>${esc(enemy?.name||'Побеждён')}</b><small>${enemy?'HP '+Math.ceil(enemy.hp)+'/'+enemy.maxHp:'—'}</small></div></div>
       <div class="ar-pick-title">🎯 Куда атаковать?</div><div class="ar-zones">${ZONES.map(z=>`<button data-a="${z[0]}" class="${battle.attack===z[0]?'sel':''}">${z[1]}</button>`).join('')}</div>
       <div class="ar-pick-title">🛡️ Что защищать? Выбери 2</div><div class="ar-zones">${ZONES.map(z=>`<button data-d="${z[0]}" class="${battle.def.includes(z[0])?'sel':''}">${z[1]}</button>`).join('')}</div>
-      <div class="ar-battle-actions"><button class="ar-main" id="arHit">⚔️ АТАКА</button><button class="ar-secondary" id="arTactic">🤖 Тактика</button></div>
+      <div class="ar-battle-actions"><button class="ar-main" id="arHit">⚔️ АТАКА</button><button class="ar-secondary" id="arTactic">🧠 Тактика</button></div>
       <div class="ar-log">${battle.log.slice(-8).map(x=>`<div>${esc(x)}</div>`).join('')||'Выбери действие.'}</div>
     `);
     $$('[data-a]').forEach(b=>b.onclick=()=>{battle.attack=b.dataset.a;renderBattle()});
