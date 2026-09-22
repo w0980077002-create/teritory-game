@@ -207,48 +207,12 @@
     if(window.Telegram?.WebApp){try{Telegram.WebApp.expand();Telegram.WebApp.setHeaderColor("#07111b");Telegram.WebApp.setBackgroundColor("#07111b")}catch(_){}}
   }
 
-  function mountPersistentMenu(){
-    let nav=document.getElementById("tr10-main-menu");
-    if(nav) return nav;
-    nav=document.createElement("nav");
-    nav.id="tr10-main-menu";
-    nav.className="tr10-main-menu tr10-hit-only-menu";
-    nav.setAttribute("aria-label","Главное меню");
-    nav.innerHTML=MAIN_MENU.map((x,i)=>`<button type="button" class="tr10-menu-btn ${i===3?"is-battle":""}" data-menu="${x[0]}" aria-label="${esc(x[2])}"></button>`).join("");
-    document.body.appendChild(nav);
-
-    const run=(b)=>{
-      if(!b || b.dataset.busy==="1") return;
-      b.dataset.busy="1";
-      setTimeout(()=>{b.dataset.busy="0"},500);
-      const target=b.dataset.menu;
-      if(target==="home") return go("districts");
-      if(target==="inventory") return go("inventory");
-      if(target==="hero") return go("inventory");
-      if(target==="battle") return go("arena");
-      if(target==="bottomQuests") return quests();
-      if(target==="game") return go("game");
-      if(target==="clan") return clan();
-    };
-
-    nav.querySelectorAll(".tr10-menu-btn").forEach(b=>{
-      const fire=e=>{e.preventDefault();e.stopPropagation();run(b)};
-      b.addEventListener("click",fire,false);
-      b.addEventListener("touchend",fire,{passive:false});
-      b.addEventListener("pointerup",e=>{if(e.pointerType!=="mouse")fire(e)},false);
-    });
-    return nav;
-  }
-  function syncPersistentMenu(){
-    const nav=mountPersistentMenu();
-    const home=$("#home");
-    const hideOnHome=!!(home&&home.classList.contains("active")&&!document.querySelector(".tr10-panel"));
-    nav.classList.toggle("on-home",hideOnHome);
-    nav.style.display=hideOnHome?"none":"grid";
-  }
-
-  function boot(){mount();hideLegacy();mountPersistentMenu();syncPersistentMenu();
-    const mo=new MutationObserver(syncPersistentMenu); mo.observe(document.body,{subtree:true,attributes:true,attributeFilter:["class"]});
+  function boot(){
+    mount();
+    hideLegacy();
+    // No secondary/persistent menu is created here.
+    // Buttons 42-48 are the original buttons drawn inside territory_reference_bg.png.
+    // The transparent hit zones mounted in #home are the only click layer for HOME.
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
