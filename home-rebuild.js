@@ -575,7 +575,7 @@
         #homeRealHud .rhud-energy{background:#07151b!important;}
         /* Only erase the baked text part of the profile. The live Telegram
            layer sits above this patch and keeps the real photo/name visible. */
-        #telegramBakedProfileCleaner{position:absolute!important;left:13.2%!important;top:.7%!important;width:13.8%!important;height:6.7%!important;z-index:110!important;pointer-events:none!important;background:rgba(17,31,44,.97)!important;border-radius:3px!important;box-shadow:none!important;}
+        #telegramBakedProfileCleaner{position:absolute!important;left:13.2%!important;top:.7%!important;width:13.8%!important;height:6.7%!important;z-index:110!important;pointer-events:none!important;background:#111f2c!important;opacity:1!important;border-radius:3px!important;box-shadow:none!important;mix-blend-mode:normal!important;}
         #telegramLiveProfile{z-index:120!important;}
       `;
       document.head.appendChild(style);
