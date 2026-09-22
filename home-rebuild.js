@@ -173,8 +173,12 @@
     ["home",0,91,14.28,9],["inventory",14.28,91,14.28,9],["hero",28.56,91,14.28,9],
     ["battle",42.84,90,14.32,10],["bottomQuests",57.16,91,14.28,9],["game",71.44,91,14.28,9],["clan",85.72,91,14.28,9]
   ];
+  const MAIN_MENU=[
+    ["home","🏰","Город"],["inventory","👜","Инвентарь"],["hero","🛡️","Герой"],["battle","⚔️","Бой"],
+    ["bottomQuests","📜","Квесты"],["game","🎲","Игры"],["clan","🚩","Клан"]
+  ];
   function hideLegacy(){
-    const sels=[".hud",".bottom-nav",".live-side-ui",".live-city-title",".live-city-time",".home-v2-scene",".g141-photo-controls",".home-v2-scene-image",".real-home-image",".scene-hotspots",".home-v2-scene-overlay"];
+    const sels=[".hud",".live-side-ui",".live-city-title",".live-city-time",".home-v2-scene",".g141-photo-controls",".home-v2-scene-image",".real-home-image",".scene-hotspots",".home-v2-scene-overlay"];
     document.querySelectorAll(sels.join(",")).forEach(e=>{e.style.setProperty("display","none","important");e.style.setProperty("pointer-events","none","important");e.style.setProperty("visibility","hidden","important")});
   }
   function addZone(layer,z,i,cls){
@@ -196,6 +200,42 @@
     hideLegacy();
     if(window.Telegram?.WebApp){try{Telegram.WebApp.expand();Telegram.WebApp.setHeaderColor("#07111b");Telegram.WebApp.setBackgroundColor("#07111b")}catch(_){}}
   }
-  function boot(){mount();hideLegacy()}
+
+  function mountPersistentMenu(){
+    let nav=document.getElementById("tr10-main-menu");
+    if(nav) return nav;
+    nav=document.createElement("nav");
+    nav.id="tr10-main-menu";
+    nav.className="tr10-main-menu";
+    nav.setAttribute("aria-label","Главное меню");
+    nav.innerHTML=MAIN_MENU.map((x,i)=>`<button type="button" class="tr10-menu-btn ${i===3?"is-battle":""}" data-menu="${x[0]}" aria-label="${esc(x[2])}"><span class="tr10-menu-icon">${x[1]}</span><b>${esc(x[2])}</b></button>`).join("");
+    document.body.appendChild(nav);
+    nav.addEventListener("click",e=>{
+      const b=e.target.closest("[data-menu]");
+      if(!b)return;
+      e.preventDefault(); e.stopPropagation();
+      action(b.dataset.menu);
+    },true);
+    let last=0;
+    nav.addEventListener("touchend",e=>{
+      const b=e.target.closest("[data-menu]");
+      if(!b)return;
+      const now=Date.now();
+      if(now-last<450)return;
+      last=now;
+      e.preventDefault(); e.stopPropagation();
+      action(b.dataset.menu);
+    },{capture:true,passive:false});
+    return nav;
+  }
+  function syncPersistentMenu(){
+    const nav=mountPersistentMenu();
+    const home=$("#home");
+    nav.classList.toggle("on-home",!!(home&&home.classList.contains("active")));
+  }
+
+  function boot(){mount();hideLegacy();mountPersistentMenu();syncPersistentMenu();
+    const mo=new MutationObserver(syncPersistentMenu); mo.observe(document.body,{subtree:true,attributes:true,attributeFilter:["class"]});
+  }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
