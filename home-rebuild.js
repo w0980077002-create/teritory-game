@@ -144,7 +144,14 @@
       case"forge":return launch("Кузница","СНАРЯЖЕНИЕ","🔨","Покупка и экипировка оружия", "Открыть кузницу",()=>{if(typeof window.openForgeV2==="function")window.openForgeV2();else go("market")});
       case"challenges":return go("arena");
       case"streets":return streets();
-      case"arena":return go("arena");
+      case"arena":{
+        /* TEST ACCESS: keep the real saved resource model, but never let a
+           depleted test account block Arena while we are building the game. */
+        const s=store();
+        const maxEnergy=Math.max(1,Number(s.maxEnergy||120));
+        if(Number(s.energy||0)<20){s.energy=maxEnergy;save();}
+        return go("arena");
+      }
       case"hp":return resourceInfo("hp"); case"equipment":return launch("Экипировка","ГЕРОЙ","🛡️","Текущий комплект героя","Открыть героя",()=>go("inventory"));
       case"consumable1":return consumable(0); case"consumable2":return consumable(1); case"consumable3":return consumable(2); case"consumable4":return consumable(3);
       case"lock1":return locked("Слот · уровень 90"); case"lock2":return locked("Слот · Арена"); case"lock3":return locked("Слот · позже");
@@ -263,27 +270,89 @@
   }
 
 
-  /* HOME SCENE FX
-     Keep the original HUD baked into the reference artwork for now.
-     Do NOT paint a second HUD layer over it: the artwork already contains
-     the complete top interface. Bottom 42-48 remains LOCKED. */
+  /* REAL HOME HUD v46
+     The reference artwork is immutable. Only the values that are truly
+     stored in TerritoryStore are painted over the baked demo values.
+     Bottom 42-48 is intentionally outside this system and is LOCKED. */
   function mountRealHud(){
     const home=$("#home"), host=$("#homeReferenceHost",home);
     if(!home||!host)return;
 
-    clearInterval(window.__homeRealHudTimer);
-    window.__homeRealHudTimer=null;
-
-    let fx=$("#homeSceneFx",host);
-    if(!fx){
-      fx=document.createElement("div");
-      fx.id="homeSceneFx";
-      fx.innerHTML=`<i class="scene-mist mist-a"></i><i class="scene-mist mist-b"></i><i class="scene-spark spark-a"></i><i class="scene-spark spark-b"></i><i class="scene-spark spark-c"></i><i class="scene-water-glow"></i>`;
-      host.appendChild(fx);
+    let hud=$("#homeRealHud",host);
+    if(!hud){
+      hud=document.createElement("div");
+      hud.id="homeRealHud";
+      hud.innerHTML=`
+        <div class="rhud-field rhud-name"><span></span></div>
+        <div class="rhud-field rhud-level"><span></span></div>
+        <div class="rhud-field rhud-coins"><span></span></div>
+        <div class="rhud-field rhud-gems"><span></span></div>
+        <div class="rhud-field rhud-redgems"><span></span></div>
+        <div class="rhud-field rhud-energy"><span></span></div>
+        <div class="rhud-field rhud-vip"><span></span></div>
+        <div class="rhud-field rhud-xp"><span></span></div>
+        <div class="rhud-field rhud-xpbar"><i></i></div>
+        <div class="rhud-field rhud-bottom-level"><span></span></div>
+        <div class="rhud-field rhud-hp"><span></span></div>
+        <div class="rhud-field rhud-bottom-energy"><span></span></div>`;
+      host.appendChild(hud);
     }
 
-    // Remove any stale HUD from a previous cached version.
-    $("#homeRealHud",host)?.remove();
+    // These rectangles are only value plates. They deliberately do not touch
+    // the artwork outside the original text/value areas.
+    const compact=v=>{
+      const n=Math.max(0,Number(v)||0);
+      if(n>=1000000000)return (n/1000000000).toFixed(n%1000000000?1:0)+"B";
+      if(n>=1000000)return (n/1000000).toFixed(n%1000000?1:0)+"M";
+      if(n>=1000)return (n/1000).toFixed(n%1000?1:0)+"K";
+      return String(Math.floor(n));
+    };
+    const has=(s,...keys)=>keys.some(k=>s[k]!==undefined&&s[k]!==null&&s[k]!=="");
+    const render=()=>{
+      const s=store();
+      const set=(cls,value)=>{const e=$(`.${cls} span`,hud);if(e)e.textContent=value};
+
+      // Profile is real: use the saved player name and level. Never invent a
+      // VIP level if the save does not contain one.
+      set("rhud-name",String(s.name||"SSS"));
+      set("rhud-level","Lv. "+Math.max(1,Number(s.level||1)));
+
+      // Counters are always read from the same save used by the game.
+      set("rhud-coins",compact(s.coins));
+      set("rhud-gems",compact(s.gems));
+      set("rhud-redgems",compact(s.redGems));
+
+      const energyMax=Math.max(1,Number(s.maxEnergy||200));
+      set("rhud-energy",`${Math.max(0,Number(s.energy||0))}/${energyMax}`);
+
+      const vipRaw=s.vipLevel??s.vip;
+      const vipEl=$(".rhud-vip",hud);
+      vipEl.style.display="flex";
+      set("rhud-vip",has(s,"vipLevel","vip") ? ("VIP "+Math.max(0,Number(vipRaw)||0)) : "");
+
+      // Bottom HUD is live too: XP, level, HP and energy come from the same
+      // TerritoryStore state. The baked demo numbers in the reference image
+      // are masked only inside their original value areas.
+      const level=Math.max(1,Number(s.level||1));
+      const xp=Math.max(0,Number(s.exp||0));
+      const xpNeeded=Math.max(1,Number(s.expToNext??s.maxExp??100));
+      const hp=Math.max(0,Number(s.hp||0));
+      const hpMax=Math.max(1,Number(s.maxHp||120));
+      const eNow=Math.max(0,Number(s.energy||0));
+      const eMax=Math.max(1,Number(s.maxEnergy||200));
+      set("rhud-xp",`${Math.floor(xp).toLocaleString("ru-RU")}/${Math.floor(xpNeeded).toLocaleString("ru-RU")}`);
+      set("rhud-bottom-level",`Lv.${level}`);
+      set("rhud-hp",`${Math.floor(hp).toLocaleString("ru-RU")} / ${Math.floor(hpMax).toLocaleString("ru-RU")}`);
+      set("rhud-bottom-energy",`${Math.floor(eNow).toLocaleString("ru-RU")} / ${Math.floor(eMax).toLocaleString("ru-RU")}`);
+      const xpBar=$(".rhud-xpbar",hud);
+      if(xpBar){
+        const fill=Math.max(0,Math.min(1,xp/xpNeeded));
+        xpBar.style.setProperty("--xp-fill",(fill*100).toFixed(2)+"%");
+      }
+    };
+    render();
+    clearInterval(window.__homeRealHudTimer);
+    window.__homeRealHudTimer=setInterval(render,350);
   }
 
   function boot(){mount();hideLegacy();mountRealHud();}
