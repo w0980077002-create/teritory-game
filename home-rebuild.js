@@ -263,44 +263,7 @@
   }
 
 
-  function mountLiveHud(){
-    const home=$("#home"); if(!home) return;
-    const host=$(".home-reference-host",home); if(!host) return;
-    let hud=$("#homeLiveHud",home);
-    if(!hud){
-      hud=document.createElement("div");
-      hud.id="homeLiveHud";
-      hud.innerHTML=`
-        <div class="hl-live hl-level-top"><span></span></div>
-        <div class="hl-live hl-vip"><span></span></div>
-        <div class="hl-live hl-coins"><span></span></div>
-        <div class="hl-live hl-gems"><span></span></div>
-        <div class="hl-live hl-redgems"><span></span></div>
-        <div class="hl-live hl-energy-top"><span></span></div>
-        <div class="hl-live hl-level-bottom"><span></span></div>
-        <div class="hl-live hl-hp"><span></span></div>
-        <div class="hl-live hl-energy-bottom"><span></span></div>`;
-      host.appendChild(hud);
-    }
-    const render=()=>{
-      const s=store();
-      const n=(v,d=0)=>Math.max(d,Number(v||0));
-      const set=(cls,v)=>{const e=$(`.${cls} span`,hud);if(e)e.textContent=v};
-      set("hl-level-top","Lv. "+n(s.level,1));
-      set("hl-vip","VIP "+n(s.vipLevel,0));
-      set("hl-coins",String(n(s.coins)));
-      set("hl-gems",String(n(s.gems)));
-      set("hl-redgems",String(n(s.redGems)));
-      set("hl-energy-top",`${n(s.energy)}/200`);
-      set("hl-hp",`${n(s.hp)}/${n(s.maxHp)}`);
-      set("hl-energy-bottom",`${n(s.energy)}/200`);
-    };
-    render();
-    clearInterval(window.__homeHudTimer);
-    window.__homeHudTimer=setInterval(render,350);
-  }
-
-  function boot(){mount();hideLegacy();mountLiveHud();
+  function boot(){mount();hideLegacy();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
