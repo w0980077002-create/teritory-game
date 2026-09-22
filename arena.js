@@ -18,11 +18,14 @@
     support:{name:'Поддержка',icon:'✨',hp:128,atk:.88,def:1.06,crit:.09,dodge:.08}
   };
   const NAMES=[
-    ['Alex Morgan','🇺🇸'],['Wei Chen','🇨🇳'],['Omar Al-Hadi','🇸🇦'],['Dmytro Kovalenko','🇺🇦'],
-    ['Luca Moretti','🇮🇹'],['Marek Novak','🇵🇱'],['Erik Lund','🇸🇪'],['Yuki Tanaka','🇯🇵'],
-    ['Noah Carter','🇨🇦'],['Mateo Silva','🇪🇸'],['Artem Volkov','🇪🇺'],['Hassan Rahman','🇦🇪'],
-    ['Jonas Weber','🇩🇪'],['Min-jun Park','🇰🇷'],['Daniel Costa','🇵🇹'],['Victor Ivanov','🇧🇬'],
-    ['Kenji Sato','🇯🇵'],['Adam Wilson','🇬🇧'],['Nikolai Petrov','🇷🇺'],['Sofia Rossi','🇮🇹']
+    'Валера','Людмила','Сергей','Андрей','Олег','Дима','Саша','Настя',
+    'Катя','Миша','Артём','Игорь','Максим','Вика','Алина','Рома',
+    'Женя','Кирилл','Влад','Таня','Наташа','Павел','Денис','Юля',
+    'Егор','Марина','Руслан','Кристина','Антон','Лера','Стас','Маша',
+    'Никита','Полина','Вадим','Света','Глеб','Оксана','Роман','Тимур',
+    'Алексей','Елена','Виталий','Ирина','Богдан','Диана','Артур','Лиза',
+    'Иван','Ольга','Марк','Вероника','Данил','Ксюша','Марат','Яна',
+    'Wei','Alex','Omar','Luca','Yuki','Sofia','Daniel','Noah'
   ];
   const STYLES=['Агрессивный','Баланс','Защитный','Контратакующий'];
   const $=(s,r=document)=>r.querySelector(s);
@@ -139,7 +142,7 @@
       <section class="ar-section ar-grid2">
         <button data-view="rating">🏆<b>Рейтинг</b><small>Лидерборд сезона</small></button>
         <button data-view="history">📜<b>История</b><small>Твои бои</small></button>
-        <button data-view="rules">📖<b>Правила</b><small>Как расоперникает арена</small></button>
+        <button data-view="rules">📖<b>Правила</b><small>Как работает арена</small></button>
         <button data-view="profile">👤<b>Профиль</b><small>Статистика</small></button>
       </section>
     `);
@@ -190,16 +193,16 @@
     currentMode=mode;queueLeft=mode==='chaos'?15:5;
     frame('🔎 Поиск соперников',`<div class="ar-queue-screen">
       <div class="ar-radar">⚔️</div><h2>${mode==='1v1'?'1 × 1':mode==='3v3'?'3 × 3':'CHAOS'}</h2>
-      <p id="arQueueText">Ищем живых игроков… ${queueLeft}с</p><div class="ar-bar"><i id="arBar"></i></div>
+      <p id="arQueueText">Ищем соперника… ${queueLeft}с</p><div class="ar-bar"><i id="arBar"></i></div>
       <div class="ar-queue-info">🟢 Ищем подходящего соперника</div>
-      <div class="ar-queue-info">${mode==='chaos'?'🔥 В этом режиме соперникы отключены':'⚔️ Подбираем соперника по уровню и рейтингу'}</div>
+      <div class="ar-queue-info">${mode==='chaos'?'🔥 В этом режиме соперники отключены':'⚔️ Подбираем соперника по уровню и рейтингу'}</div>
       <button class="ar-secondary" id="arCancel">Отмена</button>
     </div>`);
     let elapsed=0;clearInterval(queueTimer);
     queueTimer=setInterval(()=>{
       elapsed++;queueLeft--;
       const t=$('#arQueueText'),bar=$('#arBar');
-      if(t)t.textContent=`Ищем живых игроков… ${Math.max(0,queueLeft)}с`;
+      if(t)t.textContent=`Ищем соперника… ${Math.max(0,queueLeft)}с`;
       if(bar)bar.style.width=Math.min(100,elapsed/(mode==='chaos'?15:5)*100)+'%';
       if(queueLeft<=0){
         clearInterval(queueTimer);
@@ -315,6 +318,24 @@
     battle=null;
   }
 
+  function killArenaIntermediate(){
+    const scan=()=>{
+      document.querySelectorAll('.tr10-panel').forEach(p=>{
+        const text=(p.textContent||'').toLowerCase();
+        if(text.includes('арена') && text.includes('открыть арену')){
+          p.remove();
+          setTimeout(()=>home(),0);
+        }
+      });
+    };
+    scan();
+    if(window.MutationObserver){
+      const mo=new MutationObserver(scan);
+      mo.observe(document.body,{childList:true,subtree:true});
+      setTimeout(()=>mo.disconnect(),15000);
+    }
+  }
+
   function background(){
     data.botBattles+=rnd(1,3);
     if(data.botBattles>999999)data.botBattles=0;
@@ -343,6 +364,7 @@
 
   background();
   installDirectOpen();
+  killArenaIntermediate();
 
   document.addEventListener('DOMContentLoaded',()=>{
     $('#arenaModal')?.addEventListener('click',e=>{if(e.target.id==='arenaModal')window.closeArenaModal()});
