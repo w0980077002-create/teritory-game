@@ -87,3 +87,70 @@ body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active)
   #homeRealHud .rhud-xp span,#homeRealHud .rhud-bottom-level span,
   #homeRealHud .rhud-hp span,#homeRealHud .rhud-bottom-energy span{font-size:9px!important}
 }
+
+/* v51 precision HUD alignment: coordinates are measured directly from the
+   866x1536 canonical HOME artwork. The artwork itself is unchanged. */
+#homeRealHud .rhud-name{
+  left:15.242%!important;top:1.562%!important;width:8.43%!important;height:1.758%!important;
+  justify-content:flex-start!important;background:rgba(11,24,36,.92)!important;border-radius:2px!important;
+}
+#homeRealHud .rhud-level{
+  left:15.242%!important;top:3.32%!important;width:8.43%!important;height:1.758%!important;
+  justify-content:flex-start!important;background:rgba(11,24,36,.92)!important;border-radius:2px!important;
+}
+#homeRealHud .rhud-coins{
+  left:33.718%!important;top:1.953%!important;width:8.199%!important;height:1.888%!important;
+  background:linear-gradient(180deg,rgba(15,28,40,.97),rgba(7,17,27,.97))!important;border-radius:2px!important;
+}
+#homeRealHud .rhud-gems{
+  left:52.079%!important;top:1.953%!important;width:6.467%!important;height:1.888%!important;
+  background:linear-gradient(180deg,rgba(15,28,40,.97),rgba(7,17,27,.97))!important;border-radius:2px!important;
+}
+#homeRealHud .rhud-redgems{
+  left:67.667%!important;top:1.953%!important;width:6.467%!important;height:1.888%!important;
+  background:linear-gradient(180deg,rgba(15,28,40,.97),rgba(7,17,27,.97))!important;border-radius:2px!important;
+}
+#homeRealHud .rhud-energy{
+  left:36.49%!important;top:5.013%!important;width:15.935%!important;height:1.823%!important;
+  justify-content:center!important;background:#07121c!important;border-radius:2px!important;overflow:hidden!important;
+}
+#homeRealHud .rhud-energy i{
+  position:absolute!important;left:0!important;top:0!important;width:var(--energy-fill,0%)!important;height:100%!important;
+  background:linear-gradient(180deg,#31f43b,#0dbb24)!important;border-radius:2px!important;box-shadow:inset 0 1px rgba(255,255,255,.2)!important;
+}
+#homeRealHud .rhud-energy span{position:relative!important;z-index:1!important}
+
+#homeRealHud .rhud-xpbar{
+  left:27.483%!important;top:66.081%!important;width:37.76%!important;height:1.953%!important;
+  justify-content:flex-start!important;background:#07121a!important;border-radius:2px!important;overflow:hidden!important;
+}
+#homeRealHud .rhud-xpbar i{
+  display:block!important;width:var(--xp-fill,0%)!important;height:100%!important;
+  background:linear-gradient(180deg,#31f43b,#0dbb24)!important;border-radius:2px!important;box-shadow:inset 0 1px rgba(255,255,255,.22)!important;
+}
+#homeRealHud .rhud-xp{
+  left:38.684%!important;top:66.081%!important;width:18.129%!important;height:1.953%!important;
+  background:transparent!important;justify-content:center!important;z-index:2!important;
+}
+#homeRealHud .rhud-bottom-level{
+  left:66.744%!important;top:66.016%!important;width:8.43%!important;height:2.018%!important;
+  background:rgba(8,15,21,.93)!important;justify-content:center!important;border-radius:2px!important;z-index:2!important;
+}
+#homeRealHud .rhud-hp{
+  left:4.042%!important;top:73.307%!important;width:14.434%!important;height:2.148%!important;
+  background:rgba(105,0,0,.82)!important;border-radius:999px!important;justify-content:center!important;z-index:3!important;
+}
+#homeRealHud .rhud-bottom-energy{
+  left:85.219%!important;top:73.307%!important;width:11.547%!important;height:2.148%!important;
+  background:rgba(0,67,145,.82)!important;border-radius:999px!important;justify-content:center!important;z-index:3!important;
+}
+#homeRealHud .rhud-field span{font-size:clamp(10px,2.15vw,17px)!important}
+#homeRealHud .rhud-name span,#homeRealHud .rhud-level span{font-size:clamp(10px,2.05vw,16px)!important}
+#homeRealHud .rhud-xp span,#homeRealHud .rhud-bottom-level span,
+#homeRealHud .rhud-hp span,#homeRealHud .rhud-bottom-energy span{font-size:clamp(9px,1.75vw,15px)!important}
+@media(max-width:430px){
+  #homeRealHud .rhud-field span{font-size:10px!important}
+  #homeRealHud .rhud-name span,#homeRealHud .rhud-level span{font-size:9px!important}
+  #homeRealHud .rhud-xp span,#homeRealHud .rhud-bottom-level span,
+  #homeRealHud .rhud-hp span,#homeRealHud .rhud-bottom-energy span{font-size:9px!important}
+}

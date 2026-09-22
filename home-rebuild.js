@@ -197,7 +197,7 @@
   function mount(){
     const home=$("#home");if(!home)return;
     home.classList.add("home-reference-active");
-    home.innerHTML=`<div class="home-reference-host" id="homeReferenceHost"><img class="home-reference-image" src="territory_reference_bg.png?v=UNIFIED10" alt="Teritory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones" aria-label="Нижнее меню 42-48"></div></div>`;
+    home.innerHTML=`<div class="home-reference-host" id="homeReferenceHost"><img class="home-reference-image" src="territory_reference_bg.png?v=LIVEHUD51" alt="Teritory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones" aria-label="Нижнее меню 42-48"></div></div>`;
     const layer=$(".home-hitzones",home), bottom=$(".home-bottom-zones",home);
     Z.forEach((z,i)=>addZone(layer,z,i));
     BOTTOM.forEach((z,i)=>addZone(bottom,z,42+i,"home-bottom-hz"));
@@ -288,7 +288,7 @@
         <div class="rhud-field rhud-coins"><span></span></div>
         <div class="rhud-field rhud-gems"><span></span></div>
         <div class="rhud-field rhud-redgems"><span></span></div>
-        <div class="rhud-field rhud-energy"><span></span></div>
+        <div class="rhud-field rhud-energy"><i></i><span></span></div>
         <div class="rhud-field rhud-vip"><span></span></div>
         <div class="rhud-field rhud-xp"><span></span></div>
         <div class="rhud-field rhud-xpbar"><i></i></div>
@@ -323,27 +323,32 @@
       set("rhud-redgems",compact(s.redGems));
 
       const energyMax=Math.max(1,Number(s.maxEnergy||200));
-      set("rhud-energy",`${Math.max(0,Number(s.energy||0))}/${energyMax}`);
+      const energyNow=Math.max(0,Math.min(energyMax,Number(s.energy||0)));
+      set("rhud-energy",`${Math.floor(energyNow)}/${Math.floor(energyMax)}`);
+      const energyBar=$(".rhud-energy",hud);
+      if(energyBar){
+        energyBar.style.setProperty("--energy-fill",((energyNow/energyMax)*100).toFixed(2)+"%");
+      }
 
+      // Keep the baked VIP badge when the save has no VIP field. If the save
+      // contains a real VIP value, the badge becomes live automatically.
       const vipRaw=s.vipLevel??s.vip;
       const vipEl=$(".rhud-vip",hud);
-      vipEl.style.display="flex";
-      set("rhud-vip",has(s,"vipLevel","vip") ? ("VIP "+Math.max(0,Number(vipRaw)||0)) : "");
+      const hasVip=has(s,"vipLevel","vip");
+      vipEl.style.display=hasVip?"flex":"none";
+      if(hasVip)set("rhud-vip","VIP "+Math.max(0,Number(vipRaw)||0));
 
-      // Bottom HUD is live too: XP, level, HP and energy come from the same
-      // TerritoryStore state. The baked demo numbers in the reference image
-      // are masked only inside their original value areas.
+      // Bottom HUD is live: XP, level, HP and energy all read the same state
+      // that the battle/shop/game systems use. No hard-coded screenshot values.
       const level=Math.max(1,Number(s.level||1));
       const xp=Math.max(0,Number(s.exp||0));
       const xpNeeded=Math.max(1,Number(s.expToNext??s.maxExp??100));
       const hp=Math.max(0,Number(s.hp||0));
       const hpMax=Math.max(1,Number(s.maxHp||120));
-      const eNow=Math.max(0,Number(s.energy||0));
-      const eMax=Math.max(1,Number(s.maxEnergy||200));
       set("rhud-xp",`${Math.floor(xp).toLocaleString("ru-RU")}/${Math.floor(xpNeeded).toLocaleString("ru-RU")}`);
       set("rhud-bottom-level",`Lv.${level}`);
       set("rhud-hp",`${Math.floor(hp).toLocaleString("ru-RU")} / ${Math.floor(hpMax).toLocaleString("ru-RU")}`);
-      set("rhud-bottom-energy",`${Math.floor(eNow).toLocaleString("ru-RU")} / ${Math.floor(eMax).toLocaleString("ru-RU")}`);
+      set("rhud-bottom-energy",`${Math.floor(energyNow).toLocaleString("ru-RU")} / ${Math.floor(energyMax).toLocaleString("ru-RU")}`);
       const xpBar=$(".rhud-xpbar",hud);
       if(xpBar){
         const fill=Math.max(0,Math.min(1,xp/xpNeeded));
