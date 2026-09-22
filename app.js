@@ -1,4 +1,4 @@
-/* Territory v140 — unified player state foundation */
+/* Territory v141 — unified player state + Stage 3 hero profile */
 const TERRITORY_STATE_VERSION=3;
 const defaultState={
   schemaVersion:TERRITORY_STATE_VERSION,
@@ -113,7 +113,7 @@ function render(){
  if(coins)coins.textContent=state.coins; if(gems)gems.textContent=state.gems; if(level)level.textContent=state.level;
  $("#weaponName") && ($("#weaponName").textContent=state.weapon); $("#weaponStats") && ($("#weaponStats").textContent=`Урон +${state.bonusDamage}`);
  const q=document.querySelector('#alexQuestBadge'); if(q){q.textContent=state.alexQuest===1?'ЗАДАНИЕ ALEX':'Город'; q.classList.toggle('active',state.alexQuest===1);}
- renderShop(); renderInventory();
+ renderShop(); renderInventory(); renderHeroProfile();
  const dc=$("#diceCount"); if(dc)dc.textContent=Math.max(0,state.gameDice);
 }
 function showScreen(id){
@@ -154,6 +154,101 @@ if(sellBtn)sellBtn.onclick=()=>{
 function renderInventory(){
  $("#inventoryGrid").innerHTML=state.inventory.map((x,i)=>`<div class="item"><div class="pic">${x}</div><b>Предмет ${i+1}</b><span>Экипировка</span></div>`).join("");
 }
+
+/* Territory Stage 3 — unified hero/combat profile.
+   HOME artwork and frozen bottom navigation 42-48 are intentionally untouched. */
+(function initHeroStage3(){
+  "use strict";
+  const heroWeapons=[
+    {name:"Кулаки",icon:"✊",damage:0,cost:0},
+    {name:"Боевой топор",icon:"🪓",damage:12,cost:300},
+    {name:"Стальной меч",icon:"⚔️",damage:18,cost:650},
+    {name:"Молот",icon:"🔨",damage:25,cost:1000},
+    {name:"Арбалет",icon:"🏹",damage:31,cost:1500}
+  ];
+  const byName=n=>heroWeapons.find(w=>w.name===n)||heroWeapons[0];
+  const escHero=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  function syncOwnedWeapons(){
+    state.ownedWeapons=Array.isArray(state.ownedWeapons)?state.ownedWeapons.map(String):[];
+    const iconMap={"🪓":"Боевой топор","⚔️":"Стальной меч","🔨":"Молот","🏹":"Арбалет"};
+    for(const x of state.inventory||[]){const n=typeof x==="object"?x.name:iconMap[String(x)];if(n&&!state.ownedWeapons.includes(n))state.ownedWeapons.push(n)}
+    if(state.weapon&&!state.ownedWeapons.includes(state.weapon))state.ownedWeapons.push(state.weapon);
+    if(!state.ownedWeapons.length)state.ownedWeapons=["Кулаки"];
+    if(!state.ownedWeapons.includes("Кулаки"))state.ownedWeapons.unshift("Кулаки");
+  }
+  function heroStats(){
+    syncOwnedWeapons();
+    const w=byName(state.weapon);
+    const strength=Math.max(1,Number(state.strength)||5);
+    const agility=Math.max(1,Number(state.agility)||5);
+    const baseDefense=Math.max(0,Number(state.defense)||0);
+    const endurance=Math.max(1,Number(state.endurance)||12);
+    const attack=Math.max(1,Math.floor(strength+(Number(state.bonusDamage)||w.damage)));
+    const crit=Math.min(50,5+Math.floor(agility*0.75));
+    const dodge=Math.min(40,2+Math.floor(agility*0.5));
+    const speed=Math.max(1,10+agility);
+    return {w,strength,agility,defense:baseDefense,endurance,attack,crit,dodge,speed,className:String(state.heroClass||"Воин")};
+  }
+  window.TerritoryHero={getStats:heroStats,getOwnedWeapons:()=>{syncOwnedWeapons();return [...state.ownedWeapons]},equip(name){
+    const w=byName(name);syncOwnedWeapons();if(!state.ownedWeapons.includes(w.name))return false;
+    state.weapon=w.name;state.bonusDamage=w.damage;state.equipment=[{slot:"weapon",name:w.name,icon:w.icon,damage:w.damage}];save();return true;
+  }};
+  function installHeroCSS(){
+    if(document.getElementById("territoryHeroStage3CSS"))return;
+    const st=document.createElement("style");st.id="territoryHeroStage3CSS";st.textContent=`
+      #inventory.profile-screen{position:absolute!important;inset:0!important;overflow:hidden!important;background:linear-gradient(180deg,#0c1520 0%,#111923 100%)!important;color:#fff!important;box-sizing:border-box!important;padding:0!important;}
+      #inventory.profile-screen .tr3-wrap{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:12px 12px 28px;box-sizing:border-box;-webkit-overflow-scrolling:touch;}
+      #inventory.profile-screen .tr3-head{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5;padding:2px 0 10px;background:linear-gradient(#0c1520 82%,transparent);}
+      #inventory.profile-screen .tr3-back{width:44px;height:44px;border:1px solid #4b5968;border-radius:12px;background:#172330;color:#fff;font-size:30px;line-height:1;touch-action:manipulation;}
+      #inventory.profile-screen .tr3-title{min-width:0;flex:1}.tr3-title b{display:block;font:900 18px/1.1 Arial}.tr3-title small{display:block;margin-top:4px;color:#9eacba;font:700 10px/1.2 Arial;}
+      #inventory.profile-screen .tr3-card{background:linear-gradient(145deg,#1a2733,#111a23);border:1px solid #40505f;border-radius:16px;box-shadow:0 8px 22px rgba(0,0,0,.24);margin-bottom:10px;}
+      #inventory.profile-screen .tr3-identity{display:flex;align-items:center;gap:12px;padding:13px;}
+      #inventory.profile-screen .tr3-avatar{width:66px;height:66px;flex:0 0 66px;border-radius:14px;background:#172433 center/cover no-repeat;border:1px solid #566575;display:grid;place-items:center;font-size:32px;box-shadow:0 3px 9px rgba(0,0,0,.35);}
+      #inventory.profile-screen .tr3-name{font:900 20px/1.05 Arial}.tr3-user{margin-top:4px;color:#9faebb;font:700 11px/1.2 Arial}.tr3-level{margin-top:8px;font:800 12px/1.2 Arial;color:#dfe8f0}.tr3-xp{height:8px;background:#081018;border:1px solid #394957;border-radius:99px;overflow:hidden;margin-top:7px}.tr3-xp i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2e9cff,#7fd4ff);border-radius:99px}.tr3-xpt{margin-top:4px;color:#8e9eac;font:700 9px/1.1 Arial;}
+      #inventory.profile-screen .tr3-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px}.tr3-stat{padding:11px 10px;min-height:64px;box-sizing:border-box}.tr3-stat b{display:block;font:900 16px/1.1 Arial}.tr3-stat span{display:block;margin-top:5px;color:#a9b6c2;font:700 9px/1.1 Arial}.tr3-stat small{display:block;margin-top:3px;color:#7f8d99;font:600 8px/1.1 Arial;}
+      #inventory.profile-screen .tr3-section{padding:12px}.tr3-section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:9px}.tr3-section-head b{font:900 13px/1 Arial}.tr3-section-head small{color:#8493a0;font:700 9px/1 Arial}.tr3-equip{display:flex;align-items:center;gap:10px}.tr3-equip-art{width:54px;height:54px;border-radius:12px;background:#0e1720;border:1px solid #3d4c59;display:grid;place-items:center;font-size:31px}.tr3-equip-main{min-width:0;flex:1}.tr3-equip-main b{display:block;font:900 13px/1.15 Arial}.tr3-equip-main span{display:block;margin-top:4px;color:#aab6c1;font:700 9px/1.15 Arial}.tr3-tag{display:inline-block;margin-top:5px;padding:3px 6px;border-radius:5px;background:#263746;color:#c9d8e5;font:800 8px/1 Arial}.tr3-btn{min-height:40px;padding:8px 10px;border-radius:10px;border:1px solid #566878;background:#1b2a38;color:#fff;font:800 10px/1 Arial;touch-action:manipulation;}
+      #inventory.profile-screen .tr3-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.tr3-item{padding:9px;background:#121c25;border:1px solid #344554;border-radius:12px;min-width:0}.tr3-item-art{height:54px;display:grid;place-items:center;background:#0b141d;border-radius:9px;font-size:30px}.tr3-item b{display:block;margin-top:7px;font:900 10px/1.15 Arial;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tr3-item span{display:block;margin-top:3px;color:#9baab7;font:700 8px/1.1 Arial}.tr3-item .tr3-btn{width:100%;margin-top:7px;min-height:34px;padding:7px;font-size:9px}.tr3-note{color:#8795a2;font:700 9px/1.35 Arial;margin-top:8px}
+      @media(max-width:380px){#inventory.profile-screen .tr3-wrap{padding:9px}.tr3-identity{padding:10px!important}.tr3-avatar{width:58px!important;height:58px!important;flex-basis:58px!important}.tr3-name{font-size:18px!important}.tr3-stat{padding:9px!important}.tr3-stat b{font-size:14px!important}}
+    `;document.head.appendChild(st);
+  }
+  function renderHeroProfile(){
+    const screen=document.getElementById("inventory");if(!screen)return;
+    installHeroCSS();
+    syncOwnedWeapons();
+    const st=heroStats();
+    const p=state.profile||{};
+    const name=String(state.name||p.displayName||"Игрок");
+    const username=String(state.telegramUsername||p.username||"");
+    const level=Math.max(1,Number(state.level)||1), xp=Math.max(0,Number(state.exp)||0), need=Math.max(100,Number(state.expToNext)||100);
+    const hp=Math.max(0,Number(state.hp)||0), maxHp=Math.max(1,Number(state.maxHp)||120), energy=Math.max(0,Number(state.energy)||0), maxEnergy=Math.max(1,Number(state.maxEnergy)||200);
+    const xpPct=Math.max(0,Math.min(100,xp/need*100));
+    const avatar=p.photoUrl||state.telegramPhotoUrl||"";
+    const owned=state.ownedWeapons.map(byName).filter(Boolean);
+    screen.innerHTML=`<div class="tr3-wrap">
+      <div class="tr3-head"><button class="tr3-back" type="button" data-screen="home" aria-label="Назад">‹</button><div class="tr3-title"><b>ПРОФИЛЬ ГЕРОЯ</b><small>ЕДИНАЯ СИСТЕМА ПЕРСОНАЖА</small></div></div>
+      <div class="tr3-card tr3-identity"><div class="tr3-avatar">${avatar?"":"⚔️"}</div><div style="min-width:0;flex:1"><div class="tr3-name">${escHero(name)}</div>${username?`<div class="tr3-user">@${escHero(username)}</div>`:""}<div class="tr3-level">Уровень ${level} · ${escHero(st.className)}</div><div class="tr3-xp"><i style="width:${xpPct}%"></i></div><div class="tr3-xpt">${xp.toLocaleString("ru-RU")} / ${need.toLocaleString("ru-RU")} XP</div></div></div>
+      <div class="tr3-grid">
+        <div class="tr3-card tr3-stat"><b>❤️ ${hp} / ${maxHp}</b><span>ЗДОРОВЬЕ</span><small>Текущее / максимум</small></div>
+        <div class="tr3-card tr3-stat"><b>⚡ ${energy} / ${maxEnergy}</b><span>ЭНЕРГИЯ</span><small>Боевой ресурс</small></div>
+        <div class="tr3-card tr3-stat"><b>⚔️ ${st.attack}</b><span>АТАКА</span><small>Сила + оружие</small></div>
+        <div class="tr3-card tr3-stat"><b>🛡️ ${st.defense}</b><span>ЗАЩИТА</span><small>Базовая защита</small></div>
+        <div class="tr3-card tr3-stat"><b>🎯 ${st.crit}%</b><span>КРИТ. ШАНС</span><small>Зависит от ловкости</small></div>
+        <div class="tr3-card tr3-stat"><b>💨 ${st.dodge}%</b><span>УКЛОНЕНИЕ</span><small>Зависит от ловкости</small></div>
+        <div class="tr3-card tr3-stat"><b>🏃 ${st.speed}</b><span>СКОРОСТЬ</span><small>Инициатива в бою</small></div>
+        <div class="tr3-card tr3-stat"><b>💪 ${st.strength}</b><span>СИЛА</span><small>Очки персонажа</small></div>
+      </div>
+      <div class="tr3-card tr3-section"><div class="tr3-section-head"><b>ЭКИПИРОВКА</b><small>ОРУЖИЕ ВЛИЯЕТ НА АТАКУ</small></div><div class="tr3-equip"><div class="tr3-equip-art">${st.w.icon}</div><div class="tr3-equip-main"><b>${escHero(st.w.name)}</b><span>Урон оружия +${st.w.damage} · Итоговая атака ${st.attack}</span><em class="tr3-tag">ЭКИПИРОВАНО</em></div></div></div>
+      <div class="tr3-card tr3-section"><div class="tr3-section-head"><b>ДОСТУПНОЕ ОРУЖИЕ</b><small>${owned.length} шт.</small></div><div class="tr3-list">${owned.map(w=>`<div class="tr3-item"><div class="tr3-item-art">${w.icon}</div><b>${escHero(w.name)}</b><span>Атака +${w.damage}</span><button class="tr3-btn" type="button" data-equip-name="${escHero(w.name)}" ${w.name===state.weapon?"disabled":""}>${w.name===state.weapon?"Экипировано":"Экипировать"}</button></div>`).join("")}</div><div class="tr3-note">Экипировка меняет боевые характеристики. Броня и дополнительные слоты подключим следующим слоем без изменения HOME.</div></div>
+    </div>`;
+    const av=screen.querySelector(".tr3-avatar");if(av&&avatar){av.style.backgroundImage=`url("${avatar.replace(/"/g,"%22")}")`}
+    screen.querySelectorAll("[data-equip-name]").forEach(b=>b.addEventListener("click",()=>{window.TerritoryHero.equip(b.dataset.equipName)}));
+    const back=screen.querySelector("[data-screen=home]");if(back)back.addEventListener("click",()=>showScreen("home"));
+  }
+  window.renderHeroProfile=renderHeroProfile;
+  window.addEventListener("territory:stateChanged",()=>{try{renderHeroProfile()}catch(_){}});
+  window.addEventListener("load",()=>{try{renderHeroProfile()}catch(_){}});
+})();
+
 /* Territory v43 — Game: reference-inspired diamond event board */
 const GAME_CELLS=[
  {icon:'🏁',value:'СТАРТ',type:'start',label:'НАЧАЛО ПУТЕШЕСТВИЯ'},
