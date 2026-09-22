@@ -121,7 +121,7 @@
     const live=rnd(18,72), fighting=rnd(8,34), queue=rnd(2,16);
     frame('⚔️ Арена',`
       <div class="ar-hero">
-        <div><div class="ar-kicker">TERITORY · СЕЗОН ${data.season}</div><h1>Арена</h1><p>Живые игроки в приоритете. Соперники имеют полноценные профили, классы, рейтинг и тактику.</p></div>
+        <div><div class="ar-kicker">TERITORY · СЕЗОН ${data.season}</div><h1>Арена</h1><p>Ищи соперника и выходи на бой. Каждый боец имеет профиль, класс, рейтинг и тактику.</p></div>
         <div class="ar-energy">⚡ ${energy}/200</div>
       </div>
       ${playerMini()}
@@ -133,13 +133,13 @@
       <section class="ar-section"><h3>Выбери режим</h3>
         <button class="ar-mode" data-mode="1v1"><b>⚔️ 1 × 1</b><span>Один соперник · быстрый личный бой</span><strong>10 ⚡</strong></button>
         <button class="ar-mode" data-mode="3v3"><b>🛡️ 3 × 3</b><span>Командная арена · 3 бойца против 3</span><strong>15 ⚡</strong></button>
-        <button class="ar-mode ar-chaos" data-mode="chaos"><b>🔥 CHAOS</b><span>Только реальные игроки · без подстановки ботов</span><strong>20 ⚡</strong></button>
+        <button class="ar-mode ar-chaos" data-mode="chaos"><b>🔥 CHAOS</b><span>Свободный режим · динамические бои</span><strong>20 ⚡</strong></button>
       </section>
       <section class="ar-section"><h3>Игроки арены</h3>${opponents.slice(0,5).map(x=>opponentCard(x,false)).join('')}</section>
       <section class="ar-section ar-grid2">
         <button data-view="rating">🏆<b>Рейтинг</b><small>Лидерборд сезона</small></button>
         <button data-view="history">📜<b>История</b><small>Твои бои</small></button>
-        <button data-view="rules">📖<b>Правила</b><small>Как работает арена</small></button>
+        <button data-view="rules">📖<b>Правила</b><small>Как расоперникает арена</small></button>
         <button data-view="profile">👤<b>Профиль</b><small>Статистика</small></button>
       </section>
     `);
@@ -174,9 +174,9 @@
   }
   function rules(){
     frame('📖 Правила',`<div class="ar-back" data-back>← Арена</div><div class="ar-section ar-rules">
-      <h3>Матчмейкинг</h3><p>Сначала система ищет живых игроков подходящего рейтинга. Если обычный режим не набрал состав, используются бойцы пула с полноценными профилями.</p>
+      <h3>Матчмейкинг</h3><p>Система подбирает соперников подходящего уровня и рейтинга.</p>
       <h3>Классы</h3><p>🛡️ Танк · 🪓 Берсерк · 🗡️ Ассасин · ⚔️ Дуэлянт · ✨ Поддержка.</p>
-      <h3>CHAOS</h3><p>В CHAOS боты не подставляются. Нужен реальный игрок из очереди.</p>
+      <h3>CHAOS</h3><p>В CHAOS действует свободный подбор соперников.</p>
       <h3>Бой</h3><p>Выбирай цель атаки и две зоны защиты. Крит, уклонение, класс и тактика соперника влияют на результат.</p>
     </div>`);
     $('[data-back]').onclick=home;
@@ -191,8 +191,8 @@
     frame('🔎 Поиск соперников',`<div class="ar-queue-screen">
       <div class="ar-radar">⚔️</div><h2>${mode==='1v1'?'1 × 1':mode==='3v3'?'3 × 3':'CHAOS'}</h2>
       <p id="arQueueText">Ищем живых игроков… ${queueLeft}с</p><div class="ar-bar"><i id="arBar"></i></div>
-      <div class="ar-queue-info">🟢 Живые игроки имеют приоритет</div>
-      <div class="ar-queue-info">${mode==='chaos'?'🔥 В этом режиме боты отключены':'🤖 Если очередь пуста, подбирается полноценный соперник из пула'}</div>
+      <div class="ar-queue-info">🟢 Ищем подходящего соперника</div>
+      <div class="ar-queue-info">${mode==='chaos'?'🔥 В этом режиме соперникы отключены':'⚔️ Подбираем соперника по уровню и рейтингу'}</div>
       <button class="ar-secondary" id="arCancel">Отмена</button>
     </div>`);
     let elapsed=0;clearInterval(queueTimer);
