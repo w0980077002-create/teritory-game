@@ -59,169 +59,126 @@
  .arena-in-battle .bot-wrap{right:20%}
 }
 
-/* STEP-05J — compact mobile battle UI
-   Keep the approved top header/arena layout untouched.
-   Compress only the middle command area and lower equipment/consumables.
-*/
-.battle-stage{
-  height:270px!important;
-  min-height:0!important;
+/* STEP-05L — final compact command row + 7 equal equipment slots.
+   No separate Auto row; surrender/exit share the tactical command row. */
+.arena-in-battle .battle-stage{
+  height:292px!important;
 }
-.fighter-wrap{
-  bottom:10px!important;
-}
-.battle-status{
-  min-height:24px!important;
-  height:24px!important;
-  padding:3px 52px!important;
+.arena-in-battle .battle-command-row{
+  height:38px!important;
+  min-height:38px!important;
+  display:grid!important;
+  grid-template-columns:minmax(46px,1fr) 42px 70px 48px 45px 54px!important;
   align-items:center!important;
+  gap:3px!important;
+  padding:3px 5px!important;
+  background:rgba(5,13,19,.94)!important;
 }
-.battle-command-row{
-  min-height:40px!important;
-  height:40px!important;
-  padding:4px 7px!important;
+.arena-in-battle .battle-command-row .tactic-mini{
+  font-size:6.5px!important;
+  color:#b6c2c8!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
 }
-.battle-command-row button{
-  min-height:30px!important;
-  height:30px!important;
-  padding:3px 8px!important;
-  font-size:7px!important;
-}
-.battle-command-row>strong{
-  min-width:64px!important;
+.arena-in-battle .battle-command-row button{
+  width:100%!important;
+  min-width:0!important;
+  height:29px!important;
+  min-height:29px!important;
+  padding:2px 3px!important;
+  border-radius:7px!important;
   font-size:6.5px!important;
 }
-.combat-loadout-strip{
-  padding:4px 7px!important;
+.arena-in-battle .battle-command-row .command-auto{
+  display:grid!important;
+  grid-template-columns:17px 1fr!important;
+  align-items:center!important;
+  gap:1px!important;
+  border-color:#566a74!important;
+  background:#0d1b25!important;
+  color:#e8c76b!important;
 }
-.combat-section-head{
-  margin:1px 1px 3px!important;
-  font-size:7px!important;
+.arena-in-battle .battle-command-row .command-auto span{font-size:17px!important;line-height:17px!important}
+.arena-in-battle .battle-command-row .command-auto small{font-size:5.5px!important;line-height:6px!important}
+.arena-in-battle .battle-command-row .command-auto.active{background:#5d491c!important;border-color:#e8c76b!important}
+.arena-in-battle .battle-command-row .command-hit{
+  border:1px solid #c59e4d!important;
+  background:linear-gradient(#e5c56a,#9c711f)!important;
+  color:#171107!important;
+  font-weight:1000!important;
 }
-.combat-section-head small{
+.arena-in-battle .battle-command-row .command-exit{
+  border:1px solid #394f5c!important;
+  background:#0b1821!important;
+  color:#aab8bf!important;
+  font-weight:900!important;
+}
+.arena-in-battle .battle-command-row>strong{
+  min-width:0!important;
+  text-align:center!important;
+  color:#e8c76b!important;
   font-size:6px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
 }
-.gear-row,.elixir-row{
+.arena-in-battle .combat-section-head{
+  margin:1px 2px 3px!important;
+}
+.arena-in-battle .gear-row{
+  display:flex!important;
+  overflow-x:auto!important;
   gap:4px!important;
-  padding-bottom:2px!important;
+  padding:0 1px 3px!important;
 }
-.combat-item-slot{
-  flex-basis:53px!important;
-  height:49px!important;
-  grid-template-rows:21px 14px 9px!important;
-  border-radius:7px!important;
-}
-.combat-item-slot strong{
-  font-size:18px!important;
-}
-.combat-item-slot span{
-  font-size:6px!important;
-  max-width:50px!important;
-}
-.combat-item-slot small{
-  font-size:5.5px!important;
-}
-.elixir-row .combat-item-slot{
-  flex-basis:57px!important;
+.arena-in-battle .gear-row .combat-item-slot{
+  flex:0 0 calc((100% - 24px)/7)!important;
+  width:calc((100% - 24px)/7)!important;
+  min-width:0!important;
   height:48px!important;
+  padding:2px 1px!important;
 }
-.combat-auto-button{
-  width:45px!important;
-  height:29px!important;
+.arena-in-battle .gear-row .combat-item-slot strong{
+  font-size:17px!important;
 }
-.battle-chat{
-  margin:4px 7px 3px!important;
-  min-height:76px!important;
-  max-height:120px!important;
-  padding:5px!important;
+.arena-in-battle .gear-row .combat-item-slot span{
+  font-size:5.7px!important;
+  max-width:100%!important;
 }
-.battle-actions{
-  padding:2px 52px 4px!important;
+.arena-in-battle .gear-row .combat-item-slot small{display:none!important}
+.arena-in-battle .combat-loadout-strip{
+  padding:4px 6px!important;
+}
+.arena-in-battle .elixir-row{
+  gap:4px!important;
+}
+.arena-in-battle .elixir-row .combat-item-slot{
+  flex-basis:55px!important;
+  height:46px!important;
+}
+.arena-in-battle .battle-chat{
+  margin-top:4px!important;
 }
 @media(max-width:390px){
-  .battle-stage{
-    height:255px!important;
+  .arena-in-battle .battle-command-row{
+    grid-template-columns:minmax(42px,1fr) 39px 62px 45px 42px 50px!important;
+    gap:2px!important;
+    padding-left:4px!important;
+    padding-right:4px!important;
   }
-  .fighter-wrap{
-    bottom:8px!important;
+  .arena-in-battle .battle-command-row button{
+    font-size:5.8px!important;
   }
-  .battle-status{
-    height:22px!important;
-    min-height:22px!important;
-    padding-left:48px!important;
-    padding-right:48px!important;
+  .arena-in-battle .battle-command-row .command-auto{
+    grid-template-columns:15px 1fr!important;
   }
-  .battle-command-row{
-    height:38px!important;
-    min-height:38px!important;
-    gap:3px!important;
-  }
-  .battle-command-row>strong{
-    min-width:58px!important;
-    font-size:6px!important;
-  }
-  .battle-command-row button{
-    min-height:28px!important;
-    height:28px!important;
-    padding:3px 6px!important;
-    font-size:6.5px!important;
-  }
-  .combat-loadout-strip{
-    padding:3px 6px!important;
-  }
-  .combat-section-head{
-    font-size:6.5px!important;
-    margin-bottom:2px!important;
-  }
-  .combat-item-slot{
-    flex-basis:50px!important;
-    height:46px!important;
-  }
-  .elixir-row .combat-item-slot{
-    flex-basis:54px!important;
+  .arena-in-battle .battle-command-row .command-auto span{font-size:15px!important}
+  .arena-in-battle .battle-command-row .command-auto small{font-size:5px!important}
+  .arena-in-battle .battle-command-row>strong{font-size:5.5px!important}
+  .arena-in-battle .gear-row .combat-item-slot{
+    flex-basis:calc((100% - 24px)/7)!important;
+    width:calc((100% - 24px)/7)!important;
     height:45px!important;
   }
-  .combat-item-slot strong{
-    font-size:17px!important;
-  }
-  .battle-chat{
-    min-height:68px!important;
-    max-height:105px!important;
-  }
-}
-
-/* STEP-05K — command controls share one compact row; battle art gets the freed height. */
-.arena-in-battle .battle-stage{height:306px!important}
-.arena-in-battle .battle-command-row{
-  display:grid!important;
-  grid-template-columns:minmax(62px,1fr) 42px 70px 54px 48px 64px!important;
-  align-items:center!important;
-  gap:4px!important;
-  min-height:38px!important;
-  height:38px!important;
-  padding:3px 6px!important;
-}
-.arena-in-battle .battle-command-row>span{font-size:6.5px!important}
-.arena-in-battle .battle-command-row>button{min-width:0!important;width:100%!important;height:30px!important;min-height:30px!important;padding:2px 4px!important;border-radius:7px!important;font-size:6.5px!important;font-weight:1000!important;white-space:nowrap}
-.arena-in-battle .command-auto{display:grid!important;grid-template-columns:16px 1fr;align-items:center;justify-items:center;gap:1px;background:#0d1b25!important;border:1px solid #566a74!important;color:#e8c76b!important}
-.arena-in-battle .command-auto span{font-size:17px;line-height:17px}.arena-in-battle .command-auto small{font-size:5.5px;line-height:7px}
-.arena-in-battle .command-auto[aria-pressed="true"]{background:#5d491c!important;border-color:#e8c76b!important}
-.arena-in-battle .command-execute{background:linear-gradient(#e5c56a,#9c711f)!important;color:#171107!important;border:1px solid #c59e4d!important}
-.arena-in-battle .command-surrender,.arena-in-battle .command-exit{background:#0b1821!important;color:#aab8bf!important;border:1px solid #394f5c!important}
-.arena-in-battle .battle-command-row>strong{min-width:0!important;font-size:6px!important;text-align:center;color:#e8c76b!important;white-space:nowrap}
-.arena-in-battle .combat-loadout-strip{padding-top:3px!important}
-.arena-in-battle .combat-section-head{margin-bottom:3px!important}
-.arena-in-battle .gear-row{justify-content:flex-start!important}
-.arena-in-battle .gear-row .combat-item-slot{flex:0 0 calc((100vw - 38px)/7)!important;max-width:74px!important;min-width:44px!important;height:48px!important}
-.arena-in-battle .gear-row .combat-item-slot strong{font-size:17px!important}
-.arena-in-battle .gear-row .combat-item-slot span{font-size:5.8px!important}
-.arena-in-battle .combat-loadout-strip{overflow:hidden!important}
-@media(max-width:390px){
- .arena-in-battle .battle-stage{height:286px!important}
- .arena-in-battle .battle-command-row{grid-template-columns:minmax(52px,1fr) 38px 58px 48px 44px 58px!important;gap:3px!important;padding:3px 4px!important}
- .arena-in-battle .battle-command-row>span{font-size:6px!important}
- .arena-in-battle .battle-command-row>button{font-size:5.7px!important;height:28px!important;min-height:28px!important}
- .arena-in-battle .gear-row .combat-item-slot{flex-basis:calc((100vw - 34px)/7)!important;height:45px!important}
- .arena-in-battle .gear-row .combat-item-slot strong{font-size:16px!important}
- .arena-in-battle .gear-row .combat-item-slot span{font-size:5.3px!important}
+  .arena-in-battle .gear-row .combat-item-slot strong{font-size:16px!important}
+  .arena-in-battle .gear-row .combat-item-slot span{font-size:5.2px!important}
 }
