@@ -39,3 +39,21 @@
 .equip-armor-crit .hero-torso{background:linear-gradient(90deg,#3d2928,#8d4d3f,#3d2928);border-color:#d0a34d}.equip-armor-tank .hero-torso{background:linear-gradient(90deg,#263038,#7d8b92,#263038);border-color:#b9c5ca}.equip-armor-dodge .hero-torso{background:linear-gradient(90deg,#182d38,#28576b,#182d38);border-color:#4d9ab3}.equip-armor-resilience .hero-torso{background:linear-gradient(90deg,#3a3630,#746d5b,#3a3630);border-color:#a89a71}
 .equip-boots-crit .hero-leg{background:#3a3030}.equip-boots-tank .hero-leg{background:#39454b}.equip-boots-dodge .hero-leg{background:#162a34}.equip-boots-resilience .hero-leg{background:#39362f}
 @media(max-width:390px){.combat-item-slot{flex-basis:54px;min-width:54px;height:57px}.combat-item-slot strong{font-size:21px}.combat-item-slot span{font-size:6px}.combat-build-line{gap:7px;font-size:6.5px}.item-action-panel{margin-left:7px;margin-right:7px}.item-options{max-height:135px}}
+
+/* STEP-05C — reference combat bar: gear and elixirs are separate; autobattle is the compact ↻ control */
+.combat-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 1px 4px;color:#e8c76b;font-size:8px;font-weight:900;letter-spacing:.5px}
+.combat-section-head small{color:#718691;font-size:6.5px;font-weight:700;letter-spacing:0}
+.consumables-head{margin-top:5px}
+.combat-auto-button{flex:0 0 42px;width:42px;height:36px;padding:2px;border:1px solid #566a74;border-radius:8px;background:linear-gradient(#182a35,#0b171f);color:#d8e0e4;display:grid;grid-template-rows:22px 9px;place-items:center;line-height:1}
+.combat-auto-button strong{font-size:23px;font-weight:900;line-height:20px}
+.combat-auto-button small{font-size:6px;font-weight:900;color:#718691}
+.combat-auto-button.active{border-color:#e8c76b;background:linear-gradient(#5d491c,#251e0d);box-shadow:inset 0 0 0 1px rgba(232,199,107,.25),0 0 10px rgba(232,199,107,.14)}
+.combat-auto-button.active strong,.combat-auto-button.active small{color:#ffe9a8}
+.combat-item-row{padding-bottom:3px}
+.gear-row .combat-item-slot{flex-basis:58px;min-width:58px}
+.elixir-row .combat-item-slot{flex-basis:68px;min-width:68px}
+.elixir-row .combat-item-slot{border-color:#4c5960}
+.elixir-row .combat-item-slot:nth-child(1){border-color:#9d4b45}.elixir-row .combat-item-slot:nth-child(2){border-color:#356d91}.elixir-row .combat-item-slot:nth-child(3){border-color:#805d2e}.elixir-row .combat-item-slot:nth-child(4){border-color:#667a8a}
+.hero-belt{position:absolute;left:39px;top:103px;width:54px;height:9px;border-radius:5px;background:#6f5039;border:2px solid #34261e;z-index:4}
+.equip-belt-crit .hero-belt{background:#a96c42;border-color:#d0a34d}.equip-belt-tank .hero-belt{background:#56636a;border-color:#b9c5ca}.equip-belt-dodge .hero-belt{background:#28576b;border-color:#4d9ab3}.equip-belt-resilience .hero-belt{background:#746d5b;border-color:#a89a71}
+@media(max-width:390px){.combat-section-head{font-size:7px}.combat-section-head small{font-size:6px}.combat-auto-button{flex-basis:39px;width:39px;height:34px}.combat-auto-button strong{font-size:21px}.gear-row .combat-item-slot{flex-basis:53px;min-width:53px}.elixir-row .combat-item-slot{flex-basis:62px;min-width:62px}}

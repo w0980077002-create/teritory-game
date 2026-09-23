@@ -1,4 +1,4 @@
-/* Territory Game — Arena: tactical 1x1, live equipment switching, archetypes, autobattle */
+/* Territory Game — Arena: tactical 1x1, itemized combat bar, timed consumables, compact autobattle */
 (function(){
   'use strict';
 
@@ -184,7 +184,6 @@
       <div class="battle-status"><span data-status>Выбери зону удара</span><b data-player-hp>${p.hp}/${p.maxHp} ❤️</b><b data-bot-hp>${b.hp}/${b.maxHp} ❤️</b></div>
       <div class="combat-loadout-strip">${combatLoadoutStrip(p)}</div>
       <div class="item-action-panel" data-item-action-panel aria-hidden="true"></div>
-      <div class="autobattle-row"><label><input type="checkbox" data-autobattle ${battle.auto?'checked':''}><span>✓ Автобой</span></label><small>Можно выключить во время боя</small></div>
       <div class="zone-title">УДАР</div><div class="combat-zones attack-zones">${zones.map(z=>`<button data-attack-zone="${z[0]}">${z[1]}</button>`).join('')}</div>
       <div class="zone-title">ЗАЩИТА</div><div class="combat-zones defense-zones">${zones.map(z=>`<button data-defense-zone="${z[0]}">${z[1]}</button>`).join('')}</div>
       <div class="battle-actions"><button data-surrender>Сдаться</button></div><div class="battle-log" data-log></div>
@@ -219,15 +218,20 @@
   }
 
   function combatLoadoutStrip(p){
-    const slots=['weapon','helmet','armor','boots','ring','elixir_hp','elixir_energy','elixir_attack','elixir_guard'];
-    return `<div class="combat-item-row">${slots.map(slot=>{
-      const cfg=SLOT_ITEMS[slot][0], type=cfg[3], q=type==='consumable'?Number(S()?.consumables?.[slot]||0):null;
+    const gear=['weapon','helmet','armor','belt','boots','ring'];
+    const elixirs=['elixir_hp','elixir_energy','elixir_attack','elixir_guard'];
+    const slotMarkup=(slot)=>{
+      const cfg=SLOT_ITEMS[slot][0],type=cfg[3],q=type==='consumable'?Number(S()?.consumables?.[slot]||0):null;
       const name=type==='consumable'?(window.CombatItems?.CATALOG?.[slot]?.name||cfg[2]):equippedItem(p,slot);
-      const icon=cfg[1];
       const active=type==='consumable'&&q<=0?'empty':'';
       const timer=type==='consumable'&&battle?.cooldowns?.[slot]?formatTimer(battle.cooldowns[slot]-Date.now()):'';
-      return `<button class="combat-item-slot ${active}" data-combat-item="${slot}" title="${esc(name)}"><strong>${icon}</strong><span>${esc(shortItemName(name))}</span>${type==='consumable'?`<small data-item-count="${slot}">${q}${timer?` · ${timer}`:''}</small>`:''}</button>`;
-    }).join('')}</div>
+      return `<button class="combat-item-slot ${active}" data-combat-item="${slot}" title="${esc(name)}"><strong>${cfg[1]}</strong><span>${esc(shortItemName(name))}</span>${type==='consumable'?`<small data-item-count="${slot}">${q}${timer?` · ${timer}`:''}</small>`:''}</button>`;
+    };
+    const auto=`<button class="combat-auto-button ${battle?.auto?'active':''}" data-autobattle-toggle aria-pressed="${battle?.auto?'true':'false'}" title="Автобой"><strong>↻</strong><small>Авто</small></button>`;
+    return `<div class="combat-section-head"><b>СНАРЯЖЕНИЕ</b>${auto}</div>
+      <div class="combat-item-row gear-row">${gear.map(slotMarkup).join('')}</div>
+      <div class="combat-section-head consumables-head"><b>ЭЛИКСИРЫ</b><small>Нажми на эликсир, чтобы использовать</small></div>
+      <div class="combat-item-row elixir-row">${elixirs.map(slotMarkup).join('')}</div>
       <div class="combat-build-line"><span>💥 ${Math.round(p.crit*100)}%</span><span>💨 ${Math.round(p.dodge*100)}%</span><span>🧱 ${Math.round(p.resilience*100)}%</span><span>🛡️ ${Math.round(p.defense)}</span></div>`;
   }
 
@@ -270,9 +274,9 @@
   }
 
   function fighterMarkup(side,u){
-    const armorKey=selectedKey(u,'armor'),helmetKey=selectedKey(u,'helmet'),bootsKey=selectedKey(u,'boots'),weaponKey=selectedKey(u,'weapon');
-    return `<div class="combat-fighter ${side} outfit-${u.loadout} equip-armor-${armorKey} equip-helmet-${helmetKey} equip-boots-${bootsKey}" data-fighter="${u.id}" data-weapon-key="${weaponKey}"><div class="fighter-name">${esc(u.name)} <small>Lv.${u.level}</small></div>
-      <div class="fighter-body"><div class="hero-head"><i></i></div><div class="hero-torso"></div><div class="hero-armor-mark"></div><div class="hero-arm arm-back"></div><div class="hero-arm arm-front"><span class="weapon">${weaponIcon((LOADOUTS[weaponKey]||LOADOUTS.crit).weapon)}</span></div><div class="hero-leg leg-back"></div><div class="hero-leg leg-front"></div></div>
+    const armorKey=selectedKey(u,'armor'),helmetKey=selectedKey(u,'helmet'),beltKey=selectedKey(u,'belt'),bootsKey=selectedKey(u,'boots'),weaponKey=selectedKey(u,'weapon');
+    return `<div class="combat-fighter ${side} outfit-${u.loadout} equip-armor-${armorKey} equip-helmet-${helmetKey} equip-belt-${beltKey} equip-boots-${bootsKey}" data-fighter="${u.id}" data-weapon-key="${weaponKey}"><div class="fighter-name">${esc(u.name)} <small>Lv.${u.level}</small></div>
+      <div class="fighter-body"><div class="hero-head"><i></i></div><div class="hero-torso"></div><div class="hero-belt"></div><div class="hero-armor-mark"></div><div class="hero-arm arm-back"></div><div class="hero-arm arm-front"><span class="weapon">${weaponIcon((LOADOUTS[weaponKey]||LOADOUTS.crit).weapon)}</span></div><div class="hero-leg leg-back"></div><div class="hero-leg leg-front"></div></div>
       <div class="fighter-hp"><i style="width:100%"></i></div></div>`;
   }
 
@@ -362,11 +366,23 @@
     if(!window.CombatItems.use(itemId))return;
     const duration=itemId==='elixir_attack'||itemId==='elixir_guard'?30000:15000;
     battle.cooldowns[itemId]=now+duration;
-    if(itemId==='elixir_hp')battle.player.hp=Math.min(battle.player.maxHp,battle.player.hp+(Number(item?.value)||30));
-    if(itemId==='elixir_energy'){}
-    if(itemId==='elixir_attack'||itemId==='elixir_guard')recalcFighter(battle.player);
+    battle.buffExpiry=battle.buffExpiry||{};
+    if(itemId==='elixir_attack'||itemId==='elixir_guard')battle.buffExpiry[itemId]=now+duration;
+    recalcFighter(battle.player);
     updateBars();renderCombatItems();openItemPanel(itemId);log('Использован '+(item?.name||itemId)+' · действует '+formatTimer(duration));
-    setTimeout(()=>{if(battle){renderCombatItems();if(battle.itemPanel===itemId)openItemPanel(itemId);}},duration+50);
+    setTimeout(()=>{
+      if(!battle)return;
+      if(battle.buffExpiry?.[itemId] && battle.buffExpiry[itemId]<=Date.now()){
+        const st=S();if(st?.combatBuffs){
+          if(itemId==='elixir_attack')st.combatBuffs.attack=Math.max(0,Number(st.combatBuffs.attack||0)-(Number(item?.value)||5));
+          if(itemId==='elixir_guard')st.combatBuffs.defense=Math.max(0,Number(st.combatBuffs.defense||0)-(Number(item?.value)||5));
+          save();
+        }
+        delete battle.buffExpiry[itemId];
+        recalcFighter(battle.player);updateBars();log((item?.name||itemId)+' закончился');
+      }
+      renderCombatItems();if(battle.itemPanel===itemId)openItemPanel(itemId);
+    },duration+50);
   }
 
   function renderCombatItems(){
@@ -389,6 +405,7 @@
     if(e.target.closest?.('[data-arena-find]')){findOpponent();return;}
     const pf=e.target.closest?.('[data-profile-fight]');if(pf){const p=pf.dataset.profileFight==='player'?humanProfile():botRoster().find(x=>x.id===pf.dataset.profileFight);if(p&&!p.isBot)openProfile(p.id);else if(p)startBattle(p);return;}
     const item=e.target.closest?.('[data-combat-item]');if(item){if(battle&&!battle.busy)openItemPanel(item.dataset.combatItem);return;}
+    if(e.target.closest?.('[data-autobattle-toggle]')){if(!battle||battle.busy)return;battle.auto=!battle.auto;renderCombatItems();const st=$('[data-status]');if(st)st.textContent=battle.auto?'↻ Автобой включён':'Твой ход — выбери зону удара';if(battle.auto)autoStep();return;}
     if(e.target.closest?.('[data-close-item-panel]')){closeItemPanel();return;}
     const use=e.target.closest?.('[data-use-combat-item]');if(use){useItem(use.dataset.useCombatItem);return;}
     const eq=e.target.closest?.('[data-equip-slot]');if(eq){changeSingleItem(eq.dataset.equipSlot,eq.dataset.equipLoadout);return;}
@@ -399,7 +416,7 @@
     if(e.target.closest?.('[data-restart]')){findOpponent();return;}
   });
 
-  document.addEventListener('change',e=>{const toggle=e.target.closest?.('[data-autobattle]');if(!toggle||!battle)return;battle.auto=Boolean(toggle.checked);const st=$('[data-status]');if(st)st.textContent=battle.auto?'Автобой включён':'Автобой выключен — выбери зоны вручную';if(battle.auto&&!battle.busy)autoStep();});
+
   document.getElementById('arenaClose')?.addEventListener('click',close);
   window.ArenaGame={open:openHub,close,findOpponent,openProfile};
 })();
