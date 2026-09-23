@@ -180,16 +180,24 @@
     const root=ensureRoot();if(!root||!battle)return;const p=battle.player,b=battle.bot;
     root.body.innerHTML=`<div class="arena-battle" data-battle-root>
       <div class="battle-header"><button class="arena-back" data-arena-hub>‹ Арена</button><b>ХОД ${battle.turn}</b><span>Рейтинг ${S()?.arena?.rating||1000}</span></div>
-      <div class="battle-stage"><div class="fighter-wrap player-wrap">${fighterMarkup('player',p)}</div><div class="fighter-wrap bot-wrap">${fighterMarkup('bot',b)}</div><div class="damage-layer" data-damage-layer></div></div>
+      <div class="battle-stage"><div class="fighter-wrap player-wrap">${fighterMarkup('player',p)}</div><div class="fighter-wrap bot-wrap">${fighterMarkup('bot',b)}</div><div class="damage-layer" data-damage-layer></div>
+        <div class="battle-zone-controls defense-controls"><div class="side-zone-title">ЗАЩИТА</div>${zones.map(z=>`<button data-defense-zone="${z[0]}">${z[1]}</button>`).join('')}</div>
+        <div class="battle-zone-controls attack-controls"><div class="side-zone-title">УДАР</div>${zones.map(z=>`<button data-attack-zone="${z[0]}">${z[1]}</button>`).join('')}</div>
+      </div>
       <div class="battle-status"><span data-status>Выбери зону удара</span><b data-player-hp>${p.hp}/${p.maxHp} ❤️</b><b data-bot-hp>${b.hp}/${b.maxHp} ❤️</b></div>
       <div class="combat-loadout-strip">${combatLoadoutStrip(p)}</div>
       <div class="item-action-panel" data-item-action-panel aria-hidden="true"></div>
-      <div class="zone-title">УДАР</div><div class="combat-zones attack-zones">${zones.map(z=>`<button data-attack-zone="${z[0]}">${z[1]}</button>`).join('')}</div>
-      <div class="zone-title">ЗАЩИТА</div><div class="combat-zones defense-zones">${zones.map(z=>`<button data-defense-zone="${z[0]}">${z[1]}</button>`).join('')}</div>
       <div class="battle-actions"><button data-surrender>Сдаться</button></div><div class="battle-log" data-log></div>
+      ${arenaBottomNav()}
     </div>`;
     updateBars();
       }
+
+
+  function arenaBottomNav(){
+    const items=[['home','🏰','Город'],['inventory','🎒','Инвентарь'],['hero','🪖','Герой'],['battle','⚔️','Бой'],['quests','📜','Квесты'],['game','🎲','Игры'],['clan','🚩','Клан']];
+    return `<nav class="arena-bottom-nav" aria-label="Основное меню">${items.map(([id,icon,label])=>`<button data-arena-nav="${id}" class="${id==='battle'?'active':''}"><span>${icon}</span><b>${label}</b></button>`).join('')}</nav>`;
+  }
 
   const SLOT_ITEMS={
     weapon:[['weapon','⚔️','Оружие','weapon']],
@@ -407,6 +415,17 @@
     const item=e.target.closest?.('[data-combat-item]');if(item){if(battle&&!battle.busy)openItemPanel(item.dataset.combatItem);return;}
     if(e.target.closest?.('[data-autobattle-toggle]')){if(!battle||battle.busy)return;battle.auto=!battle.auto;renderCombatItems();const st=$('[data-status]');if(st)st.textContent=battle.auto?'↻ Автобой включён':'Твой ход — выбери зону удара';if(battle.auto)autoStep();return;}
     if(e.target.closest?.('[data-close-item-panel]')){closeItemPanel();return;}
+    const nav=e.target.closest?.('[data-arena-nav]');if(nav){
+      const id=nav.dataset.arenaNav;
+      if(id==='battle'){openHub();return;}
+      close();
+      if(id==='home')window.showScreen?.('home');
+      else if(id==='inventory'||id==='hero')window.showScreen?.('inventory');
+      else if(id==='game')window.showScreen?.('casino');
+      else if(id==='quests')window.showScreen?.('districts');
+      else if(id==='clan')window.showScreen?.('districts');
+      return;
+    }
     const use=e.target.closest?.('[data-use-combat-item]');if(use){useItem(use.dataset.useCombatItem);return;}
     const eq=e.target.closest?.('[data-equip-slot]');if(eq){changeSingleItem(eq.dataset.equipSlot,eq.dataset.equipLoadout);return;}
     const az=e.target.closest?.('[data-attack-zone]');if(az){playerAttack(az.dataset.attackZone);return;}

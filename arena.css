@@ -57,3 +57,34 @@
 .hero-belt{position:absolute;left:39px;top:103px;width:54px;height:9px;border-radius:5px;background:#6f5039;border:2px solid #34261e;z-index:4}
 .equip-belt-crit .hero-belt{background:#a96c42;border-color:#d0a34d}.equip-belt-tank .hero-belt{background:#56636a;border-color:#b9c5ca}.equip-belt-dodge .hero-belt{background:#28576b;border-color:#4d9ab3}.equip-belt-resilience .hero-belt{background:#746d5b;border-color:#a89a71}
 @media(max-width:390px){.combat-section-head{font-size:7px}.combat-section-head small{font-size:6px}.combat-auto-button{flex-basis:39px;width:39px;height:34px}.combat-auto-button strong{font-size:21px}.gear-row .combat-item-slot{flex-basis:53px;min-width:53px}.elixir-row .combat-item-slot{flex-basis:62px;min-width:62px}}
+
+/* STEP-05D — combat controls moved beside the fighters; bottom navigation mirrors HOME */
+.arena-battle{padding-bottom:76px!important}
+.battle-stage{position:relative!important;min-height:500px!important;padding:0!important;overflow:visible!important}
+.battle-zone-controls{position:absolute!important;top:50%!important;transform:translateY(-50%)!important;z-index:35!important;display:flex!important;flex-direction:column!important;gap:5px!important;width:54px!important;pointer-events:auto!important}
+.defense-controls{left:3px!important}
+.attack-controls{right:3px!important}
+.side-zone-title{font-size:7px!important;font-weight:900!important;letter-spacing:.5px!important;color:#e8c76b!important;text-align:center!important;margin-bottom:2px!important}
+.battle-zone-controls button{width:54px!important;min-height:43px!important;padding:4px 2px!important;border:1px solid rgba(232,199,107,.42)!important;border-radius:9px!important;background:rgba(7,17,27,.88)!important;color:#fff!important;font-size:8px!important;font-weight:900!important;box-shadow:0 4px 12px rgba(0,0,0,.22)!important}
+.battle-zone-controls button.selected{border-color:#e8c76b!important;background:linear-gradient(180deg,#3d3012,#17140c)!important;box-shadow:0 0 0 1px rgba(232,199,107,.2),0 0 10px rgba(232,199,107,.12)!important}
+.battle-zone-controls button:disabled{opacity:.4!important}
+.battle-actions{position:relative!important;z-index:38!important;margin:5px 64px 4px!important;display:flex!important;justify-content:center!important}
+.battle-actions button{min-height:32px!important;padding:5px 22px!important;border:1px solid #394f5c!important;border-radius:9px!important;background:#0b1821!important;color:#9aabb4!important;font-size:8px!important;font-weight:900!important}
+.battle-log{max-height:44px!important;overflow:auto!important;margin:0 62px 5px!important}
+.arena-bottom-nav{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:100000!important;height:64px!important;display:grid!important;grid-template-columns:repeat(7,1fr)!important;padding:0!important;margin:0!important;background:linear-gradient(180deg,#111e29,#07111b)!important;border-top:1px solid rgba(232,199,107,.32)!important;box-shadow:0 -8px 22px rgba(0,0,0,.38)!important;safe-area-inset-bottom:env(safe-area-inset-bottom)!important}
+.arena-bottom-nav button{min-width:0!important;height:64px!important;border:0!important;border-right:1px solid rgba(70,91,103,.28)!important;background:transparent!important;color:#aebbc2!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;padding:3px 1px!important}
+.arena-bottom-nav button span{font-size:21px!important;line-height:22px!important;filter:drop-shadow(0 2px 2px #000)!important}
+.arena-bottom-nav button b{font-size:7px!important;white-space:nowrap!important;font-weight:900!important}
+.arena-bottom-nav button.active{color:#f2d37d!important;background:rgba(232,199,107,.07)!important;box-shadow:inset 0 2px 0 #e8c76b!important}
+@media(max-width:390px){
+  .battle-stage{min-height:475px!important}
+  .battle-zone-controls{width:50px!important;gap:4px!important}
+  .defense-controls{left:2px!important}.attack-controls{right:2px!important}
+  .battle-zone-controls button{width:50px!important;min-height:40px!important;font-size:7px!important}
+  .side-zone-title{font-size:6px!important}
+  .arena-bottom-nav{height:60px!important}
+  .arena-bottom-nav button{height:60px!important}
+  .arena-bottom-nav button span{font-size:19px!important}
+  .arena-bottom-nav button b{font-size:6.5px!important}
+  .arena-battle{padding-bottom:70px!important}
+}
