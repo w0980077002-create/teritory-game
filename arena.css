@@ -35,3 +35,26 @@
 .combat-item-slot[data-combat-slot="adrenaline"] small,
 .combat-item-slot[data-combat-slot="speed_scroll"] small,
 .combat-item-slot[data-combat-slot="anti_speed_scroll"] small{color:#e8c76b}
+
+/* STEP-05I — clean battle chrome and preserve the character art area */
+.arena-modal.arena-in-battle .arena-modal-head{display:none!important}
+.arena-modal.arena-in-battle .arena-sheet{overflow-y:auto}
+.arena-modal.arena-in-battle .arena-battle{min-height:100vh;padding-top:0}
+.arena-in-battle .battle-header{height:34px;min-height:34px;padding:2px 8px;background:rgba(5,13,19,.84);border-bottom:1px solid rgba(232,199,107,.18)}
+.arena-in-battle .battle-header .arena-back{width:32px;height:28px;padding:0;font-size:16px;line-height:26px;text-align:center}
+/* Side controls stay in the extreme gutters and use less visual area. */
+.arena-in-battle .battle-stage{height:292px}
+.arena-in-battle .battle-zone-controls{width:43px;gap:3px}
+.arena-in-battle .battle-zone-controls button{width:43px;min-height:34px;padding:2px 1px;border-radius:7px;background:rgba(7,17,27,.72);font-size:6.5px}
+.arena-in-battle .side-zone-title{font-size:6px}
+.arena-in-battle .defense-controls{left:1px}
+.arena-in-battle .attack-controls{right:1px}
+.arena-in-battle .player-wrap{left:21%}
+.arena-in-battle .bot-wrap{right:21%}
+@media(max-width:390px){
+ .arena-in-battle .battle-stage{height:265px}
+ .arena-in-battle .battle-zone-controls{width:40px}
+ .arena-in-battle .battle-zone-controls button{width:40px;min-height:32px;font-size:6px}
+ .arena-in-battle .player-wrap{left:20%}
+ .arena-in-battle .bot-wrap{right:20%}
+}

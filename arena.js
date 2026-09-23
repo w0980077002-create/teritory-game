@@ -8,7 +8,7 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 const zones=[['head','Голова'],['chest','Грудь'],['waist','Пояс'],['legs','Ноги']];
 const styles={crit:{name:'Крит',icon:'💥',mods:{attack:5,defense:0,crit:.14,dodge:.03,resilience:0,maxHp:0}},tank:{name:'Танк',icon:'🛡️',mods:{attack:1,defense:8,crit:0,dodge:-.02,resilience:.12,maxHp:35}},dodge:{name:'Уворот',icon:'💨',mods:{attack:2,defense:1,crit:.04,dodge:.14,resilience:0,maxHp:0}},resilience:{name:'Стойкость',icon:'🧱',mods:{attack:2,defense:4,crit:.02,dodge:0,resilience:.22,maxHp:18}}};
 const gearSlots=[['weapon','⚔️','Оружие'],['helmet','🪖','Шлем'],['armor','🛡️','Броня'],['belt','🎗️','Пояс'],['boots','🥾','Сапоги'],['ring','💍','Кольцо']];
-const combatSlots=[['elixir_hp','🧪','HP'],['elixir_energy','🔵','Энергия'],['elixir_attack','🔥','Атака'],['elixir_guard','🛡️','Защита'],['elixir_crit','💥','Крит'],['elixir_dodge','💨','Уворот'],['elixir_resilience','🧱','Стойкость']];
+const combatSlots=[['elixir_hp','🧪','HP'],['elixir_energy','🔵','Энергия'],['elixir_attack','🔥','Атака'],['elixir_guard','🛡️','Защита'],['adrenaline','⚡','Адреналин'],['speed_scroll','📜','Ускорение'],['anti_speed_scroll','🐌','Антиускорение']];
 let battle=null,selectedProfile=null;
 function root(){const m=$('#arenaModal'),b=$('#arenaModalBody');return m&&b?{m,b}:null}
 function roster(){const l=Math.max(1,Number(S().level)||1),n=['Эйрик','Хальвдан','Сигурд','Рагнар','Ивар','Бьёрн'];return n.map((name,i)=>({id:'arena-bot-'+i,name,level:Math.max(1,l+i%3-1),class:['duelist','berserker','tank','assassin'][i%4],rating:820+(5-i)*42, wins:18+i*7,losses:6+i*3,avatar:['⚔️','🪓','🛡️','🏹','🗡️','🔱'][i],isBot:true}))}
@@ -16,15 +16,15 @@ function me(){const s=S();return{id:'player',name:String(s.profile?.displayName|
 function loadout(){const k=String(S().arena?.loadout||'crit');return styles[k]?k:'crit'}
 function profile(id){return id==='player'?me():roster().find(x=>x.id===id)}
 function open(){openHub()}
-function openHub(){stopBattleTimer();const r=root();if(!r)return;battle=null;selectedProfile=null;r.b.innerHTML=`<div class="arena-hub"><div class="arena-hero"><div><small>СОРЕВНОВАТЕЛЬНАЯ АРЕНА</small><h1>⚔️ АРЕНА</h1><p>Тактические бои 1×1.</p></div><div class="arena-rating"><span>РЕЙТИНГ</span><b>${me().rating}</b><small>${me().wins} побед · ${me().losses} поражений</small></div></div><button class="arena-start" data-arena-find>⚔️ НАЙТИ СОПЕРНИКА</button><div class="arena-section-title"><b>🏆 ТОП АРЕНЫ</b><small>Профиль игрока</small></div><div class="arena-top">${roster().map((p,i)=>`<button class="arena-top-row" data-profile-id="${p.id}"><strong>${i+1}</strong><span class="arena-avatar">${p.avatar}</span><span class="arena-player-copy"><b>${esc(p.name)}</b><small>Lv.${p.level}</small></span><span class="arena-player-rating">${p.rating}</span></button>`).join('')}</div></div>`;r.m.classList.add('show');r.m.setAttribute('aria-hidden','false')}
+function openHub(){stopBattleTimer();const r=root();if(!r)return;r.m.classList.remove('arena-in-battle');battle=null;selectedProfile=null;r.b.innerHTML=`<div class="arena-hub"><div class="arena-hero"><div><small>СОРЕВНОВАТЕЛЬНАЯ АРЕНА</small><h1>⚔️ АРЕНА</h1><p>Тактические бои 1×1.</p></div><div class="arena-rating"><span>РЕЙТИНГ</span><b>${me().rating}</b><small>${me().wins} побед · ${me().losses} поражений</small></div></div><button class="arena-start" data-arena-find>⚔️ НАЙТИ СОПЕРНИКА</button><div class="arena-section-title"><b>🏆 ТОП АРЕНЫ</b><small>Профиль игрока</small></div><div class="arena-top">${roster().map((p,i)=>`<button class="arena-top-row" data-profile-id="${p.id}"><strong>${i+1}</strong><span class="arena-avatar">${p.avatar}</span><span class="arena-player-copy"><b>${esc(p.name)}</b><small>Lv.${p.level}</small></span><span class="arena-player-rating">${p.rating}</span></button>`).join('')}</div></div>`;r.m.classList.add('show');r.m.setAttribute('aria-hidden','false')}
 function openProfile(id){const p=profile(id);if(!p)return;selectedProfile=p;const r=root();r.b.innerHTML=`<div class="arena-profile"><button class="arena-back" data-arena-hub>‹ АРЕНА</button><div class="profile-hero"><div class="profile-big-avatar">${p.avatar}</div><div><small>ИГРОК</small><h1>${esc(p.name)}</h1><p>Уровень ${p.level}</p></div></div><div class="profile-stats"><div><small>РЕЙТИНГ</small><b>${p.rating}</b></div><div><small>ПОБЕДЫ</small><b>${p.wins}</b></div><div><small>ПОРАЖЕНИЯ</small><b>${p.losses}</b></div><div><small>КЛАСС</small><b>${esc(p.class)}</b></div></div>${id!=='player'?'<button class="arena-start" data-profile-fight="'+id+'">⚔️ ВЫЗВАТЬ НА БОЙ</button>':''}</div>`}
 function fighter(p,side){const s=S(),k=side==='player'?loadout():(p.class==='tank'?'tank':p.class==='assassin'?'dodge':p.class==='berserker'?'crit':'resilience'),m=styles[k].mods,max=side==='player'?Math.max(1,Number(s.maxHp)||120)+m.maxHp:100+p.level*12+m.maxHp;return{id:side,name:p.name,level:p.level,hp:max,maxHp:max,attack:(Number(s.strength)||8)+(m.attack||0),defense:(Number(s.defense)||3)+(m.defense||0),crit:.06+(m.crit||0),dodge:.03+(m.dodge||0),resilience:m.resilience||0,style:k}}
 function start(op){
   const r=root();if(!r)return;
-  battle={mode:'1v1',player:fighter(me(),'player'),bot:fighter(op,'bot'),opponent:op,turn:1,playerDefense:[],attackZone:'',botDefense:[],auto:false,busy:false,logs:[`⚔️ Бой начался: ${me().name} против ${op.name}`],chat:[],ended:false,pendingResult:null,exited:{player:false,bot:false},startedAt:Date.now(),nextActionAt:0,baseCooldown:60000,timer:null};
+  battle={mode:'1v1',player:fighter(me(),'player'),bot:fighter(op,'bot'),opponent:op,turn:1,playerDefense:[],attackZone:'',botDefense:[],auto:false,busy:false,logs:[`⚔️ Бой начался: ${me().name} против ${op.name}`],chat:[],ended:false,pendingResult:null,exited:{player:false,bot:false},startedAt:Date.now(),playerReadyAt:0,botReadyAt:0,baseCooldown:60000,timer:null};
   startBattleTimer();render();
 }
-function render(){const r=root(),p=battle.player,b=battle.bot;if(!r)return;r.b.innerHTML=`<div class="arena-battle" data-battle-root><div class="battle-header"><button class="arena-back" data-arena-hub>‹ Арена</button><b>ХОД ${battle.turn}</b><span>Рейтинг ${me().rating}</span></div><div class="battle-stage"><div class="fighter-wrap player-wrap">${fighterMarkup(p)}</div><div class="fighter-wrap bot-wrap">${fighterMarkup(b)}</div><div class="battle-zone-controls defense-controls"><div class="side-zone-title">ЗАЩИТА · 2</div>${zones.map(z=>`<button data-defense-zone="${z[0]}">${z[1]}</button>`).join('')}</div><div class="battle-zone-controls attack-controls"><div class="side-zone-title">АТАКА · 1</div>${zones.map(z=>`<button data-attack-zone="${z[0]}">${z[1]}</button>`).join('')}</div></div><div class="battle-status"><span data-status>Выбери 2 зоны защиты и 1 зону атаки</span><b>${p.hp}/${p.maxHp} ❤️</b><b>${b.hp}/${b.maxHp} ❤️</b></div><div class="battle-command-row"><span>Тактика: <b>2 🛡️ + 1 ⚔️</b></span><button data-execute-attack disabled>⚔️ ВЫПОЛНИТЬ УДАР</button><strong data-cooldown>Готов</strong></div>${combatBar()}<div class="battle-chat" data-chat>${chatHtml()}</div><div class="battle-actions"><button data-surrender ${battle.ended?'disabled':''}>Сдаться</button><button data-exit-battle>Выйти</button></div>${bottomNav()}</div>`;sync();bindBattleControls();}
+function render(){const r=root(),p=battle.player,b=battle.bot;if(!r)return;r.m.classList.add('arena-in-battle');r.b.innerHTML=`<div class="arena-battle" data-battle-root><div class="battle-header"><button class="arena-back" data-arena-hub>‹</button><b>ХОД ${battle.turn}</b><span>Рейтинг ${me().rating}</span></div><div class="battle-stage"><div class="fighter-wrap player-wrap">${fighterMarkup(p)}</div><div class="fighter-wrap bot-wrap">${fighterMarkup(b)}</div><div class="battle-zone-controls defense-controls"><div class="side-zone-title">ЗАЩИТА · 2</div>${zones.map(z=>`<button data-defense-zone="${z[0]}">${z[1]}</button>`).join('')}</div><div class="battle-zone-controls attack-controls"><div class="side-zone-title">АТАКА · 1</div>${zones.map(z=>`<button data-attack-zone="${z[0]}">${z[1]}</button>`).join('')}</div></div><div class="battle-status"><span data-status>Выбери 2 зоны защиты и 1 зону атаки</span><b>${p.hp}/${p.maxHp} ❤️</b><b>${b.hp}/${b.maxHp} ❤️</b></div><div class="battle-command-row"><span>Тактика: <b>2 🛡️ + 1 ⚔️</b></span><button data-execute-attack disabled>⚔️ ВЫПОЛНИТЬ УДАР</button><strong data-cooldown>Готов</strong></div>${combatBar()}<div class="battle-chat" data-chat>${chatHtml()}</div><div class="battle-actions"><button data-surrender ${battle.ended?'disabled':''}>Сдаться</button><button data-exit-battle>Выйти</button></div>${bottomNav()}</div>`;sync();bindBattleControls();}
 function fighterMarkup(u){return `<div class="combat-fighter ${u.id}"><div class="fighter-name">${esc(u.name)} <small>Lv.${u.level}</small></div><div class="fighter-hp-top">${u.hp}/${u.maxHp} ❤️</div><div class="fighter-body"><div class="hero-head"><i></i></div><div class="hero-torso"></div><div class="hero-belt"></div><div class="hero-arm arm-back"></div><div class="hero-arm arm-front"><span class="weapon">⚔️</span></div><div class="hero-leg leg-back"></div><div class="hero-leg leg-front"></div></div></div>`}
 function combatBar(){return `<div class="combat-loadout-strip"><div class="combat-section-head"><b>СНАРЯЖЕНИЕ</b><button class="combat-auto-button ${battle.auto?'active':''}" data-autobattle-toggle aria-pressed="${battle.auto?'true':'false'}"><span>↻</span><small>${battle.auto?'✓ АВТО':'АВТО'}</small></button></div><div class="combat-item-row gear-row">${gearSlots.map(g=>`<button class="combat-item-slot" data-gear="${g[0]}"><strong>${g[1]}</strong><span>${g[2]}</span></button>`).join('')}</div><div class="combat-section-head consumables-head"><b>ЭЛИКСИРЫ И БОЕВЫЕ ПРЕДМЕТЫ</b><small>7 слотов</small></div><div class="combat-item-row elixir-row">${combatSlots.map((g,i)=>`<button class="combat-item-slot ${i>Number(S().arena?.combatSlotsUnlocked??3)?'locked':''}" data-combat-slot="${g[0]}"><strong>${i>Number(S().arena?.combatSlotsUnlocked??3)?'🔒':g[1]}</strong><span>${g[2]}</span><small>${i>Number(S().arena?.combatSlotsUnlocked??3)?'Открывается':`×${Number(S().consumables?.[g[0]]||0)}`}</small></button>`).join('')}</div></div>`}
 function chatHtml(){return [...battle.logs.map(x=>`<div class="chat-line system">${esc(x)}</div>`),...battle.chat.map(x=>`<div class="chat-line"><b>${esc(x.name)}:</b> ${esc(x.text)}</div>`)].join('')+`<div class="chat-compose"><input data-chat-input maxlength="180" placeholder="Написать сообщение…"><button data-chat-send>➤</button></div>`}
@@ -34,13 +34,17 @@ function startBattleTimer(){
   if(!battle)return;
   battle.timer=setInterval(()=>{
     if(!battle)return;
-    if(battle.pendingResult&&Date.now()>=battle.pendingResult.readyAt){const r=battle.pendingResult;battle.pendingResult=null;finalize(r.win);return;}
-    if(!battle.ended&&!battle.pendingResult&&battle.nextActionAt&&Date.now()>=battle.nextActionAt){battle.nextActionAt=0;botTurn();}
+    const now=Date.now();
+    if(battle.pendingResult&&now>=battle.pendingResult.readyAt){const r=battle.pendingResult;battle.pendingResult=null;finalize(r.win);return;}
+    if(!battle.ended&&!battle.pendingResult&&battle.botReadyAt&&now>=battle.botReadyAt){battle.botReadyAt=0;botTurn();return;}
+    if(!battle.ended&&!battle.pendingResult&&battle.auto&&cooldownLeft()<=0)autoStep();
     sync();
   },250);
 }
 function stopBattleTimer(){if(battle?.timer){clearInterval(battle.timer);battle.timer=null;}}
-function cooldownLeft(){return Math.max(0,(battle?.nextActionAt||0)-Date.now());}
+function cooldownLeft(){return Math.max(0,(battle?.playerReadyAt||0)-Date.now());}
+function botCooldownLeft(){return Math.max(0,(battle?.botReadyAt||0)-Date.now());}
+function botDelay(){return 25000+Math.floor(Math.random()*30001);}
 function battleElapsed(){return battle?Date.now()-battle.startedAt:0;}
 function usesTurnTimer(){return !!battle&&battle.mode!=='1v1';}
 function minBattleLeft(){return usesTurnTimer()?Math.max(0,30000-battleElapsed()):0;}
@@ -64,7 +68,7 @@ function sync(){
   const btn=r.b.querySelector('[data-execute-attack]'),status=r.b.querySelector('[data-status]'),clock=r.b.querySelector('[data-cooldown]');
   const ready=battle.playerDefense.length===2&&!!battle.attackZone&&!battle.busy&&!battle.ended&&!battle.pendingResult&&cd<=0;
   if(btn)btn.disabled=!ready;
-  if(clock)clock.textContent=cd>0?`След. удар ${formatClock(cd)}`:battle.pendingResult?`Мин. бой ${formatClock(minLeft)}`:(battle.mode==='1v1'?'Готов к ходу':'Готов');
+  if(clock)clock.textContent=cd>0?`Твой удар ${formatClock(cd)}`:battle.pendingResult?`Мин. бой ${formatClock(minLeft)}`:(botCooldownLeft()>0?`Бот: ${formatClock(botCooldownLeft())}`:'Готов к ходу');
   if(status)status.textContent=battle.pendingResult?`Исход определён · минимум боя ${formatClock(minLeft)}`:cd>0?`Перезарядка удара · ${formatClock(cd)}`:battle.busy?'Ход выполняется…':battle.playerDefense.length<2?`Выбрано защит: ${battle.playerDefense.length}/2`:!battle.attackZone?'Теперь выбери зону атаки':'Готово: нажми «ВЫПОЛНИТЬ УДАР»';
 }
 function executeAttack(){
@@ -72,7 +76,7 @@ function executeAttack(){
   battle.busy=true;const p=battle.player,b=battle.bot;let dmg=Math.max(1,p.attack-b.defense);
   if(Math.random()<b.dodge)battle.logs.push('💨 Соперник увернулся');
   else{if(battle.botDefense.includes(battle.attackZone))dmg=Math.max(1,Math.floor(dmg*.25));if(Math.random()<p.crit){dmg=Math.floor(dmg*1.8);battle.logs.push(`💥 Критический удар: ${dmg}`);}else battle.logs.push(`⚔️ Ты нанёс ${dmg} урона`);b.hp=Math.max(0,b.hp-dmg);}
-  battle.nextActionAt=Date.now()+battle.baseCooldown;battle.busy=false;battle.attackZone='';
+  battle.playerReadyAt=Date.now()+battle.baseCooldown;battle.botReadyAt=Date.now()+botDelay();battle.busy=false;battle.attackZone='';
   if(b.hp<=0){finish(true);return;}render();
 }
 function botTurn(){
@@ -81,14 +85,14 @@ function botTurn(){
   while(def2===def1)def2=zones[Math.floor(Math.random()*4)][0];battle.botDefense=[def1,def2];
   let dmg=Math.max(1,b.attack-p.defense);if(battle.playerDefense.includes(atk))dmg=Math.max(1,Math.floor(dmg*.25));
   if(Math.random()<p.dodge)battle.logs.push('💨 Ты увернулся от удара');else if(Math.random()<b.crit){dmg=Math.floor(dmg*1.8);battle.logs.push(`💥 Критический удар соперника: ${dmg}`);p.hp=Math.max(0,p.hp-dmg);}else{p.hp=Math.max(0,p.hp-dmg);battle.logs.push(`🛡️ Соперник нанёс ${dmg} урона`);}
-  if(p.hp<=0){finish(false);return;}battle.turn++;battle.playerDefense=[];battle.attackZone='';battle.nextActionAt=0;render();if(battle.auto)setTimeout(autoStep,150);
+  if(p.hp<=0){finish(false);return;}battle.turn++;battle.playerDefense=[];battle.attackZone='';render();
 }
 function autoStep(){
   if(!battle||battle.ended||battle.busy||battle.pendingResult||cooldownLeft()>0||!battle.auto)return;
   const d1=zones[Math.floor(Math.random()*4)][0];let d2=zones[Math.floor(Math.random()*4)][0];while(d2===d1)d2=zones[Math.floor(Math.random()*4)][0];
   battle.playerDefense=[d1,d2];battle.attackZone=zones[Math.floor(Math.random()*4)][0];sync();setTimeout(()=>{if(battle?.auto&&!battle.ended&&cooldownLeft()<=0)executeAttack();},250);
 }
-function finalize(win){if(!battle)return;battle.ended=true;battle.busy=false;battle.nextActionAt=0;stopBattleTimer();battle.logs.push(win?'🏆 Победа!':'☠️ Ты проиграл. Бой завершён.');render();}
+function finalize(win){if(!battle)return;battle.ended=true;battle.busy=false;battle.playerReadyAt=0;battle.botReadyAt=0;stopBattleTimer();battle.logs.push(win?'🏆 Победа!':'☠️ Ты проиграл. Бой завершён.');render();}
 function finish(win){
   if(!battle||battle.ended||battle.pendingResult)return;
   const wait=minBattleLeft();
@@ -103,11 +107,11 @@ function useSlot(slot){
   const c=S().consumables||{};
   if(slot==='speed_scroll'&&Number(c[slot]||0)>0&&cooldownLeft()>0){
     const floor=usesTurnTimer()?battle.startedAt+30000:Date.now();
-    battle.nextActionAt=Math.max(floor,battle.nextActionAt-10000);
+    battle.playerReadyAt=Math.max(floor,battle.playerReadyAt-10000);
     c[slot]--;save();battle.logs.push('📜 Свиток ускорения: −10 секунд.');render();return;
   }
   if(slot==='anti_speed_scroll'&&Number(c[slot]||0)>0&&cooldownLeft()>0){
-    battle.nextActionAt=Math.min(Date.now()+60000,battle.nextActionAt+10000);
+    battle.playerReadyAt=Math.min(Date.now()+60000,battle.playerReadyAt+10000);
     c[slot]--;save();battle.logs.push('🐌 Свиток антиускорения: +10 секунд. Максимум ожидания — 60 секунд.');render();return;
   }
   if(slot==='adrenaline'){
@@ -118,7 +122,7 @@ function useSlot(slot){
 }
 function performTeamUtility(label,fn){
   if(!battle||battle.ended||battle.busy)return false;
-  fn();battle.logs.push(`🧩 ${label}: ход пропущен.`);battle.turn++;battle.playerDefense=[];battle.attackZone='';battle.nextActionAt=Date.now()+battle.baseCooldown;render();return true;
+  fn();battle.logs.push(`🧩 ${label}: ход пропущен.`);battle.turn++;battle.playerDefense=[];battle.attackZone='';battle.playerReadyAt=Date.now()+battle.baseCooldown;render();return true;
 }
 function chooseGear(slot){if(!battle)return;const keys=Object.keys(styles);const k=keys[(keys.indexOf(battle.player.style)+1)%keys.length];
   if(battle.mode!=='1v1'){
