@@ -7,3 +7,35 @@
 .outfit-crit .hero-torso{background:linear-gradient(90deg,#3d2928,#8d4d3f,#3d2928);border-color:#d0a34d}.outfit-crit .hero-head i{background:#8d4d3f}.outfit-crit .hero-leg{background:#3a3030}.outfit-crit .hero-armor-mark{background:#d0a34d}.outfit-tank .hero-torso{background:linear-gradient(90deg,#263038,#7d8b92,#263038);border-color:#b9c5ca;box-shadow:inset 0 0 0 3px rgba(190,205,211,.16)}.outfit-tank .hero-head i{background:#65737a}.outfit-tank .hero-leg{background:#39454b}.outfit-tank .hero-armor-mark{background:#c5d0d4}.outfit-dodge .hero-torso{background:linear-gradient(90deg,#182d38,#28576b,#182d38);border-color:#4d9ab3}.outfit-dodge .hero-head i{background:#173e4e}.outfit-dodge .hero-leg{background:#162a34}.outfit-dodge .hero-armor-mark{background:#53a8c0}.outfit-resilience .hero-torso{background:linear-gradient(90deg,#3a3630,#746d5b,#3a3630);border-color:#a89a71}.outfit-resilience .hero-head i{background:#655e4d}.outfit-resilience .hero-leg{background:#39362f}.outfit-resilience .hero-armor-mark{background:#b4a36d}.hero-armor-mark{position:absolute;left:47px;top:57px;width:38px;height:24px;border-radius:4px;opacity:.8;z-index:3;box-shadow:0 0 8px rgba(255,255,255,.08)}
 .bot-wrap .outfit-crit .hero-torso{background:linear-gradient(90deg,#4d2f2b,#8c4e45,#4d2f2b)}.bot-wrap .outfit-tank .hero-torso{background:linear-gradient(90deg,#3a4145,#707a7d,#3a4145)}.bot-wrap .outfit-dodge .hero-torso{background:linear-gradient(90deg,#24343a,#42616a,#24343a)}.bot-wrap .outfit-resilience .hero-torso{background:linear-gradient(90deg,#4a4439,#716954,#4a4439)}
 @media(max-width:390px){.equipment-bar{padding:5px 8px}.equipment-open{min-height:35px;font-size:8px;padding:0 7px}.combat-stats-mini{gap:4px}.combat-stats-mini span{font-size:7px}.equipment-panel{margin-left:8px;margin-right:8px}.equipment-slots span{font-size:6.5px}.loadout-card{min-height:50px}.loadout-card em{font-size:6px}.arena-build-preview>span{max-width:145px}.arena-build-preview{padding:8px 9px}}
+
+/* STEP-05B — permanent combat item bar: equipped gear + consumables */
+.combat-loadout-strip{position:relative;z-index:25;padding:6px 8px 5px;border-top:1px solid rgba(232,199,107,.18);border-bottom:1px solid rgba(232,199,107,.18);background:rgba(4,12,18,.94)}
+.combat-item-row{display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:1px 1px 3px;-webkit-overflow-scrolling:touch}
+.combat-item-row::-webkit-scrollbar{display:none}
+.combat-item-slot{flex:0 0 58px;min-width:58px;height:61px;padding:4px 3px;border:1px solid #344a56;border-radius:8px;background:linear-gradient(#15232d,#0a151d);color:#fff;display:grid;grid-template-rows:28px 14px 11px;place-items:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)}
+.combat-item-slot:active{transform:translateY(1px)}
+.combat-item-slot strong{font-size:23px;line-height:25px}
+.combat-item-slot span{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;font-size:6.5px;font-weight:900;color:#d6dee2}
+.combat-item-slot small{font-size:7px;font-weight:900;color:#e8c76b;line-height:10px}
+.combat-item-slot.empty{opacity:.52}
+.combat-item-slot.empty small{color:#718691}
+.combat-item-slot:nth-child(1){border-color:#9c711f}
+.combat-item-slot:nth-child(2),.combat-item-slot:nth-child(3),.combat-item-slot:nth-child(4),.combat-item-slot:nth-child(5){border-color:#3c5562}
+.combat-build-line{display:flex;justify-content:flex-end;gap:10px;padding:3px 2px 0;color:#9fb0ba;font-size:7px;font-weight:900;white-space:nowrap}
+.item-action-panel{position:relative;z-index:30;display:none;margin:5px 8px 6px;padding:8px;border:1px solid rgba(232,199,107,.4);border-radius:10px;background:#091721;box-shadow:0 10px 25px rgba(0,0,0,.38)}
+.item-action-panel.show{display:block}
+.item-action-head{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#e8c76b;font-size:9px}
+.item-action-head button{width:27px;height:27px;border:1px solid #354c58;border-radius:7px;background:#10212b;color:#dce5e8;font-size:18px}
+.item-action-copy{display:flex;justify-content:space-between;gap:8px;margin:5px 0;color:#c6d1d6;font-size:8px}
+.item-action-copy small{color:#718691;text-align:right}
+.item-action-use{width:100%;min-height:35px;border:1px solid #c59e4d;border-radius:8px;background:linear-gradient(#e5c56a,#9c711f);color:#171107;font-weight:900;font-size:9px}
+.item-action-use:disabled{opacity:.45}
+.item-options{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px;max-height:150px;overflow:auto}
+.item-option{display:grid;grid-template-columns:25px 1fr;gap:6px;align-items:center;padding:6px;border:1px solid #2e4653;border-radius:8px;background:#0d1b25;color:#fff;text-align:left;min-width:0}
+.item-option.selected{border-color:#e8c76b;background:rgba(232,199,107,.1)}
+.item-option strong{font-size:18px;text-align:center}.item-option span{min-width:0}.item-option b,.item-option small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.item-option b{font-size:7.5px}.item-option small{margin-top:2px;color:#7f929b;font-size:6px}
+/* Single-slot visual changes: swapping one item changes only that visible part. */
+.equip-helmet-crit .hero-head i{background:#8d4d3f}.equip-helmet-tank .hero-head i{background:#aeb8bd;box-shadow:0 -2px 0 #d5dde0}.equip-helmet-dodge .hero-head i{background:#28576b}.equip-helmet-resilience .hero-head i{background:#746d5b}
+.equip-armor-crit .hero-torso{background:linear-gradient(90deg,#3d2928,#8d4d3f,#3d2928);border-color:#d0a34d}.equip-armor-tank .hero-torso{background:linear-gradient(90deg,#263038,#7d8b92,#263038);border-color:#b9c5ca}.equip-armor-dodge .hero-torso{background:linear-gradient(90deg,#182d38,#28576b,#182d38);border-color:#4d9ab3}.equip-armor-resilience .hero-torso{background:linear-gradient(90deg,#3a3630,#746d5b,#3a3630);border-color:#a89a71}
+.equip-boots-crit .hero-leg{background:#3a3030}.equip-boots-tank .hero-leg{background:#39454b}.equip-boots-dodge .hero-leg{background:#162a34}.equip-boots-resilience .hero-leg{background:#39362f}
+@media(max-width:390px){.combat-item-slot{flex-basis:54px;min-width:54px;height:57px}.combat-item-slot strong{font-size:21px}.combat-item-slot span{font-size:6px}.combat-build-line{gap:7px;font-size:6.5px}.item-action-panel{margin-left:7px;margin-right:7px}.item-options{max-height:135px}}
