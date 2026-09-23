@@ -1,0 +1,175 @@
+
+/* Territory Game — reference-style inventory UI
+   Built from the supplied mobile-game reference:
+   ornate header, large hero socket, circular gems and horizontal equipment rows.
+*/
+#inventory.reference-inventory{
+  background:#171019!important;
+  color:#fff3d5!important;
+  overflow:hidden!important;
+}
+#inventory.reference-inventory .screen-head,
+#inventory.reference-inventory .profile-card,
+#inventory.reference-inventory > .panel-title{
+  display:none!important;
+}
+.reference-wrap{
+  position:absolute; inset:0; overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(113,54,119,.26),transparent 34%),
+    linear-gradient(180deg,#29152d 0%,#180d18 54%,#2d241f 54%,#d8bf8b 54.8%,#d8bf8b 100%);
+  font-family:Arial,sans-serif;
+}
+.reference-topbar{
+  position:absolute;left:0;right:0;top:0;height:74px;z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  border-top:3px solid #f1bf50;border-bottom:4px solid #6c351e;
+  background:linear-gradient(180deg,#4b241f,#29131d 56%,#4a241f);
+  box-shadow:inset 0 2px #ffe08a,inset 0 -3px #1a0d15,0 3px 8px #000b;
+}
+.reference-topbar:before,.reference-topbar:after{
+  content:"◆";position:absolute;top:24px;color:#e7a53b;font-size:15px;
+  text-shadow:0 0 4px #ffdc77;
+}
+.reference-topbar:before{left:9%}.reference-topbar:after{right:9%}
+.reference-back{
+  position:absolute;left:9px;top:14px;width:44px;height:44px;border-radius:50%;
+  border:2px solid #8b5a2c;background:radial-gradient(circle,#68462f,#241a18);
+  color:#ffe6a7;font-size:30px;font-weight:900;line-height:1;z-index:3;
+}
+.reference-title{
+  min-width:72%;padding:8px 22px;text-align:center;
+  color:#fff1a8;font:900 24px/1 Georgia,serif;
+  text-shadow:0 2px 0 #5c2717,0 0 7px #ffcc61;
+  letter-spacing:.2px;
+}
+.reference-title small{
+  display:block;margin-top:4px;color:#e6b86c;font:800 8px/1 Arial,sans-serif;
+  letter-spacing:2px;text-shadow:none;
+}
+.reference-main{
+  position:absolute;left:0;right:0;top:74px;bottom:70px;overflow:auto;
+  scrollbar-width:none;
+}
+.reference-main::-webkit-scrollbar{display:none}
+.reference-stage{
+  position:relative;margin:12px auto 10px;width:86%;height:208px;
+  border:4px solid #8e4c2b;border-radius:9px;
+  background:
+    linear-gradient(135deg,transparent 10%,rgba(227,162,67,.18) 10.5%,transparent 11%),
+    linear-gradient(315deg,transparent 10%,rgba(227,162,67,.18) 10.5%,transparent 11%),
+    radial-gradient(circle at 50% 48%,rgba(135,79,123,.45),transparent 43%),
+    linear-gradient(180deg,#39203e,#24142b);
+  box-shadow:inset 0 0 0 3px #d69a42,inset 0 0 30px #100813,0 6px 10px #0009;
+}
+.reference-stage:before{
+  content:"";position:absolute;inset:12px;border:2px solid rgba(217,157,66,.42);
+  border-radius:6px;pointer-events:none;
+}
+.reference-stage:after{
+  content:"";position:absolute;left:50%;top:50%;width:92px;height:92px;
+  transform:translate(-50%,-50%);border:3px solid rgba(205,144,64,.36);
+  border-radius:50%;box-shadow:0 0 0 18px rgba(42,20,46,.26),inset 0 0 25px #0008;
+}
+.reference-gem-slot{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:70px;height:70px;border-radius:50%;z-index:2;
+  display:grid;place-items:center;border:4px solid #6c4a30;
+  background:radial-gradient(circle,#4d284f,#23142a 68%);
+}
+.reference-gem-slot .gem{
+  width:48px;height:48px;
+}
+.reference-stage-label{
+  position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+  color:#d9bb8b;font:800 9px Arial;letter-spacing:1.5px;z-index:3;
+}
+.reference-divider{
+  width:92%;height:18px;margin:0 auto 7px;position:relative;
+  border-top:4px solid #b37a38;border-bottom:2px solid #4c281b;
+  background:linear-gradient(180deg,#6a3a24,#3b211b);
+  box-shadow:0 2px 4px #0008;
+}
+.reference-divider:after{
+  content:"◆";position:absolute;left:50%;top:-9px;transform:translateX(-50%);
+  color:#ffca55;background:#4a251d;padding:0 7px;font-size:13px;
+}
+.reference-equip-list{
+  width:94%;margin:0 auto;padding-bottom:12px;display:grid;gap:7px;
+}
+.reference-row{
+  position:relative;min-height:68px;border:3px solid #9a622c;border-radius:7px;
+  background:linear-gradient(90deg,#d8c19a,#bca37b 48%,#d8c19a);
+  box-shadow:inset 0 1px #fff1,inset 0 -4px rgba(93,48,24,.28),0 3px 5px #0008;
+  display:grid;grid-template-columns:74px repeat(3,1fr);align-items:center;
+  gap:5px;padding:4px 9px 4px 5px;box-sizing:border-box;
+}
+.reference-row:before{
+  content:"";position:absolute;inset:4px;pointer-events:none;border:1px solid rgba(98,54,25,.45);
+}
+.reference-row.selected{
+  border-color:#ffb52e;box-shadow:0 0 0 2px #ffd768,inset 0 1px #fff4,0 0 12px #ffad2c99;
+}
+.reference-row-label{
+  position:relative;z-index:2;height:56px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;color:#fff7dd;
+  text-align:center;font:900 12px/1.05 Arial,sans-serif;
+  text-shadow:0 2px 2px #342017,-1px 0 #342017,1px 0 #342017;
+}
+.reference-row-label .slot-icon{
+  width:35px;height:35px;border-radius:50%;display:grid;place-items:center;
+  border:2px solid #d8b477;background:radial-gradient(circle,#8c6c4e,#3f3027);
+  font-size:18px;box-shadow:inset 0 1px #fff4,0 2px 3px #0007;
+}
+.reference-orb{
+  position:relative;height:58px;display:grid;place-items:center;cursor:pointer;
+  border:0;background:transparent;padding:0;
+}
+.reference-orb .gem{
+  width:42px;height:42px;
+}
+.reference-orb .orb-level{
+  position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+  color:#fff9e7;font:900 9px Arial,sans-serif;
+  text-shadow:0 2px 2px #1b1110,0 0 2px #000;
+  white-space:nowrap;
+}
+.reference-orb .orb-bonus{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  color:#fff1b3;font:900 7px Arial,sans-serif;white-space:nowrap;
+}
+.gem{
+  position:relative;display:block;box-sizing:border-box;
+  border:3px solid #332c22;transform:rotate(45deg);
+  border-radius:10px 4px 10px 4px;
+  background:linear-gradient(145deg,#fffbd5 0 12%,#ffd52d 22%,#e49d00 67%,#704000 100%);
+  box-shadow:inset 3px 3px 4px #fff9,inset -4px -5px 6px #6a3600,0 3px 5px #000b;
+}
+.gem:after{content:"";position:absolute;inset:5px;border:1px solid rgba(255,255,255,.6);opacity:.7}
+.gem.orange{background:linear-gradient(145deg,#fff0bf 0 12%,#ffb340 23%,#dc6500 70%,#633100)}
+.gem.purple{background:linear-gradient(145deg,#fff 0 12%,#d76bff 24%,#8120c9 68%,#32105d)}
+.gem.blue{background:linear-gradient(145deg,#fff 0 12%,#b8f4ff 24%,#3b9eb8 68%,#183e56)}
+.gem.green{background:linear-gradient(145deg,#fff 0 12%,#b8ef9b 24%,#4c9f3a 68%,#183e2a)}
+.gem.silver{background:linear-gradient(145deg,#fff 0 12%,#f0e6dc 24%,#9f9389 68%,#4d4743)}
+.reference-bottom{
+  position:absolute;left:0;right:0;bottom:0;height:70px;z-index:8;
+  background:linear-gradient(180deg,#4c4745,#302d2c);
+  border-top:3px solid #171514;box-shadow:0 -2px 7px #000a;
+}
+.reference-bottom-back{
+  position:absolute;left:12px;top:7px;width:54px;height:54px;border-radius:50%;
+  border:3px solid #2b1920;background:linear-gradient(180deg,#ff4c75,#c91e52);
+  color:#fff;font-size:33px;font-weight:900;line-height:1;
+  box-shadow:inset 0 2px #ff9bb0,0 3px 5px #0009;
+}
+.reference-bottom-status{
+  position:absolute;right:13px;top:23px;color:#b9b0a7;font:700 8px Arial;
+}
+@media(max-width:390px){
+  .reference-topbar{height:66px}.reference-main{top:66px;bottom:64px}
+  .reference-title{font-size:20px}.reference-stage{height:190px;width:88%}
+  .reference-row{grid-template-columns:68px repeat(3,1fr);min-height:64px}
+  .reference-row-label{font-size:10px}.reference-row-label .slot-icon{width:31px;height:31px}
+  .reference-orb .gem{width:37px;height:37px}.reference-bottom{height:64px}
+  .reference-bottom-back{width:50px;height:50px}
+}
