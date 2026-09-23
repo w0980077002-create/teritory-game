@@ -6,8 +6,8 @@
 'use strict';
 if(!window.__territoryCombatItemsLoader){window.__territoryCombatItemsLoader=true;const s=document.createElement('script');s.src='combat-items.js?v=2';document.head.appendChild(s);}
 const ZONES=[['head','Голова'],['chest','Грудь'],['waist','Пояс'],['legs','Ноги']];
-const CLASSES={tank:{name:'Танк',icon:'🛡️',hp:150,atk:.86,def:1.30,crit:.06,dodge:.04},berserker:{name:'Берсерк',icon:'🪓',hp:112,atk:1.30,def:.84,crit:.17,dodge:.07},assassin:{name:'Ассасин',icon:'🗡️',hp:98,atk:1.20,def:.80,crit:.24,dodge:.18},duelist:{name:'Дуэлянт',icon:'⚔️',hp:118,atk:1.08,def:1.02,crit:.14,dodge:.12},support:{name:'Поддержка',icon:'✨',hp:128,atk:.88,def:1.06,crit:.09,dodge:.08}};
-const NAMES=['Michael Carter','Валера Соколов','James Anderson','Андрей Кузнецов','Robert Mitchell','Олег Морозов','David Thompson','Daniel Brooks','Сергей Волков','Christopher Reed','Максим Орлов','Andrew Walker','Thomas Bennett','Дмитрий Павлов','Kevin Parker','Matthew Collins','Виктор Смирнов','Ryan Cooper','Jason Morgan','Никита Ковалёв'];
+const CLASSES={tank:{name:'Танк',icon:'🛡️',hp:150,atk:.86,def:1.30,crit:.06,dodge:.04},berserker:{name:'Топор',icon:🤸',hp:112,atk:1.30,def:.84,crit:.17,dodge:.07},assassin:{name:'Ассасин',icon:'🗡️',hp:98,atk:1.20,def:.80,crit:.24,dodge:.18},duelist:{name:'Дуэлянт',icon:'⚔️',hp:118,atk:1.08,def:1.02,crit:.14,dodge:.12},support:{name:'Поддержка',icon:'✨',hp:128,atk:.88,def:1.06,crit:.09,dodge:.08}};
+const NAMES=['Michael Carter','Валера ','James','Андрей','Robert','Олег','David','Daniel','Сергей','Christopher Reed','Макс','Andrew ','Thomas','Дмитрий','Kevin Parker','Matthew Collins','Виктор Смирнов','Ryan Cooper','Jason Morgan','Никита'];
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>Array.from(r.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
