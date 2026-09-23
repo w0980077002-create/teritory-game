@@ -182,3 +182,19 @@
   .arena-in-battle .gear-row .combat-item-slot strong{font-size:16px!important}
   .arena-in-battle .gear-row .combat-item-slot span{font-size:5.2px!important}
 }
+
+/* STEP-05M — clean Arena UI:
+   no duplicate slot counters, no technical status strip under fighters.
+   Item quantities remain inside their own cards. */
+.arena-in-battle .battle-status{
+  display:none!important;
+}
+.arena-in-battle .combat-section-head small{
+  display:none!important;
+}
+.arena-in-battle .combat-item-slot small{
+  display:block!important;
+}
+.arena-in-battle .combat-item-slot.locked small{
+  display:block!important;
+}
