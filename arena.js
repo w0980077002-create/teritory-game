@@ -72,7 +72,31 @@ function renderMarket(){const grid=$('#shopGrid');if(!grid)return;const old=grid
 function renderInventory(){const grid=$('#inventoryGrid');if(!grid)return;const old=grid.querySelectorAll('.lavka-inv');old.forEach(x=>x.remove());const generic=grid.querySelectorAll('.item:not(.lavka-inv)');const wrap=document.createElement('div');wrap.className='lavka-inv';wrap.style.display='contents';const title=document.createElement('div');title.className='lavka-block-title lavka-inv';title.style.gridColumn='1/-1';title.innerHTML='<b>РАСХОДНИКИ</b><small>Общие для RPG и боёв</small>';grid.appendChild(title);CATALOG.forEach(x=>{const q=qty(x.id),card=document.createElement('div');card.className='item lavka-inv';card.innerHTML=`<div class="pic">${x.icon}</div><b>${x.name}</b><span>${x.effect}</span><strong>Количество · ×${q}</strong><button type="button" class="lavka-use" data-lavka-use="${x.id}" ${q?'':'disabled'}>${q?'ИСПОЛЬЗОВАТЬ':'НЕТ В ЗАПАСЕ'}</button>`;grid.appendChild(card);});}
 function render(){rename();renderMarket();renderInventory();const c=$('#coins');if(c)c.textContent=st().coins;const mc=$('#marketCoins');if(mc)mc.textContent=st().coins;}
 if(!window.__territoryLavkaObserver){window.__territoryLavkaObserver=true;const mo=new MutationObserver(()=>{const b=document.querySelector('[data-screen="market"] span');if(b&&b.textContent.trim()==='Магазин')b.textContent='Лавка';const h=document.querySelector('#market h2');if(h&&h.textContent.trim()!=='ЛАВКА')h.textContent='ЛАВКА';const t=document.querySelector('#market .market-section-title-v12 b');if(t&&t.textContent.trim()!=='ТОВАРЫ ЛАВКИ')t.textContent='ТОВАРЫ ЛАВКИ';});mo.observe(document.documentElement,{subtree:true,childList:true,characterData:true});}
-function boot(){installCSS();const old=window.render;if(typeof old==='function'&&!window.__lavkaRenderWrapped){window.__lavkaRenderWrapped=true;window.render=function(){const r=old.apply(this,arguments);setTimeout(render,0);return r;};}document.addEventListener('click',e=>{const buyBtn=e.target.closest?.('[data-lavka-buy]');if(buyBtn){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();buy(buyBtn.dataset.lavkaBuy);return;}const useBtn=e.target.closest?.('[data-lavka-use]');if(useBtn&&!useBtn.disabled){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();use(useBtn.dataset.lavkaUse);}},true);setTimeout(render,0);}
+function mountHomeLavkaLabel(){
+  const host=document.getElementById('homeReferenceHost');
+  if(!host)return false;
+  if(host.querySelector('#homeLavkaLabel'))return true;
+  const style=document.createElement('style');
+  style.id='homeLavkaLabelCSS';
+  style.textContent=`
+    #homeLavkaLabel{position:absolute;left:87.25%;top:13.2%;width:12.4%;height:3.05%;z-index:125;pointer-events:none;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:0 1px;border-radius:5px;background:rgba(22,30,37,.94);color:#fff;font-family:Arial,sans-serif;font-weight:700;font-size:clamp(10px,2.15vw,14px);line-height:1;text-shadow:0 1px 2px #000;letter-spacing:0;}
+    @media(max-width:390px){#homeLavkaLabel{font-size:clamp(9px,2.2vw,12px);}}
+  `;
+  document.head.appendChild(style);
+  const label=document.createElement('div');
+  label.id='homeLavkaLabel';
+  label.textContent='Лавка';
+  host.appendChild(label);
+  return true;
+}
+function watchHomeLavkaLabel(){
+  if(mountHomeLavkaLabel())return;
+  if(window.__territoryHomeLavkaObserver)return;
+  window.__territoryHomeLavkaObserver=true;
+  const mo=new MutationObserver(()=>{if(mountHomeLavkaLabel())mo.disconnect()});
+  mo.observe(document.documentElement,{subtree:true,childList:true});
+}
+function boot(){watchHomeLavkaLabel();installCSS();const old=window.render;if(typeof old==='function'&&!window.__lavkaRenderWrapped){window.__lavkaRenderWrapped=true;window.render=function(){const r=old.apply(this,arguments);setTimeout(render,0);return r;};}document.addEventListener('click',e=>{const buyBtn=e.target.closest?.('[data-lavka-buy]');if(buyBtn){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();buy(buyBtn.dataset.lavkaBuy);return;}const useBtn=e.target.closest?.('[data-lavka-use]');if(useBtn&&!useBtn.disabled){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();use(useBtn.dataset.lavkaUse);}},true);setTimeout(render,0);}
 window.TerritoryLavka={catalog:CATALOG,buy,use,quantity:qty,render};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
