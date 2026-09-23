@@ -198,3 +198,166 @@
 .arena-in-battle .combat-item-slot.locked small{
   display:block!important;
 }
+
+/* STEP-05N — final card-boundary polish.
+   Counts/status text must stay INSIDE every item card. */
+.arena-in-battle .combat-item-slot{
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  align-content:center!important;
+}
+.arena-in-battle .gear-row .combat-item-slot{
+  grid-template-rows:18px 13px 1px!important;
+}
+.arena-in-battle .elixir-row .combat-item-slot{
+  grid-template-rows:18px 13px 9px!important;
+}
+.arena-in-battle .combat-item-slot small{
+  position:static!important;
+  margin:0!important;
+  line-height:8px!important;
+  height:8px!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+}
+.arena-in-battle .combat-item-slot span{
+  line-height:12px!important;
+  height:12px!important;
+}
+@media(max-width:390px){
+  .arena-in-battle .gear-row .combat-item-slot{
+    grid-template-rows:17px 12px 1px!important;
+    height:45px!important;
+  }
+  .arena-in-battle .elixir-row .combat-item-slot{
+    grid-template-rows:17px 12px 8px!important;
+    height:46px!important;
+  }
+  .arena-in-battle .combat-item-slot strong{line-height:17px!important}
+  .arena-in-battle .combat-item-slot span{
+    line-height:11px!important;
+    height:11px!important;
+  }
+}
+
+/* STEP-05O — Arena visual focus:
+   slightly smaller fighters, lighter side zones, compact command row,
+   and collapsible battle history/chat. No new controls under fighters. */
+.arena-in-battle .fighter-wrap{
+  transform:scale(.84)!important;
+  transform-origin:center bottom!important;
+}
+.arena-in-battle .battle-zone-controls{
+  width:48px!important;
+}
+.arena-in-battle .battle-zone-controls button{
+  height:48px!important;
+  min-height:48px!important;
+  padding:2px!important;
+  background:rgba(7,20,29,.55)!important;
+  border:1px solid rgba(210,184,105,.42)!important;
+  box-shadow:none!important;
+  font-size:7px!important;
+}
+.arena-in-battle .battle-zone-controls button.active,
+.arena-in-battle .battle-zone-controls button.selected{
+  background:rgba(117,87,31,.72)!important;
+  border-color:#e7c66b!important;
+}
+.arena-in-battle .battle-chat-wrap{
+  margin:4px 7px 3px!important;
+}
+.arena-in-battle .battle-chat-toggle{
+  width:100%!important;
+  height:30px!important;
+  min-height:30px!important;
+  border:1px solid #324b58!important;
+  border-radius:8px!important;
+  background:#0a1821!important;
+  color:#c5d0d5!important;
+  font-size:7px!important;
+  font-weight:900!important;
+  text-align:left!important;
+  padding:0 10px!important;
+}
+.arena-in-battle .battle-chat-toggle span{
+  float:right!important;
+  color:#e7c66b!important;
+  font-size:13px!important;
+  line-height:28px!important;
+}
+.arena-in-battle .battle-chat{
+  margin:3px 0 0!important;
+  min-height:0!important;
+  max-height:150px!important;
+  overflow:hidden!important;
+  transition:max-height .18s ease, padding .18s ease, border-width .18s ease!important;
+}
+.arena-in-battle .battle-chat.collapsed{
+  max-height:0!important;
+  padding-top:0!important;
+  padding-bottom:0!important;
+  border-width:0!important;
+}
+@media(max-width:390px){
+  .arena-in-battle .fighter-wrap{
+    transform:scale(.80)!important;
+  }
+  .arena-in-battle .battle-zone-controls{
+    width:44px!important;
+  }
+  .arena-in-battle .battle-zone-controls button{
+    height:44px!important;
+    min-height:44px!important;
+    font-size:6.5px!important;
+  }
+  .arena-in-battle .battle-chat-toggle{
+    height:28px!important;
+    min-height:28px!important;
+    font-size:6.5px!important;
+  }
+}
+
+/* STEP-05P — LOCKED Arena UI from approved reference.
+   Command row = Tactic | Auto | Hit | Timer.
+   No extra buttons in this row and no buttons under fighters. */
+.arena-in-battle .battle-command-row{
+  grid-template-columns:minmax(0,1fr) 48px 76px 60px!important;
+  gap:4px!important;
+}
+.arena-in-battle .battle-command-row .tactic-mini{
+  min-width:0!important;
+  text-align:left!important;
+}
+.arena-in-battle .battle-command-row .command-auto,
+.arena-in-battle .battle-command-row .command-hit{
+  width:100%!important;
+}
+.arena-in-battle .battle-command-row>strong{
+  width:100%!important;
+}
+.arena-in-battle .battle-actions{
+  display:flex!important;
+  gap:6px!important;
+  padding:3px 8px 4px!important;
+}
+.arena-in-battle .battle-actions button{
+  flex:1!important;
+  height:28px!important;
+  min-height:28px!important;
+  font-size:6.5px!important;
+  padding:2px 5px!important;
+  border-radius:7px!important;
+}
+@media(max-width:390px){
+  .arena-in-battle .battle-command-row{
+    grid-template-columns:minmax(0,1fr) 43px 64px 54px!important;
+    gap:3px!important;
+  }
+  .arena-in-battle .battle-command-row button{
+    font-size:5.8px!important;
+  }
+  .arena-in-battle .battle-command-row>strong{
+    font-size:5.5px!important;
+  }
+}
