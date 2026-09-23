@@ -22,3 +22,16 @@
   .combat-auto-button{width:45px!important;height:31px!important}
   .combat-auto-button small{font-size:5.5px}
 }
+
+/* STEP-05H — reliable mobile controls + 60s attack interval + speed scroll */
+.battle-command-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto;align-items:center!important;gap:6px}
+.battle-command-row>strong{min-width:72px;text-align:center;color:#e8c76b;font-size:7px;white-space:nowrap}
+.battle-command-row button,.battle-zone-controls button,.combat-auto-button,.combat-item-slot{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.combat-item-slot[data-combat-slot="speed_scroll"]{border-color:#8d6a32}
+@media(max-width:390px){.battle-command-row{grid-template-columns:minmax(0,1fr) auto auto;gap:4px}.battle-command-row>strong{min-width:61px;font-size:6px}}
+
+/* STEP-05H2 — 1v1 ends immediately; team timers/items are prepared */
+.battle-command-row [data-cooldown]{min-width:72px;text-align:center;color:#e8c76b;font-size:7px}
+.combat-item-slot[data-combat-slot="adrenaline"] small,
+.combat-item-slot[data-combat-slot="speed_scroll"] small,
+.combat-item-slot[data-combat-slot="anti_speed_scroll"] small{color:#e8c76b}
