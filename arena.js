@@ -1,10 +1,9 @@
-/* TERITORY ARENA v33 — Stage 1: unified 1×1 Arena Engine, 4 combat zones
+/* TERITORY ARENA v32 — Stage 1: unified 1×1 Arena Engine, 4 combat zones
    HOME artwork and frozen bottom navigation 42–48 are untouched.
    TerritoryStore is the single source of player state.
 */
 (function(){
 'use strict';
-
 if(!window.__territoryCombatItemsLoader){window.__territoryCombatItemsLoader=true;const s=document.createElement('script');s.src='combat-items.js?v=2';document.head.appendChild(s);}
 const ZONES=[['head','Голова'],['chest','Грудь'],['waist','Пояс'],['legs','Ноги']];
 const CLASSES={tank:{name:'Танк',icon:'🛡️',hp:150,atk:.86,def:1.30,crit:.06,dodge:.04},berserker:{name:'Берсерк',icon:'🪓',hp:112,atk:1.30,def:.84,crit:.17,dodge:.07},assassin:{name:'Ассасин',icon:'🗡️',hp:98,atk:1.20,def:.80,crit:.24,dodge:.18},duelist:{name:'Дуэлянт',icon:'⚔️',hp:118,atk:1.08,def:1.02,crit:.14,dodge:.12},support:{name:'Поддержка',icon:'✨',hp:128,atk:.88,def:1.06,crit:.09,dodge:.08}};
@@ -38,65 +37,4 @@ window.openBattle=openArena;
 function direct(e){const hz=e.target.closest?.('.hz'),screen=e.target.closest?.('[data-screen]');const arena=hz&&(hz.dataset.hz==='arena'||hz.dataset.hz==='battle'),bottom=screen&&screen.dataset.screen==='arena';if(!arena&&!bottom)return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();openArena();}
 document.addEventListener('click',direct,true);document.addEventListener('pointerdown',direct,true);document.addEventListener('touchstart',direct,{capture:true,passive:false});
 document.addEventListener('DOMContentLoaded',()=>$('#arenaModal')?.addEventListener('click',e=>{if(e.target.id==='arenaModal')close()}));
-})();
-/* INLINE LAVKA v2 */
-/* TERITORY LAVKA v2 — one catalog: LAVKA -> purchase -> inventory -> quantity -> use.
-   Standalone layer. Does not touch HOME artwork or frozen navigation 42–48. */
-(function(){
-'use strict';
-const $=(s,r=document)=>r.querySelector(s);
-const CATALOG=[
- {id:'elixir_hp',name:'Зелье HP',icon:'🧪',price:80,max:5,effect:'+30 HP',desc:'Восстанавливает здоровье героя.'},
- {id:'elixir_energy',name:'Зелье энергии',icon:'🔵',price:70,max:5,effect:'+25 энергии',desc:'Восстанавливает энергию героя.'},
- {id:'elixir_guard',name:'Защитный эликсир',icon:'🛡️',price:120,max:5,effect:'+5 защиты на следующий бой',desc:'Даёт +5 защиты для следующего боя.'},
- {id:'elixir_attack',name:'Боевой эликсир',icon:'🔥',price:120,max:5,effect:'+5 урона на следующий бой',desc:'Даёт +5 урона для следующего боя.'}
-];
-const st=()=>window.TerritoryStore?.state||{};
-const save=()=>{try{window.TerritoryStore?.saveNow?.('lavka')}catch(_){} };
-const qty=id=>{const r=(Array.isArray(st().consumables)?st().consumables:[]).find(x=>x&&x.id===id);return Math.max(0,Math.floor(Number(r?.quantity)||0));};
-function setQty(id,n){const s=st();s.consumables=Array.isArray(s.consumables)?s.consumables:[];const item=CATALOG.find(x=>x.id===id);n=Math.max(0,Math.min(item?.max||99,Math.floor(Number(n)||0)));let r=s.consumables.find(x=>x&&x.id===id);if(!r&&n>0){s.consumables.push({id,quantity:n});}else if(r){r.quantity=n;if(n===0)s.consumables=s.consumables.filter(x=>x!==r);}save();}
-function cost(item){const rep=Number(st().merchantRep||0);return Math.floor(item.price*(rep>=5?.9:rep>=2?.95:1));}
-function buy(id){const item=CATALOG.find(x=>x.id===id);if(!item)return false;const q=qty(id);if(q>=item.max){toast('📦 Запас уже полный');return false;}const c=cost(item);if(Number(st().coins||0)<c){toast('🪙 Не хватает монет');return false;}st().coins=Number(st().coins||0)-c;setQty(id,q+1);st().merchantRep=Math.max(0,Number(st().merchantRep||0)+1);save();toast(`${item.icon} ${item.name} · теперь ×${q+1}`);render();return true;}
-function use(id){const item=CATALOG.find(x=>x.id===id);if(!item||qty(id)<=0)return false;const s=st();
- if(id==='elixir_hp'){const max=Math.max(1,Number(s.maxHp)||120),before=Math.max(0,Number(s.hp)||0);if(before>=max){toast('❤️ Здоровье уже полное');return false;}s.hp=Math.min(max,before+30);}
- else if(id==='elixir_energy'){const max=Math.max(1,Number(s.maxEnergy)||200),before=Math.max(0,Number(s.energy)||0);if(before>=max){toast('⚡ Энергия уже полная');return false;}s.energy=Math.min(max,before+25);}
- else if(id==='elixir_guard'){s.combatBuffs={...(s.combatBuffs||{}),defense:Number(s.combatBuffs?.defense||0)+5};}
- else if(id==='elixir_attack'){s.combatBuffs={...(s.combatBuffs||{}),attack:Number(s.combatBuffs?.attack||0)+5};}
- setQty(id,qty(id)-1);save();toast(`${item.icon} Использовано: ${item.name}`);render();return true;}
-function toast(t){try{window.arenaToast?.(t)}catch(_){} const l=$('#merchantLog');if(l)l.textContent='Торговец: «'+t+'»';}
-function installCSS(){if($('#lavkaV2CSS'))return;const x=document.createElement('style');x.id='lavkaV2CSS';x.textContent=`
-#market .lavka-block{margin-top:12px}.lavka-block-title{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:12px 0 8px}.lavka-block-title b{font-size:14px}.lavka-block-title small{color:#9eacba;font-size:9px;text-align:right}.lavka-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.lavka-card{background:#17242f;border:1px solid #40515f;border-radius:13px;padding:10px;color:#fff}.lavka-card .pic{font-size:31px}.lavka-card b{display:block;margin-top:3px;font-size:12px}.lavka-card span{display:block;color:#aebbc6;font-size:10px;line-height:1.3;margin-top:3px;min-height:26px}.lavka-card small{display:block;margin-top:5px;color:#d5dee5;font-weight:800}.lavka-card button,.lavka-use{width:100%;margin-top:7px;min-height:35px;border:0;border-radius:9px;background:#b98b3e;color:#101820;font-weight:900;font-size:10px}.lavka-use{background:#29465a;color:#fff}.lavka-empty{grid-column:1/-1;padding:12px;border:1px dashed #40515f;border-radius:11px;color:#9eacba;font-size:11px}@media(max-width:360px){.lavka-grid{grid-template-columns:1fr}}
-`;document.head.appendChild(x);}
-function rename(){document.querySelectorAll('[data-screen="market"] span').forEach(x=>{if(x.textContent.trim()==='Магазин')x.textContent='Лавка';});const h=$('#market h2');if(h)h.textContent='ЛАВКА';const title=$('#market .market-section-title-v12 b');if(title)title.textContent='ТОВАРЫ ЛАВКИ';const kicker=$('#market .market-head-v12 small');if(kicker)kicker.textContent='SDOLARS · ЛАВКА';}
-function renderMarket(){const grid=$('#shopGrid');if(!grid)return;const old=grid.querySelector('.lavka-block');if(old)old.remove();const block=document.createElement('div');block.className='lavka-block';block.innerHTML=`<div class="lavka-block-title"><b>ЭЛИКСИРЫ И РАСХОДНИКИ</b><small>Покупка сразу попадёт в инвентарь</small></div><div class="lavka-grid">${CATALOG.map(x=>{const q=qty(x.id),c=cost(x);return `<div class="lavka-card"><div class="pic">${x.icon}</div><b>${x.name}</b><span>${x.effect}</span><small>В запасе: ×${q} / ${x.max}</small><button type="button" data-lavka-buy="${x.id}">${c} 🪙 · КУПИТЬ</button></div>`}).join('')}</div>`;grid.appendChild(block);}
-function renderInventory(){const grid=$('#inventoryGrid');if(!grid)return;const old=grid.querySelectorAll('.lavka-inv');old.forEach(x=>x.remove());const generic=grid.querySelectorAll('.item:not(.lavka-inv)');const wrap=document.createElement('div');wrap.className='lavka-inv';wrap.style.display='contents';const title=document.createElement('div');title.className='lavka-block-title lavka-inv';title.style.gridColumn='1/-1';title.innerHTML='<b>РАСХОДНИКИ</b><small>Общие для RPG и боёв</small>';grid.appendChild(title);CATALOG.forEach(x=>{const q=qty(x.id),card=document.createElement('div');card.className='item lavka-inv';card.innerHTML=`<div class="pic">${x.icon}</div><b>${x.name}</b><span>${x.effect}</span><strong>Количество · ×${q}</strong><button type="button" class="lavka-use" data-lavka-use="${x.id}" ${q?'':'disabled'}>${q?'ИСПОЛЬЗОВАТЬ':'НЕТ В ЗАПАСЕ'}</button>`;grid.appendChild(card);});}
-function render(){rename();renderMarket();renderInventory();const c=$('#coins');if(c)c.textContent=st().coins;const mc=$('#marketCoins');if(mc)mc.textContent=st().coins;}
-if(!window.__territoryLavkaObserver){window.__territoryLavkaObserver=true;const mo=new MutationObserver(()=>{const b=document.querySelector('[data-screen="market"] span');if(b&&b.textContent.trim()==='Магазин')b.textContent='Лавка';const h=document.querySelector('#market h2');if(h&&h.textContent.trim()!=='ЛАВКА')h.textContent='ЛАВКА';const t=document.querySelector('#market .market-section-title-v12 b');if(t&&t.textContent.trim()!=='ТОВАРЫ ЛАВКИ')t.textContent='ТОВАРЫ ЛАВКИ';});mo.observe(document.documentElement,{subtree:true,childList:true,characterData:true});}
-function mountHomeLavkaLabel(){
-  const host=document.getElementById('homeReferenceHost');
-  if(!host)return false;
-  if(host.querySelector('#homeLavkaLabel'))return true;
-  const style=document.createElement('style');
-  style.id='homeLavkaLabelCSS';
-  style.textContent=`
-    #homeLavkaLabel{position:absolute;left:87.25%;top:13.2%;width:12.4%;height:3.05%;z-index:125;pointer-events:none;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:0 1px;border-radius:5px;background:rgba(22,30,37,.94);color:#fff;font-family:Arial,sans-serif;font-weight:700;font-size:clamp(10px,2.15vw,14px);line-height:1;text-shadow:0 1px 2px #000;letter-spacing:0;}
-    @media(max-width:390px){#homeLavkaLabel{font-size:clamp(9px,2.2vw,12px);}}
-  `;
-  document.head.appendChild(style);
-  const label=document.createElement('div');
-  label.id='homeLavkaLabel';
-  label.textContent='Лавка';
-  host.appendChild(label);
-  return true;
-}
-function watchHomeLavkaLabel(){
-  if(mountHomeLavkaLabel())return;
-  if(window.__territoryHomeLavkaObserver)return;
-  window.__territoryHomeLavkaObserver=true;
-  const mo=new MutationObserver(()=>{if(mountHomeLavkaLabel())mo.disconnect()});
-  mo.observe(document.documentElement,{subtree:true,childList:true});
-}
-function boot(){watchHomeLavkaLabel();installCSS();const old=window.render;if(typeof old==='function'&&!window.__lavkaRenderWrapped){window.__lavkaRenderWrapped=true;window.render=function(){const r=old.apply(this,arguments);setTimeout(render,0);return r;};}document.addEventListener('click',e=>{const buyBtn=e.target.closest?.('[data-lavka-buy]');if(buyBtn){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();buy(buyBtn.dataset.lavkaBuy);return;}const useBtn=e.target.closest?.('[data-lavka-use]');if(useBtn&&!useBtn.disabled){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();use(useBtn.dataset.lavkaUse);}},true);setTimeout(render,0);}
-window.TerritoryLavka={catalog:CATALOG,buy,use,quantity:qty,render};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
