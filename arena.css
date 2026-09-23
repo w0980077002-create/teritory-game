@@ -58,3 +58,134 @@
  .arena-in-battle .player-wrap{left:20%}
  .arena-in-battle .bot-wrap{right:20%}
 }
+
+/* STEP-05J — compact mobile battle UI
+   Keep the approved top header/arena layout untouched.
+   Compress only the middle command area and lower equipment/consumables.
+*/
+.battle-stage{
+  height:270px!important;
+  min-height:0!important;
+}
+.fighter-wrap{
+  bottom:10px!important;
+}
+.battle-status{
+  min-height:24px!important;
+  height:24px!important;
+  padding:3px 52px!important;
+  align-items:center!important;
+}
+.battle-command-row{
+  min-height:40px!important;
+  height:40px!important;
+  padding:4px 7px!important;
+}
+.battle-command-row button{
+  min-height:30px!important;
+  height:30px!important;
+  padding:3px 8px!important;
+  font-size:7px!important;
+}
+.battle-command-row>strong{
+  min-width:64px!important;
+  font-size:6.5px!important;
+}
+.combat-loadout-strip{
+  padding:4px 7px!important;
+}
+.combat-section-head{
+  margin:1px 1px 3px!important;
+  font-size:7px!important;
+}
+.combat-section-head small{
+  font-size:6px!important;
+}
+.gear-row,.elixir-row{
+  gap:4px!important;
+  padding-bottom:2px!important;
+}
+.combat-item-slot{
+  flex-basis:53px!important;
+  height:49px!important;
+  grid-template-rows:21px 14px 9px!important;
+  border-radius:7px!important;
+}
+.combat-item-slot strong{
+  font-size:18px!important;
+}
+.combat-item-slot span{
+  font-size:6px!important;
+  max-width:50px!important;
+}
+.combat-item-slot small{
+  font-size:5.5px!important;
+}
+.elixir-row .combat-item-slot{
+  flex-basis:57px!important;
+  height:48px!important;
+}
+.combat-auto-button{
+  width:45px!important;
+  height:29px!important;
+}
+.battle-chat{
+  margin:4px 7px 3px!important;
+  min-height:76px!important;
+  max-height:120px!important;
+  padding:5px!important;
+}
+.battle-actions{
+  padding:2px 52px 4px!important;
+}
+@media(max-width:390px){
+  .battle-stage{
+    height:255px!important;
+  }
+  .fighter-wrap{
+    bottom:8px!important;
+  }
+  .battle-status{
+    height:22px!important;
+    min-height:22px!important;
+    padding-left:48px!important;
+    padding-right:48px!important;
+  }
+  .battle-command-row{
+    height:38px!important;
+    min-height:38px!important;
+    gap:3px!important;
+  }
+  .battle-command-row>strong{
+    min-width:58px!important;
+    font-size:6px!important;
+  }
+  .battle-command-row button{
+    min-height:28px!important;
+    height:28px!important;
+    padding:3px 6px!important;
+    font-size:6.5px!important;
+  }
+  .combat-loadout-strip{
+    padding:3px 6px!important;
+  }
+  .combat-section-head{
+    font-size:6.5px!important;
+    margin-bottom:2px!important;
+  }
+  .combat-item-slot{
+    flex-basis:50px!important;
+    height:46px!important;
+  }
+  .elixir-row .combat-item-slot{
+    flex-basis:54px!important;
+    height:45px!important;
+  }
+  .combat-item-slot strong{
+    font-size:17px!important;
+  }
+  .battle-chat{
+    min-height:68px!important;
+    max-height:105px!important;
+  }
+}
