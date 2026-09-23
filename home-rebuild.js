@@ -38,9 +38,113 @@
   function mountRealHud(){const host=document.getElementById('homeRealHud');if(!host)return;host.innerHTML=`<span class="hud-clean hud-name"></span><span class="hud-clean hud-level"></span><span class="hud-clean hud-coins"></span><span class="hud-clean hud-gems"></span><span class="hud-clean hud-redgems"></span><span class="hud-clean hud-energy"></span><span class="hud-clean hud-xp"></span><span class="hud-clean hud-bottom-level"></span><span class="hud-clean hud-hp"></span><span class="hud-clean hud-bottom-energy"></span><i class="hud-mask hud-hp-mask"></i><i class="hud-mask hud-energy-mask"></i><i class="hud-mask hud-xp-mask"></i><span class="hud-clean hud-i i1"></span><span class="hud-clean hud-i i2"></span><span class="hud-clean hud-i i3"></span><span class="hud-clean hud-i i4"></span><span class="hud-clean hud-i i5"></span><span class="hud-clean hud-i i6"></span>`;}
   function paint(){const s=S()||{};const p=s.profile||{};const name=p.displayName||s.name||'Игрок';const set=(q,v)=>{const e=document.querySelector(q);if(e)e.textContent=v};set('.hud-name',name);set('.hud-level','Lv. '+(s.level||1));set('.hud-coins',compact(s.coins));set('.hud-gems',compact(s.gems));set('.hud-redgems',compact(s.redGems));set('.hud-energy',`${Math.floor(s.energy||0)}/${Math.floor(s.maxEnergy||200)}`);set('.hud-xp',`${Math.floor(s.exp||0)}/${Math.floor(s.expToNext||100)}`);set('.hud-bottom-level','Lv.'+(s.level||1));set('.hud-hp',`${Math.floor(s.hp||0)} / ${Math.floor(s.maxHp||120)}`);set('.hud-bottom-energy',`${Math.floor(s.energy||0)} / ${Math.floor(s.maxEnergy||200)}`);const eq=Array.isArray(s.equipment)?s.equipment:[];const inv=Array.isArray(s.inventory)?s.inventory:[];for(let i=0;i<6;i++)set(`.hud-i.i${i+1}`,eq[i]?.name||inv[i]||'');const hpPct=Math.max(0,Math.min(1,(s.hp||0)/Math.max(1,s.maxHp||120)));const enPct=Math.max(0,Math.min(1,(s.energy||0)/Math.max(1,s.maxEnergy||200)));const xpPct=Math.max(0,Math.min(1,(s.exp||0)/Math.max(1,s.expToNext||100)));for(const [q,pct] of [['.hud-hp-mask',hpPct],['.hud-energy-mask',enPct],['.hud-xp-mask',xpPct]]){const e=document.querySelector(q);if(e)e.style.setProperty('--fill',(pct*100)+'%');}}
   function compact(v){const n=Math.max(0,Number(v)||0);if(n>=1e6)return (n/1e6).toFixed(1)+'M';if(n>=1e3)return (n/1e3).toFixed(1)+'K';return String(Math.floor(n));}
-  function mountRunner(){if(document.getElementById('runnerScreen'))return;const root=document.createElement('div');root.id='runnerScreen';root.className='runner-screen show';root.innerHTML=`<div class="runner-scroll"></div><div class="runner-vignette"></div><div class="runner-ui"><b>БОЙ</b><span data-run-status>Вперёд!</span><button data-run-close>×</button></div><div class="runner-stage"><div class="runner-fighter runner-player"><div class="runner-head"></div><div class="runner-torso"></div><div class="runner-arm ra1"></div><div class="runner-arm ra2"></div><div class="runner-leg rl1"></div><div class="runner-leg rl2"></div><span class="runner-weapon">⚔️</span></div><div class="runner-bot-slot"></div><div class="runner-damage-layer"></div></div>`;document.body.appendChild(root);runSequence(root);}
-  function damage(root,text){const e=document.createElement('div');e.className='runner-damage';e.textContent=text;root.querySelector('.runner-damage-layer').appendChild(e);setTimeout(()=>e.remove(),750);}
-  async function runSequence(root){const status=root.querySelector('[data-run-status]');for(let i=0;i<4;i++){const bot=document.createElement('div');bot.className='runner-bot';bot.style.left='120%';bot.innerHTML='<div class="runner-bot-head"></div><div class="runner-bot-body"></div><div class="runner-bot-arm"></div><div class="runner-bot-leg"></div><span>⚔️</span>';root.querySelector('.runner-bot-slot').appendChild(bot);requestAnimationFrame(()=>bot.classList.add('approach'));await wait(1150);status.textContent='УДАР!';root.querySelector('.runner-player').classList.add('runner-strike');bot.classList.add('runner-hit');await wait(300);const d=12+Math.floor(Math.random()*20);damage(root,'-'+d);bot.classList.remove('approach');bot.classList.add('defeated');root.querySelector('.runner-player').classList.remove('runner-strike');status.textContent=i<3?'Следующий противник…':'Победа!';await wait(650);}await wait(500);root.classList.add('closing');await wait(300);root.remove();}
+  function mountRunner(){
+    if(document.getElementById('runnerScreen'))return;
+    const root=document.createElement('div');
+    root.id='runnerScreen';
+    root.className='runner-screen show';
+    root.innerHTML=`
+      <div class="runner-combat-window">
+        <div class="runner-scroll"></div>
+        <div class="runner-vignette"></div>
+        <div class="runner-ui">
+          <div class="runner-title"><b>БОЙ</b><span data-run-status>Вперёд!</span></div>
+          <div class="runner-progress"><i data-run-progress></i></div>
+          <button type="button" data-run-close aria-label="Закрыть">×</button>
+        </div>
+        <div class="runner-stage">
+          <div class="runner-bot-slot" aria-live="polite"></div>
+          <div class="runner-impact-layer"></div>
+          <div class="runner-damage-layer"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(root);
+    runSequence(root);
+  }
+  function damage(root,text,critical=false){
+    const layer=root.querySelector('.runner-damage-layer');
+    if(!layer)return;
+    const e=document.createElement('div');
+    e.className='runner-damage'+(critical?' critical':'');
+    e.textContent=critical?'💥 '+text:text;
+    layer.appendChild(e);
+    setTimeout(()=>e.remove(),800);
+  }
+  function impact(root,critical=false){
+    const screen=root.querySelector('.runner-combat-window');
+    if(!screen)return;
+    screen.classList.remove('shake','crit-flash');
+    void screen.offsetWidth;
+    screen.classList.add('shake');
+    if(critical)screen.classList.add('crit-flash');
+    setTimeout(()=>screen.classList.remove('shake','crit-flash'),critical?180:210);
+  }
+  function runnerReward(){
+    const s=S();
+    if(!s)return;
+    s.coins=Math.max(0,Number(s.coins||0)+75*4);
+    s.energy=Math.max(0,Number(s.energy||0)-Math.min(40,Number(s.energy||0)));
+    s.exp=Math.max(0,Number(s.exp||0)+60);
+    let need=Math.max(1,Number(s.expToNext||100));
+    while(s.exp>=need){s.exp-=need;s.level=Math.max(1,Number(s.level||1)+1);need=Math.max(100,Math.floor(need*1.12));}
+    s.expToNext=need;
+    window.TerritoryStore?.saveNow?.('runner-battle');
+    paint();
+  }
+  async function runSequence(root){
+    const status=root.querySelector('[data-run-status]');
+    const progress=root.querySelector('[data-run-progress]');
+    const slot=root.querySelector('.runner-bot-slot');
+    const enemies=[
+      {icon:'⚔️',name:'Северный воин',level:4,maxHp:105},
+      {icon:'🪓',name:'Берсерк',level:5,maxHp:125},
+      {icon:'🐺',name:'Лютый страж',level:6,maxHp:145},
+      {icon:'👹',name:'Вождь',level:7,maxHp:175}
+    ];
+    try{
+      for(let i=0;i<enemies.length;i++){
+        const enemy={...enemies[i],hp:enemies[i].maxHp};
+        const bot=document.createElement('article');
+        bot.className='runner-enemy';
+        bot.style.left='120%';
+        bot.innerHTML=`<div class="runner-enemy-card"><div class="runner-enemy-icon">${enemy.icon}</div><div class="runner-enemy-info"><b>${enemy.name}</b><small>Lv.${enemy.level}</small><div class="runner-enemy-hp"><i style="width:100%"></i></div><span>${enemy.hp}/${enemy.maxHp}</span></div></div>`;
+        slot.appendChild(bot);
+        requestAnimationFrame(()=>bot.classList.add('approach'));
+        status.textContent=`${enemy.name} выходит навстречу`;
+        await wait(1150);
+        for(let hit=0;hit<3 && enemy.hp>0;hit++){
+          status.textContent=hit===2?'Финишный удар!':'УДАР!';
+          bot.classList.remove('enemy-strike');
+          void bot.offsetWidth;
+          bot.classList.add('enemy-strike');
+          await wait(230);
+          const critical=Math.random()<0.18;
+          const d=critical?Math.floor(28+Math.random()*20):Math.floor(12+Math.random()*16);
+          enemy.hp=Math.max(0,enemy.hp-d);
+          const hp=Math.round(enemy.hp/enemy.maxHp*100);
+          const bar=bot.querySelector('.runner-enemy-hp i');
+          const hpText=bot.querySelector('.runner-enemy-info span');
+          if(bar)bar.style.width=hp+'%';
+          if(hpText)hpText.textContent=`${enemy.hp}/${enemy.maxHp}`;
+          impact(root,critical);
+          damage(root,'-'+d,critical);
+          await wait(430);
+        }
+        bot.classList.add('defeated');
+        status.textContent=i<enemies.length-1?'Следующий противник…':'Победа!';
+        progress.style.width=((i+1)/enemies.length*100)+'%';
+        await wait(650);
+        bot.remove();
+      }
+      runnerReward();
+      await wait(500);
+      root.classList.add('closing');
+      await wait(300);
+      root.remove();
+    }catch(_){
+      root.remove();
+    }
+  }
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
   document.addEventListener('click',e=>{const b=e.target.closest?.('.hz');if(!b)return;e.preventDefault();e.stopPropagation();const fn=action[b.dataset.action];if(fn)fn();});
   document.addEventListener('click',e=>{if(e.target.closest?.('[data-run-close]'))document.getElementById('runnerScreen')?.remove();});
