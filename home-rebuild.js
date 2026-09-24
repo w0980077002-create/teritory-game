@@ -55,7 +55,55 @@
   }
   function damage(root,text,critical=false,side='bot'){const layer=root.querySelector('.runner-damage-layer');if(!layer)return;const e=document.createElement('div');e.className='runner-damage '+(critical?'critical':'')+' '+(side==='player'?'damage-player':'damage-bot');e.textContent=critical?'💥 '+text:text;layer.appendChild(e);setTimeout(()=>e.remove(),850);}
   function impact(root,critical=false){root.classList.remove('shake');void root.offsetWidth;root.classList.add('shake');if(critical){const f=document.createElement('div');f.className='crit-flash';root.querySelector('.runner-impact-layer').appendChild(f);setTimeout(()=>f.remove(),180);}setTimeout(()=>root.classList.remove('shake'),220);}
-  async function runSequence(root){const status=root.querySelector('[data-run-status]'),hp=root.querySelector('[data-boss-hp]'),hpText=root.querySelector('[data-boss-hp-text']);let bossHp=100;const maxHp=100;const renderHp=()=>{const pct=Math.max(0,bossHp/maxHp);hp.style.width=(pct*100)+'%';hpText.textContent=`${bossHp} / ${maxHp}`;};renderHp();status.textContent='Вперёд!';for(let i=0;i<4;i++){await wait(650);status.textContent='УДАР!';const critical=Math.random()<.22,d=critical?28+Math.floor(Math.random()*18):12+Math.floor(Math.random()*18);bossHp=Math.max(0,bossHp-d);renderHp();damage(root,'-'+d,critical,'bot');impact(root,critical);await wait(420);if(bossHp<=0){status.textContent='Победа!';await wait(650);bossHp=maxHp;renderHp();if(i<3)status.textContent='Следующий противник…';}else{status.textContent=i<3?'Следующая атака…':'Добей его!';await wait(520);}}status.textContent='Серия завершена';const s=S();if(s){s.energy=Math.max(0,Number(s.energy||0)-10);s.exp=Math.max(0,Number(s.exp||0)+15);s.coins=Math.max(0,Number(s.coins||0)+75);window.TerritoryStore?.saveNow?.('runner-series');window.TerritoryStore?.render?.();paint();}await wait(550);root.classList.add('closing');await wait(300);root.remove();}
+  async function runSequence(root){
+    const status=root.querySelector('[data-run-status]');
+    const hp=root.querySelector('[data-boss-hp]');
+    const hpText=root.querySelector('[data-boss-hp-text]');
+    let bossHp=100;
+    const maxHp=100;
+    const renderHp=()=>{
+      const pct=Math.max(0,bossHp/maxHp);
+      hp.style.width=(pct*100)+'%';
+      hpText.textContent=bossHp+' / '+maxHp;
+    };
+    renderHp();
+    status.textContent='Вперёд!';
+    for(let i=0;i<4;i++){
+      await wait(650);
+      status.textContent='УДАР!';
+      const critical=Math.random()<.22;
+      const d=critical ? 28+Math.floor(Math.random()*18) : 12+Math.floor(Math.random()*18);
+      bossHp=Math.max(0,bossHp-d);
+      renderHp();
+      damage(root,'-'+d,critical,'bot');
+      impact(root,critical);
+      await wait(420);
+      if(bossHp<=0){
+        status.textContent='Победа!';
+        await wait(650);
+        bossHp=maxHp;
+        renderHp();
+        if(i<3)status.textContent='Следующий противник…';
+      }else{
+        status.textContent=i<3?'Следующая атака…':'Добей его!';
+        await wait(520);
+      }
+    }
+    status.textContent='Серия завершена';
+    const s=S();
+    if(s){
+      s.energy=Math.max(0,Number(s.energy||0)-10);
+      s.exp=Math.max(0,Number(s.exp||0)+15);
+      s.coins=Math.max(0,Number(s.coins||0)+75);
+      window.TerritoryStore?.saveNow?.('runner-series');
+      window.TerritoryStore?.render?.();
+      paint();
+    }
+    await wait(550);
+    root.classList.add('closing');
+    await wait(300);
+    root.remove();
+  }
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
   document.addEventListener('click',e=>{const b=e.target.closest?.('.hz');if(!b)return;e.preventDefault();e.stopPropagation();action[b.dataset.action]?.();});
   document.addEventListener('click',e=>{if(e.target.closest?.('[data-run-close]'))document.getElementById('runnerScreen')?.remove();});
