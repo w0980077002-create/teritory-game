@@ -123,3 +123,89 @@
  .arena-in-battle .battle-command-row .command-surrender,.arena-in-battle .battle-command-row .command-exit{font-size:5.2px!important}
  .arena-in-battle .battle-command-row .command-hit{font-size:5.3px!important}
 }
+
+/* STEP-05T — interaction hardening */
+.arena-in-battle .battle-zone-controls,.arena-in-battle .battle-zone-controls button,.arena-in-battle .battle-command-row button,.arena-in-battle .combat-item-slot,.arena-in-battle .battle-chat-toggle,.arena-in-battle .chat-compose button,.arena-in-battle .arena-bottom-nav button{pointer-events:auto!important;touch-action:manipulation!important}
+.arena-in-battle .battle-stage{touch-action:manipulation!important;background:#061018 url('arena-assets/arena-stage-approved-base.png') center bottom/cover no-repeat!important}
+
+/* STEP-05U — LOCKED VISUAL: approved 2nd Arena concept, modular layers */
+.arena-in-battle .battle-stage{
+  height:305px!important;
+  min-height:305px!important;
+  overflow:hidden!important;
+  background:#061018 url('arena-assets/arena-night-approved.png') center 54%/cover no-repeat!important;
+  border-bottom:1px solid rgba(232,199,107,.25)!important;
+}
+.arena-in-battle .battle-stage:before,
+.arena-in-battle .battle-stage:after{display:none!important}
+.arena-in-battle .fighter-wrap{
+  width:122px!important;
+  height:250px!important;
+  bottom:3px!important;
+  pointer-events:none!important;
+  z-index:20!important;
+}
+.arena-in-battle .player-wrap{left:20%!important}
+.arena-in-battle .bot-wrap{right:20%!important}
+.arena-in-battle .combat-fighter{width:100%!important;height:100%!important;position:relative!important}
+.arena-in-battle .viking-image{
+  position:absolute!important;
+  left:50%!important;
+  bottom:0!important;
+  transform:translateX(-50%)!important;
+  width:auto!important;
+  height:222px!important;
+  max-width:122px!important;
+  object-fit:contain!important;
+  z-index:2!important;
+  pointer-events:none!important;
+  user-select:none!important;
+}
+.arena-in-battle .fighter-shadow{
+  left:17%!important;right:17%!important;bottom:0!important;height:10px!important;z-index:1!important
+}
+.arena-in-battle .fighter-name{
+  top:3px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  font-size:9px!important;
+  z-index:12!important;
+}
+.arena-in-battle .fighter-hp-top{
+  top:21px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  width:104px!important;
+  height:18px!important;
+  z-index:12!important;
+}
+.arena-in-battle .fighter-hp-top b{font-size:8px!important}
+.arena-in-battle .battle-zone-controls{
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  z-index:70!important;
+}
+.arena-in-battle .defense-controls{left:3px!important}
+.arena-in-battle .attack-controls{right:3px!important}
+.arena-in-battle .battle-zone-controls button{height:45px!important}
+.arena-in-battle .combat-loadout-strip{z-index:80!important}
+.arena-in-battle .combat-item-row{overflow-x:auto!important;touch-action:pan-x!important}
+.arena-in-battle .combat-item-slot{flex:0 0 calc((100% - 24px)/7)!important;width:calc((100% - 24px)/7)!important}
+.arena-in-battle .battle-chat-wrap{z-index:80!important}
+.arena-in-battle .arena-bottom-nav{z-index:100000!important}
+@media(max-width:390px){
+  .arena-in-battle .battle-stage{height:295px!important;min-height:295px!important}
+  .arena-in-battle .fighter-wrap{width:112px!important;height:240px!important}
+  .arena-in-battle .player-wrap{left:20%!important}
+  .arena-in-battle .bot-wrap{right:20%!important}
+  .arena-in-battle .viking-image{height:214px!important;max-width:112px!important}
+  .arena-in-battle .fighter-hp-top{width:96px!important}
+  .arena-in-battle .fighter-name{font-size:8px!important}
+  .arena-in-battle .battle-zone-controls button{height:42px!important;width:43px!important}
+}
+@media(min-width:391px) and (max-width:430px){
+  .arena-in-battle .fighter-wrap{width:132px!important;height:258px!important}
+  .arena-in-battle .player-wrap{left:19%!important}
+  .arena-in-battle .bot-wrap{right:19%!important}
+  .arena-in-battle .viking-image{height:232px!important;max-width:132px!important}
+}
