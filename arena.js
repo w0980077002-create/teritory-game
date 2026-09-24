@@ -68,20 +68,31 @@ function bindBattleControls(){
   const r=root();
   if(!r||!r.b||r.b.dataset.controlsBound==='1')return;
   r.b.dataset.controlsBound='1';
-  r.b.addEventListener('click',e=>{
+  let lastTouchAction=0;
+  const dispatch=(t,e)=>{
+    if(!t||!r.b.contains(t))return false;
+    if(t.dataset.defenseZone){e.preventDefault();selectDefense(t.dataset.defenseZone);return true}
+    if(t.dataset.attackZone){e.preventDefault();selectAttack(t.dataset.attackZone);return true}
+    if(t.dataset.autobattleToggle){e.preventDefault();toggleAuto();return true}
+    if(t.dataset.executeAttack){e.preventDefault();executeAttack();return true}
+    if(t.dataset.combatSlot){e.preventDefault();useSlot(t.dataset.combatSlot);return true}
+    if(t.dataset.gear){e.preventDefault();chooseGear(t.dataset.gear);return true}
+    if(t.dataset.chatToggle){e.preventDefault();toggleChat(t);return true}
+    if(t.dataset.chatSend){e.preventDefault();sendChat();return true}
+    if(t.dataset.surrender){e.preventDefault();if(battle&&!battle.ended)finish(false);return true}
+    if(t.dataset.exitBattle){e.preventDefault();exitBattle();return true}
+    if(t.dataset.arenaNav){e.preventDefault();navigateArena(t.dataset.arenaNav);return true}
+    return false;
+  };
+  r.b.addEventListener('pointerup',e=>{
+    if(e.pointerType!=='touch' && e.pointerType!=='pen')return;
     const t=e.target.closest?.('button');
-    if(!t||!r.b.contains(t))return;
-    if(t.dataset.defenseZone){e.preventDefault();selectDefense(t.dataset.defenseZone);return}
-    if(t.dataset.attackZone){e.preventDefault();selectAttack(t.dataset.attackZone);return}
-    if(t.dataset.autobattleToggle){e.preventDefault();toggleAuto();return}
-    if(t.dataset.executeAttack){e.preventDefault();executeAttack();return}
-    if(t.dataset.combatSlot){e.preventDefault();useSlot(t.dataset.combatSlot);return}
-    if(t.dataset.gear){e.preventDefault();chooseGear(t.dataset.gear);return}
-    if(t.dataset.chatToggle){e.preventDefault();toggleChat(t);return}
-    if(t.dataset.chatSend){e.preventDefault();sendChat();return}
-    if(t.dataset.surrender){e.preventDefault();if(battle&&!battle.ended)finish(false);return}
-    if(t.dataset.exitBattle){e.preventDefault();exitBattle();return}
-    if(t.dataset.arenaNav){e.preventDefault();navigateArena(t.dataset.arenaNav);return}
+    if(dispatch(t,e)) lastTouchAction=Date.now();
+  },{passive:false});
+  r.b.addEventListener('click',e=>{
+    if(Date.now()-lastTouchAction<700){e.preventDefault();return;}
+    const t=e.target.closest?.('button');
+    dispatch(t,e);
   });
 }
 function selectDefense(z){if(!battle||battle.busy||battle.ended||battle.pendingResult||cooldownLeft()>0)return;const i=battle.playerDefense.indexOf(z);if(i>=0)battle.playerDefense.splice(i,1);else if(battle.playerDefense.length<2)battle.playerDefense.push(z);sync()}

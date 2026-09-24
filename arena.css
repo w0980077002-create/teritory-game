@@ -226,3 +226,83 @@
  .arena-in-battle .battle-follower .follower-icon{font-size:25px}
  .arena-in-battle .battle-follower b{font-size:6px}.arena-in-battle .battle-follower small{font-size:5.5px}
 }
+
+
+/* FINAL REPAIR V1 — one authoritative mobile battle layer */
+.arena-in-battle .battle-stage{
+  background:#061018 url('./arena-assets/arena-night-approved.png') center 54%/cover no-repeat!important;
+  height:305px!important;
+  min-height:305px!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+}
+.arena-in-battle .battle-stage:before,
+.arena-in-battle .battle-stage:after{display:none!important}
+
+.arena-in-battle .fighter-wrap{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:122px!important;
+  height:250px!important;
+  bottom:3px!important;
+  z-index:20!important;
+  pointer-events:none!important;
+}
+.arena-in-battle .player-wrap{left:20%!important}
+.arena-in-battle .bot-wrap{right:20%!important}
+.arena-in-battle .combat-fighter{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:100%!important;
+  height:100%!important;
+  position:relative!important;
+}
+.arena-in-battle .viking-image{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  position:absolute!important;
+  left:50%!important;
+  bottom:0!important;
+  transform:translateX(-50%)!important;
+  width:auto!important;
+  height:222px!important;
+  max-width:122px!important;
+  object-fit:contain!important;
+  z-index:2!important;
+  pointer-events:none!important;
+}
+.arena-in-battle .battle-zone-controls{
+  z-index:70!important;
+  pointer-events:auto!important;
+}
+.arena-in-battle .battle-zone-controls button,
+.arena-in-battle .battle-command-row button,
+.arena-in-battle .combat-item-slot,
+.arena-in-battle .battle-chat-toggle,
+.arena-in-battle .chat-compose button,
+.arena-in-battle .arena-bottom-nav button{
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+.arena-in-battle .battle-command-row,
+.arena-in-battle .combat-loadout-strip,
+.arena-in-battle .battle-chat-wrap{
+  position:relative!important;
+  z-index:80!important;
+}
+.arena-in-battle .command-hit:not(:disabled),
+.arena-in-battle .command-auto,
+.arena-in-battle .command-surrender,
+.arena-in-battle .command-exit{
+  pointer-events:auto!important;
+}
+@media(max-width:390px){
+  .arena-in-battle .battle-stage{height:295px!important;min-height:295px!important}
+  .arena-in-battle .fighter-wrap{width:112px!important;height:240px!important}
+  .arena-in-battle .player-wrap{left:20%!important}
+  .arena-in-battle .bot-wrap{right:20%!important}
+  .arena-in-battle .viking-image{height:214px!important;max-width:112px!important}
+}
