@@ -126,7 +126,7 @@
 
 /* STEP-05T — interaction hardening */
 .arena-in-battle .battle-zone-controls,.arena-in-battle .battle-zone-controls button,.arena-in-battle .battle-command-row button,.arena-in-battle .combat-item-slot,.arena-in-battle .battle-chat-toggle,.arena-in-battle .chat-compose button,.arena-in-battle .arena-bottom-nav button{pointer-events:auto!important;touch-action:manipulation!important}
-.arena-in-battle .battle-stage{touch-action:manipulation!important;background:#061018 url('arena-assets/arena-stage-approved-base.png') center bottom/cover no-repeat!important}
+.arena-in-battle .battle-stage{touch-action:manipulation!important;background:#061018 url('arena-assets/arena-night-approved.png') center bottom/cover no-repeat!important}
 
 /* STEP-05U — LOCKED VISUAL: approved 2nd Arena concept, modular layers */
 .arena-in-battle .battle-stage{
@@ -210,27 +210,19 @@
   .arena-in-battle .viking-image{height:232px!important;max-width:132px!important}
 }
 
-/* STEP-05V — FOLLOWER COMBAT LAYER: companion badge/effect only; approved Arena art untouched */
-.arena-in-battle .fighter-follower{
-  position:absolute; z-index:16; bottom:2px; min-width:72px; max-width:92px;
-  padding:3px 5px; border:1px solid rgba(232,199,107,.65); border-radius:8px;
-  background:rgba(5,12,17,.82); box-shadow:0 2px 7px rgba(0,0,0,.55);
-  display:grid; grid-template-columns:17px 1fr; grid-template-rows:11px 10px;
-  column-gap:3px; align-items:center; pointer-events:none;
-}
-.arena-in-battle .player .fighter-follower{left:-8px}
-.arena-in-battle .bot .fighter-follower{right:-8px}
-.arena-in-battle .fighter-follower span{grid-row:1/3;font-size:15px;line-height:20px;text-align:center}
-.arena-in-battle .fighter-follower b{font-size:6.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.arena-in-battle .fighter-follower small{font-size:5.5px;color:#e8c76b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.arena-in-battle .fighter-follower.follower-active{animation:followerPulse .85s ease-out}
-.arena-in-battle .fighter-follower.follower-crit{border-color:#ffd45c;box-shadow:0 0 15px rgba(255,195,55,.75)}
-.arena-in-battle .fighter-follower.follower-block{border-color:#8ed8ff;box-shadow:0 0 15px rgba(80,180,255,.55)}
-.arena-in-battle .fighter-follower.follower-heal{border-color:#78e79b;box-shadow:0 0 15px rgba(70,230,130,.55)}
-.arena-in-battle .fighter-follower.follower-miss{border-color:#b9e8ff;box-shadow:0 0 15px rgba(120,220,255,.55)}
-.arena-in-battle .fighter-follower.follower-control{border-color:#d6a4ff;box-shadow:0 0 15px rgba(170,80,255,.65)}
-@keyframes followerPulse{0%{transform:scale(.72) translateY(6px);opacity:.2}25%{transform:scale(1.08) translateY(0);opacity:1}65%{transform:scale(1);opacity:1}100%{transform:scale(.98);opacity:.95}}
+/* STEP-05V — follower + interaction lock */
+.arena-in-battle .battle-stage{background-image:url('./arena-assets/arena-night-approved.png')!important;background-position:center 54%!important;background-size:cover!important;background-repeat:no-repeat!important}
+.arena-in-battle .viking-image{display:block!important;visibility:visible!important;opacity:1!important}
+.arena-in-battle .battle-zone-controls,.arena-in-battle .battle-zone-controls button,.arena-in-battle .battle-command-row button,.arena-in-battle .combat-item-slot,.arena-in-battle .battle-chat-toggle,.arena-in-battle .chat-compose button,.arena-in-battle .arena-bottom-nav button{pointer-events:auto!important;touch-action:manipulation!important}
+.arena-in-battle .battle-follower{position:absolute;z-index:25;left:50%;bottom:-2px;transform:translateX(-50%);width:82px;height:78px;display:grid;grid-template-rows:36px 15px 14px;place-items:center;filter:drop-shadow(0 5px 5px rgba(0,0,0,.65));pointer-events:none;text-shadow:0 2px 4px #000}
+.arena-in-battle .battle-follower .follower-aura{position:absolute;width:58px;height:58px;border-radius:50%;bottom:12px;background:radial-gradient(circle,rgba(232,199,107,.38),rgba(232,199,107,.08) 48%,transparent 70%);animation:followerPulse 1.2s ease-in-out infinite}
+.arena-in-battle .battle-follower .follower-icon{position:relative;font-size:29px;line-height:36px;z-index:2}
+.arena-in-battle .battle-follower b{position:relative;font-size:7px;color:#fff;z-index:2;white-space:nowrap}
+.arena-in-battle .battle-follower small{position:relative;font-size:6px;color:#e8c76b;z-index:2;white-space:nowrap}
+@keyframes followerPulse{0%,100%{transform:scale(.88);opacity:.65}50%{transform:scale(1.08);opacity:1}}
+.arena-in-battle .fx-heal{color:#75ff9a;font-size:34px}.arena-in-battle .fx-control{color:#c58cff;font-size:40px}
 @media(max-width:390px){
- .arena-in-battle .fighter-follower{min-width:66px;max-width:82px;padding:2px 4px;grid-template-columns:15px 1fr;grid-template-rows:10px 9px}
- .arena-in-battle .fighter-follower span{font-size:13px}.arena-in-battle .fighter-follower b{font-size:5.8px}.arena-in-battle .fighter-follower small{font-size:5px}
+ .arena-in-battle .battle-follower{width:72px;height:70px;grid-template-rows:32px 14px 12px}
+ .arena-in-battle .battle-follower .follower-icon{font-size:25px}
+ .arena-in-battle .battle-follower b{font-size:6px}.arena-in-battle .battle-follower small{font-size:5.5px}
 }
