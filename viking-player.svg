@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 360">
+<defs><linearGradient id="steel" x2="1"><stop stop-color="#27343d"/><stop offset=".5" stop-color="#687780"/><stop offset="1" stop-color="#202b33"/></linearGradient><linearGradient id="leather" x2="1"><stop stop-color="#4a2c20"/><stop offset=".5" stop-color="#80533b"/><stop offset="1" stop-color="#39241b"/></linearGradient></defs>
+<ellipse cx="120" cy="345" rx="58" ry="9" fill="#000" opacity=".45"/>
+<!-- legs --> <path d="M82 235l-7 91q8 18 27 3l13-86z" fill="#202a31"/><path d="M128 239l12 88q12 15 27-1l-11-93z" fill="#202a31"/><path d="M70 323h43v16H63q-7-8 7-16zM137 326h37q12 9 4 14h-51z" fill="#171d22"/>
+<!-- cloak --> <path d="M69 118q51-26 102 2l18 121q-67 29-138 0z" fill="url(#steel)" stroke="#161f25" stroke-width="4"/><path d="M67 229q53 18 124-1l-5 20q-61 22-122 0z" fill="url(#leather)"/>
+<!-- arms --> <path d="M70 135q-27 29-35 79 7 14 20 6l35-65z" fill="#bd8c68" stroke="#5c4030" stroke-width="4"/><path d="M164 137q28 28 39 68-3 15-17 10l-41-55z" fill="#bd8c68" stroke="#5c4030" stroke-width="4"/>
+<!-- axe --> <path d="M201 199l28-66" stroke="#5b3927" stroke-width="8"/><path d="M211 145q22-30 29 1-10 19-29 10z" fill="#aeb8ba" stroke="#303a3d" stroke-width="3"/>
+<!-- neck/head --> <path d="M101 109h38v22h-38z" fill="#bd8c68"/><ellipse cx="120" cy="82" rx="43" ry="49" fill="#c99670" stroke="#3a2a22" stroke-width="4"/>
+<!-- hair/beard --> <path d="M77 78q3-54 45-55 42 4 43 54-14-17-31-18-22 19-57 19z" fill="#33251e"/><path d="M89 98q13 26 31 29 22-2 33-29l-5 35q-27 31-55 0z" fill="#4b3026"/>
+<!-- helmet --> <path d="M78 72q4-54 42-56 39 4 43 56l-12-9-7-20-24-10-23 10-8 20z" fill="#53636b" stroke="#202a30" stroke-width="5"/><path d="M75 70h90" stroke="#a8b4b8" stroke-width="6"/>
+<!-- shoulder fur --> <path d="M69 125q51-20 102 1l-8 17q-42-14-86 0z" fill="#d0c3a1" opacity=".95"/>
+<!-- belt --> <path d="M67 221q54 16 107 0v13q-55 17-108 0z" fill="#5a3625" stroke="#2c2019" stroke-width="3"/><circle cx="120" cy="231" r="8" fill="#d2b06b"/>
+</svg>
