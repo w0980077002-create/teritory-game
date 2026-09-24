@@ -13,13 +13,13 @@
   ];
   const bottom=[['home',0,91,14.28,9],['inventory',14.28,91,14.28,9],['hero',28.56,91,14.28,9],['battle',42.84,90,14.32,10],['bottomQuests',57.16,91,14.28,9],['game',71.44,91,14.28,9],['clan',85.72,91,14.28,9]];
   const action={
-    home:()=>window.showScreen?.('home'),inventory:()=>window.showScreen?.('inventory'),hero:()=>window.showScreen?.('inventory'),game:()=>window.showScreen?.('casino'),bottomQuests:()=>window.showScreen?.('districts'),clan:()=>window.showScreen?.('districts'),
+    home:()=>window.showScreen?.('home'),inventory:()=>window.showScreen?.('inventory'),hero:()=>window.showScreen?.('hero'),game:()=>window.showScreen?.('casino'),bottomQuests:()=>window.showScreen?.('districts'),clan:()=>window.showScreen?.('districts'),
     battle:()=>mountRunner(),attack:()=>mountRunner(),arena:()=>window.ArenaGame?.open?.(),challenges:()=>window.ArenaGame?.open?.(),shop:()=>window.showScreen?.('market'),forge:()=>window.ForgeV2?.open?.()||window.showScreen?.('market'),events:()=>window.showScreen?.('districts'),daily:()=>window.showScreen?.('casino'),quests:()=>window.showScreen?.('districts'),friends:()=>window.showScreen?.('districts'),sea:()=>window.showScreen?.('districts'),
-    coins:()=>{},gems:()=>{},redgems:()=>{},profile:()=>window.showScreen?.('inventory'),trophy:()=>{},messages:()=>{},settings:()=>{},energy:()=>{},chapter:()=>{},hp:()=>{},equipment:()=>window.showScreen?.('inventory'),consumable1:()=>window.CombatItems?.use?.('elixir_hp'),consumable2:()=>window.CombatItems?.use?.('elixir_energy'),consumable3:()=>window.CombatItems?.use?.('elixir_attack'),consumable4:()=>window.CombatItems?.use?.('elixir_guard'),lock1:()=>{},lock2:()=>{},lock3:()=>{},quest:()=>window.showScreen?.('districts'),speed:()=>{},refresh:()=>{},crown:()=>{},star:()=>{}
+    coins:()=>{},gems:()=>{},redgems:()=>{},profile:()=>window.showScreen?.('hero'),trophy:()=>{},messages:()=>{},settings:()=>{},energy:()=>{},chapter:()=>{},hp:()=>{},equipment:()=>window.showScreen?.('hero'),consumable1:()=>window.CombatItems?.use?.('elixir_hp'),consumable2:()=>window.CombatItems?.use?.('elixir_energy'),consumable3:()=>window.CombatItems?.use?.('elixir_attack'),consumable4:()=>window.CombatItems?.use?.('elixir_guard'),lock1:()=>{},lock2:()=>{},lock3:()=>{},quest:()=>window.showScreen?.('districts'),speed:()=>{},refresh:()=>{},crown:()=>{},star:()=>{}
   };
   function initTelegram(){
     const tg=window.Telegram?.WebApp;if(!tg||!window.TerritoryStore)return;
-    try{tg.ready();tg.expand();tg.setHeaderColor('#07111b');tg.setBackgroundColor('#07111b');}catch(_){ }
+    try{tg.ready();tg.expand();tg.setHeaderColor('#07111b');tg.setBackgroundColor('#07111b');}catch(_){}
     const u=tg.initDataUnsafe?.user;if(!u?.id)return;
     const s=window.TerritoryStore.state,p=s.profile||{};
     const display=[u.first_name,u.last_name].filter(Boolean).join(' ').trim()||'Игрок';
@@ -47,40 +47,15 @@
     for(const [q,pct] of [['.hud-hp-mask',hpPct],['.hud-energy-mask',enPct],['.hud-xp-mask',xpPct]]){const e=document.querySelector(q);if(e)e.style.setProperty('--fill',(pct*100)+'%');}
   }
   function compact(v){const n=Math.max(0,Number(v)||0);if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(Math.floor(n));}
-
-  /* Clean combat surface: the HOME artwork remains visible and stationary underneath. */
   function mountRunner(){
     const old=document.getElementById('runnerScreen');if(old)old.remove();
     const root=document.createElement('div');root.id='runnerScreen';root.className='runner-screen show';
     root.innerHTML='<div class="runner-ui"><div><b>БОЙ</b><span data-run-status>Готовься…</span></div><button type="button" data-run-close aria-label="Закрыть">×</button></div><div class="runner-boss-hud" aria-live="polite"><div class="runner-boss-title">ПРОТИВНИК</div><div class="runner-boss-name" data-boss-name>Северный воин</div><div class="runner-hp-track"><i data-boss-hp></i></div><div class="runner-boss-hp-text" data-boss-hp-text>100 / 100</div></div><div class="runner-stage"><div class="runner-damage-layer"></div><div class="runner-impact-layer"></div></div>';
     document.body.appendChild(root);runSequence(root);
   }
-  function damage(root,text,critical=false,side='bot'){
-    const layer=root.querySelector('.runner-damage-layer');if(!layer)return;
-    const e=document.createElement('div');e.className='runner-damage '+(critical?'critical':'')+' '+(side==='player'?'damage-player':'damage-bot');e.textContent=critical?'💥 '+text:text;layer.appendChild(e);setTimeout(()=>e.remove(),850);
-  }
-  function impact(root,critical=false){
-    root.classList.remove('shake');void root.offsetWidth;root.classList.add('shake');
-    if(critical){const f=document.createElement('div');f.className='crit-flash';root.querySelector('.runner-impact-layer').appendChild(f);setTimeout(()=>f.remove(),180);}
-    setTimeout(()=>root.classList.remove('shake'),220);
-  }
-  async function runSequence(root){
-    const status=root.querySelector('[data-run-status]'),hp=root.querySelector('[data-boss-hp]'),hpText=root.querySelector('[data-boss-hp-text]');
-    let bossHp=100;const maxHp=100;
-    const renderHp=()=>{const pct=Math.max(0,bossHp/maxHp);hp.style.width=(pct*100)+'%';hpText.textContent=`${bossHp} / ${maxHp}`;};renderHp();
-    status.textContent='Вперёд!';
-    for(let i=0;i<4;i++){
-      await wait(650);status.textContent='УДАР!';
-      const critical=Math.random()<.22,d=critical?28+Math.floor(Math.random()*18):12+Math.floor(Math.random()*18);
-      bossHp=Math.max(0,bossHp-d);renderHp();damage(root,'-'+d,critical,'bot');impact(root,critical);
-      await wait(420);
-      if(bossHp<=0){status.textContent='Победа!';await wait(650);bossHp=maxHp;renderHp();if(i<3)status.textContent='Следующий противник…';}
-      else {status.textContent=i<3?'Следующая атака…':'Добей его!';await wait(520);}
-    }
-    status.textContent='Серия завершена';
-    const s=S();if(s){s.energy=Math.max(0,Number(s.energy||0)-10);s.exp=Math.max(0,Number(s.exp||0)+15);s.coins=Math.max(0,Number(s.coins||0)+75);window.TerritoryStore?.saveNow?.('runner-series');window.TerritoryStore?.render?.();paint();}
-    await wait(550);root.classList.add('closing');await wait(300);root.remove();
-  }
+  function damage(root,text,critical=false,side='bot'){const layer=root.querySelector('.runner-damage-layer');if(!layer)return;const e=document.createElement('div');e.className='runner-damage '+(critical?'critical':'')+' '+(side==='player'?'damage-player':'damage-bot');e.textContent=critical?'💥 '+text:text;layer.appendChild(e);setTimeout(()=>e.remove(),850);}
+  function impact(root,critical=false){root.classList.remove('shake');void root.offsetWidth;root.classList.add('shake');if(critical){const f=document.createElement('div');f.className='crit-flash';root.querySelector('.runner-impact-layer').appendChild(f);setTimeout(()=>f.remove(),180);}setTimeout(()=>root.classList.remove('shake'),220);}
+  async function runSequence(root){const status=root.querySelector('[data-run-status]'),hp=root.querySelector('[data-boss-hp]'),hpText=root.querySelector('[data-boss-hp-text']);let bossHp=100;const maxHp=100;const renderHp=()=>{const pct=Math.max(0,bossHp/maxHp);hp.style.width=(pct*100)+'%';hpText.textContent=`${bossHp} / ${maxHp}`;};renderHp();status.textContent='Вперёд!';for(let i=0;i<4;i++){await wait(650);status.textContent='УДАР!';const critical=Math.random()<.22,d=critical?28+Math.floor(Math.random()*18):12+Math.floor(Math.random()*18);bossHp=Math.max(0,bossHp-d);renderHp();damage(root,'-'+d,critical,'bot');impact(root,critical);await wait(420);if(bossHp<=0){status.textContent='Победа!';await wait(650);bossHp=maxHp;renderHp();if(i<3)status.textContent='Следующий противник…';}else{status.textContent=i<3?'Следующая атака…':'Добей его!';await wait(520);}}status.textContent='Серия завершена';const s=S();if(s){s.energy=Math.max(0,Number(s.energy||0)-10);s.exp=Math.max(0,Number(s.exp||0)+15);s.coins=Math.max(0,Number(s.coins||0)+75);window.TerritoryStore?.saveNow?.('runner-series');window.TerritoryStore?.render?.();paint();}await wait(550);root.classList.add('closing');await wait(300);root.remove();}
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
   document.addEventListener('click',e=>{const b=e.target.closest?.('.hz');if(!b)return;e.preventDefault();e.stopPropagation();action[b.dataset.action]?.();});
   document.addEventListener('click',e=>{if(e.target.closest?.('[data-run-close]'))document.getElementById('runnerScreen')?.remove();});
