@@ -59,7 +59,7 @@
     render();startTimer();
   }
   function fighterMarkup(u,side){
-    const src=side==='player'?'./player-viking-approved.png':'./opponent-viking-approved.png';
+    const src=side==='player'?'./arena-assets/player-viking-approved.png':'./arena-assets/opponent-viking-approved.png';
     return `<div class="combat-fighter ${side}" data-fighter="${side}"><div class="fighter-name">${esc(u.name)} <small>Lv.${u.level}</small></div><div class="fighter-hp-top"><span class="hp-fill" style="width:${Math.round(u.hp/u.maxHp*100)}%"></span><b>${Math.ceil(u.hp)}/${Math.ceil(u.maxHp)} ❤️</b></div><img class="viking-art viking-image" src="${src}" alt="" draggable="false"><div class="fighter-shadow"></div></div>`;
   }
   function render(){
