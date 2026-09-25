@@ -1,4 +1,4 @@
-/* Territory Game — FINAL INPUT ROUTER 10007
+/* Territory Game — FINAL INPUT ROUTER 10009
    One touch router for HOME hitzones, internal back buttons, Arena controls and persistent bottom nav. */
 (function(){
 'use strict';
