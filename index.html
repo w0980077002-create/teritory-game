@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="pve-battle.css">
 <link rel="stylesheet" href="pve-battle-10032.css">
 <link rel="stylesheet" href="map-progress.css">
+<link rel="stylesheet" href="boss-battle-10034.css">
 <link rel="stylesheet" href="boss.css">
 </head>
 <body>
@@ -81,37 +82,73 @@
 </section>
 
   
-<section id="bossBattle" class="screen boss-screen">
-  <div class="boss-scene">
-    <div class="boss-bg"></div>
-    <header class="boss-header">
+
+<section id="bossBattle" class="screen boss-fight-screen">
+  <div class="bossfight">
+    <div class="bossfight-bg"></div>
+
+    <header class="bf-top">
       <button id="bossBack">‹</button>
-      <div><b>БОСС ЛОКАЦИИ</b><small>Карта пройдена на 100%</small></div>
-      <div class="boss-progress">100%</div>
+      <div class="bf-chapter"><b>БОСС ГЛАВЫ</b><small>Карта пройдена на 100%</small></div>
+      <div class="bf-progress">100%</div>
     </header>
-    <div class="boss-title">⚔ ПОСЛЕДНИЙ СТРАЖ ⚔</div>
-    <div class="boss-stage">
-      <div class="boss-hero">⚔️</div>
-      <div class="boss-enemy">👹</div>
+
+    <div class="bf-title">ВЛАДЫКА СЕВЕРНЫХ ЗЕМЕЛЬ</div>
+
+    <div class="bf-field">
+      <div class="bf-player">
+        <div class="bf-avatar">⚔️</div>
+        <b>SSS</b><small>Lv. 78 · VIP 6</small>
+      </div>
+      <div class="bf-boss">
+        <div class="bf-avatar">👹</div>
+        <b>ВЛАДЫКА</b><small>БОСС · Lv. 80</small>
+      </div>
+      <div id="bfFloat" class="bf-float"></div>
     </div>
-    <div class="boss-card">
-      <b>ВЛАДЫКА СЕВЕРНЫХ ЗЕМЕЛЬ</b>
-      <span>Особый босс главы</span>
-      <div class="boss-hp"><i id="bossHp"></i></div>
-      <small id="bossHpText">500 / 500</small>
+
+    <div class="bf-hp-row">
+      <div class="bf-hp player"><span id="bfPlayerText">119.6K / 119.6K</span><i id="bfPlayerHp"></i></div>
+      <div class="bf-hp boss"><span id="bfBossText">500K / 500K</span><i id="bfBossHp"></i></div>
     </div>
-    <button id="bossStart" class="boss-start">НАЧАТЬ БОЙ</button>
-    <nav class="boss-bottom-nav">
-      <button data-boss-nav="home">🏰<span>Город</span></button>
-      <button data-boss-nav="inventory">🎒<span>Инвентарь</span></button>
-      <button data-boss-nav="hero">🪖<span>Герой</span></button>
-      <button class="active" data-boss-nav="map">🗺️<span>Карта</span></button>
-      <button data-boss-nav="quests">📜<span>Квесты</span></button>
-      <button data-boss-nav="games">🎲<span>Игры</span></button>
-      <button data-boss-nav="clan">🚩<span>Клан</span></button>
+
+    <div class="bf-skills">
+      <button class="bf-skill selected" data-skill="axe">⚔<small>УДАР</small></button>
+      <button class="bf-skill" data-skill="ice">❄<small>ЛЁД</small></button>
+      <button class="bf-skill" data-skill="shield">🛡<small>ЩИТ</small></button>
+      <button class="bf-skill" data-skill="rage">🔥<small>ЯРОСТЬ</small></button>
+      <button class="bf-skill" data-skill="heal">🧪<small>ЛЕЧЕНИЕ</small></button>
+    </div>
+
+    <div class="bf-actions">
+      <button id="bfAuto">AUTO</button>
+      <button id="bfHit">⚔ УДАР БОССА</button>
+      <button id="bfTimer">⏱ <b>60</b></button>
+    </div>
+
+    <div id="bfLog" class="bf-log">Выбери навык и атакуй босса.</div>
+
+    <div id="bfResult" class="bf-result hidden">
+      <div class="bf-result-card">
+        <div id="bfResultIcon">🏆</div>
+        <b id="bfResultTitle">БОСС ПОБЕЖДЁН!</b>
+        <span id="bfResultText">Глава завершена.</span>
+        <button id="bfReward">ЗАБРАТЬ НАГРАДУ</button>
+      </div>
+    </div>
+
+    <nav class="bf-nav">
+      <button data-bf-nav="home">🏰<span>Город</span></button>
+      <button data-bf-nav="inventory">🎒<span>Инвентарь</span></button>
+      <button data-bf-nav="hero">🪖<span>Герой</span></button>
+      <button class="active" data-bf-nav="map">🗺️<span>Карта</span></button>
+      <button data-bf-nav="quests">📜<span>Квесты</span></button>
+      <button data-bf-nav="games">🎲<span>Игры</span></button>
+      <button data-bf-nav="clan">🚩<span>Клан</span></button>
     </nav>
   </div>
 </section>
+
 
   <section id="arena" class="screen"><img class="master-art" src="arena-master.jpg" alt=""><div id="arenaZones" class="zones"></div></section>
   <section id="map" class="screen map-screen">
@@ -175,5 +212,6 @@
 <script src="map.js"></script>
 <script src="pve-battle.js"></script>
 <script src="boss.js"></script>
+<script src="boss-battle-10034.js"></script>
 </body>
 </html>
