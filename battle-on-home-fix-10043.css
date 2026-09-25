@@ -1,0 +1,40 @@
+/* 10043 — HOME battle overlay: transparent, no panel/rectangle */
+html body #runnerScreen.home-battle-overlay,
+body[data-screen="home"] #runnerScreen.home-battle-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  overflow: hidden !important;
+  z-index: 1800 !important;
+  pointer-events: none !important;
+}
+#runnerScreen.home-battle-overlay::before,
+#runnerScreen.home-battle-overlay::after { display:none !important; content:none !important; }
+#runnerScreen.home-battle-overlay .runner-stage {
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  background:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  overflow:hidden !important;
+}
+#runnerScreen.home-battle-overlay .runner-character,
+#runnerScreen.home-battle-overlay .runner-follower,
+#runnerScreen.home-battle-overlay .runner-enemy,
+#runnerScreen.home-battle-overlay .runner-damage-layer,
+#runnerScreen.home-battle-overlay .runner-impact-layer,
+#runnerScreen.home-battle-overlay .runner-meet-flash { background:transparent !important; border:0 !important; box-shadow:none !important; }
+#runnerScreen.home-battle-overlay .runner-character img,
+#runnerScreen.home-battle-overlay .runner-enemy img { background:transparent !important; border:0 !important; box-shadow:none !important; }
+#runnerScreen.home-battle-overlay .runner-scene-status { background:rgba(7,19,27,.78) !important; }
