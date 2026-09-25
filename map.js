@@ -70,7 +70,7 @@ function stopMovement(){
 function enterFight(){
   clearTimeout(moveTimer);
   // The existing Arena screen is the next block's destination.
-  UI.show('arena');
+  UI.show('pveBattle');
 }
 
 $('mapStart').addEventListener('click', startMovement);

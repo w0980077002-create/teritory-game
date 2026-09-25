@@ -8,10 +8,72 @@
 <title>Teritory Game</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="map.css">
+<link rel="stylesheet" href="pve-battle.css">
 </head>
 <body>
 <div id="app">
   <section id="home" class="screen active"><img class="master-art" src="home-master.png" alt=""><div id="homeZones" class="zones"></div></section>
+  
+<section id="pveBattle" class="screen pve-battle-screen">
+  <div class="pve-scene">
+    <div class="pve-world"></div>
+    <div class="pve-hud">
+      <button id="pveBack">‹</button>
+      <div class="pve-fighter">
+        <b>SSS</b><small>Lv. 78 · VIP 6</small>
+        <div class="pve-bar"><i id="pvePlayerHp"></i></div>
+        <span id="pvePlayerHpText">138 / 138</span>
+      </div>
+      <div class="pve-turn">ХОД <b id="pveTurn">1</b></div>
+      <div class="pve-fighter enemy">
+        <b>Победитель Камней</b><small>Lv. 72</small>
+        <div class="pve-bar"><i id="pveEnemyHp"></i></div>
+        <span id="pveEnemyHpText">124 / 124</span>
+      </div>
+    </div>
+
+    <div class="pve-stage">
+      <div id="pveHero" class="pve-character hero">⚔️</div>
+      <div id="pveEnemy" class="pve-character enemy-char">🪓</div>
+      <div id="pveDamage" class="pve-damage"></div>
+    </div>
+
+    <div class="pve-zones">
+      <div class="pve-zone-title">ВЫБЕРИ АТАКУ</div>
+      <div class="pve-zone-grid">
+        <button data-pve-attack="head">Голова</button>
+        <button data-pve-attack="chest">Грудь</button>
+        <button data-pve-attack="belt">Пояс</button>
+        <button data-pve-attack="legs">Ноги</button>
+      </div>
+    </div>
+
+    <div class="pve-actions">
+      <button id="pveTactic">Тактика</button>
+      <button id="pveAuto">Авто</button>
+      <button id="pveAttack" class="primary">⚔ УДАР</button>
+      <button id="pveTimer">⏱ <b>60</b></button>
+    </div>
+
+    <div id="pveLog" class="pve-log">Встреча с противником. Выбери зону атаки.</div>
+
+    <div class="pve-equip">
+      <button>⚔</button><button>🪖</button><button>🛡</button>
+      <button>🥋</button><button>🥾</button><button>💍</button><button>🔮</button>
+    </div>
+
+    <nav class="pve-bottom-nav">
+      <button data-pve-nav="home">🏰<span>Город</span></button>
+      <button data-pve-nav="inventory">🎒<span>Инвентарь</span></button>
+      <button data-pve-nav="hero">🪖<span>Герой</span></button>
+      <button class="active" data-pve-nav="map">🗺️<span>Карта</span></button>
+      <button data-pve-nav="quests">📜<span>Квесты</span></button>
+      <button data-pve-nav="games">🎲<span>Игры</span></button>
+      <button data-pve-nav="clan">🚩<span>Клан</span></button>
+    </nav>
+  </div>
+</section>
+
   <section id="arena" class="screen"><img class="master-art" src="arena-master.jpg" alt=""><div id="arenaZones" class="zones"></div></section>
   <section id="map" class="screen map-screen">
     <div id="mapScene" class="map-scene" aria-label="Карта и движение">
@@ -72,5 +134,6 @@
 <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
 <script src="app.js"></script>
 <script src="map.js"></script>
+<script src="pve-battle.js"></script>
 </body>
 </html>
