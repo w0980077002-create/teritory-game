@@ -1,5 +1,0 @@
-Exact CSS files linked by index.html:
-style.css
-home-rebuild.css
-arena.css
-reference-ui.css
