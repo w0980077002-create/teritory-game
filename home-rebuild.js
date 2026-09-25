@@ -64,16 +64,16 @@
   }
   function runnerTemplate(root){
     syncChapter240();const s=S(),p=S().profile||{},f=followerData(),chapter=Math.max(1,Number(s.pve?.chapter)||1);
-    root.innerHTML=`<div class="runner-ui"><div><b>БОЙ · ГЛАВА ${chapter}</b><span data-run-status>Вперёд!</span></div><button type="button" data-run-close>×</button></div><div class="runner-chapter-hud"><div><small>ПРОГРЕСС ГЛАВЫ</small><b data-run-progress>0%</b></div><div class="runner-progress-track"><i data-run-progress-fill></i></div><button type="button" data-run-boss aria-label="Запустить босса">💀</button></div><div class="runner-stage"><div class="runner-character player-runner"><img src="./player-viking-approved.png" alt="" draggable="false"><span>${esc(p.displayName||s.name||'Игрок')}</span></div>${f?`<div class="runner-follower"><i>${esc(f.icon)}</i><b>${esc(f.name)}</b></div>`:''}<div class="runner-enemy" data-run-enemy><img src="./opponent-viking-approved.png" alt="" draggable="false"><span data-run-enemy-name>Разбойник</span></div><div class="runner-damage-layer"></div><div class="runner-impact-layer"></div></div>`;
+    root.innerHTML=`<div class="runner-scene-status" aria-hidden="true"><b data-run-status>Вперёд!</b><span data-run-progress>0%</span></div><div class="runner-stage"><div class="runner-character player-runner"><img src="./player-viking-approved.png" alt="" draggable="false"><span>${esc(p.displayName||s.name||'Игрок')}</span></div>${f?`<div class="runner-follower"><i>${esc(f.icon)}</i><b>${esc(f.name)}</b></div>`:''}<div class="runner-enemy" data-run-enemy><img src="./opponent-viking-approved.png" alt="" draggable="false"><span data-run-enemy-name>Разбойник</span></div><div class="runner-damage-layer"></div><div class="runner-impact-layer"></div><div class="runner-meet-flash" aria-hidden="true"></div></div>`;
   }
   function syncChapter240(){const s=S(),api=window.TerritoryChaptersAPI;if(!s||!api?.state)return;const c=api.state();s.pve=s.pve||{};s.pve.chapter=Number(c.currentChapter)||1;s.pve.progress=Number(c.chapterProgress)||0;s.pve.bossPending=Boolean(c.chapterBossUnlocked&&c.chapterProgress>=100);s.pve.stage=Number(c.chapterStage)||1;}
   function startRunner(forceBoss){
     syncChapter240();
     stopRunner();
     if(!forceBoss && Number(S().pve?.progress||0)>=100){window.showScreen?.('home');return;}
-    const root=document.createElement('div');root.id='runnerScreen';root.className='runner-screen show';
+    const root=document.createElement('div');root.id='runnerScreen';root.className='runner-screen show home-battle-overlay';
     runnerTemplate(root);document.body.appendChild(root);
-    runnerBattle={root,boss:Boolean(forceBoss||S().pve?.bossPending),running:true,enemyHp:0,enemyMaxHp:0,enemyIndex:0};
+    runnerBattle={root,boss:Boolean(forceBoss||S().pve?.bossPending),running:true,enemyHp:0,enemyMaxHp:0,enemyIndex:0,encounter:false};
     if(runnerBattle.boss){S().pve.bossActive=true;S().pve.bossPending=false;window.TerritoryStore.saveNow?.('pve-boss-start');}
     tickRunner();
   }
@@ -84,11 +84,12 @@
     const s=S(),chapter=Math.max(1,Number(s.pve.chapter)||1),boss=runnerBattle.boss;
     runnerBattle.enemyMaxHp=boss?220+chapter*35:70+chapter*12;runnerBattle.enemyHp=runnerBattle.enemyMaxHp;runnerBattle.enemyIndex++;
     const names=boss?['Глава Севера','Железный Ярл','Кровавый Вождь']:['Разбойник','Северный воин','Наёмник','Лесной охотник'];
-    const e=runnerBattle.root.querySelector('[data-run-enemy]');if(e){e.classList.remove('runner-enemy-dead');e.classList.add('runner-enemy-enter');e.querySelector('[data-run-enemy-name]').textContent=boss?names[(chapter-1)%names.length]:names[(runnerBattle.enemyIndex-1)%names.length];}
-    const st=runnerBattle.root.querySelector('[data-run-status]');if(st)st.textContent=boss?'БОСС!':'Встреча с противником';
+    const e=runnerBattle.root.querySelector('[data-run-enemy]');if(e){e.classList.remove('runner-enemy-dead','runner-enemy-enter');void e.offsetWidth;e.classList.add('runner-enemy-enter');runnerBattle.encounter=false;e.querySelector('[data-run-enemy-name]').textContent=boss?names[(chapter-1)%names.length]:names[(runnerBattle.enemyIndex-1)%names.length];}
+    const st=runnerBattle.root.querySelector('[data-run-status]');if(st)st.textContent=boss?'БОСС!':'Идём вперёд';
   }
   function damageText(value,critical){const l=runnerBattle?.root?.querySelector('.runner-damage-layer');if(!l)return;const e=document.createElement('div');e.className='runner-damage '+(critical?'critical':'');e.textContent=(critical?'💥 ':'')+'-'+value;l.appendChild(e);setTimeout(()=>e.remove(),850);}
   function hitAnim(){const r=runnerBattle?.root;if(!r)return;r.classList.remove('runner-hit');void r.offsetWidth;r.classList.add('runner-hit');setTimeout(()=>r.classList.remove('runner-hit'),220);}
+  function encounterAnim(){const r=runnerBattle?.root;if(!r||runnerBattle.encounter)return;runnerBattle.encounter=true;r.classList.add('runner-meet');setTimeout(()=>r.classList.remove('runner-meet'),520);setTimeout(()=>{if(runnerBattle){const st=r.querySelector('[data-run-status]');if(st)st.textContent='⚔️ БОЙ!';}},180);}
   function awardBot(){
     const s=S(),d=window.TerritoryStore?.getDerivedStats?.()||{},f=followerData();
     s.coins+=20+Math.floor((d.strength||5)*1.5);s.exp+=8+Math.floor((d.strength||5)/2);
@@ -109,6 +110,7 @@
     const s=S(),base=window.TerritoryStore?.getDerivedStats?.()||{},f=followerData(),d={strength:Number(base.strength||s.strength||0),defense:Number(base.defense||s.defense||0),maxHp:Number(base.maxHp||s.maxHp||1),agility:Number(base.agility||s.agility||0),bonusDamage:Number(base.bonusDamage||s.bonusDamage||0)};
     const enemy=runnerBattle.root.querySelector('[data-run-enemy]');
     if(!runnerBattle.enemyMaxHp)spawnEnemy();
+    if(!runnerBattle.boss && !runnerBattle.encounter && runnerBattle.enemyHp===runnerBattle.enemyMaxHp){encounterAnim();}
     const power=Math.max(1,Number(d.strength)||5)+(Number(d.bonusDamage)||0);
     const critical=Math.random()<Math.min(.35,.08+(Number(d.agility)||5)/200);
     const dealt=runnerBattle.boss?(critical?Math.floor(power*1.8):power):Math.max(1,critical?Math.floor(power*1.55):power);

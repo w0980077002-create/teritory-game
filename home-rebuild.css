@@ -36,5 +36,37 @@ body[data-screen="home"] #home{display:block!important;visibility:visible!import
 body[data-screen="home"] #homeReferenceHost{display:block!important;visibility:visible!important;opacity:1!important;background:transparent!important}
 body[data-screen="home"] .screen:not(#home){display:none!important;visibility:hidden!important}
 body[data-screen="home"] #arenaModal{display:none!important;visibility:hidden!important;opacity:0!important}
-body[data-screen="home"] #runnerScreen{display:none!important;visibility:hidden!important;opacity:0!important}
+body[data-screen="home"] #runnerScreen{display:block!important;visibility:visible!important;opacity:1!important}
 #homeReferenceHost,.home-reference-image{border:0!important;border-radius:0!important;box-shadow:none!important}
+
+/* 10041: Battle starts directly over HOME. HOME art/HUD/baked bottom navigation stay visible; only the moving characters/effects are layered above it. */
+#runnerScreen.home-battle-overlay{position:absolute!important;inset:0!important;z-index:1800!important;display:block!important;pointer-events:none!important;background:transparent!important;overflow:hidden!important;}
+#runnerScreen.home-battle-overlay .runner-stage{position:absolute!important;left:0!important;right:0!important;top:26%!important;bottom:24%!important;pointer-events:none!important;overflow:hidden!important;background:transparent!important;}
+#runnerScreen.home-battle-overlay .runner-character{position:absolute!important;left:18%!important;bottom:5%!important;width:27%!important;z-index:12!important;animation:homeHeroAdvance 3.4s cubic-bezier(.2,.75,.25,1) forwards!important;filter:drop-shadow(0 5px 5px #0009)!important;}
+#runnerScreen.home-battle-overlay .runner-character img{width:100%!important;height:auto!important;display:block!important;}
+#runnerScreen.home-battle-overlay .runner-character span{display:none!important;}
+#runnerScreen.home-battle-overlay .runner-follower{position:absolute!important;left:5%!important;bottom:7%!important;width:16%!important;z-index:11!important;font-size:clamp(18px,5vw,32px)!important;animation:homeFollowerAdvance 3.4s ease forwards!important;filter:drop-shadow(0 4px 4px #0009)!important;}
+#runnerScreen.home-battle-overlay .runner-follower i{font-style:normal!important;}
+#runnerScreen.home-battle-overlay .runner-follower b{display:none!important;}
+#runnerScreen.home-battle-overlay .runner-enemy{position:absolute!important;right:9%!important;bottom:7%!important;width:24%!important;z-index:10!important;transform:translateX(115%)!important;filter:drop-shadow(0 5px 5px #0009)!important;}
+#runnerScreen.home-battle-overlay .runner-enemy img{width:100%!important;height:auto!important;display:block!important;}
+#runnerScreen.home-battle-overlay .runner-enemy span{display:none!important;}
+#runnerScreen.home-battle-overlay .runner-enemy.runner-enemy-enter{animation:homeEnemyApproach 3.4s cubic-bezier(.2,.75,.25,1) forwards!important;}
+#runnerScreen.home-battle-overlay .runner-enemy.runner-enemy-dead{animation:homeEnemyFall .42s ease forwards!important;}
+#runnerScreen.home-battle-overlay .runner-scene-status{position:absolute!important;left:50%!important;top:22%!important;transform:translateX(-50%)!important;z-index:30!important;display:flex!important;gap:10px!important;align-items:center!important;padding:6px 12px!important;border:1px solid #e4bd62!important;border-radius:999px!important;background:#07131bd9!important;color:#fff!important;font-weight:900!important;font-size:clamp(11px,2.8vw,16px)!important;pointer-events:none!important;}
+#runnerScreen.home-battle-overlay .runner-scene-status span{color:#e8c66f!important;}
+#runnerScreen.home-battle-overlay .runner-damage-layer{position:absolute!important;inset:0!important;z-index:40!important;pointer-events:none!important;}
+#runnerScreen.home-battle-overlay .runner-damage{position:absolute!important;left:68%!important;top:48%!important;color:#ffe16b!important;font-weight:1000!important;font-size:clamp(20px,6vw,38px)!important;text-shadow:0 2px 4px #000,0 0 8px #000!important;animation:homeDamageFly .85s ease-out forwards!important;}
+#runnerScreen.home-battle-overlay .runner-damage.critical{color:#ffb35c!important;}
+#runnerScreen.home-battle-overlay .runner-impact-layer{position:absolute!important;inset:0!important;z-index:39!important;pointer-events:none!important;}
+#runnerScreen.home-battle-overlay .runner-meet-flash{position:absolute!important;left:50%!important;bottom:16%!important;width:24%!important;height:24%!important;transform:translate(-50%,20%) scale(.4)!important;border-radius:50%!important;background:radial-gradient(circle,#fff 0%,#ffd56b 12%,#ff7a1a 35%,transparent 70%)!important;opacity:0!important;pointer-events:none!important;}
+#runnerScreen.home-battle-overlay.runner-meet .runner-meet-flash{animation:homeMeetFlash .52s ease-out forwards!important;}
+#runnerScreen.home-battle-overlay.runner-hit .runner-character{animation:homeHeroHit .22s ease!important;}
+@keyframes homeHeroAdvance{0%{left:-28%;transform:scale(.9)}45%{left:18%;transform:scale(1)}75%{left:31%;transform:scale(1.03)}100%{left:34%;transform:scale(1.03)}}
+@keyframes homeFollowerAdvance{0%{left:-18%}45%{left:5%}100%{left:13%}}
+@keyframes homeEnemyApproach{0%{right:-25%;transform:translateX(0) scale(.92)}55%{right:9%;transform:translateX(0) scale(1)}100%{right:25%;transform:translateX(0) scale(1)}}
+@keyframes homeEnemyFall{to{transform:translateX(0) translateY(25px) rotate(10deg) scale(.82);opacity:.15}}
+@keyframes homeHeroHit{50%{transform:translateX(10px)}}
+@keyframes homeDamageFly{0%{transform:translateY(10px) scale(.7);opacity:0}20%{opacity:1}100%{transform:translateY(-65px) scale(1.05);opacity:0}}
+@keyframes homeMeetFlash{0%{opacity:0;transform:translate(-50%,20%) scale(.3)}35%{opacity:.95;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,0) scale(1.4)}}
+@media(max-width:430px){#runnerScreen.home-battle-overlay .runner-character{width:29%}#runnerScreen.home-battle-overlay .runner-enemy{width:26%}#runnerScreen.home-battle-overlay .runner-stage{top:30%;bottom:25%}}
