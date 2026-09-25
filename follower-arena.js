@@ -1,140 +1,35 @@
-/* Territory Game — Arena follower visual layer
-   Keeps the existing Arena combat logic intact.
-   Adds a clean companion beside each Viking without covering HUD or controls.
-*/
+/* Territory Game — Arena follower visual layer */
 (function(){
-'use strict';
-
-const FOLLOWER_STYLE = `
-.battle-follower{
-  position:absolute;
-  z-index:8;
-  pointer-events:none;
-  width:58px;
-  min-height:58px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:2px;
-  transform:translateZ(0);
-  filter:drop-shadow(0 5px 8px rgba(0,0,0,.45));
-}
-.battle-follower .follower-aura{
-  position:absolute;
-  width:48px;height:48px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(232,199,107,.24) 0%,rgba(232,199,107,.07) 45%,transparent 72%);
-  box-shadow:0 0 14px rgba(232,199,107,.20);
-}
-.battle-follower .follower-icon{
-  position:relative;
-  width:38px;height:38px;
-  display:grid;place-items:center;
-  border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.16),rgba(9,17,24,.78) 62%,rgba(9,17,24,.25));
-  border:1px solid rgba(232,199,107,.60);
-  font-size:22px;
-  line-height:1;
-  box-shadow:0 0 10px rgba(232,199,107,.18),inset 0 0 8px rgba(0,0,0,.4);
-}
-.battle-follower b{
-  position:relative;
-  color:#f1d98e;
-  font-size:7px;
-  line-height:1;
-  white-space:nowrap;
-  text-shadow:0 1px 3px #000;
-}
-.battle-follower small{
-  position:relative;
-  color:rgba(239,235,221,.72);
-  font-size:5.5px;
-  line-height:1;
-  white-space:nowrap;
-  text-shadow:0 1px 3px #000;
-}
-.player-wrap .battle-follower{left:100%;bottom:25px;margin-left:2px}
-.bot-wrap .battle-follower{right:100%;bottom:25px;margin-right:2px}
-.follower-companion-bot{position:absolute;right:100%;bottom:25px;margin-right:2px}
-@media(max-width:390px){
- .battle-follower{width:52px;min-height:52px}
- .battle-follower .follower-icon{width:34px;height:34px;font-size:19px}
- .battle-follower .follower-aura{width:43px;height:43px}
-}
-`;
-
-function injectStyle(){
-  if(document.getElementById('arenaFollowerVisualStyle'))return;
-  const s=document.createElement('style');
-  s.id='arenaFollowerVisualStyle';
-  s.textContent=FOLLOWER_STYLE;
-  document.head.appendChild(s);
-}
-function state(){return window.TerritoryStore?.state||null}
-function active(){
-  const s=state(),id=s?.followers?.activeFollower;
-  const f=id&&window.Followers?.get?.(id);
-  const cfg=id&&window.Followers?.CATALOG?.[id];
-  const stats=id&&window.Followers?.getStats?.(id);
-  return f?.owned&&cfg&&stats?{id,data:f,cfg,stats}:null;
-}
-function makeFollower(data,extraClass){
-  const el=document.createElement('div');
-  el.className='battle-follower '+(extraClass||'');
-  el.innerHTML=`<div class="follower-aura"></div><div class="follower-icon">${data.icon||'✦'}</div><b>${String(data.name||'Спутник')}</b><small>${String(data.role||'Поддержка')} · ур.${Number(data.level)||1}</small>`;
-  return el;
-}
-function ensurePlayer(){
-  const f=active();
-  const wrap=document.querySelector('.player-wrap');
-  if(!wrap)return;
-  const old=wrap.querySelector('.battle-follower');
-  if(!f){old?.remove();return}
-  if(old){
-    old.querySelector('.follower-icon').textContent=f.cfg.icon||'✦';
-    old.querySelector('b').textContent=f.cfg.name;
-    old.querySelector('small').textContent=`${f.cfg.role} · ур.${f.data.level}`;
-    return;
+  'use strict';
+  const styleId='arenaFollowerVisualStyle';
+  const css=`.arena-in-battle .battle-follower{position:absolute;z-index:25;width:68px;height:70px;display:grid;grid-template-rows:38px 14px 12px;place-items:center;pointer-events:none;filter:drop-shadow(0 5px 7px rgba(0,0,0,.65));text-shadow:0 2px 4px #000}.arena-in-battle .battle-follower .follower-aura{position:absolute;width:58px;height:58px;border-radius:50%;bottom:10px;background:radial-gradient(circle,rgba(232,199,107,.42),rgba(232,199,107,.08) 48%,transparent 72%);animation:followerPulse 1.2s ease-in-out infinite}.arena-in-battle .battle-follower .follower-icon{position:relative;width:38px;height:38px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(232,199,107,.75);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.18),rgba(8,18,25,.9) 65%);font-size:24px;z-index:2}.arena-in-battle .battle-follower b{position:relative;font-size:7px;color:#fff;z-index:2;white-space:nowrap}.arena-in-battle .battle-follower small{position:relative;font-size:5.5px;color:#e8c76b;z-index:2;white-space:nowrap}.arena-in-battle .player-wrap .battle-follower{left:100%;bottom:20px;margin-left:2px}.arena-in-battle .bot-wrap .battle-follower{right:100%;bottom:20px;margin-right:2px}@keyframes followerPulse{0%,100%{transform:scale(.88);opacity:.65}50%{transform:scale(1.08);opacity:1}}@media(max-width:390px){.arena-in-battle .battle-follower{width:60px;height:66px}.arena-in-battle .battle-follower .follower-icon{width:34px;height:34px;font-size:21px}}`;
+  function inject(){if(document.getElementById(styleId))return;const s=document.createElement('style');s.id=styleId;s.textContent=css;document.head.appendChild(s);}
+  function playerData(){
+    const id=window.TerritoryStore?.state?.followers?.activeFollower;
+    const f=id&&window.Followers?.get?.(id),cfg=id&&window.Followers?.CATALOG?.[id];
+    return f?.owned&&cfg?{id,name:cfg.name,role:cfg.role,icon:cfg.icon,level:f.level}:null;
   }
-  wrap.appendChild(makeFollower({icon:f.cfg.icon,name:f.cfg.name,role:f.cfg.role,level:f.data.level},'follower-companion-player'));
-}
-function ensureBot(){
-  const wrap=document.querySelector('.bot-wrap');
-  if(!wrap)return;
-  if(wrap.querySelector('.follower-companion-bot'))return;
-  const name=wrap.querySelector('.fighter-name')?.textContent||'';
-  const presets={
-    'tank':{name:'Тералель',role:'Защита',icon:'🛡️'},
-    'assassin':{name:'Морт',role:'Уворот',icon:'🌀'},
-    'berserker':{name:'Лиабро',role:'Крит',icon:'⚔️'},
-    'duelist':{name:'Каменное Лицо',role:'Контроль',icon:'💀'}
-  };
-  let kind='duelist';
-  const battleRoot=document.querySelector('[data-battle-root]');
-  const text=battleRoot?.querySelector('.bot-wrap .fighter-name')?.textContent||name;
-  const mapByName={'Эйрик':'tank','Хальвдан':'berserker','Сигурд':'dodge','Рагнар':'assassin','Ивар':'duelist','Бьёрн':'tank'};
-  kind=mapByName[text.split(' Lv.')[0].trim()]||kind;
-  if(kind==='dodge')presets.dodge={name:'Морт',role:'Уворот',icon:'🌀'};
-  const data=presets[kind]||presets.duelist;
-  const el=makeFollower(data,'follower-companion-bot');
-  el.classList.add('follower-companion-bot');
-  wrap.appendChild(el);
-}
-function decorate(){
-  injectStyle();
-  if(!document.querySelector('.arena-battle'))return;
-  ensurePlayer();
-  ensureBot();
-}
-const observer=new MutationObserver(()=>decorate());
-document.addEventListener('DOMContentLoaded',()=>{decorate();observer.observe(document.body,{subtree:true,childList:true})});
-window.FollowerArena={
-  active,
-  getAbilityState:function(){
-    const f=active();
-    if(!f)return null;
-    return {id:f.id,name:f.cfg.name,role:f.cfg.role,level:f.data.level,awakened:Boolean(f.data.awakened),critChance:Number(f.stats.critChance||0),defense:Number(f.stats.defense||0),heal:Number(f.stats.heal||0),dodge:Number(f.stats.dodge||0),control:Number(f.stats.control||0)};
+  function botData(){
+    const wrap=document.querySelector('.bot-wrap'),id=wrap?.dataset.botFollowerId;
+    const cfg=id&&window.Followers?.CATALOG?.[id];
+    if(!cfg)return null;
+    return{id,name:cfg.name,role:cfg.role,icon:cfg.icon,level:Math.max(1,Number(wrap?.querySelector('.fighter-name small')?.textContent?.replace(/\D/g,''))||1)};
   }
-};
+  function make(data,cls){const e=document.createElement('div');e.className=`battle-follower ${cls||''}`;e.dataset.followerId=data.id;e.innerHTML=`<div class="follower-aura"></div><div class="follower-icon">${data.icon||'✦'}</div><b>${data.name}</b><small>${data.role} · ур.${data.level}</small>`;return e;}
+  function syncWrap(wrap,data,cls){
+    if(!wrap)return;
+    let e=wrap.querySelector(`.${cls}`);
+    if(!data){e?.remove();return;}
+    if(!e){e=make(data,cls);wrap.appendChild(e);return;}
+    e.querySelector('.follower-icon').textContent=data.icon||'✦';e.querySelector('b').textContent=data.name;e.querySelector('small').textContent=`${data.role} · ур.${data.level}`;
+  }
+  function decorate(){
+    inject();
+    if(!document.querySelector('.arena-battle'))return;
+    syncWrap(document.querySelector('.player-wrap'),playerData(),'follower-companion-player');
+    syncWrap(document.querySelector('.bot-wrap'),botData(),'follower-companion-bot');
+  }
+  const observer=new MutationObserver(()=>decorate());
+  document.addEventListener('DOMContentLoaded',()=>{decorate();observer.observe(document.body,{subtree:true,childList:true});});
+  window.FollowerArena={decorate,active:playerData,getAbilityState(){const id=playerData()?.id,stats=id&&window.Followers?.getStats?.(id);return id?{id,stats}:null;}};
 })();

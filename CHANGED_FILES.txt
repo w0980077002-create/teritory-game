@@ -1,0 +1,6 @@
+FINAL FIX V2
+- followers.js replaces follower-core.js
+- Telegram bot handle: @TeritoryGameBot
+- isolated runnerBattle / arenaBattle
+- active follower stats applied through TerritoryStore.getDerivedStats()
+- nginx reference-ui cache versions bumped
