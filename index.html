@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#07111b">
 <meta name="telegram-bot" content="@TeritoryGameBot">
 <title>Teritory Game</title>
-<link rel="stylesheet" href="style.css?v=10006">
+<link rel="stylesheet" href="style.css?v=10007">
 <link rel="stylesheet" href="home-rebuild.css?v=10001">
 <link rel="stylesheet" href="arena.css?v=10001">
 <link rel="stylesheet" href="follower-arena.css?v=10001">
@@ -23,16 +23,8 @@
 <section id="market" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button" onclick="window.showScreen&&window.showScreen('home')">‹</button><div><small>ТОРГОВЛЯ</small><h2>ЛАВКА</h2></div><div class="wallet">🪙 <b data-coins>0</b></div></header><div class="merchant"><div>🧔‍♂️</div><b>ТОРГОВЕЦ<small>Эликсиры и оружие</small></b></div><div class="panel-title">ТОВАРЫ ЛАВКИ</div><div id="shopGrid" class="shop-grid"></div><div id="merchantLog" class="log">Торговец ждёт сделки.</div></section>
 <section id="casino" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button" onclick="window.showScreen&&window.showScreen('home')">‹</button><div><small>СОБЫТИЕ</small><h2>ИГРЫ</h2></div><div class="wallet">🎲 <b data-dice>0</b></div></header><div class="casino-card"><div class="casino-title">МОНОПОЛИЯ</div><div id="casinoBoard" class="casino-board"></div><div data-roll-result class="roll-result">Готов к броску</div><button data-roll class="primary" type="button">БРОСИТЬ КУБИК</button></div></section>
 <div id="arenaModal" class="arena-modal" aria-hidden="true"><div class="arena-sheet"><div class="arena-modal-head"><h2>⚔️ АРЕНА</h2><button id="arenaClose" class="arena-close" type="button">Закрыть</button></div><div id="arenaModalBody"></div></div></div>
-
-<nav id="hardMobileNav" aria-label="Навигация">
-<button type="button" onclick="window.showScreen&&window.showScreen('home')">⌂<span>Город</span></button>
-<button type="button" onclick="window.showScreen&&window.showScreen('inventory')">🎒<span>Инвентарь</span></button>
-<button type="button" onclick="window.showScreen&&window.showScreen('hero')">⚔<span>Герой</span></button>
-<button type="button" onclick="window.HomeRebuild&&window.HomeRebuild.startRunner&&window.HomeRebuild.startRunner(false)">⚔️<span>Бой</span></button>
-<button type="button" onclick="window.showScreen&&window.showScreen('districts')">📜<span>Квесты</span></button>
-<button type="button" onclick="window.showScreen&&window.showScreen('casino')">🎲<span>Игры</span></button>
-<button type="button" onclick="alert('Клан — в разработке')">🛡<span>Клан</span></button>
-</nav>
+<nav id="hardMobileNav" aria-label="Постоянная навигация"></nav>
+<button id="globalBackButton" type="button" aria-label="Назад">‹</button>
 </main>
 <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
 <script src="app.js?v=10006"></script>
@@ -45,20 +37,6 @@
 <script src="home-rebuild.js?v=10001"></script>
 <script src="button-fix.js?v=10003"></script>
 <script src="reference-ui.js?v=10001"></script>
-<script>
-(function(){
-  function syncNav(){
-    var n=document.getElementById('hardMobileNav');
-    if(!n)return;
-    n.style.display=(document.body.dataset.screen||'home')==='home'?'none':'grid';
-  }
-  var old=window.showScreen;
-  if(typeof old==='function'){
-    window.showScreen=function(id){old(id);syncNav();};
-  }
-  document.addEventListener('DOMContentLoaded',syncNav);
-  document.addEventListener('territory:render',syncNav);
-})();
-</script>
+<script src="navigation-final.js?v=10007"></script>
 </body>
 </html>
