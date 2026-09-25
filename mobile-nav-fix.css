@@ -1,0 +1,133 @@
+/* Territory Game — mobile navigation fix 10004 */
+#mobileGlobalNav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:100000;
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:2px;
+  padding:6px 5px calc(6px + env(safe-area-inset-bottom));
+  background:rgba(5,13,20,.97);
+  border-top:1px solid rgba(232,199,107,.42);
+  box-shadow:0 -8px 28px rgba(0,0,0,.35);
+}
+#mobileGlobalNav button{
+  min-width:0;
+  min-height:54px;
+  padding:5px 2px;
+  border:1px solid rgba(67,86,101,.72);
+  border-radius:10px;
+  background:#10202c;
+  color:#d7e0e5;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  font-weight:800;
+}
+#mobileGlobalNav button i{
+  font-style:normal;
+  font-size:18px;
+  line-height:18px;
+}
+#mobileGlobalNav button span{
+  font-size:8px;
+  line-height:10px;
+  white-space:nowrap;
+}
+#mobileGlobalNav button.active{
+  border-color:#d1ad55;
+  background:#2a2114;
+  color:#f2d77d;
+}
+#mobileGlobalNav.home-mode{
+  display:none;
+}
+#mobileBack{
+  position:fixed;
+  left:14px;
+  top:calc(10px + env(safe-area-inset-top));
+  z-index:100001;
+  display:none;
+  width:48px;
+  height:48px;
+  border:1px solid #435665;
+  border-radius:13px;
+  background:#132532;
+  color:#fff;
+  font-size:34px;
+  line-height:42px;
+  padding:0;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+#mobileBack.show{
+  display:block;
+}
+#mobileFeatureModal{
+  position:fixed;
+  inset:0;
+  z-index:100002;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(0,0,0,.7);
+}
+#mobileFeatureModal.show{display:flex}
+.mobile-feature-card{
+  position:relative;
+  width:min(92vw,380px);
+  padding:28px 22px 22px;
+  border:1px solid rgba(232,199,107,.55);
+  border-radius:18px;
+  background:linear-gradient(145deg,#142d3b,#07131d);
+  box-shadow:0 18px 60px rgba(0,0,0,.65);
+  text-align:center;
+}
+.mobile-feature-card>button:first-child{
+  position:absolute;
+  right:8px;
+  top:6px;
+  border:0;
+  background:transparent;
+  color:#fff;
+  font-size:28px;
+}
+.mobile-feature-card b{
+  display:block;
+  color:#e8c76b;
+  font-size:20px;
+  margin-bottom:12px;
+}
+.mobile-feature-card span{
+  display:block;
+  color:#d8e0e5;
+  font-size:14px;
+  margin-bottom:20px;
+}
+.mobile-feature-card>button:last-child{
+  min-width:100px;
+  padding:10px 18px;
+  border:1px solid #b99548;
+  border-radius:10px;
+  background:linear-gradient(#e8c76b,#a97b22);
+  color:#171008;
+  font-weight:900;
+}
+
+@media (max-width:380px){
+  #mobileGlobalNav button{min-height:50px}
+  #mobileGlobalNav button i{font-size:16px}
+  #mobileGlobalNav button span{font-size:7px}
+}
+
+/* Screens scroll above the persistent navigation instead of hiding behind it. */
+.screen.panel-screen{
+  padding-bottom:calc(92px + env(safe-area-inset-bottom)) !important;
+}
+.screen.panel-screen .screen-head{
+  padding-left:72px;
+}
