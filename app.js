@@ -7,7 +7,7 @@ try{const saved=JSON.parse(localStorage.getItem('territory_store_v1')||'null');i
 Store.saveNow=function(){try{localStorage.setItem('territory_store_v1',JSON.stringify(Store.state));}catch(e){}};
 Store.getDerivedStats=function(){return {maxHp:Store.state.maxHp,strength:125,defense:98};};
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-function show(id){$$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));if(id==='roadmap')roadmap();if(id==='inventory')inventory();if(id==='shop')shop();if(id==='games')games();}
+function show(id){$$('.screen').forEach(x=>x.classList.remove('active'));const target=document.getElementById(id);if(target)target.classList.add('active');if(id==='roadmap')roadmap();if(id==='inventory')inventory();if(id==='shop')shop();if(id==='games')games();}
 function home(){show('home')}
 function modal(title,body){$('#modalBody').innerHTML='<h2>'+title+'</h2>'+body;$('#modal').classList.add('show')}
 $('#modalClose').onclick=()=>$('#modal').classList.remove('show');
@@ -28,5 +28,5 @@ function games(){const b=$('#board');b.innerHTML='';for(let i=0;i<25;i++){const 
 $('#roll').onclick=()=>{if(!Store.state.dice){modal('Кубики','<p>Кубики закончились.</p>');return}Store.state.dice--;Store.state.pos=(Store.state.pos||0)+1+Math.floor(Math.random()*6);Store.state.pos%=25;Store.saveNow();games();$('#rollLog').textContent='Бросок выполнен. Позиция '+(Store.state.pos+1)};
 $('#followersBtn').onclick=()=>modal('Последователи','<div class="followers">'+['Лиабро — Крит','Тералель — Защита','Король-коров — Лечение','Морт — Уклонение','Каменное Лицо — Контроль'].map((x,i)=>`<button class="frow" data-f="${i}"><b>${x.split(' — ')[0]}</b><span>${x.split(' — ')[1]}</span></button>`).join('')+'</div>');
 $$('[data-home]').forEach(b=>b.onclick=home);$$('[data-roadmap]').forEach(b=>b.onclick=()=>show('roadmap'));
-setHomeZones();arenaZones();inventory();shop();games();
+$$('.screen').forEach(x=>x.classList.remove('active'));$('#home').classList.add('active');setHomeZones();arenaZones();inventory();shop();games();
 })();
