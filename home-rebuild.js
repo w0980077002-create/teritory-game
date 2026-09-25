@@ -38,20 +38,20 @@
   function mount(){
     const home=document.getElementById('home');if(!home||home.dataset.mounted)return;
     home.dataset.mounted='1';
-    home.innerHTML='<div id="homeReferenceHost" class="home-reference-host"><img src="teritory_reference_bg.png?v=700" class="home-reference-image" alt="Territory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones"></div><div id="homeRealHud" aria-hidden="true"></div></div>';
+    home.innerHTML='<div id="homeReferenceHost" class="home-reference-host"><img src="territory_reference_bg.png?v=9001" class="home-reference-image" alt="Territory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones"></div><div id="homeRealHud" aria-hidden="true"></div></div>';
     const layer=home.querySelector('.home-hitzones'),bot=home.querySelector('.home-bottom-zones');
     zones.forEach((z,i)=>add(layer,z,i,false));bottom.forEach((z,i)=>add(bot,z,42+i,true));mountRealHud();
   }
   function add(layer,z,i,isBottom){const b=document.createElement('button');b.type='button';b.className='hz '+(isBottom?'home-bottom-hz':'');b.dataset.action=z[0];b.dataset.index=i;b.style.left=z[1]+'%';b.style.top=z[2]+'%';b.style.width=z[3]+'%';b.style.height=z[4]+'%';layer.appendChild(b);}
   function mountRealHud(){
     const host=document.getElementById('homeRealHud');if(!host)return;
-    host.innerHTML='<span class="hud-clean hud-name"></span><span class="hud-clean hud-level"></span><span class="hud-clean hud-coins"></span><span class="hud-clean hud-gems"></span><span class="hud-clean hud-redgems"></span><span class="hud-clean hud-energy"></span><span class="hud-clean hud-xp"></span><span class="hud-clean hud-bottom-level"></span><span class="hud-clean hud-hp"></span><span class="hud-clean hud-bottom-energy"></span><i class="hud-mask hud-hp-mask"></i><i class="hud-mask hud-energy-mask"></i><i class="hud-mask hud-xp-mask"></i><span class="hud-clean hud-i i1"></span><span class="hud-clean hud-i i2"></span><span class="hud-clean hud-i i3"></span><span class="hud-clean hud-i i4"></span><span class="hud-clean hud-i i5"></span><span class="hud-clean hud-i i6"></span>';
+    host.innerHTML='<span class="hud-clean hud-name"></span><span class="hud-clean hud-level"></span><span class="hud-clean hud-vip">VIP</span><span class="hud-clean hud-coins"></span><span class="hud-clean hud-gems"></span><span class="hud-clean hud-redgems"></span><span class="hud-clean hud-energy"></span><span class="hud-clean hud-xp"></span><span class="hud-clean hud-bottom-level"></span><span class="hud-clean hud-hp"></span><span class="hud-clean hud-bottom-energy"></span>';
   }
   function paint(){
     const s=S(),p=s.profile||{},d=window.TerritoryStore?.getDerivedStats?.()||{},set=(q,v)=>{const e=document.querySelector(q);if(e)e.textContent=v};
     set('.hud-name',p.displayName||s.name||'Игрок');set('.hud-level','Lv. '+(s.level||1));set('.hud-coins',compact(s.coins));set('.hud-gems',compact(s.gems));set('.hud-redgems',compact(s.redGems));set('.hud-energy',`${Math.floor(s.energy||0)}/${Math.floor(s.maxEnergy||200)}`);set('.hud-xp',`${Math.floor(s.exp||0)}/${Math.floor(s.expToNext||100)}`);set('.hud-bottom-level','Lv.'+(s.level||1));set('.hud-hp',`${Math.floor(s.hp||0)} / ${Math.floor(d.maxHp||s.maxHp||120)}`);set('.hud-bottom-energy',`${Math.floor(s.energy||0)} / ${Math.floor(s.maxEnergy||200)}`);
     const hp=Math.max(0,Math.min(1,(s.hp||0)/Math.max(1,d.maxHp||s.maxHp||120))),en=Math.max(0,Math.min(1,(s.energy||0)/Math.max(1,s.maxEnergy||200))),xp=Math.max(0,Math.min(1,(s.exp||0)/Math.max(1,s.expToNext||100)));
-    [['.hud-hp-mask',hp],['.hud-energy-mask',en],['.hud-xp-mask',xp]].forEach(([q,v])=>document.querySelector(q)?.style.setProperty('--fill',(v*100)+'%'));
+    [['.hud-hp',hp],['.hud-energy',en],['.hud-xp',xp]].forEach(([q,v])=>document.querySelector(q)?.style.setProperty('--fill',(v*100)+'%'));
   }
   function compact(v){const n=Math.max(0,Number(v)||0);return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(Math.floor(n));}
 

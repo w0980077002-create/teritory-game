@@ -96,3 +96,8 @@
 @keyframes enemyHit{50%{transform:translateX(10px) rotate(2deg)}}
 @keyframes damageFly{0%{opacity:0;transform:translateY(15px) scale(.8)}20%{opacity:1}100%{opacity:0;transform:translateY(-80px) scale(1.15)}}
 @media(max-width:390px){.fighter-wrap{width:112px;height:240px}.player-wrap{left:20%}.bot-wrap{right:20%}.viking-image{height:214px;max-width:112px}.battle-zone-controls button{width:43px;height:42px}.battle-command-row{grid-template-columns:minmax(48px,1fr) 42px 58px 45px 45px 53px;gap:2px;padding:3px 4px}.battle-command-row .command-surrender,.battle-command-row .command-exit{font-size:5.2px}.battle-command-row .command-hit{font-size:5.3px}.battle-command-row>strong{font-size:5.4px}.runner-character,.runner-enemy{width:105px;height:205px}.runner-character img,.runner-enemy img{height:180px;max-width:105px}.runner-character{left:10%}.runner-enemy{right:5%}.runner-follower{left:42%;bottom:22%}}
+
+/* Master combat effects */
+.combat-fx{z-index:120!important;max-width:62%;text-align:center;color:#fff1b0;font-size:12px!important;line-height:1.05;font-weight:1000!important;letter-spacing:.2px;white-space:normal;pointer-events:none;filter:drop-shadow(0 2px 4px #000)}
+.fx-crit{color:#ff5b42!important;font-size:15px!important}.fx-block{color:#8fdcff!important}.fx-hit{color:#ffd36a!important}.fx-miss{color:#dce8ee!important}.fx-heal{color:#72ff9a!important}
+.battle-zone-controls button,.battle-command-row button,.combat-item-slot,.arena-bottom-nav button{touch-action:manipulation;-webkit-user-select:none;user-select:none}

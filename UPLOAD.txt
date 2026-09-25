@@ -1,0 +1,7 @@
+TERITORY GAME — COMPLETE FIX 9001
+
+Replace/overwrite exactly the files in this ZIP and the arena-assets folder.
+DO NOT delete the existing territory_reference_bg.png from the repository: it is the original HOME artwork and this patch references that exact filename.
+
+Bot name: @TeritoryGameBot
+Internal JS store: window.TerritoryStore (intentionally unchanged).

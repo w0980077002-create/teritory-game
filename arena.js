@@ -19,7 +19,7 @@
 
   function root(){const modal=$('#arenaModal'),body=$('#arenaModalBody');return modal&&body?{modal,body}:null;}
   function me(){const s=S();return{id:'player',name:String(s.profile?.displayName||s.name||'Игрок'),level:Math.max(1,Number(s.level)||1),rating:Number(s.arena?.rating)||1000,wins:Number(s.arena?.wins)||0,losses:Number(s.arena?.losses)||0,class:'duelist'};}
-  function roster(){const l=me().level,n=['Эйрик','Хальвдан','Сигурд','Рагнар','Ивар','Бьёрн'];return n.map((name,i)=>({id:'arena-bot-'+i,name,level:Math.max(1,l+i%3-1),class:['duelist','berserker','tank','assassin'][i%4],rating:820+(5-i)*42,wins:18+i*7,losses:6+i*3,isBot:true}));}
+  function roster(){const l=me().level,n=['Liam','Jack','Ethan','Oliver','Mason','Ryan','Валера','Людмила'];return n.map((name,i)=>({id:'arena-bot-'+i,name,level:Math.max(1,l+i%3-1),class:['duelist','berserker','tank','assassin'][i%4],rating:820+(7-i)*42,wins:18+i*7,losses:6+i*3,isBot:true}));}
   function profile(id){return id==='player'?me():roster().find(x=>x.id===id);}
   function playerFollower(){
     const id=S().followers?.activeFollower;
@@ -55,8 +55,8 @@
   function start(op){
     const r=root();if(!r||!op)return;
     const pf=playerFollower(),of=botFollower(op);
-    arenaBattle={mode:'1v1',player:fighter(me(),'player'),bot:fighter(op,'bot'),opponent:op,playerFollowerId:pf?.id||null,opponentFollowerId:of?.id||null,turn:1,playerDefense:[],attackZone:null,botDefense:[],busy:false,auto:false,ended:false,playerReadyAt:0,botReadyAt:0,baseCooldown:15000,timer:null,logs:[`⚔️ ${me().name} против ${op.name}`],chat:[]};
-    render();startTimer();
+    arenaBattle={mode:'1v1',player:fighter(me(),'player'),bot:fighter(op,'bot'),opponent:op,playerFollowerId:pf?.id||null,opponentFollowerId:of?.id||null,turn:1,playerDefense:[],attackZone:null,botDefense:[],botAttackZone:null,busy:false,auto:false,ended:false,playerReadyAt:0,botReadyAt:0,baseCooldown:15000,timer:null,logs:[`⚔️ ${me().name} против ${op.name}`],chat:[]};
+    prepareBotPlan();render();startTimer();
   }
   function fighterMarkup(u,side){
     const src=side==='player'?'./arena-assets/player-viking-approved.png':'./arena-assets/opponent-viking-approved.png';
@@ -132,27 +132,32 @@
     const cd=r.body.querySelector('[data-cooldown]');if(cd)cd.textContent=cooldownLeft()>0?`Удар ${formatClock(cooldownLeft())}`:botCooldownLeft()>0?`Бот ${formatClock(botCooldownLeft())}`:'Готов';
     const auto=r.body.querySelector('[data-autobattle-toggle]');auto?.classList.toggle('active',arenaBattle.auto);
   }
-  function effect(type,side){const layer=$('[data-effects]');if(!layer)return;const e=document.createElement('div');e.className=`combat-fx fx-${type} fx-${side}`;e.textContent={crit:'✦',block:'✧',hit:'✹',miss:'×',heal:'+'}[type]||'×';layer.appendChild(e);setTimeout(()=>e.remove(),700);}
+  function effect(type,side,text){const layer=$('[data-effects]');if(!layer)return;const e=document.createElement('div');e.className=`combat-fx fx-${type} fx-${side}`;e.textContent=text||({crit:'КРИТ',block:'БЛОК',hit:'ПОПАДАНИЕ',miss:'ПРОМАХ',heal:'ЛЕЧЕНИЕ'}[type]||type);layer.appendChild(e);setTimeout(()=>e.remove(),850);}
   function animate(side,cls){const e=$(`[data-fighter="${side}"]`);if(!e)return;e.classList.remove(cls);void e.offsetWidth;e.classList.add(cls);setTimeout(()=>e.classList.remove(cls),800);}
   function executeAttack(){
     if(!arenaBattle||arenaBattle.busy||arenaBattle.ended||cooldownLeft()>0||arenaBattle.playerDefense.length!==2||!arenaBattle.attackZone)return;
     arenaBattle.busy=true;const p=arenaBattle.player,b=arenaBattle.bot;const follower=playerFollower();
     let dmg=Math.max(1,p.attack-b.defense);
     if(follower?.id==='liabro'&&Math.random()<Math.min(.35,Number(follower.stats.critChance||0)/100)){dmg=Math.floor(dmg*1.8);arenaBattle.logs.push(`💥 ${follower.cfg.name}: критический удар`);effect('crit','bot');}
-    else if(Math.random()<b.dodge){arenaBattle.logs.push('💨 Соперник увернулся');effect('miss','bot');animate('bot','dodge');}
-    else if(battleDefenseHas(b.attackZone)){dmg=Math.max(1,Math.floor(dmg*.25));arenaBattle.logs.push(`🛡️ Блок: ${dmg}`);effect('block','bot');animate('bot','block');}
-    else if(Math.random()<p.crit){dmg=Math.floor(dmg*1.8);arenaBattle.logs.push(`💥 Критический удар: ${dmg}`);effect('crit','bot');animate('bot','hurt');}
-    else{arenaBattle.logs.push(`⚔️ Ты нанёс ${dmg} урона`);effect('hit','bot');animate('bot','hurt');}
+    else if(Math.random()<b.dodge){arenaBattle.logs.push('💨 Соперник увернулся');effect('miss','bot','ПРОМАХ');animate('bot','dodge');}
+    else if(battleDefenseHas(arenaBattle.attackZone)){dmg=Math.max(1,Math.floor(dmg*.25));arenaBattle.logs.push(`🛡️ Блок: ${dmg}`);effect('block','bot',`БЛОК -${dmg}`);animate('bot','block');}
+    else if(Math.random()<p.crit){dmg=Math.floor(dmg*1.8);arenaBattle.logs.push(`💥 Критический удар: ${dmg}`);effect('crit','bot',`КРИТИЧЕСКИЙ УДАР -${dmg}`);animate('bot','hurt');}
+    else{arenaBattle.logs.push(`⚔️ Ты нанёс ${dmg} урона`);effect('hit','bot',`УДАР В ${zones.find(z=>z[0]===arenaBattle.attackZone)?.[1]?.toUpperCase()||'ЦЕЛЬ'} -${dmg}`);animate('bot','hurt');}
     b.hp=Math.max(0,b.hp-dmg);arenaBattle.playerReadyAt=Date.now()+arenaBattle.baseCooldown;arenaBattle.botReadyAt=Date.now()+7000+Math.floor(Math.random()*5000);arenaBattle.playerDefense=[];arenaBattle.attackZone=null;
     if(b.hp<=0){setTimeout(()=>finish(true),650);return;}
     setTimeout(()=>{if(!arenaBattle||arenaBattle.ended)return;arenaBattle.busy=false;render();},650);
   }
-  function battleDefenseHas(z){return arenaBattle.botDefense.includes(z);}
+  function battleDefenseHas(z){return Boolean(z)&&arenaBattle.botDefense.includes(z);}
+  function prepareBotPlan(){
+    if(!arenaBattle||arenaBattle.ended)return;
+    arenaBattle.botDefense=[];
+    while(arenaBattle.botDefense.length<2){const z=zones[Math.floor(Math.random()*zones.length)][0];if(!arenaBattle.botDefense.includes(z))arenaBattle.botDefense.push(z);}
+    arenaBattle.botAttackZone=zones[Math.floor(Math.random()*zones.length)][0];
+  }
   function botTurn(){
     if(!arenaBattle||arenaBattle.ended||arenaBattle.busy)return;
     const p=arenaBattle.player,b=arenaBattle.bot;
-    arenaBattle.botDefense=[];while(arenaBattle.botDefense.length<2){const z=zones[Math.floor(Math.random()*zones.length)][0];if(!arenaBattle.botDefense.includes(z))arenaBattle.botDefense.push(z);}
-    const atk=zones[Math.floor(Math.random()*zones.length)][0];let dmg=Math.max(1,b.attack-p.defense);
+    const atk=arenaBattle.botAttackZone;let dmg=Math.max(1,b.attack-p.defense);
     const f=playerFollower();
     if(f?.id==='teralel')dmg=Math.max(1,Math.floor(dmg*(1-Math.min(.35,Number(f.stats.defense||0)/200))));
     if(f?.id==='mort'&&Math.random()<Math.min(.4,Number(f.stats.dodge||0)/100)){arenaBattle.logs.push('💨 Морт: уклонение');effect('miss','player');animate('player','dodge');}
@@ -161,7 +166,7 @@
     else{p.hp=Math.max(0,p.hp-dmg);arenaBattle.logs.push(`⚔️ Соперник нанёс ${dmg}`);effect('hit','player');animate('player','hurt');}
     if(f?.id==='king_cows'&&p.hp<p.maxHp){const heal=Math.max(1,Math.round(Number(f.stats.heal||0)));p.hp=Math.min(p.maxHp,p.hp+heal);arenaBattle.logs.push(`❤️ Король Коров: +${heal} HP`);effect('heal','player');}
     if(p.hp<=0){setTimeout(()=>finish(false),650);return;}
-    arenaBattle.turn++;arenaBattle.busy=true;arenaBattle.botReadyAt=0;
+    arenaBattle.turn++;arenaBattle.busy=true;arenaBattle.botReadyAt=0;prepareBotPlan();
     setTimeout(()=>{if(!arenaBattle||arenaBattle.ended)return;arenaBattle.busy=false;render();},650);
   }
   function autoStep(){if(!arenaBattle||arenaBattle.busy||arenaBattle.ended||cooldownLeft()>0||!arenaBattle.auto)return;arenaBattle.playerDefense=[];while(arenaBattle.playerDefense.length<2){const z=zones[Math.floor(Math.random()*zones.length)][0];if(!arenaBattle.playerDefense.includes(z))arenaBattle.playerDefense.push(z);}arenaBattle.attackZone=zones[Math.floor(Math.random()*zones.length)][0];sync();setTimeout(()=>{if(arenaBattle?.auto)executeAttack();},180);}
