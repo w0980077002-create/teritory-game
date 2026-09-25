@@ -11,3 +11,4 @@
 .next-info{position:absolute;z-index:8;left:12%;right:12%;top:53%;padding:12px;text-align:center;background:#07151de8;border:1px solid #76583a;border-radius:10px}.next-info b{display:block;color:#e6c16b;font-size:9px}.next-info span{font-size:8px;color:#c4cccf}
 #startNextChapter{position:absolute;z-index:9;left:15%;right:15%;bottom:105px;height:43px;border:1px solid #e5bb5e;border-radius:9px;background:linear-gradient(#d9ad55,#70471c);color:#fff;font-weight:1000;font-size:11px}
 .next-nav{position:absolute;z-index:20;left:0;right:0;bottom:0;height:45px;display:grid;grid-template-columns:repeat(7,1fr);background:#07131af7;border-top:1px solid #856238}.next-nav button{border:0;border-right:1px solid #263a43;background:#0b1a23;color:#d3dcdf;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center}.next-nav span{font-size:6px}.next-nav .active{color:#efc86d;background:#2a2115}
+.chapter-card h1{text-transform:uppercase}

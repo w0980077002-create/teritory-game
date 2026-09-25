@@ -1,57 +1,13 @@
-
 (function(){
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-let bossHp=500000,playerHp=119600,auto=false,seconds=60,finished=false;
-const maxBoss=500000,maxPlayer=119600;
-function render(){
- $('#bfBossHp').style.width=(bossHp/maxBoss*100)+'%';
- $('#bfPlayerHp').style.width=(playerHp/maxPlayer*100)+'%';
- $('#bfBossText').textContent=`${Math.round(bossHp/1000)}K / 500K`;
- $('#bfPlayerText').textContent=`${Math.round(playerHp/1000)}K / 119.6K`;
- $('#bfTimer').innerHTML=`⏱ <b>${seconds}</b>`;
-}
-function result(win){
- finished=true; auto=false;
- $('#bfResult').classList.remove('hidden');
- $('#bfResultIcon').textContent=win?'🏆':'💀';
- $('#bfResultTitle').textContent=win?'БОСС ПОБЕЖДЁН!':'ГЕРОЙ ПОВЕРЖЕН';
- $('#bfResultText').textContent=win?'Глава завершена. Награда готова.':'Бой проигран. Можно вернуться на карту и повторить.';
- $('#bfReward').textContent=win?'ЗАБРАТЬ НАГРАДУ':'ВЕРНУТЬСЯ НА КАРТУ';
- $('#bfReward').onclick=()=>{
-   if(win){
-     const s=window.TerritoryStore?.state;
-     if(s){s.mapProgress=100;s.chapterBossDefeated=true;s.chapterCompleted=true;window.TerritoryStore.saveNow?.();}
-   }
-   window.TerritoryUI?.show('chapterComplete');
- };
-}
-function attack(){
- if(finished)return;
- const skill=document.querySelector('.bf-skill.selected')?.dataset.skill||'axe';
- let dmg=18000+Math.floor(Math.random()*26000);
- if(skill==='rage')dmg*=1.35;
- if(skill==='ice')dmg*=1.15;
- if(skill==='heal') playerHp=Math.min(maxPlayer,playerHp+22000);
- bossHp=Math.max(0,bossHp-Math.round(dmg));
- const field=$('.bf-field');field.classList.remove('hit');void field.offsetWidth;field.classList.add('hit');
- const fl=$('#bfFloat');fl.textContent='−'+Math.round(dmg/1000)+'K';fl.classList.remove('show');void fl.offsetWidth;fl.classList.add('show');
- $('#bfLog').textContent=skill==='heal'?'Здоровье восстановлено.':`Босс получает ${Math.round(dmg/1000)}K урона.`;
- if(bossHp>0 && skill!=='shield'){
-   const retaliation=9000+Math.floor(Math.random()*11000);
-   playerHp=Math.max(0,playerHp-retaliation);
-   $('#bfLog').textContent+=` Ответный удар: −${Math.round(retaliation/1000)}K.`;
- }
- if(bossHp===0) result(true);
- else if(playerHp===0) result(false);
- render();
-}
-$$('.bf-skill').forEach(b=>b.addEventListener('click',()=>{$$('.bf-skill').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')}));
-$('#bfHit').addEventListener('click',attack);
-$('#bfAuto').addEventListener('click',()=>{auto=!auto;$('#bfAuto').classList.toggle('on',auto);$('#bfLog').textContent=auto?'Авто-бой включён.':'Авто-бой выключен.'});
-$('#bfTimer').addEventListener('click',()=>{seconds=Math.max(30,seconds-10);render()});
-$('#bossBack').addEventListener('click',()=>window.TerritoryUI?.show('map'));
-$$('[data-bf-nav]').forEach(b=>b.addEventListener('click',()=>window.TerritoryUI?.show(b.dataset.bfNav==='map'?'map':b.dataset.bfNav)));
-setInterval(()=>{seconds=Math.max(0,seconds-1);if(seconds===0){seconds=60;if(auto)attack()}render()},1000);
-render();
+let bossHp=1,bossMax=1,playerHp=6850,playerMax=6850,auto=false,seconds=60,finished=false;
+function state(){return window.TerritoryChaptersAPI?.state?.()||window.TerritoryStore?.state||{currentChapter:1,chapterProgress:100}}
+function chapter(){return window.TerritoryChaptersAPI?.current?.()}
+function fmt(n){return Number(n).toLocaleString('en-US')}
+function setup(){const s=state(),ch=chapter();if(!ch)return;bossMax=bossHp=Number(ch.boss.hp)||500000;playerMax=Number(window.TerritoryStore?.state?.maxHp)||6850;playerHp=playerMax;seconds=60;finished=false;auto=false;$('#bfAuto')?.classList.remove('on');$('#bfResult')?.classList.add('hidden');$('.bf-title').textContent=`БОСС · ${ch.name}`;$('.bf-boss b').textContent=`ВЛАДЫКА · Lv.${ch.boss.level}`;$('.bf-boss small').textContent=`ГЛАВА ${ch.id} · БОСС`;$('.bf-progress').textContent='100%';let mapBtn=$('#bfChapterMap');if(!mapBtn){mapBtn=document.createElement('button');mapBtn.id='bfChapterMap';mapBtn.className='chapter-map-link';mapBtn.textContent='☠️';$('.bossfight').appendChild(mapBtn);mapBtn.onclick=()=>window.TerritoryUI?.show('map')}render()}
+function render(){$('#bfBossHp').style.width=(bossHp/bossMax*100)+'%';$('#bfPlayerHp').style.width=(playerHp/playerMax*100)+'%';$('#bfBossText').textContent=`${fmt(bossHp)} / ${fmt(bossMax)}`;$('#bfPlayerText').textContent=`${fmt(playerHp)} / ${fmt(playerMax)}`;$('#bfTimer').innerHTML=`⏱ <b>${seconds}</b>`}
+function result(win){finished=true;auto=false;$('#bfAuto')?.classList.remove('on');$('#bfResult').classList.remove('hidden');$('#bfResultIcon').textContent=win?'🏆':'💀';$('#bfResultTitle').textContent=win?'БОСС ПОБЕЖДЁН!':'ГЕРОЙ ПОВЕРЖЕН';$('#bfResultText').textContent=win?'Глава завершена. Награда готова.':'Бой проигран. Можно повторить бой.';$('#bfReward').textContent=win?'ЗАБРАТЬ НАГРАДУ':'ВЕРНУТЬСЯ НА КАРТУ';$('#bfReward').onclick=()=>{if(win)window.TerritoryChaptersAPI?.completeBoss?.();window.dispatchEvent(new CustomEvent('territory:state-changed'));window.TerritoryUI?.show(win?'chapterComplete':'map')};render()}
+function attack(){if(finished)return;const ch=chapter();if(!ch)return;const skill=document.querySelector('.bf-skill.selected')?.dataset.skill||'axe';let dmg=Math.round(bossMax*(.11+Math.random()*.06));if(skill==='rage')dmg*=1.3;if(skill==='ice')dmg*=1.12;if(skill==='heal')playerHp=Math.min(playerMax,playerHp+Math.round(playerMax*.2));bossHp=Math.max(0,bossHp-Math.round(dmg));const ratio=Number(ch.boss.damage)/Math.max(1,Number(ch.boss.hp));if(bossHp>0&&skill!=='shield'){const retaliation=Math.max(100,Math.min(Math.round(playerMax*.24),Math.round(playerMax*(.10+Math.min(.12,ratio*3)))));playerHp=Math.max(0,playerHp-retaliation);$('#bfLog').textContent=`Босс −${fmt(Math.round(dmg))}. Ответный удар −${fmt(retaliation)}.`}else $('#bfLog').textContent=skill==='heal'?'Здоровье восстановлено.':`Босс получает −${fmt(Math.round(dmg))}.`;const field=$('.bf-field');field.classList.remove('hit');void field.offsetWidth;field.classList.add('hit');$('#bfFloat').textContent='−'+fmt(Math.round(dmg));$('#bfFloat').classList.remove('show');void $('#bfFloat').offsetWidth;$('#bfFloat').classList.add('show');if(bossHp===0)result(true);else if(playerHp===0)result(false);else render()}
+$$('.bf-skill').forEach(b=>b.addEventListener('click',()=>{$$('.bf-skill').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')}));$('#bfHit')?.addEventListener('click',attack);$('#bfAuto')?.addEventListener('click',()=>{auto=!auto;$('#bfAuto').classList.toggle('on',auto)});$('#bfTimer')?.addEventListener('click',()=>{seconds=Math.max(30,seconds-10);render()});$('#bossBack')?.addEventListener('click',()=>window.TerritoryUI?.show('map'));$$('[data-bf-nav]').forEach(b=>b.addEventListener('click',()=>window.TerritoryUI?.show(b.dataset.bfNav==='map'?'map':b.dataset.bfNav)));window.addEventListener('territory:screen',e=>{if(e.detail==='bossBattle')setup()});setInterval(()=>{if(!$('#bossBattle')?.classList.contains('active'))return;seconds=Math.max(0,seconds-1);if(seconds===0){seconds=60;if(auto)attack()}render()},1000);setup();
 })();
