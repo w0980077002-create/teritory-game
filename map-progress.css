@@ -1,0 +1,5 @@
+
+.map-progress-live{display:none;position:fixed;z-index:999;top:68px;left:50%;transform:translateX(-50%);min-width:145px;padding:7px 12px;text-align:center;background:#08151de8;border:1px solid #8b6a3d;border-radius:9px;color:#fff;pointer-events:none}
+body[data-screen="map"] .map-progress-live{display:block}.map-progress-live b{display:block;color:#e8c36b;font-size:8px}.map-progress-live strong{display:block;font-size:19px}.map-progress-live small{font-size:7px;color:#bfc8ca}.map-progress-live.boss-unlocked{border-color:#e4b653}
+.map-boss-live{display:none;position:fixed;z-index:1000;left:18%;right:18%;bottom:105px;height:44px;border:1px solid #e5b957;border-radius:10px;background:linear-gradient(#d7aa50,#6d441b);color:#fff;font-weight:1000;font-size:12px}
+body[data-screen="map"] .map-boss-live{display:block}

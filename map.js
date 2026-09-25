@@ -116,3 +116,29 @@ window.TerritoryMap = {
   }
   setInterval(unlockBoss,500);
 })();
+
+(function(){
+  function ensureProgress(){
+    const s=window.TerritoryStore?.state;
+    const pct=Math.max(0,Math.min(100,Number(s?.mapProgress)||0));
+    let el=document.getElementById('mapProgressLive');
+    if(!el){
+      el=document.createElement('div'); el.id='mapProgressLive'; el.className='map-progress-live';
+      document.body.appendChild(el);
+    }
+    el.innerHTML=`<b>ПРОГРЕСС КАРТЫ</b><strong>${pct}%</strong><small>${pct>=100?'БОСС ОТКРЫТ':'Пройдено этапов'}</small>`;
+    el.classList.toggle('boss-unlocked',pct>=100);
+    if(pct>=100){
+      let boss=document.getElementById('mapBossLive');
+      if(!boss){
+        boss=document.createElement('button'); boss.id='mapBossLive'; boss.className='map-boss-live';
+        boss.innerHTML='👹 БОСС';
+        document.body.appendChild(boss);
+        boss.onclick=()=>window.TerritoryUI?.show('bossBattle');
+      }
+    }
+  }
+  setInterval(ensureProgress,400);
+  document.addEventListener('visibilitychange',ensureProgress);
+  ensureProgress();
+})();
