@@ -63,11 +63,14 @@
     return f?.owned&&cfg&&stats?{id,name:cfg.name,icon:cfg.icon,role:cfg.role,level:f.level,stats}:null;
   }
   function runnerTemplate(root){
-    const s=S(),p=S().profile||{},f=followerData(),chapter=Math.max(1,Number(s.pve?.chapter)||1);
+    syncChapter240();const s=S(),p=S().profile||{},f=followerData(),chapter=Math.max(1,Number(s.pve?.chapter)||1);
     root.innerHTML=`<div class="runner-ui"><div><b>БОЙ · ГЛАВА ${chapter}</b><span data-run-status>Вперёд!</span></div><button type="button" data-run-close>×</button></div><div class="runner-chapter-hud"><div><small>ПРОГРЕСС ГЛАВЫ</small><b data-run-progress>0%</b></div><div class="runner-progress-track"><i data-run-progress-fill></i></div><button type="button" data-run-boss aria-label="Запустить босса">💀</button></div><div class="runner-stage"><div class="runner-character player-runner"><img src="./player-viking-approved.png" alt="" draggable="false"><span>${esc(p.displayName||s.name||'Игрок')}</span></div>${f?`<div class="runner-follower"><i>${esc(f.icon)}</i><b>${esc(f.name)}</b></div>`:''}<div class="runner-enemy" data-run-enemy><img src="./opponent-viking-approved.png" alt="" draggable="false"><span data-run-enemy-name>Разбойник</span></div><div class="runner-damage-layer"></div><div class="runner-impact-layer"></div></div>`;
   }
+  function syncChapter240(){const s=S(),api=window.TerritoryChaptersAPI;if(!s||!api?.state)return;const c=api.state();s.pve=s.pve||{};s.pve.chapter=Number(c.currentChapter)||1;s.pve.progress=Number(c.chapterProgress)||0;s.pve.bossPending=Boolean(c.chapterBossUnlocked&&c.chapterProgress>=100);s.pve.stage=Number(c.chapterStage)||1;}
   function startRunner(forceBoss){
+    syncChapter240();
     stopRunner();
+    if(!forceBoss && Number(S().pve?.progress||0)>=100){window.showScreen?.('home');return;}
     const root=document.createElement('div');root.id='runnerScreen';root.className='runner-screen show';
     runnerTemplate(root);document.body.appendChild(root);
     runnerBattle={root,boss:Boolean(forceBoss||S().pve?.bossPending),running:true,enemyHp:0,enemyMaxHp:0,enemyIndex:0};
@@ -90,8 +93,8 @@
     const s=S(),d=window.TerritoryStore?.getDerivedStats?.()||{},f=followerData();
     s.coins+=20+Math.floor((d.strength||5)*1.5);s.exp+=8+Math.floor((d.strength||5)/2);
     if(f)window.Followers?.addXp?.(f.id,5);
-    s.pve.progress=Math.min(100,Number(s.pve.progress||0)+10);
-    if(s.pve.progress>=100&&!runnerBattle.boss){s.pve.bossPending=true;}
+    const api=window.TerritoryChaptersAPI;
+    if(api?.completeStage){api.completeStage();syncChapter240();}else{s.pve.progress=Math.min(100,Number(s.pve.progress||0)+25);s.pve.bossPending=s.pve.progress>=100;}
     window.TerritoryStore.saveNow?.('pve-bot-reward');window.TerritoryStore.render?.();setProgress(s.pve.progress);
   }
   function bossWin(){
@@ -115,7 +118,7 @@
       enemy?.classList.add('runner-enemy-dead');
       if(runnerBattle.boss){bossWin();setTimeout(tickRunner,1200);return;}
       awardBot();
-      if(S().pve.bossPending){runnerBattle.boss=true;S().pve.bossActive=true;window.TerritoryStore.saveNow?.('pve-boss-ready');}
+      if(S().pve.bossPending){runnerBattle.running=false;const st2=runnerBattle.root.querySelector('[data-run-status]');if(st2)st2.textContent='☠️ 100% · БОСС ОТКРЫТ НА КАРТЕ';window.TerritoryStore.saveNow?.('pve-bots-complete');setTimeout(()=>{if(runnerBattle){stopRunner();window.showScreen?.('home');}},900);return;}
       setTimeout(tickRunner,700);return;
     }
     const incoming=Math.max(1,(runnerBattle.boss?16+Number(S().pve.chapter||1)*2:7)-Math.floor((Number(d.defense)||0)/8));

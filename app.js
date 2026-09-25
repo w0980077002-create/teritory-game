@@ -1,15 +1,15 @@
 (function(){'use strict';
-const DEFAULT={profile:{displayName:'SSS',level:78,vip:6},coins:45000,gems:4500,energy:125,maxEnergy:200,hp:6850,maxHp:6850,xp:81431,xpNext:119500,dice:10,stage:7,equipment:0,activeFollower:null,auto:false};
+const DEFAULT={profile:{displayName:'SSS',level:78,vip:6},coins:45000,gems:4500,energy:125,maxEnergy:200,hp:6850,maxHp:6850,xp:81431,xpNext:119500,dice:10,stage:7,equipment:0,activeFollower:null,auto:false,pve:{chapter:1,stage:1,progress:0,bossPending:false,bossActive:false,bossDefeated:0}};
 window.TerritoryStore=window.TerritoryStore||{};
 const Store=window.TerritoryStore;
-Store.state=Object.assign({},DEFAULT);
-try{const saved=JSON.parse(localStorage.getItem('territory_store_v1')||'null');if(saved) Store.state=Object.assign({},DEFAULT,saved,{profile:Object.assign({},DEFAULT.profile,saved.profile||{})});}catch(e){}
+Store.state=Object.assign({},DEFAULT); Store.state.pve=Object.assign({},DEFAULT.pve);
+try{const saved=JSON.parse(localStorage.getItem('territory_store_v1')||'null');if(saved) Store.state=Object.assign({},DEFAULT,saved,{profile:Object.assign({},DEFAULT.profile,saved.profile||{}),pve:Object.assign({},DEFAULT.pve,saved.pve||{})});}catch(e){}
 Store.saveNow=function(){try{localStorage.setItem('territory_store_v1',JSON.stringify(Store.state));}catch(e){}};
 Store.getDerivedStats=function(){return {maxHp:Store.state.maxHp,strength:125,defense:98};};
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function show(id){$$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));document.body.dataset.screen=id;window.dispatchEvent(new CustomEvent('territory:screen',{detail:id}));if(id==='roadmap')roadmap();if(id==='inventory')inventory();if(id==='shop')shop();if(id==='games')games();}
 function home(){show('home')}
-window.TerritoryUI={show:show,home:home};
+window.TerritoryUI={show:show,home:home}; window.showScreen=show;
 function modal(title,body){$('#modalBody').innerHTML='<h2>'+title+'</h2>'+body;$('#modal').classList.add('show')}
 $('#modalClose').onclick=()=>$('#modal').classList.remove('show');
 function setHomeZones(){const z=$('#homeZones');const add=(cls,x,y,w,h,fn)=>{const b=document.createElement('button');b.className='zone '+cls;b.style.cssText=`left:${x}%;top:${y}%;width:${w}%;height:${h}%;`;b.onclick=fn;z.appendChild(b)};
@@ -30,4 +30,7 @@ $('#roll').onclick=()=>{if(!Store.state.dice){modal('Кубики','<p>Куби�
 $('#followersBtn').onclick=()=>modal('Последователи','<div class="followers">'+['Лиабро — Крит','Тералель — Защита','Король-коров — Лечение','Морт — Уклонение','Каменное Лицо — Контроль'].map((x,i)=>`<button class="frow" data-f="${i}"><b>${x.split(' — ')[0]}</b><span>${x.split(' — ')[1]}</span></button>`).join('')+'</div>');
 $$('[data-home]').forEach(b=>b.onclick=home);$$('[data-roadmap]').forEach(b=>b.onclick=()=>show('roadmap'));
 setHomeZones();arenaZones();inventory();shop();games();
+function loadRuntime(src){return new Promise((resolve,reject)=>{if(document.querySelector('script[src=\"'+src+'\"]'))return resolve();const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.body.appendChild(s);});}
+function bootFinalRuntime(){const css=document.createElement('link');css.rel='stylesheet';css.href='home-rebuild.css?v=10040';document.head.appendChild(css);loadRuntime('home-rebuild.js?v=10040').then(()=>loadRuntime('navigation-final.js?v=10040')).catch(()=>{});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootFinalRuntime,{once:true});else bootFinalRuntime();
 })();
