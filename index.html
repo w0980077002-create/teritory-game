@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="map-progress.css">
 <link rel="stylesheet" href="boss-battle-10034.css">
 <link rel="stylesheet" href="next-chapter-10035.css">
+<link rel="stylesheet" href="fjords-map-10036.css">
 <link rel="stylesheet" href="boss.css">
 </head>
 <body>
@@ -198,53 +199,51 @@
 </section>
 
   <section id="arena" class="screen"><img class="master-art" src="arena-master.jpg" alt=""><div id="arenaZones" class="zones"></div></section>
-  <section id="map" class="screen map-screen">
-    <div id="mapScene" class="map-scene" aria-label="Карта и движение">
-      <div class="map-layer map-sky"></div>
-      <div class="map-layer map-mountains map-mountains-back"></div>
-      <div class="map-layer map-mountains map-mountains-front"></div>
-      <div class="map-layer map-ground"></div>
-      <div class="map-layer map-road"></div>
-      <div class="map-particles"></div>
+  <section id="map" class="screen fjords-screen">
+  <div class="fjords-map">
+    <div class="fjords-bg"></div>
+    <header class="fjords-top">
+      <button id="fjordsBack">‹</button>
+      <div><b>ГЛАВА 16 · ЗАТЕРЯННЫЕ ФЬОРДЫ</b><small>Северный путь</small></div>
+      <strong id="fjordsPct">0%</strong>
+    </header>
 
-      <header class="map-hud">
-        <button class="map-back" id="mapBack">‹</button>
-        <div class="map-title"><small>ГЛАВА 2</small><b id="mapStageTitle">СЕВЕРНЫЕ ЗЕМЛИ · 2-7</b></div>
-        <div class="map-progress"><i id="mapProgressFill"></i></div>
-      </header>
-
-      <div class="map-stage-card" id="mapStageCard">
-        <small>СЛЕДУЮЩИЙ ЭТАП</small>
-        <b id="mapStageName">Заснеженный перевал</b>
-        <span>Дойти до точки встречи</span>
-      </div>
-
-      <div class="traveller follower" id="mapFollower"><span>✦</span></div>
-      <div class="traveller hero-runner" id="mapHero"><div class="nameplate">SSS · Lv. 78</div><div class="hero-sprite">⚔️</div></div>
-      <div class="encounter-bot" id="mapBot"><div class="nameplate">Ragnar · Lv. 72</div><div class="bot-sprite">🪓</div></div>
-
-      <div class="encounter-banner" id="mapEncounterBanner">
-        <b>ВСТРЕЧА!</b>
-        <span>Противник преградил путь</span>
-      </div>
-
-      <div class="map-controls" id="mapControls">
-        <button id="mapStart" class="map-primary">▶ ПРОДОЛЖИТЬ</button>
-        <button id="mapStop" class="map-secondary" hidden>Ⅱ ОСТАНОВИТЬ</button>
-        <button id="mapFight" class="map-fight" hidden>⚔ В БОЙ</button>
-      </div>
-
-      <nav class="map-bottom-nav" aria-label="Основная навигация">
-        <button data-map-nav="home">🏰<span>Город</span></button>
-        <button data-map-nav="inventory">🎒<span>Инвентарь</span></button>
-        <button data-map-nav="hero">🪖<span>Герой</span></button>
-        <button class="active" data-map-nav="map">🗺️<span>Карта</span></button>
-        <button data-map-nav="quests">📜<span>Квесты</span></button>
-        <button data-map-nav="games">🎲<span>Игры</span></button>
-        <button data-map-nav="clan">🚩<span>Клан</span></button>
-      </nav>
+    <div class="fjords-route">
+      <div class="route-node active" data-stage="1"><b>1</b><small>Берег</small></div><i></i>
+      <div class="route-node" data-stage="2"><b>2</b><small>Причал</small></div><i></i>
+      <div class="route-node" data-stage="3"><b>3</b><small>Фьорд</small></div><i></i>
+      <div class="route-node" data-stage="4"><b>4</b><small>Лагерь</small></div><i></i>
+      <div class="route-node boss" data-stage="5"><b>👹</b><small>Босс</small></div>
     </div>
-  </section>
+
+    <div class="fjords-hero" id="fjordsHero">⚔️</div>
+    <div class="fjords-companion">🛡️</div>
+    <div class="fjords-enemy" id="fjordsEnemy">👹</div>
+
+    <div class="fjords-stage-card">
+      <small id="fjordsStageLabel">ЭТАП 1</small>
+      <b id="fjordsStageName">Берег Затерянных Фьордов</b>
+      <span id="fjordsStageText">Путь открыт. Впереди первый противник.</span>
+      <button id="fjordsStart">НАЧАТЬ ДВИЖЕНИЕ</button>
+    </div>
+
+    <div id="fjordsEncounter" class="fjords-encounter hidden">
+      <b>ВРАГ НА ПУТИ</b>
+      <span>Победитель Камней</span>
+      <button id="fjordsFight">В БОЙ</button>
+    </div>
+
+    <nav class="fjords-nav">
+      <button data-fj-nav="home">🏰<span>Город</span></button>
+      <button data-fj-nav="inventory">🎒<span>Инвентарь</span></button>
+      <button data-fj-nav="hero">🪖<span>Герой</span></button>
+      <button class="active" data-fj-nav="map">🗺️<span>Карта</span></button>
+      <button data-fj-nav="quests">📜<span>Квесты</span></button>
+      <button data-fj-nav="games">🎲<span>Игры</span></button>
+      <button data-fj-nav="clan">🚩<span>Клан</span></button>
+    </nav>
+  </div>
+</section>
   <section id="roadmap" class="screen panel"><header><button data-home>‹</button><div><small>ПРОХОЖДЕНИЕ</small><h1>ДОРОЖНАЯ КАРТА</h1></div></header><div class="roadmap"><div class="chapter">ГЛАВА 2<small>Северные земли</small></div><div id="roadNodes" class="roadNodes"></div><div class="stageBox"><b id="stageTitle">2-7</b><span>Пройти Северные земли</span></div></div></section>
   <section id="inventory" class="screen panel"><header><button data-home>‹</button><div><small>ГЕРОЙ</small><h1>ИНВЕНТАРЬ</h1></div></header><div class="tabs" id="invTabs"><button class="active">Оружие</button><button>Броня</button><button>Аксессуары</button><button>Предметы</button></div><div id="inventoryGrid" class="grid"></div></section>
   <section id="hero" class="screen panel"><header><button data-home>‹</button><div><small>ПЕРСОНАЖ</small><h1>ГЕРОЙ</h1></div></header><div class="heroVisual"><div class="heroEmoji">⚔️</div><b>SSS</b><span>Lv. 78 · VIP 6</span></div><div class="statGrid"><div>СИЛА <b>125</b></div><div>ЗАЩИТА <b>98</b></div><div>ЛОВКОСТЬ <b>101</b></div><div>ЗДОРОВЬЕ <b>6 850</b></div></div><button class="gold wide" id="followersBtn">ПОСЛЕДОВАТЕЛИ</button></section>
@@ -261,5 +260,6 @@
 <script src="boss.js"></script>
 <script src="boss-battle-10034.js"></script>
 <script src="next-chapter-10035.js"></script>
+<script src="fjords-map-10036.js"></script>
 </body>
 </html>
