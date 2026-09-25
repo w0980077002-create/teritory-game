@@ -4,22 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#07111b">
-<title>Teritory Game — Master Clean</title>
+<meta name="telegram-bot" content="@TeritoryGameBot">
+<title>Teritory Game</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="app">
-  <section id="home" class="screen active"><div class="master home-master"><img src="home-master.png" alt="HOME master"></div><div class="zones home-zones"></div></section>
-  <section id="arena" class="screen"><div class="master arena-master"><img src="arena-master.jpg" alt="Arena master"></div><div class="zones arena-zones"></div></section>
-  <section id="roadmap" class="screen panel"><header><button data-home>‹</button><div><small>ПРОХОЖДЕНИЕ</small><h1>ДОРОЖНАЯ КАРТА</h1></div></header><div class="roadmap-art"><div class="chapter">ГЛАВА 2<small>Северные земли 2-7</small></div><div class="nodes" id="nodes"></div><div class="stage-info"><b id="stageTitle">2-7</b><span id="stageText">Пройти Северные земли</span></div></div></section>
-  <section id="inventory" class="screen panel"><header><button data-home>‹</button><div><small>ГЕРОЙ</small><h1>ИНВЕНТАРЬ</h1></div></header><div class="section-tabs"><button class="active">Оружие</button><button>Броня</button><button>Аксессуары</button><button>Предметы</button></div><div id="inventoryGrid" class="grid"></div></section>
-  <section id="hero" class="screen panel"><header><button data-home>‹</button><div><small>ПЕРСОНАЖ</small><h1>ГЕРОЙ</h1></div></header><div class="hero-card"><div class="hero-avatar">⚔️</div><b>SSS</b><span>Lv. 78 · VIP 6</span></div><div class="stats"><div>СИЛА <b>125</b></div><div>ЗАЩИТА <b>98</b></div><div>ЛОВКОСТЬ <b>101</b></div><div>ЗДОРОВЬЕ <b>6 850</b></div></div><button class="gold wide" id="followersBtn">ПОСЛЕДОВАТЕЛИ</button></section>
-  <section id="shop" class="screen panel"><header><button data-home>‹</button><div><small>ТОРГОВЛЯ</small><h1>ЛАВКА</h1></div></header><div class="section-tabs"><button class="active">Эликсиры</button><button>Оружие</button><button>Броня</button><button>Боевые</button></div><div id="shopGrid" class="grid"></div></section>
-  <section id="quests" class="screen panel"><header><button data-home>‹</button><div><small>ЗАДАНИЯ</small><h1>КВЕСТЫ</h1></div></header><div class="quest" id="questMain"><b>2-7 Пройти Северные земли</b><span>0 / 1</span><div class="progress"><i style="width:0%"></i></div><button class="gold" data-roadmap>ОТКРЫТЬ ГЛАВУ</button></div><div class="quest"><b>Ежедневная тренировка</b><span>0 / 3</span><div class="progress"><i style="width:0%"></i></div></div></section>
-  <section id="games" class="screen panel"><header><button data-home>‹</button><div><small>РАЗВЛЕЧЕНИЯ</small><h1>ИГРОВОЙ ЗАЛ</h1></div></header><div class="monopoly"><h2>МОНОПОЛИЯ</h2><div id="board" class="board"></div><div class="dice-line"><span>Кубики: <b id="diceCount">10</b></span><button class="gold" id="roll">БРОСИТЬ</button></div><p id="rollLog">Готов к броску.</p></div></section>
+  <section id="home" class="screen active"><img class="master-art" src="home-master.png" alt=""><div id="homeZones" class="zones"></div></section>
+  <section id="arena" class="screen"><img class="master-art" src="arena-master.jpg" alt=""><div id="arenaZones" class="zones"></div></section>
+  <section id="roadmap" class="screen panel"><header><button data-home>‹</button><div><small>ПРОХОЖДЕНИЕ</small><h1>ДОРОЖНАЯ КАРТА</h1></div></header><div class="roadmap"><div class="chapter">ГЛАВА 2<small>Северные земли</small></div><div id="roadNodes" class="roadNodes"></div><div class="stageBox"><b id="stageTitle">2-7</b><span>Пройти Северные земли</span></div></div></section>
+  <section id="inventory" class="screen panel"><header><button data-home>‹</button><div><small>ГЕРОЙ</small><h1>ИНВЕНТАРЬ</h1></div></header><div class="tabs" id="invTabs"><button class="active">Оружие</button><button>Броня</button><button>Аксессуары</button><button>Предметы</button></div><div id="inventoryGrid" class="grid"></div></section>
+  <section id="hero" class="screen panel"><header><button data-home>‹</button><div><small>ПЕРСОНАЖ</small><h1>ГЕРОЙ</h1></div></header><div class="heroVisual"><div class="heroEmoji">⚔️</div><b>SSS</b><span>Lv. 78 · VIP 6</span></div><div class="statGrid"><div>СИЛА <b>125</b></div><div>ЗАЩИТА <b>98</b></div><div>ЛОВКОСТЬ <b>101</b></div><div>ЗДОРОВЬЕ <b>6 850</b></div></div><button class="gold wide" id="followersBtn">ПОСЛЕДОВАТЕЛИ</button></section>
+  <section id="shop" class="screen panel"><header><button data-home>‹</button><div><small>ТОРГОВЛЯ</small><h1>ЛАВКА</h1></div><b class="wallet">🪙 <span data-coins>45 000</span></b></header><div class="tabs" id="shopTabs"><button class="active">Эликсиры</button><button>Оружие</button><button>Броня</button><button>Боевые</button></div><div id="shopGrid" class="grid"></div></section>
+  <section id="quests" class="screen panel"><header><button data-home>‹</button><div><small>ЗАДАНИЯ</small><h1>КВЕСТЫ</h1></div></header><div class="quest"><b>2-7 Пройти Северные земли</b><span>0 / 1</span><div class="progress"><i style="width:0%"></i></div><button class="gold" data-roadmap>ОТКРЫТЬ ГЛАВУ</button></div><div class="quest"><b>Ежедневная тренировка</b><span>0 / 3</span><div class="progress"><i style="width:0%"></i></div></div></section>
+  <section id="games" class="screen panel"><header><button data-home>‹</button><div><small>РАЗВЛЕЧЕНИЯ</small><h1>ИГРОВОЙ ЗАЛ</h1></div></header><div class="monopoly"><h2>МОНОПОЛИЯ</h2><div id="board" class="board"></div><div class="diceLine"><span>Кубики: <b data-dice>10</b></span><button class="gold" id="roll">БРОСИТЬ</button></div><p id="rollLog">Готов к броску.</p></div></section>
   <section id="clan" class="screen panel"><header><button data-home>‹</button><div><small>СООБЩЕСТВО</small><h1>КЛАН</h1></div></header><div class="dev"><div>⚔️</div><b>В РАЗРАБОТКЕ</b><span>Клановая система будет добавлена позже.</span></div></section>
 </div>
-<div id="modal" class="modal"><div class="modal-card"><button class="close" id="modalClose">×</button><div id="modalBody"></div></div></div>
+<div id="modal" class="modal"><div class="modalCard"><button id="modalClose" class="close">×</button><div id="modalBody"></div></div></div>
+<script src="https://telegram.org/js/telegram-web-app.js?63"></script>
 <script src="app.js"></script>
 </body>
 </html>
