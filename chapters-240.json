@@ -1,0 +1,4082 @@
+[
+  {
+    "id": 1,
+    "name": "Северный Причал",
+    "stages": 4,
+    "enemy": {
+      "hp": 90000,
+      "damage": 9000,
+      "level": 78
+    },
+    "boss": {
+      "hp": 500000,
+      "damage": 18000,
+      "level": 81
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 2,
+    "name": "Золотой Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 94050,
+      "damage": 9342,
+      "level": 79
+    },
+    "boss": {
+      "hp": 527500,
+      "damage": 18756,
+      "level": 82
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 3,
+    "name": "Туманные Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 98282,
+      "damage": 9697,
+      "level": 80
+    },
+    "boss": {
+      "hp": 556512,
+      "damage": 19544,
+      "level": 83
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 4,
+    "name": "Волчий Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 102705,
+      "damage": 10065,
+      "level": 81
+    },
+    "boss": {
+      "hp": 587121,
+      "damage": 20365,
+      "level": 84
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 5,
+    "name": "Ледяная Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 107327,
+      "damage": 10448,
+      "level": 82
+    },
+    "boss": {
+      "hp": 619412,
+      "damage": 21220,
+      "level": 85
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 6,
+    "name": "Черные Водопады",
+    "stages": 4,
+    "enemy": {
+      "hp": 112156,
+      "damage": 10845,
+      "level": 83
+    },
+    "boss": {
+      "hp": 653480,
+      "damage": 22111,
+      "level": 86
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 7,
+    "name": "Долина Воронов",
+    "stages": 4,
+    "enemy": {
+      "hp": 117203,
+      "damage": 11257,
+      "level": 84
+    },
+    "boss": {
+      "hp": 689421,
+      "damage": 23040,
+      "level": 87
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 8,
+    "name": "Каменный Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 122478,
+      "damage": 11685,
+      "level": 85
+    },
+    "boss": {
+      "hp": 727340,
+      "damage": 24007,
+      "level": 88
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 9,
+    "name": "Забытый Причал",
+    "stages": 4,
+    "enemy": {
+      "hp": 127989,
+      "damage": 12129,
+      "level": 86
+    },
+    "boss": {
+      "hp": 767343,
+      "damage": 25016,
+      "level": 89
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 10,
+    "name": "Холодные Пики",
+    "stages": 4,
+    "enemy": {
+      "hp": 133749,
+      "damage": 12590,
+      "level": 87
+    },
+    "boss": {
+      "hp": 809547,
+      "damage": 26066,
+      "level": 90
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 11,
+    "name": "Красный Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 139767,
+      "damage": 13068,
+      "level": 88
+    },
+    "boss": {
+      "hp": 854072,
+      "damage": 27161,
+      "level": 91
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 12,
+    "name": "Остров Дракона",
+    "stages": 4,
+    "enemy": {
+      "hp": 146057,
+      "damage": 13565,
+      "level": 89
+    },
+    "boss": {
+      "hp": 901046,
+      "damage": 28302,
+      "level": 92
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 13,
+    "name": "Серебряный Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 152629,
+      "damage": 14080,
+      "level": 90
+    },
+    "boss": {
+      "hp": 950604,
+      "damage": 29491,
+      "level": 93
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 14,
+    "name": "Штормовой Перевал",
+    "stages": 4,
+    "enemy": {
+      "hp": 159498,
+      "damage": 14615,
+      "level": 91
+    },
+    "boss": {
+      "hp": 1002887,
+      "damage": 30729,
+      "level": 94
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 15,
+    "name": "Морская Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 166675,
+      "damage": 15171,
+      "level": 92
+    },
+    "boss": {
+      "hp": 1058046,
+      "damage": 32020,
+      "level": 95
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 16,
+    "name": "Затерянные Фьорды",
+    "stages": 4,
+    "enemy": {
+      "hp": 174175,
+      "damage": 15747,
+      "level": 93
+    },
+    "boss": {
+      "hp": 1116238,
+      "damage": 33365,
+      "level": 96
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 17,
+    "name": "Ледяной Трон",
+    "stages": 4,
+    "enemy": {
+      "hp": 182013,
+      "damage": 16346,
+      "level": 94
+    },
+    "boss": {
+      "hp": 1177631,
+      "damage": 34766,
+      "level": 97
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 18,
+    "name": "Волчья Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 190204,
+      "damage": 16967,
+      "level": 95
+    },
+    "boss": {
+      "hp": 1242401,
+      "damage": 36226,
+      "level": 98
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 19,
+    "name": "Северный Замок",
+    "stages": 4,
+    "enemy": {
+      "hp": 198763,
+      "damage": 17611,
+      "level": 96
+    },
+    "boss": {
+      "hp": 1310733,
+      "damage": 37748,
+      "level": 99
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 20,
+    "name": "Кровавый Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 207707,
+      "damage": 18281,
+      "level": 97
+    },
+    "boss": {
+      "hp": 1382823,
+      "damage": 39333,
+      "level": 100
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 21,
+    "name": "Громовой Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 217054,
+      "damage": 18975,
+      "level": 98
+    },
+    "boss": {
+      "hp": 1458879,
+      "damage": 40985,
+      "level": 101
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 22,
+    "name": "Тень Викинга",
+    "stages": 4,
+    "enemy": {
+      "hp": 226822,
+      "damage": 19696,
+      "level": 99
+    },
+    "boss": {
+      "hp": 1539117,
+      "damage": 42707,
+      "level": 102
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 23,
+    "name": "Древняя Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 237029,
+      "damage": 20445,
+      "level": 100
+    },
+    "boss": {
+      "hp": 1623769,
+      "damage": 44500,
+      "level": 103
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 24,
+    "name": "Пепельные Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 247695,
+      "damage": 21222,
+      "level": 101
+    },
+    "boss": {
+      "hp": 1713076,
+      "damage": 46369,
+      "level": 104
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 25,
+    "name": "Ледяные Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 258841,
+      "damage": 22028,
+      "level": 102
+    },
+    "boss": {
+      "hp": 1807295,
+      "damage": 48317,
+      "level": 105
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 26,
+    "name": "Остров Туманов",
+    "stages": 4,
+    "enemy": {
+      "hp": 270489,
+      "damage": 22865,
+      "level": 103
+    },
+    "boss": {
+      "hp": 1906696,
+      "damage": 50346,
+      "level": 106
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 27,
+    "name": "Черный Причал",
+    "stages": 4,
+    "enemy": {
+      "hp": 282661,
+      "damage": 23734,
+      "level": 104
+    },
+    "boss": {
+      "hp": 2011564,
+      "damage": 52461,
+      "level": 107
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 28,
+    "name": "Золотые Пики",
+    "stages": 4,
+    "enemy": {
+      "hp": 295381,
+      "damage": 24636,
+      "level": 105
+    },
+    "boss": {
+      "hp": 2122201,
+      "damage": 54664,
+      "level": 108
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 29,
+    "name": "Рунный Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 308673,
+      "damage": 25572,
+      "level": 106
+    },
+    "boss": {
+      "hp": 2238922,
+      "damage": 56960,
+      "level": 109
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 30,
+    "name": "Врата Севера",
+    "stages": 4,
+    "enemy": {
+      "hp": 322563,
+      "damage": 26544,
+      "level": 107
+    },
+    "boss": {
+      "hp": 2362062,
+      "damage": 59352,
+      "level": 110
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 31,
+    "name": "Морозная Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 337079,
+      "damage": 27553,
+      "level": 108
+    },
+    "boss": {
+      "hp": 2491976,
+      "damage": 61845,
+      "level": 111
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 32,
+    "name": "Старый Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 352247,
+      "damage": 28600,
+      "level": 109
+    },
+    "boss": {
+      "hp": 2629034,
+      "damage": 64442,
+      "level": 112
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 33,
+    "name": "Око Шторма",
+    "stages": 4,
+    "enemy": {
+      "hp": 368098,
+      "damage": 29686,
+      "level": 110
+    },
+    "boss": {
+      "hp": 2773631,
+      "damage": 67149,
+      "level": 113
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 34,
+    "name": "Скалистый Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 384663,
+      "damage": 30815,
+      "level": 111
+    },
+    "boss": {
+      "hp": 2926181,
+      "damage": 69969,
+      "level": 114
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 35,
+    "name": "Королевская Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 401973,
+      "damage": 31985,
+      "level": 112
+    },
+    "boss": {
+      "hp": 3087121,
+      "damage": 72908,
+      "level": 115
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 36,
+    "name": "Зимний Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 420061,
+      "damage": 33201,
+      "level": 113
+    },
+    "boss": {
+      "hp": 3256913,
+      "damage": 75970,
+      "level": 116
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 37,
+    "name": "Глубокий Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 438964,
+      "damage": 34463,
+      "level": 114
+    },
+    "boss": {
+      "hp": 3436043,
+      "damage": 79161,
+      "level": 117
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 38,
+    "name": "Вороньи Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 458717,
+      "damage": 35772,
+      "level": 115
+    },
+    "boss": {
+      "hp": 3625025,
+      "damage": 82486,
+      "level": 118
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 39,
+    "name": "Северный Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 479360,
+      "damage": 37131,
+      "level": 116
+    },
+    "boss": {
+      "hp": 3824401,
+      "damage": 85950,
+      "level": 119
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 40,
+    "name": "Ледяная Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 500931,
+      "damage": 38542,
+      "level": 117
+    },
+    "boss": {
+      "hp": 4034743,
+      "damage": 89560,
+      "level": 120
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 41,
+    "name": "Штормовые Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 523473,
+      "damage": 40007,
+      "level": 118
+    },
+    "boss": {
+      "hp": 4256654,
+      "damage": 93321,
+      "level": 121
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 42,
+    "name": "Драконий Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 547029,
+      "damage": 41527,
+      "level": 119
+    },
+    "boss": {
+      "hp": 4490770,
+      "damage": 97241,
+      "level": 122
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 43,
+    "name": "Каменный Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 571645,
+      "damage": 43105,
+      "level": 120
+    },
+    "boss": {
+      "hp": 4737763,
+      "damage": 101325,
+      "level": 123
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 44,
+    "name": "Белый Замок",
+    "stages": 4,
+    "enemy": {
+      "hp": 597369,
+      "damage": 44743,
+      "level": 121
+    },
+    "boss": {
+      "hp": 4998340,
+      "damage": 105581,
+      "level": 124
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 45,
+    "name": "Туманный Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 624251,
+      "damage": 46444,
+      "level": 122
+    },
+    "boss": {
+      "hp": 5273248,
+      "damage": 110015,
+      "level": 125
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 46,
+    "name": "Пещеры Севера",
+    "stages": 4,
+    "enemy": {
+      "hp": 652342,
+      "damage": 48208,
+      "level": 123
+    },
+    "boss": {
+      "hp": 5563277,
+      "damage": 114636,
+      "level": 126
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 47,
+    "name": "Огненный Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 681698,
+      "damage": 50040,
+      "level": 124
+    },
+    "boss": {
+      "hp": 5869257,
+      "damage": 119450,
+      "level": 127
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 48,
+    "name": "Зал Викингов",
+    "stages": 4,
+    "enemy": {
+      "hp": 712374,
+      "damage": 51942,
+      "level": 125
+    },
+    "boss": {
+      "hp": 6192066,
+      "damage": 124467,
+      "level": 128
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 49,
+    "name": "Черная Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 744431,
+      "damage": 53916,
+      "level": 126
+    },
+    "boss": {
+      "hp": 6532630,
+      "damage": 129695,
+      "level": 129
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 50,
+    "name": "Серый Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 777930,
+      "damage": 55965,
+      "level": 127
+    },
+    "boss": {
+      "hp": 6891925,
+      "damage": 135142,
+      "level": 130
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 51,
+    "name": "Ледяной Архипелаг",
+    "stages": 4,
+    "enemy": {
+      "hp": 812937,
+      "damage": 58091,
+      "level": 128
+    },
+    "boss": {
+      "hp": 7270981,
+      "damage": 140818,
+      "level": 131
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 52,
+    "name": "Мыс Воронов",
+    "stages": 4,
+    "enemy": {
+      "hp": 849519,
+      "damage": 60299,
+      "level": 129
+    },
+    "boss": {
+      "hp": 7670885,
+      "damage": 146732,
+      "level": 132
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 53,
+    "name": "Золотая Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 887748,
+      "damage": 62590,
+      "level": 130
+    },
+    "boss": {
+      "hp": 8092783,
+      "damage": 152895,
+      "level": 133
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 54,
+    "name": "Северная Стена",
+    "stages": 4,
+    "enemy": {
+      "hp": 927696,
+      "damage": 64968,
+      "level": 131
+    },
+    "boss": {
+      "hp": 8537886,
+      "damage": 159317,
+      "level": 134
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 55,
+    "name": "Долина Драконов",
+    "stages": 4,
+    "enemy": {
+      "hp": 969443,
+      "damage": 67437,
+      "level": 132
+    },
+    "boss": {
+      "hp": 9007470,
+      "damage": 166008,
+      "level": 135
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 56,
+    "name": "Бурный Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 1013068,
+      "damage": 70000,
+      "level": 133
+    },
+    "boss": {
+      "hp": 9502881,
+      "damage": 172980,
+      "level": 136
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 57,
+    "name": "Остров Саги",
+    "stages": 4,
+    "enemy": {
+      "hp": 1058656,
+      "damage": 72660,
+      "level": 134
+    },
+    "boss": {
+      "hp": 10025539,
+      "damage": 180246,
+      "level": 137
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 58,
+    "name": "Кровавые Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 1106295,
+      "damage": 75421,
+      "level": 135
+    },
+    "boss": {
+      "hp": 10576944,
+      "damage": 187816,
+      "level": 138
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 59,
+    "name": "Зимняя Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 1156079,
+      "damage": 78287,
+      "level": 136
+    },
+    "boss": {
+      "hp": 11158676,
+      "damage": 195704,
+      "level": 139
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 60,
+    "name": "Скалы Великанов",
+    "stages": 4,
+    "enemy": {
+      "hp": 1208102,
+      "damage": 81262,
+      "level": 137
+    },
+    "boss": {
+      "hp": 11772403,
+      "damage": 203924,
+      "level": 140
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 61,
+    "name": "Трон Воронов",
+    "stages": 4,
+    "enemy": {
+      "hp": 1262467,
+      "damage": 84350,
+      "level": 138
+    },
+    "boss": {
+      "hp": 12419885,
+      "damage": 212489,
+      "level": 141
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 62,
+    "name": "Фьорд Грома",
+    "stages": 4,
+    "enemy": {
+      "hp": 1319278,
+      "damage": 87555,
+      "level": 139
+    },
+    "boss": {
+      "hp": 13102979,
+      "damage": 221413,
+      "level": 142
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 63,
+    "name": "Долина Троллей",
+    "stages": 4,
+    "enemy": {
+      "hp": 1378645,
+      "damage": 90882,
+      "level": 140
+    },
+    "boss": {
+      "hp": 13823643,
+      "damage": 230712,
+      "level": 143
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 64,
+    "name": "Северный Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 1440684,
+      "damage": 94336,
+      "level": 141
+    },
+    "boss": {
+      "hp": 14583943,
+      "damage": 240402,
+      "level": 144
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 65,
+    "name": "Ледяная Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 1505515,
+      "damage": 97920,
+      "level": 142
+    },
+    "boss": {
+      "hp": 15386060,
+      "damage": 250499,
+      "level": 145
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 66,
+    "name": "Штормовой Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 1573263,
+      "damage": 101641,
+      "level": 143
+    },
+    "boss": {
+      "hp": 16232293,
+      "damage": 261020,
+      "level": 146
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 67,
+    "name": "Пепельная Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 1644060,
+      "damage": 105504,
+      "level": 144
+    },
+    "boss": {
+      "hp": 17125069,
+      "damage": 271983,
+      "level": 147
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 68,
+    "name": "Черный Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 1718043,
+      "damage": 109513,
+      "level": 145
+    },
+    "boss": {
+      "hp": 18066948,
+      "damage": 283406,
+      "level": 148
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 69,
+    "name": "Драконий Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 1795355,
+      "damage": 113674,
+      "level": 146
+    },
+    "boss": {
+      "hp": 19060630,
+      "damage": 295309,
+      "level": 149
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 70,
+    "name": "Золотой Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 1876146,
+      "damage": 117994,
+      "level": 147
+    },
+    "boss": {
+      "hp": 20108965,
+      "damage": 307712,
+      "level": 150
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 71,
+    "name": "Волчьи Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 1960572,
+      "damage": 122478,
+      "level": 148
+    },
+    "boss": {
+      "hp": 21214958,
+      "damage": 320636,
+      "level": 151
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 72,
+    "name": "Серебряные Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 2048798,
+      "damage": 127132,
+      "level": 149
+    },
+    "boss": {
+      "hp": 22381781,
+      "damage": 334103,
+      "level": 152
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 73,
+    "name": "Морозный Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 2140994,
+      "damage": 131963,
+      "level": 150
+    },
+    "boss": {
+      "hp": 23612779,
+      "damage": 348135,
+      "level": 153
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 74,
+    "name": "Долина Рун",
+    "stages": 4,
+    "enemy": {
+      "hp": 2237339,
+      "damage": 136978,
+      "level": 151
+    },
+    "boss": {
+      "hp": 24911482,
+      "damage": 362757,
+      "level": 154
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 75,
+    "name": "Крепость Шторма",
+    "stages": 4,
+    "enemy": {
+      "hp": 2338019,
+      "damage": 142183,
+      "level": 152
+    },
+    "boss": {
+      "hp": 26281613,
+      "damage": 377993,
+      "level": 155
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 76,
+    "name": "Туманный Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 2443230,
+      "damage": 147586,
+      "level": 153
+    },
+    "boss": {
+      "hp": 27727102,
+      "damage": 393869,
+      "level": 156
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 77,
+    "name": "Кровавый Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 2553175,
+      "damage": 153194,
+      "level": 154
+    },
+    "boss": {
+      "hp": 29252092,
+      "damage": 410411,
+      "level": 157
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 78,
+    "name": "Северная Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 2668068,
+      "damage": 159015,
+      "level": 155
+    },
+    "boss": {
+      "hp": 30860957,
+      "damage": 427648,
+      "level": 158
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 79,
+    "name": "Каменный Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 2788131,
+      "damage": 165058,
+      "level": 156
+    },
+    "boss": {
+      "hp": 32558310,
+      "damage": 445610,
+      "level": 159
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 80,
+    "name": "Огненные Пики",
+    "stages": 4,
+    "enemy": {
+      "hp": 2913597,
+      "damage": 171330,
+      "level": 157
+    },
+    "boss": {
+      "hp": 34349017,
+      "damage": 464325,
+      "level": 160
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 81,
+    "name": "Ледяной Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 3044709,
+      "damage": 177841,
+      "level": 158
+    },
+    "boss": {
+      "hp": 36238213,
+      "damage": 483827,
+      "level": 161
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 82,
+    "name": "Воронья Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 3181721,
+      "damage": 184598,
+      "level": 159
+    },
+    "boss": {
+      "hp": 38231315,
+      "damage": 504148,
+      "level": 162
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 83,
+    "name": "Громовые Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 3324898,
+      "damage": 191613,
+      "level": 160
+    },
+    "boss": {
+      "hp": 40334037,
+      "damage": 525322,
+      "level": 163
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 84,
+    "name": "Старый Замок",
+    "stages": 4,
+    "enemy": {
+      "hp": 3474518,
+      "damage": 198895,
+      "level": 161
+    },
+    "boss": {
+      "hp": 42552409,
+      "damage": 547385,
+      "level": 164
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 85,
+    "name": "Драконий Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 3630872,
+      "damage": 206453,
+      "level": 162
+    },
+    "boss": {
+      "hp": 44892792,
+      "damage": 570376,
+      "level": 165
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 86,
+    "name": "Золотой Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 3794261,
+      "damage": 214298,
+      "level": 163
+    },
+    "boss": {
+      "hp": 47361895,
+      "damage": 594331,
+      "level": 166
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 87,
+    "name": "Белые Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 3965003,
+      "damage": 222441,
+      "level": 164
+    },
+    "boss": {
+      "hp": 49966800,
+      "damage": 619293,
+      "level": 167
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 88,
+    "name": "Штормовая Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 4143428,
+      "damage": 230894,
+      "level": 165
+    },
+    "boss": {
+      "hp": 52714973,
+      "damage": 645304,
+      "level": 168
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 89,
+    "name": "Черная Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 4329882,
+      "damage": 239668,
+      "level": 166
+    },
+    "boss": {
+      "hp": 55614297,
+      "damage": 672406,
+      "level": 169
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 90,
+    "name": "Ледяные Ворота",
+    "stages": 4,
+    "enemy": {
+      "hp": 4524727,
+      "damage": 248775,
+      "level": 167
+    },
+    "boss": {
+      "hp": 58673083,
+      "damage": 700647,
+      "level": 170
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 91,
+    "name": "Северный Архипелаг",
+    "stages": 4,
+    "enemy": {
+      "hp": 4728339,
+      "damage": 258229,
+      "level": 168
+    },
+    "boss": {
+      "hp": 61900103,
+      "damage": 730075,
+      "level": 171
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 92,
+    "name": "Волчий Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 4941115,
+      "damage": 268041,
+      "level": 169
+    },
+    "boss": {
+      "hp": 65304609,
+      "damage": 760738,
+      "level": 172
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 93,
+    "name": "Туманный Замок",
+    "stages": 4,
+    "enemy": {
+      "hp": 5163465,
+      "damage": 278227,
+      "level": 170
+    },
+    "boss": {
+      "hp": 68896362,
+      "damage": 792689,
+      "level": 173
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 94,
+    "name": "Кровавый Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 5395821,
+      "damage": 288799,
+      "level": 171
+    },
+    "boss": {
+      "hp": 72685662,
+      "damage": 825982,
+      "level": 174
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 95,
+    "name": "Рунный Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 5638633,
+      "damage": 299774,
+      "level": 172
+    },
+    "boss": {
+      "hp": 76683373,
+      "damage": 860673,
+      "level": 175
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 96,
+    "name": "Остров Великанов",
+    "stages": 4,
+    "enemy": {
+      "hp": 5892371,
+      "damage": 311165,
+      "level": 173
+    },
+    "boss": {
+      "hp": 80900959,
+      "damage": 896821,
+      "level": 176
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 97,
+    "name": "Морозные Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 6157528,
+      "damage": 322990,
+      "level": 174
+    },
+    "boss": {
+      "hp": 85350512,
+      "damage": 934488,
+      "level": 177
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 98,
+    "name": "Пепельный Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 6434617,
+      "damage": 335263,
+      "level": 175
+    },
+    "boss": {
+      "hp": 90044790,
+      "damage": 973736,
+      "level": 178
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 99,
+    "name": "Золотая Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 6724174,
+      "damage": 348003,
+      "level": 176
+    },
+    "boss": {
+      "hp": 94997253,
+      "damage": 1014633,
+      "level": 179
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 100,
+    "name": "Долина Шторма",
+    "stages": 4,
+    "enemy": {
+      "hp": 7026762,
+      "damage": 361227,
+      "level": 177
+    },
+    "boss": {
+      "hp": 100222102,
+      "damage": 1057248,
+      "level": 180
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 101,
+    "name": "Черный Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 7342967,
+      "damage": 374954,
+      "level": 178
+    },
+    "boss": {
+      "hp": 105734318,
+      "damage": 1101652,
+      "level": 181
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 102,
+    "name": "Серебряный Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 7673400,
+      "damage": 389202,
+      "level": 179
+    },
+    "boss": {
+      "hp": 111549705,
+      "damage": 1147921,
+      "level": 182
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 103,
+    "name": "Ледяная Стена",
+    "stages": 4,
+    "enemy": {
+      "hp": 8018703,
+      "damage": 403992,
+      "level": 180
+    },
+    "boss": {
+      "hp": 117684939,
+      "damage": 1196134,
+      "level": 183
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 104,
+    "name": "Драконьи Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 8379545,
+      "damage": 419344,
+      "level": 181
+    },
+    "boss": {
+      "hp": 124157611,
+      "damage": 1246372,
+      "level": 184
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 105,
+    "name": "Северный Трон",
+    "stages": 4,
+    "enemy": {
+      "hp": 8756624,
+      "damage": 435279,
+      "level": 182
+    },
+    "boss": {
+      "hp": 130986279,
+      "damage": 1298719,
+      "level": 185
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 106,
+    "name": "Воронья Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 9150672,
+      "damage": 451819,
+      "level": 183
+    },
+    "boss": {
+      "hp": 138190525,
+      "damage": 1353265,
+      "level": 186
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 107,
+    "name": "Каменная Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 9562453,
+      "damage": 468988,
+      "level": 184
+    },
+    "boss": {
+      "hp": 145791004,
+      "damage": 1410103,
+      "level": 187
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 108,
+    "name": "Громовой Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 9992763,
+      "damage": 486810,
+      "level": 185
+    },
+    "boss": {
+      "hp": 153809509,
+      "damage": 1469327,
+      "level": 188
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 109,
+    "name": "Белый Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 10442437,
+      "damage": 505309,
+      "level": 186
+    },
+    "boss": {
+      "hp": 162269032,
+      "damage": 1531039,
+      "level": 189
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 110,
+    "name": "Врата Великанов",
+    "stages": 4,
+    "enemy": {
+      "hp": 10912347,
+      "damage": 524510,
+      "level": 187
+    },
+    "boss": {
+      "hp": 171193829,
+      "damage": 1595342,
+      "level": 190
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 111,
+    "name": "Штормовой Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 11403403,
+      "damage": 544442,
+      "level": 188
+    },
+    "boss": {
+      "hp": 180609489,
+      "damage": 1662347,
+      "level": 191
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 112,
+    "name": "Зимние Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 11916556,
+      "damage": 565131,
+      "level": 189
+    },
+    "boss": {
+      "hp": 190543011,
+      "damage": 1732165,
+      "level": 192
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 113,
+    "name": "Огненный Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 12452801,
+      "damage": 586605,
+      "level": 190
+    },
+    "boss": {
+      "hp": 201022877,
+      "damage": 1804916,
+      "level": 193
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 114,
+    "name": "Туманный Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 13013177,
+      "damage": 608896,
+      "level": 191
+    },
+    "boss": {
+      "hp": 212079135,
+      "damage": 1880723,
+      "level": 194
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 115,
+    "name": "Черные Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 13598770,
+      "damage": 632035,
+      "level": 192
+    },
+    "boss": {
+      "hp": 223743487,
+      "damage": 1959713,
+      "level": 195
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 116,
+    "name": "Золотой Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 14210714,
+      "damage": 656052,
+      "level": 193
+    },
+    "boss": {
+      "hp": 236049379,
+      "damage": 2042021,
+      "level": 196
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 117,
+    "name": "Ледяная Гавань 117",
+    "stages": 4,
+    "enemy": {
+      "hp": 14850197,
+      "damage": 680982,
+      "level": 194
+    },
+    "boss": {
+      "hp": 249032095,
+      "damage": 2127786,
+      "level": 197
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 118,
+    "name": "Волчий Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 15518455,
+      "damage": 706859,
+      "level": 195
+    },
+    "boss": {
+      "hp": 262728860,
+      "damage": 2217153,
+      "level": 198
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 119,
+    "name": "Серебряный Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 16216786,
+      "damage": 733720,
+      "level": 196
+    },
+    "boss": {
+      "hp": 277178947,
+      "damage": 2310273,
+      "level": 199
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 120,
+    "name": "Кровавые Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 16946541,
+      "damage": 761601,
+      "level": 197
+    },
+    "boss": {
+      "hp": 292423789,
+      "damage": 2407305,
+      "level": 200
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 121,
+    "name": "Долина Севера",
+    "stages": 4,
+    "enemy": {
+      "hp": 17709136,
+      "damage": 790542,
+      "level": 198
+    },
+    "boss": {
+      "hp": 308507098,
+      "damage": 2508411,
+      "level": 201
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 122,
+    "name": "Драконий Замок",
+    "stages": 4,
+    "enemy": {
+      "hp": 18506047,
+      "damage": 820583,
+      "level": 199
+    },
+    "boss": {
+      "hp": 325474988,
+      "damage": 2613765,
+      "level": 202
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 123,
+    "name": "Пепельный Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 19338819,
+      "damage": 851765,
+      "level": 200
+    },
+    "boss": {
+      "hp": 343376113,
+      "damage": 2723543,
+      "level": 203
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 124,
+    "name": "Громовая Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 20209066,
+      "damage": 884132,
+      "level": 201
+    },
+    "boss": {
+      "hp": 362261799,
+      "damage": 2837932,
+      "level": 204
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 125,
+    "name": "Северный Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 21118474,
+      "damage": 917729,
+      "level": 202
+    },
+    "boss": {
+      "hp": 382186198,
+      "damage": 2957125,
+      "level": 205
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 126,
+    "name": "Каменные Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 22068805,
+      "damage": 952602,
+      "level": 203
+    },
+    "boss": {
+      "hp": 403206439,
+      "damage": 3081324,
+      "level": 206
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 127,
+    "name": "Морозный Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 23061901,
+      "damage": 988801,
+      "level": 204
+    },
+    "boss": {
+      "hp": 425382793,
+      "damage": 3210740,
+      "level": 207
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 128,
+    "name": "Вороньи Пики",
+    "stages": 4,
+    "enemy": {
+      "hp": 24099687,
+      "damage": 1026376,
+      "level": 205
+    },
+    "boss": {
+      "hp": 448778846,
+      "damage": 3345591,
+      "level": 208
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 129,
+    "name": "Штормовой Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 25184173,
+      "damage": 1065378,
+      "level": 206
+    },
+    "boss": {
+      "hp": 473461683,
+      "damage": 3486106,
+      "level": 209
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 130,
+    "name": "Золотая Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 26317460,
+      "damage": 1105862,
+      "level": 207
+    },
+    "boss": {
+      "hp": 499502075,
+      "damage": 3632522,
+      "level": 210
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 131,
+    "name": "Белый Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 27501746,
+      "damage": 1147885,
+      "level": 208
+    },
+    "boss": {
+      "hp": 526974690,
+      "damage": 3785088,
+      "level": 211
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 132,
+    "name": "Туманные Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 28739325,
+      "damage": 1191505,
+      "level": 209
+    },
+    "boss": {
+      "hp": 555958298,
+      "damage": 3944062,
+      "level": 212
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 133,
+    "name": "Черный Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 30032594,
+      "damage": 1236782,
+      "level": 210
+    },
+    "boss": {
+      "hp": 586536004,
+      "damage": 4109712,
+      "level": 213
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 134,
+    "name": "Ледяные Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 31384061,
+      "damage": 1283780,
+      "level": 211
+    },
+    "boss": {
+      "hp": 618795484,
+      "damage": 4282320,
+      "level": 214
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 135,
+    "name": "Волчья Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 32796344,
+      "damage": 1332563,
+      "level": 212
+    },
+    "boss": {
+      "hp": 652829236,
+      "damage": 4462178,
+      "level": 215
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 136,
+    "name": "Рунный Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 34272179,
+      "damage": 1383201,
+      "level": 213
+    },
+    "boss": {
+      "hp": 688734844,
+      "damage": 4649589,
+      "level": 216
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 137,
+    "name": "Долина Льда",
+    "stages": 4,
+    "enemy": {
+      "hp": 35814427,
+      "damage": 1435762,
+      "level": 214
+    },
+    "boss": {
+      "hp": 726615260,
+      "damage": 4844872,
+      "level": 217
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 138,
+    "name": "Кровавый Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 37426076,
+      "damage": 1490321,
+      "level": 215
+    },
+    "boss": {
+      "hp": 766579099,
+      "damage": 5048356,
+      "level": 218
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 139,
+    "name": "Драконий Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 39110250,
+      "damage": 1546954,
+      "level": 216
+    },
+    "boss": {
+      "hp": 808740950,
+      "damage": 5260387,
+      "level": 219
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 140,
+    "name": "Громовые Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 40870211,
+      "damage": 1605738,
+      "level": 217
+    },
+    "boss": {
+      "hp": 853221702,
+      "damage": 5481324,
+      "level": 220
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 141,
+    "name": "Северная Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 42709371,
+      "damage": 1666756,
+      "level": 218
+    },
+    "boss": {
+      "hp": 900148896,
+      "damage": 5711539,
+      "level": 221
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 142,
+    "name": "Пепельные Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 44631292,
+      "damage": 1730093,
+      "level": 219
+    },
+    "boss": {
+      "hp": 949657085,
+      "damage": 5951424,
+      "level": 222
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 143,
+    "name": "Серебряный Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 46639701,
+      "damage": 1795836,
+      "level": 220
+    },
+    "boss": {
+      "hp": 1001888225,
+      "damage": 6201384,
+      "level": 223
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 144,
+    "name": "Штормовой Замок",
+    "stages": 4,
+    "enemy": {
+      "hp": 48738487,
+      "damage": 1864078,
+      "level": 221
+    },
+    "boss": {
+      "hp": 1056992077,
+      "damage": 6461842,
+      "level": 224
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 145,
+    "name": "Зимний Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 50931719,
+      "damage": 1934913,
+      "level": 222
+    },
+    "boss": {
+      "hp": 1115126641,
+      "damage": 6733239,
+      "level": 225
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 146,
+    "name": "Вороний Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 53223646,
+      "damage": 2008440,
+      "level": 223
+    },
+    "boss": {
+      "hp": 1176458607,
+      "damage": 7016035,
+      "level": 226
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 147,
+    "name": "Золотые Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 55618710,
+      "damage": 2084760,
+      "level": 224
+    },
+    "boss": {
+      "hp": 1241163830,
+      "damage": 7310709,
+      "level": 227
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 148,
+    "name": "Каменный Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 58121552,
+      "damage": 2163981,
+      "level": 225
+    },
+    "boss": {
+      "hp": 1309427841,
+      "damage": 7617758,
+      "level": 228
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 149,
+    "name": "Ледяная Долина 149",
+    "stages": 4,
+    "enemy": {
+      "hp": 60737022,
+      "damage": 2246212,
+      "level": 226
+    },
+    "boss": {
+      "hp": 1381446372,
+      "damage": 7937704,
+      "level": 229
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 150,
+    "name": "Черный Трон",
+    "stages": 4,
+    "enemy": {
+      "hp": 63470188,
+      "damage": 2331569,
+      "level": 227
+    },
+    "boss": {
+      "hp": 1457425922,
+      "damage": 8271088,
+      "level": 230
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 151,
+    "name": "Морозный Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 66326347,
+      "damage": 2420168,
+      "level": 228
+    },
+    "boss": {
+      "hp": 1537584348,
+      "damage": 8618473,
+      "level": 231
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 152,
+    "name": "Драконья Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 69311032,
+      "damage": 2512135,
+      "level": 229
+    },
+    "boss": {
+      "hp": 1622151487,
+      "damage": 8980449,
+      "level": 232
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 153,
+    "name": "Туманный Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 72430029,
+      "damage": 2607596,
+      "level": 230
+    },
+    "boss": {
+      "hp": 1711369819,
+      "damage": 9357628,
+      "level": 233
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 154,
+    "name": "Кровавая Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 75689380,
+      "damage": 2706684,
+      "level": 231
+    },
+    "boss": {
+      "hp": 1805495159,
+      "damage": 9750649,
+      "level": 234
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 155,
+    "name": "Северный Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 79095402,
+      "damage": 2809538,
+      "level": 232
+    },
+    "boss": {
+      "hp": 1904797393,
+      "damage": 10160176,
+      "level": 235
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 156,
+    "name": "Волчьи Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 82654695,
+      "damage": 2916301,
+      "level": 233
+    },
+    "boss": {
+      "hp": 2009561249,
+      "damage": 10586903,
+      "level": 236
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 157,
+    "name": "Громовой Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 86374156,
+      "damage": 3027120,
+      "level": 234
+    },
+    "boss": {
+      "hp": 2120087118,
+      "damage": 11031553,
+      "level": 237
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 158,
+    "name": "Белая Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 90260994,
+      "damage": 3142151,
+      "level": 235
+    },
+    "boss": {
+      "hp": 2236691909,
+      "damage": 11494878,
+      "level": 238
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 159,
+    "name": "Рунная Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 94322738,
+      "damage": 3261552,
+      "level": 236
+    },
+    "boss": {
+      "hp": 2359709964,
+      "damage": 11977663,
+      "level": 239
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 160,
+    "name": "Пепельный Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 98567261,
+      "damage": 3385491,
+      "level": 237
+    },
+    "boss": {
+      "hp": 2489494013,
+      "damage": 12480725,
+      "level": 240
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 161,
+    "name": "Золотой Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 103002788,
+      "damage": 3514140,
+      "level": 238
+    },
+    "boss": {
+      "hp": 2626416183,
+      "damage": 13004916,
+      "level": 241
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 162,
+    "name": "Ледяные Пики",
+    "stages": 4,
+    "enemy": {
+      "hp": 107637914,
+      "damage": 3647677,
+      "level": 239
+    },
+    "boss": {
+      "hp": 2770869073,
+      "damage": 13551122,
+      "level": 242
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 163,
+    "name": "Черная Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 112481620,
+      "damage": 3786289,
+      "level": 240
+    },
+    "boss": {
+      "hp": 2923266872,
+      "damage": 14120269,
+      "level": 243
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 164,
+    "name": "Штормовые Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 117543293,
+      "damage": 3930168,
+      "level": 241
+    },
+    "boss": {
+      "hp": 3084046550,
+      "damage": 14713321,
+      "level": 244
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 165,
+    "name": "Серебряные Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 122832741,
+      "damage": 4079515,
+      "level": 242
+    },
+    "boss": {
+      "hp": 3253669111,
+      "damage": 15331280,
+      "level": 245
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 166,
+    "name": "Воронья Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 128360214,
+      "damage": 4234536,
+      "level": 243
+    },
+    "boss": {
+      "hp": 3432620912,
+      "damage": 15975194,
+      "level": 246
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 167,
+    "name": "Драконий Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 134136424,
+      "damage": 4395448,
+      "level": 244
+    },
+    "boss": {
+      "hp": 3621415062,
+      "damage": 16646152,
+      "level": 247
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 168,
+    "name": "Морозная Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 140172563,
+      "damage": 4562476,
+      "level": 245
+    },
+    "boss": {
+      "hp": 3820592890,
+      "damage": 17345290,
+      "level": 248
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 169,
+    "name": "Каменный Фьорд 169",
+    "stages": 4,
+    "enemy": {
+      "hp": 146480328,
+      "damage": 4735850,
+      "level": 246
+    },
+    "boss": {
+      "hp": 4030725499,
+      "damage": 18073792,
+      "level": 249
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 170,
+    "name": "Северная Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 153071943,
+      "damage": 4915812,
+      "level": 247
+    },
+    "boss": {
+      "hp": 4252415402,
+      "damage": 18832892,
+      "level": 250
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 171,
+    "name": "Кровавый Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 159960180,
+      "damage": 5102613,
+      "level": 248
+    },
+    "boss": {
+      "hp": 4486298249,
+      "damage": 19623873,
+      "level": 251
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 172,
+    "name": "Туманный Предел 172",
+    "stages": 4,
+    "enemy": {
+      "hp": 167158389,
+      "damage": 5296512,
+      "level": 249
+    },
+    "boss": {
+      "hp": 4733044652,
+      "damage": 20448076,
+      "level": 252
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 173,
+    "name": "Золотой Трон",
+    "stages": 4,
+    "enemy": {
+      "hp": 174680516,
+      "damage": 5497779,
+      "level": 250
+    },
+    "boss": {
+      "hp": 4993362108,
+      "damage": 21306895,
+      "level": 253
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 174,
+    "name": "Ледяной Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 182541139,
+      "damage": 5706695,
+      "level": 251
+    },
+    "boss": {
+      "hp": 5267997024,
+      "damage": 22201785,
+      "level": 254
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 175,
+    "name": "Волчья Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 190755491,
+      "damage": 5923549,
+      "level": 252
+    },
+    "boss": {
+      "hp": 5557736861,
+      "damage": 23134260,
+      "level": 255
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 176,
+    "name": "Громовой Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 199339488,
+      "damage": 6148644,
+      "level": 253
+    },
+    "boss": {
+      "hp": 5863412388,
+      "damage": 24105899,
+      "level": 256
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 177,
+    "name": "Пепельный Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 208309765,
+      "damage": 6382293,
+      "level": 254
+    },
+    "boss": {
+      "hp": 6185900069,
+      "damage": 25118346,
+      "level": 257
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 178,
+    "name": "Белые Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 217683704,
+      "damage": 6624820,
+      "level": 255
+    },
+    "boss": {
+      "hp": 6526124573,
+      "damage": 26173317,
+      "level": 258
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 179,
+    "name": "Черный Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 227479471,
+      "damage": 6876563,
+      "level": 256
+    },
+    "boss": {
+      "hp": 6885061425,
+      "damage": 27272596,
+      "level": 259
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 180,
+    "name": "Серебряная Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 237716047,
+      "damage": 7137873,
+      "level": 257
+    },
+    "boss": {
+      "hp": 7263739803,
+      "damage": 28418045,
+      "level": 260
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 181,
+    "name": "Штормовой Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 248413269,
+      "damage": 7409112,
+      "level": 258
+    },
+    "boss": {
+      "hp": 7663245492,
+      "damage": 29611603,
+      "level": 261
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 182,
+    "name": "Рунный Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 259591866,
+      "damage": 7690658,
+      "level": 259
+    },
+    "boss": {
+      "hp": 8084723994,
+      "damage": 30855290,
+      "level": 262
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 183,
+    "name": "Драконьи Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 271273500,
+      "damage": 7982903,
+      "level": 260
+    },
+    "boss": {
+      "hp": 8529383814,
+      "damage": 32151213,
+      "level": 263
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 184,
+    "name": "Морозные Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 283480808,
+      "damage": 8286253,
+      "level": 261
+    },
+    "boss": {
+      "hp": 8998499924,
+      "damage": 33501563,
+      "level": 264
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 185,
+    "name": "Северный Замок 185",
+    "stages": 4,
+    "enemy": {
+      "hp": 296237444,
+      "damage": 8601131,
+      "level": 262
+    },
+    "boss": {
+      "hp": 9493417419,
+      "damage": 34908629,
+      "level": 265
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 186,
+    "name": "Каменная Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 309568129,
+      "damage": 8927974,
+      "level": 263
+    },
+    "boss": {
+      "hp": 10015555377,
+      "damage": 36374792,
+      "level": 266
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 187,
+    "name": "Кровавый Мыс 187",
+    "stages": 4,
+    "enemy": {
+      "hp": 323498695,
+      "damage": 9267237,
+      "level": 264
+    },
+    "boss": {
+      "hp": 10566410923,
+      "damage": 37902533,
+      "level": 267
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 188,
+    "name": "Туманный Остров 188",
+    "stages": 4,
+    "enemy": {
+      "hp": 338056136,
+      "damage": 9619392,
+      "level": 265
+    },
+    "boss": {
+      "hp": 11147563524,
+      "damage": 39494439,
+      "level": 268
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 189,
+    "name": "Золотые Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 353268662,
+      "damage": 9984929,
+      "level": 266
+    },
+    "boss": {
+      "hp": 11760679518,
+      "damage": 41153206,
+      "level": 269
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 190,
+    "name": "Ледяной Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 369165752,
+      "damage": 10364356,
+      "level": 267
+    },
+    "boss": {
+      "hp": 12407516891,
+      "damage": 42881640,
+      "level": 270
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 191,
+    "name": "Волчий Фьорд 191",
+    "stages": 4,
+    "enemy": {
+      "hp": 385778211,
+      "damage": 10758202,
+      "level": 268
+    },
+    "boss": {
+      "hp": 13089930320,
+      "damage": 44682669,
+      "level": 271
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 192,
+    "name": "Громовая Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 403138230,
+      "damage": 11167013,
+      "level": 269
+    },
+    "boss": {
+      "hp": 13809876488,
+      "damage": 46559341,
+      "level": 272
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 193,
+    "name": "Пепельная Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 421279450,
+      "damage": 11591360,
+      "level": 270
+    },
+    "boss": {
+      "hp": 14569419695,
+      "damage": 48514834,
+      "level": 273
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 194,
+    "name": "Белый Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 440237026,
+      "damage": 12031831,
+      "level": 271
+    },
+    "boss": {
+      "hp": 15370737778,
+      "damage": 50552457,
+      "level": 274
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 195,
+    "name": "Черные Скалы",
+    "stages": 4,
+    "enemy": {
+      "hp": 460047692,
+      "damage": 12489041,
+      "level": 272
+    },
+    "boss": {
+      "hp": 16216128356,
+      "damage": 52675660,
+      "level": 275
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 196,
+    "name": "Серебряный Замок",
+    "stages": 4,
+    "enemy": {
+      "hp": 480749838,
+      "damage": 12963625,
+      "level": 273
+    },
+    "boss": {
+      "hp": 17108015415,
+      "damage": 54888037,
+      "level": 276
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 197,
+    "name": "Штормовая Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 502383581,
+      "damage": 13456242,
+      "level": 274
+    },
+    "boss": {
+      "hp": 18048956263,
+      "damage": 57193335,
+      "level": 277
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 198,
+    "name": "Рунный Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 524990842,
+      "damage": 13967579,
+      "level": 275
+    },
+    "boss": {
+      "hp": 19041648858,
+      "damage": 59595455,
+      "level": 278
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 199,
+    "name": "Драконий Фьорд 199",
+    "stages": 4,
+    "enemy": {
+      "hp": 548615430,
+      "damage": 14498348,
+      "level": 276
+    },
+    "boss": {
+      "hp": 20088939545,
+      "damage": 62098464,
+      "level": 279
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 200,
+    "name": "Морозные Врата 200",
+    "stages": 4,
+    "enemy": {
+      "hp": 573303124,
+      "damage": 15049285,
+      "level": 277
+    },
+    "boss": {
+      "hp": 21193831220,
+      "damage": 64706600,
+      "level": 280
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 201,
+    "name": "Северный Трон 201",
+    "stages": 4,
+    "enemy": {
+      "hp": 599101765,
+      "damage": 15621158,
+      "level": 278
+    },
+    "boss": {
+      "hp": 22359491937,
+      "damage": 67424277,
+      "level": 281
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 202,
+    "name": "Каменные Пики",
+    "stages": 4,
+    "enemy": {
+      "hp": 626061344,
+      "damage": 16214762,
+      "level": 279
+    },
+    "boss": {
+      "hp": 23589263993,
+      "damage": 70256097,
+      "level": 282
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 203,
+    "name": "Кровавая Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 654234105,
+      "damage": 16830922,
+      "level": 280
+    },
+    "boss": {
+      "hp": 24886673513,
+      "damage": 73206853,
+      "level": 283
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 204,
+    "name": "Туманные Скалы 204",
+    "stages": 4,
+    "enemy": {
+      "hp": 683674639,
+      "damage": 17470498,
+      "level": 281
+    },
+    "boss": {
+      "hp": 26255440556,
+      "damage": 76281540,
+      "level": 284
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 205,
+    "name": "Золотой Предел 205",
+    "stages": 4,
+    "enemy": {
+      "hp": 714439998,
+      "damage": 18134376,
+      "level": 282
+    },
+    "boss": {
+      "hp": 27699489787,
+      "damage": 79485365,
+      "level": 285
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 206,
+    "name": "Ледяной Замок",
+    "stages": 4,
+    "enemy": {
+      "hp": 746589798,
+      "damage": 18823483,
+      "level": 283
+    },
+    "boss": {
+      "hp": 29222961725,
+      "damage": 82823750,
+      "level": 286
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 207,
+    "name": "Волчья Долина 207",
+    "stages": 4,
+    "enemy": {
+      "hp": 780186339,
+      "damage": 19538775,
+      "level": 284
+    },
+    "boss": {
+      "hp": 30830224620,
+      "damage": 86302348,
+      "level": 287
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 208,
+    "name": "Громовой Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 815294724,
+      "damage": 20281249,
+      "level": 285
+    },
+    "boss": {
+      "hp": 32525886974,
+      "damage": 89927047,
+      "level": 288
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 209,
+    "name": "Пепельные Врата 209",
+    "stages": 4,
+    "enemy": {
+      "hp": 851982987,
+      "damage": 21051936,
+      "level": 286
+    },
+    "boss": {
+      "hp": 34314810758,
+      "damage": 93703983,
+      "level": 289
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 210,
+    "name": "Белый Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 890322221,
+      "damage": 21851910,
+      "level": 287
+    },
+    "boss": {
+      "hp": 36202125349,
+      "damage": 97639550,
+      "level": 290
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 211,
+    "name": "Черный Фьорд 211",
+    "stages": 4,
+    "enemy": {
+      "hp": 930386721,
+      "damage": 22682282,
+      "level": 288
+    },
+    "boss": {
+      "hp": 38193242244,
+      "damage": 101740411,
+      "level": 291
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 212,
+    "name": "Серебряные Пики",
+    "stages": 4,
+    "enemy": {
+      "hp": 972254124,
+      "damage": 23544209,
+      "level": 289
+    },
+    "boss": {
+      "hp": 40293870567,
+      "damage": 106013508,
+      "level": 292
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 213,
+    "name": "Штормовая Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 1016005559,
+      "damage": 24438889,
+      "level": 290
+    },
+    "boss": {
+      "hp": 42510033448,
+      "damage": 110466076,
+      "level": 293
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 214,
+    "name": "Рунный Берег 214",
+    "stages": 4,
+    "enemy": {
+      "hp": 1061725809,
+      "damage": 25367567,
+      "level": 291
+    },
+    "boss": {
+      "hp": 44848085288,
+      "damage": 115105651,
+      "level": 294
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 215,
+    "name": "Драконий Предел 215",
+    "stages": 4,
+    "enemy": {
+      "hp": 1109503471,
+      "damage": 26331534,
+      "level": 292
+    },
+    "boss": {
+      "hp": 47314729979,
+      "damage": 119940088,
+      "level": 295
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 216,
+    "name": "Морозный Трон",
+    "stages": 4,
+    "enemy": {
+      "hp": 1159431127,
+      "damage": 27332132,
+      "level": 293
+    },
+    "boss": {
+      "hp": 49917040127,
+      "damage": 124977572,
+      "level": 296
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 217,
+    "name": "Северные Врата",
+    "stages": 4,
+    "enemy": {
+      "hp": 1211605528,
+      "damage": 28370753,
+      "level": 294
+    },
+    "boss": {
+      "hp": 52662477334,
+      "damage": 130226630,
+      "level": 297
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 218,
+    "name": "Каменный Мыс 218",
+    "stages": 4,
+    "enemy": {
+      "hp": 1266127776,
+      "damage": 29448842,
+      "level": 295
+    },
+    "boss": {
+      "hp": 55558913588,
+      "damage": 135696148,
+      "level": 298
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 219,
+    "name": "Кровавый Фьорд 219",
+    "stages": 4,
+    "enemy": {
+      "hp": 1323103526,
+      "damage": 30567898,
+      "level": 296
+    },
+    "boss": {
+      "hp": 58614653835,
+      "damage": 141395386,
+      "level": 299
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 220,
+    "name": "Туманный Замок 220",
+    "stages": 4,
+    "enemy": {
+      "hp": 1382643185,
+      "damage": 31729478,
+      "level": 297
+    },
+    "boss": {
+      "hp": 61838459796,
+      "damage": 147333993,
+      "level": 300
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 221,
+    "name": "Золотая Долина 221",
+    "stages": 4,
+    "enemy": {
+      "hp": 1444862128,
+      "damage": 32935198,
+      "level": 298
+    },
+    "boss": {
+      "hp": 65239575085,
+      "damage": 153522020,
+      "level": 301
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 222,
+    "name": "Ледяная Крепость 222",
+    "stages": 4,
+    "enemy": {
+      "hp": 1509880924,
+      "damage": 34186736,
+      "level": 299
+    },
+    "boss": {
+      "hp": 68827751715,
+      "damage": 159969945,
+      "level": 302
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 223,
+    "name": "Волчьи Врата 223",
+    "stages": 4,
+    "enemy": {
+      "hp": 1577825566,
+      "damage": 35485832,
+      "level": 300
+    },
+    "boss": {
+      "hp": 72613278059,
+      "damage": 166688683,
+      "level": 303
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 224,
+    "name": "Громовой Предел 224",
+    "stages": 4,
+    "enemy": {
+      "hp": 1648827716,
+      "damage": 36834293,
+      "level": 301
+    },
+    "boss": {
+      "hp": 76607008352,
+      "damage": 173689608,
+      "level": 304
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 225,
+    "name": "Пепельный Берег",
+    "stages": 4,
+    "enemy": {
+      "hp": 1723024963,
+      "damage": 38233997,
+      "level": 302
+    },
+    "boss": {
+      "hp": 80820393811,
+      "damage": 180984571,
+      "level": 305
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 226,
+    "name": "Белая Крепость",
+    "stages": 4,
+    "enemy": {
+      "hp": 1800561087,
+      "damage": 39686888,
+      "level": 303
+    },
+    "boss": {
+      "hp": 85265515471,
+      "damage": 188585923,
+      "level": 306
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 227,
+    "name": "Черный Трон 227",
+    "stages": 4,
+    "enemy": {
+      "hp": 1881586336,
+      "damage": 41194990,
+      "level": 304
+    },
+    "boss": {
+      "hp": 89955118822,
+      "damage": 196506532,
+      "level": 307
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 228,
+    "name": "Серебряный Фьорд 228",
+    "stages": 4,
+    "enemy": {
+      "hp": 1966257721,
+      "damage": 42760400,
+      "level": 305
+    },
+    "boss": {
+      "hp": 94902650357,
+      "damage": 204759806,
+      "level": 308
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 229,
+    "name": "Штормовой Мыс 229",
+    "stages": 4,
+    "enemy": {
+      "hp": 2054739318,
+      "damage": 44385295,
+      "level": 306
+    },
+    "boss": {
+      "hp": 100122296127,
+      "damage": 213359718,
+      "level": 309
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 230,
+    "name": "Рунная Гавань",
+    "stages": 4,
+    "enemy": {
+      "hp": 2147202587,
+      "damage": 46071936,
+      "level": 307
+    },
+    "boss": {
+      "hp": 105629022414,
+      "damage": 222320826,
+      "level": 310
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 231,
+    "name": "Драконий Трон",
+    "stages": 4,
+    "enemy": {
+      "hp": 2243826704,
+      "damage": 47822670,
+      "level": 308
+    },
+    "boss": {
+      "hp": 111438618647,
+      "damage": 231658301,
+      "level": 311
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 232,
+    "name": "Морозный Предел",
+    "stages": 4,
+    "enemy": {
+      "hp": 2344798906,
+      "damage": 49639931,
+      "level": 309
+    },
+    "boss": {
+      "hp": 117567742672,
+      "damage": 241387950,
+      "level": 312
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 233,
+    "name": "Северный Фьорд",
+    "stages": 4,
+    "enemy": {
+      "hp": 2450314856,
+      "damage": 51526249,
+      "level": 310
+    },
+    "boss": {
+      "hp": 124033968519,
+      "damage": 251526243,
+      "level": 313
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 234,
+    "name": "Каменные Врата 234",
+    "stages": 4,
+    "enemy": {
+      "hp": 2560579025,
+      "damage": 53484246,
+      "level": 311
+    },
+    "boss": {
+      "hp": 130855836788,
+      "damage": 262090346,
+      "level": 314
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 235,
+    "name": "Кровавая Долина",
+    "stages": 4,
+    "enemy": {
+      "hp": 2675805081,
+      "damage": 55516647,
+      "level": 312
+    },
+    "boss": {
+      "hp": 138052907811,
+      "damage": 273098140,
+      "level": 315
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 236,
+    "name": "Туманный Мыс",
+    "stages": 4,
+    "enemy": {
+      "hp": 2796216310,
+      "damage": 57626280,
+      "level": 313
+    },
+    "boss": {
+      "hp": 145645817741,
+      "damage": 284568262,
+      "level": 316
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 237,
+    "name": "Золотая Крепость 237",
+    "stages": 4,
+    "enemy": {
+      "hp": 2922046043,
+      "damage": 59816079,
+      "level": 314
+    },
+    "boss": {
+      "hp": 153656337716,
+      "damage": 296520129,
+      "level": 317
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 238,
+    "name": "Ледяные Врата 238",
+    "stages": 4,
+    "enemy": {
+      "hp": 3053538115,
+      "damage": 62089090,
+      "level": 315
+    },
+    "boss": {
+      "hp": 162107436291,
+      "damage": 308973974,
+      "level": 318
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 239,
+    "name": "Волчий Остров",
+    "stages": 4,
+    "enemy": {
+      "hp": 3190947331,
+      "damage": 64448475,
+      "level": 316
+    },
+    "boss": {
+      "hp": 171023345287,
+      "damage": 321950881,
+      "level": 319
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  },
+  {
+    "id": 240,
+    "name": "Громовые Пики",
+    "stages": 4,
+    "enemy": {
+      "hp": 3334539961,
+      "damage": 66897517,
+      "level": 317
+    },
+    "boss": {
+      "hp": 180429629278,
+      "damage": 335472818,
+      "level": 320
+    },
+    "progressPerWin": 25,
+    "bossAt": 100
+  }
+]
