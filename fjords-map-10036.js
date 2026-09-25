@@ -29,7 +29,7 @@ function open(){reset();render();window.TerritoryUI?.show('map');}
 function movement(){
  const s=state(), ch=chapter(); if(!ch||Number(s.chapterProgress)>=100)return;
  const root=$('.fjords-map');reset();root.classList.add('moving');$('#fjordsStart').disabled=true;$('#fjordsStart').textContent='ИДЁМ...';
- moveTimer=setTimeout(()=>{root.classList.remove('moving');root.classList.add('encounter');$('#fjordsEncounter').classList.remove('hidden');$('#fjordsStart').textContent='ВСТРЕЧА';},1500);
+ moveTimer=setTimeout(()=>{root.classList.remove('moving');root.classList.add('encounter');$('#fjordsEncounter').classList.remove('hidden');$('#fjordsStart').textContent='ВСТРЕЧА';setTimeout(()=>fight(),350);},1500);
 }
 function fight(){
  const s=state(),ch=chapter(); if(!ch)return;
