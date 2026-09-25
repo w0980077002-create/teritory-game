@@ -1,0 +1,57 @@
+/* Territory Game — REAL HOME BATTLE OVERLAY FIX 10044 */
+#runnerScreen.home-battle-overlay,
+#runnerScreen.home-battle-overlay *,
+#runnerScreen.home-battle-overlay .runner-stage,
+#runnerScreen.home-battle-overlay .runner-stage::before,
+#runnerScreen.home-battle-overlay .runner-stage::after{
+  box-sizing:border-box!important;
+}
+#runnerScreen.home-battle-overlay{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  background-color:transparent!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+  z-index:2147483000!important;
+  pointer-events:none!important;
+}
+#runnerScreen.home-battle-overlay .runner-stage{
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  background-color:transparent!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+#runnerScreen.home-battle-overlay .runner-stage::before,
+#runnerScreen.home-battle-overlay .runner-stage::after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+#runnerScreen.home-battle-overlay .runner-character,
+#runnerScreen.home-battle-overlay .runner-follower,
+#runnerScreen.home-battle-overlay .runner-enemy{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
