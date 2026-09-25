@@ -63,3 +63,4 @@ Do not rename the assets and do not move them out of that directory.
 - Nginx cache-busting references are `reference-ui.css` and `reference-ui.js` with V2 query versions.
 
 IMPORTANT: the current GitHub working tree inspected for this rebuild did not contain the three approved Arena PNG files. The `arena-assets/` directory is therefore retained in the package, but no replacement artwork was invented or substituted.
+V3 CLICK FIX: arena.js bindBattleControls() now uses one standard delegated click handler only; pointerup/pointerType/touchAt interception removed so Arena controls, bottom navigation, consumables, equipment, Surrender and Exit remain clickable in Telegram mobile WebView.

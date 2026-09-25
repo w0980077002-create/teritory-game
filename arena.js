@@ -96,24 +96,25 @@
     const r=root();if(!r?.body)return;
     if(r.body.dataset.controlsBound==='1')return;
     r.body.dataset.controlsBound='1';
-    let touchAt=0;
-    const dispatch=(e)=>{
-      const t=e.target.closest?.('button');if(!t||!r.body.contains(t))return;
-      if(t.dataset.defenseZone){e.preventDefault();selectDefense(t.dataset.defenseZone);}
-      else if(t.dataset.attackZone){e.preventDefault();selectAttack(t.dataset.attackZone);}
-      else if(t.dataset.executeAttack){e.preventDefault();executeAttack();}
-      else if(t.dataset.autobattleToggle){e.preventDefault();toggleAuto();}
-      else if(t.dataset.combatSlot){e.preventDefault();useSlot(t.dataset.combatSlot);}
-      else if(t.dataset.gear){e.preventDefault();chooseGear(t.dataset.gear);}
-      else if(t.dataset.surrender){e.preventDefault();finish(false);}
-      else if(t.dataset.exitBattle){e.preventDefault();exitBattle();}
-      else if(t.dataset.chatToggle){e.preventDefault();toggleChat(t);}
-      else if(t.dataset.chatSend){e.preventDefault();sendChat();}
-      else if(t.dataset.arenaNav){e.preventDefault();navigateArena(t.dataset.arenaNav);}
-    };
-    r.body.addEventListener('pointerup',e=>{if(e.pointerType==='touch'||e.pointerType==='pen'){dispatch(e);touchAt=Date.now();}},{passive:false});
-    r.body.addEventListener('click',e=>{if(Date.now()-touchAt<650){e.preventDefault();return;}dispatch(e);});
+
+    r.body.addEventListener('click',e=>{
+      const t=e.target.closest('button');
+      if(!t||!r.body.contains(t))return;
+
+      if(t.dataset.defenseZone){selectDefense(t.dataset.defenseZone);}
+      else if(t.dataset.attackZone){selectAttack(t.dataset.attackZone);}
+      else if(t.dataset.executeAttack){executeAttack();}
+      else if(t.dataset.autobattleToggle){toggleAuto();}
+      else if(t.dataset.combatSlot){useSlot(t.dataset.combatSlot);}
+      else if(t.dataset.gear){chooseGear(t.dataset.gear);}
+      else if(t.dataset.surrender){finish(false);}
+      else if(t.dataset.exitBattle){exitBattle();}
+      else if(t.dataset.chatToggle){toggleChat(t);}
+      else if(t.dataset.chatSend){sendChat();}
+      else if(t.dataset.arenaNav){navigateArena(t.dataset.arenaNav);}
+    });
   }
+
   function selectDefense(z){
     if(!arenaBattle||arenaBattle.ended)return;
     const i=arenaBattle.playerDefense.indexOf(z);
