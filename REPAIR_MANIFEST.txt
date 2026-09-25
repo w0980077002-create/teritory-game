@@ -1,8 +1,0 @@
-TERITORY GAME — REPAIRED PHONE ZIP
-
-This archive repairs the previous phone ZIP's missing HOME artwork.
-Added:
-- territory_reference_bg.png (restored baked HOME artwork)
-
-The archive is NOT a modification of GitHub and does not upload anything.
-It is for local inspection/upload only.
