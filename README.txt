@@ -1,16 +1,21 @@
-TERITORY — COMBAT ITEMS FOUNDATION v12
+# Territory Game — Reference Build v1
 
-Replace/add ONLY these files:
-- arena.js (replace existing)
-- combat-items.js (add new file)
+Это не новый арт и не замена исходной игры.
 
-Do NOT change:
+В основу положен кадр из видео, предоставленного владельцем проекта:
+`assets/gameplay-reference.jpg`
+
+Цель сборки:
+- сохранить реальный внешний вид исходной игры;
+- показать дорожную карту и структуру интерфейса;
+- использовать прозрачные hitzone поверх исходного экрана;
+- зафиксировать правило: при смене главы меняется только фон/локация, а герой, последователь и постоянный HUD не пересоздаются.
+
+ВАЖНО:
+Эта версия является безопасным визуально-функциональным reference build. Она не утверждает, что все серверные механики уже восстановлены. Ничего из неё не следует загружать в production вместо существующего проекта без отдельной проверки.
+
+Файлы:
 - index.html
-- app.js
-- home-rebuild.js
 - style.css
-- arena.css
-- territory_reference_bg.png
-- bottom navigation 42–48
-
-This stage adds the shared consumable foundation and item-detail modal without changing HOME artwork.
+- app.js
+- assets/gameplay-reference.jpg
