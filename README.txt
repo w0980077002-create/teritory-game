@@ -1,21 +1,16 @@
-# Territory Game — Reference Build v1
+TERITORY GAME — MASTER CLEAN BUILD
 
-Это не новый арт и не замена исходной игры.
+SOURCE OF TRUTH:
+- assets/home-master.png = user-approved final HOME screenshot.
+- assets/arena-master.jpg = user-approved final ARENA screenshot, cropped only to remove black letterbox bars.
 
-В основу положен кадр из видео, предоставленного владельцем проекта:
-`assets/gameplay-reference.jpg`
+This build intentionally contains no legacy HOME/reference backgrounds and no old game.css/reference-ui layer.
 
-Цель сборки:
-- сохранить реальный внешний вид исходной игры;
-- показать дорожную карту и структуру интерфейса;
-- использовать прозрачные hitzone поверх исходного экрана;
-- зафиксировать правило: при смене главы меняется только фон/локация, а герой, последователь и постоянный HUD не пересоздаются.
+Implemented clean navigation:
+HOME, ARENA, ROADMAP, INVENTORY, HERO, SHOP, QUESTS, GAMES, CLAN.
+Arena has transparent hit zones, attack/defense zones, auto/tactics/timer controls, 7 equipment slots and follower selector.
+Roadmap is chapter/stage based. Hero/follower are persistent concepts; changing stage does not recreate them.
+Clan is explicitly marked in development.
+Monopoly is a functional starter board with dice.
 
-ВАЖНО:
-Эта версия является безопасным визуально-функциональным reference build. Она не утверждает, что все серверные механики уже восстановлены. Ничего из неё не следует загружать в production вместо существующего проекта без отдельной проверки.
-
-Файлы:
-- index.html
-- style.css
-- app.js
-- assets/gameplay-reference.jpg
+This is a clean master foundation, not a claim that every unfinished subsystem is production-complete.
