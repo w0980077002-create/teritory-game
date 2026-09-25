@@ -6,27 +6,36 @@
 <meta name="theme-color" content="#07111b">
 <meta name="telegram-bot" content="@TeritoryGameBot">
 <title>Teritory Game</title>
-<link rel="stylesheet" href="style.css?v=10001">
+<link rel="stylesheet" href="style.css?v=10006">
 <link rel="stylesheet" href="home-rebuild.css?v=10001">
 <link rel="stylesheet" href="arena.css?v=10001">
 <link rel="stylesheet" href="follower-arena.css?v=10001">
 <link rel="stylesheet" href="forge-v2.css?v=10001">
 <link rel="stylesheet" href="hero.css?v=10001">
 <link rel="stylesheet" href="reference-ui.css?v=10001">
-<link rel="stylesheet" href="mobile-core-nav.css?v=10005">
 </head>
 <body data-screen="home">
 <main id="app">
 <section id="home" class="screen active" aria-label="Главный экран"></section>
-<section id="inventory" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button">‹</button><div><small>ГЕРОЙ</small><h2>ИНВЕНТАРЬ</h2></div></header><div class="profile-card"><div class="profile-avatar" data-profile-photo>⚔️</div><div><b data-profile-name>Игрок</b><span>Уровень <strong data-level>1</strong></span><small data-username>@</small></div></div><div class="panel-title">ПРЕДМЕТЫ</div><div id="inventoryGrid" class="inventory-grid"></div></section>
+<section id="inventory" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button" onclick="window.showScreen&&window.showScreen('home')">‹</button><div><small>ГЕРОЙ</small><h2>ИНВЕНТАРЬ</h2></div></header><div class="profile-card"><div class="profile-avatar" data-profile-photo>⚔️</div><div><b data-profile-name>Игрок</b><span>Уровень <strong data-level>1</strong></span><small data-username>@</small></div></div><div class="panel-title">ПРЕДМЕТЫ</div><div id="inventoryGrid" class="inventory-grid"></div></section>
 <section id="hero" class="screen panel-screen" aria-label="Персонаж"></section>
-<section id="districts" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button">‹</button><div><small>ГОРОД</small><h2>РАЙОНЫ</h2></div></header><div class="district-grid"><button class="district-card" type="button"><b>🏰 Центральный квартал</b><span>События и городские награды</span></button><button class="district-card" type="button"><b>⚓ Порт</b><span>Морские задания и торговля</span></button><button class="district-card" type="button"><b>🛡️ Северные стены</b><span>Испытания и сражения</span></button></div></section>
-<section id="market" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button">‹</button><div><small>ТОРГОВЛЯ</small><h2>ЛАВКА</h2></div><div class="wallet">🪙 <b data-coins>0</b></div></header><div class="merchant"><div>🧔‍♂️</div><b>ТОРГОВЕЦ<small>Эликсиры и оружие</small></b></div><div class="panel-title">ТОВАРЫ ЛАВКИ</div><div id="shopGrid" class="shop-grid"></div><div id="merchantLog" class="log">Торговец ждёт сделки.</div></section>
-<section id="casino" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button">‹</button><div><small>СОБЫТИЕ</small><h2>ИГРЫ</h2></div><div class="wallet">🎲 <b data-dice>0</b></div></header><div class="casino-card"><div class="casino-title">МОНОПОЛИЯ</div><div id="casinoBoard" class="casino-board"></div><div data-roll-result class="roll-result">Готов к броску</div><button data-roll class="primary" type="button">БРОСИТЬ КУБИК</button></div></section>
+<section id="districts" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button" onclick="window.showScreen&&window.showScreen('home')">‹</button><div><small>ГОРОД</small><h2>РАЙОНЫ</h2></div></header><div class="district-grid"><button class="district-card" type="button"><b>🏰 Центральный квартал</b><span>События и городские награды</span></button><button class="district-card" type="button"><b>⚓ Порт</b><span>Морские задания и торговля</span></button><button class="district-card" type="button"><b>🛡️ Северные стены</b><span>Испытания и сражения</span></button></div></section>
+<section id="market" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button" onclick="window.showScreen&&window.showScreen('home')">‹</button><div><small>ТОРГОВЛЯ</small><h2>ЛАВКА</h2></div><div class="wallet">🪙 <b data-coins>0</b></div></header><div class="merchant"><div>🧔‍♂️</div><b>ТОРГОВЕЦ<small>Эликсиры и оружие</small></b></div><div class="panel-title">ТОВАРЫ ЛАВКИ</div><div id="shopGrid" class="shop-grid"></div><div id="merchantLog" class="log">Торговец ждёт сделки.</div></section>
+<section id="casino" class="screen panel-screen"><header class="screen-head"><button data-screen="home" class="back" type="button" onclick="window.showScreen&&window.showScreen('home')">‹</button><div><small>СОБЫТИЕ</small><h2>ИГРЫ</h2></div><div class="wallet">🎲 <b data-dice>0</b></div></header><div class="casino-card"><div class="casino-title">МОНОПОЛИЯ</div><div id="casinoBoard" class="casino-board"></div><div data-roll-result class="roll-result">Готов к броску</div><button data-roll class="primary" type="button">БРОСИТЬ КУБИК</button></div></section>
 <div id="arenaModal" class="arena-modal" aria-hidden="true"><div class="arena-sheet"><div class="arena-modal-head"><h2>⚔️ АРЕНА</h2><button id="arenaClose" class="arena-close" type="button">Закрыть</button></div><div id="arenaModalBody"></div></div></div>
+
+<nav id="hardMobileNav" aria-label="Навигация">
+<button type="button" onclick="window.showScreen&&window.showScreen('home')">⌂<span>Город</span></button>
+<button type="button" onclick="window.showScreen&&window.showScreen('inventory')">🎒<span>Инвентарь</span></button>
+<button type="button" onclick="window.showScreen&&window.showScreen('hero')">⚔<span>Герой</span></button>
+<button type="button" onclick="window.HomeRebuild&&window.HomeRebuild.startRunner&&window.HomeRebuild.startRunner(false)">⚔️<span>Бой</span></button>
+<button type="button" onclick="window.showScreen&&window.showScreen('districts')">📜<span>Квесты</span></button>
+<button type="button" onclick="window.showScreen&&window.showScreen('casino')">🎲<span>Игры</span></button>
+<button type="button" onclick="alert('Клан — в разработке')">🛡<span>Клан</span></button>
+</nav>
 </main>
 <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
-<script src="app.js?v=10005"></script>
+<script src="app.js?v=10006"></script>
 <script src="combat-items.js?v=10001"></script>
 <script src="forge-v2.js?v=10001"></script>
 <script src="followers.js?v=10001"></script>
@@ -36,5 +45,20 @@
 <script src="home-rebuild.js?v=10001"></script>
 <script src="button-fix.js?v=10003"></script>
 <script src="reference-ui.js?v=10001"></script>
+<script>
+(function(){
+  function syncNav(){
+    var n=document.getElementById('hardMobileNav');
+    if(!n)return;
+    n.style.display=(document.body.dataset.screen||'home')==='home'?'none':'grid';
+  }
+  var old=window.showScreen;
+  if(typeof old==='function'){
+    window.showScreen=function(id){old(id);syncNav();};
+  }
+  document.addEventListener('DOMContentLoaded',syncNav);
+  document.addEventListener('territory:render',syncNav);
+})();
+</script>
 </body>
 </html>
