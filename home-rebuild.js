@@ -38,7 +38,7 @@
   function mount(){
     const home=document.getElementById('home');if(!home||home.dataset.mounted)return;
     home.dataset.mounted='1';
-    home.innerHTML=`<div id="homeReferenceHost" class="home-reference-host"><img src="territory_reference_bg.jpg?v=9300" onerror="this.onerror=null;this.src='territory_reference_bg.png?v=9300'" class="home-reference-image" alt="Territory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones"></div><div id="homeRealHud" aria-hidden="true"></div></div>`;
+    home.innerHTML=`<div id="homeReferenceHost" class="home-reference-host"><img src="territory_reference_bg.png?v=9300" class="home-reference-image" alt="Territory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones"></div><div id="homeRealHud" aria-hidden="true"></div></div>`;
     const layer=home.querySelector('.home-hitzones'),bot=home.querySelector('.home-bottom-zones');
     zones.forEach((z,i)=>add(layer,z,i,false));bottom.forEach((z,i)=>add(bot,z,42+i,true));mountRealHud();
   }
