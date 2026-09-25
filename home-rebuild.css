@@ -33,52 +33,27 @@ body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active)
 .tr10-card button:disabled{opacity:.5!important}
 @media(max-width:390px){.tr10-card{width:96vw!important;max-height:88vh!important;padding:11px!important}.tr10-head h2{font-size:18px!important}}
 
-/* REAL HOME HUD v45 — dynamic values only. Bottom 42-48 is untouched. */
+/* REAL HOME HUD v45 */
 #homeRealHud{position:absolute!important;inset:0!important;z-index:72!important;pointer-events:none!important;font-family:Arial,sans-serif!important}
 #homeRealHud .rhud-field{position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;overflow:hidden!important;white-space:nowrap!important;pointer-events:none!important;color:#fff!important;font-weight:900!important;line-height:1!important;text-shadow:0 1px 2px #000,0 0 3px rgba(0,0,0,.95)!important}
 #homeRealHud .rhud-field span{font-size:clamp(10px,2.4vw,17px)!important}
-/* Profile: portrait stays baked into the original artwork; only name + level are live. */
-#homeRealHud .rhud-name{left:10.0%!important;top:1.15%!important;width:16.5%!important;height:2.55%!important;justify-content:flex-start!important;background:#16283a!important;border-radius:2px!important}
-#homeRealHud .rhud-level{left:10.0%!important;top:3.35%!important;width:10.5%!important;height:2.55%!important;justify-content:flex-start!important;background:#16283a!important}
-/* Top resource counters: masks sit exactly inside the dark number plates. */
-#homeRealHud .rhud-coins{left:34.1%!important;top:1.15%!important;width:9.8%!important;height:3.25%!important;background:#0a1928!important;border-radius:2px!important}
-#homeRealHud .rhud-gems{left:53.7%!important;top:1.15%!important;width:8.0%!important;height:3.25%!important;background:#0a1928!important;border-radius:2px!important}
-#homeRealHud .rhud-redgems{left:70.1%!important;top:1.15%!important;width:6.2%!important;height:3.25%!important;background:#0a1928!important;border-radius:2px!important}
-#homeRealHud .rhud-energy{left:34.5%!important;top:5.65%!important;width:20.5%!important;height:3.55%!important;background:#10a82f!important;border-radius:4px!important;text-shadow:0 1px 2px #002b08!important}
-#homeRealHud .rhud-vip{left:10.0%!important;top:5.65%!important;width:12.5%!important;height:2.6%!important;justify-content:flex-start!important;background:#172a3a!important;color:#ffd84d!important}
+#homeRealHud .rhud-name{left:15.0%!important;top:1.48%!important;width:9.2%!important;height:2.25%!important;justify-content:flex-start!important;background:rgba(17,31,44,.94)!important;border-radius:2px!important}
+#homeRealHud .rhud-level{left:15.0%!important;top:3.28%!important;width:8.5%!important;height:1.95%!important;justify-content:flex-start!important;background:rgba(17,31,44,.94)!important;border-radius:2px!important}
+#homeRealHud .rhud-vip{left:14.8%!important;top:5.08%!important;width:9.8%!important;height:2.15%!important;justify-content:flex-start!important;background:rgba(17,31,44,.88)!important;color:#ffd84d!important}
 #homeRealHud .rhud-vip span{color:#ffd84d!important}
-@media(max-width:430px){
-  #homeRealHud .rhud-field span{font-size:10px!important}
-  #homeRealHud .rhud-name span{font-size:9px!important}
-  #homeRealHud .rhud-level span,#homeRealHud .rhud-vip span{font-size:9px!important}
-  #homeRealHud .rhud-energy span{font-size:10px!important}
-}
-
-/* v57 — live state layer. The canonical artwork stays untouched; these are
-   narrow value windows only. No screenshot/crop assets are used. */
-#homeRealHud .rhud-field{z-index:90!important;background:transparent!important;border-radius:0!important;box-shadow:none!important}
-#homeRealHud .rhud-field span{font-family:Arial,sans-serif!important;font-weight:900!important;color:#fff!important;text-shadow:0 1px 2px #000,0 0 3px #000!important}
-#homeRealHud .rhud-name{left:15.1%!important;top:1.72%!important;width:9.7%!important;height:2.15%!important;justify-content:flex-start!important;background:linear-gradient(90deg,rgba(17,31,44,.92),rgba(17,31,44,.58))!important;border-radius:2px!important}
-#homeRealHud .rhud-level{left:15.1%!important;top:3.55%!important;width:8.2%!important;height:1.95%!important;justify-content:flex-start!important;background:rgba(17,31,44,.72)!important;border-radius:2px!important}
-#homeRealHud .rhud-vip{left:8.1%!important;top:5.05%!important;width:8.4%!important;height:2.1%!important;justify-content:flex-start!important;background:rgba(17,31,44,.55)!important;color:#ffd84d!important}
-#homeRealHud .rhud-vip span{color:#ffd84d!important}
-#homeRealHud .rhud-coins{left:33.8%!important;top:1.55%!important;width:10.8%!important;height:2.45%!important;background:rgba(9,22,34,.78)!important;border-radius:3px!important}
-#homeRealHud .rhud-gems{left:52.1%!important;top:1.72%!important;width:7.2%!important;height:2.25%!important;background:rgba(9,22,34,.78)!important;border-radius:3px!important}
-#homeRealHud .rhud-redgems{left:68.0%!important;top:1.72%!important;width:7.0%!important;height:2.25%!important;background:rgba(9,22,34,.78)!important;border-radius:3px!important}
-#homeRealHud .rhud-energy{left:31.0%!important;top:4.85%!important;width:25.3%!important;height:2.55%!important;background:#07151b!important;border-radius:4px!important;overflow:hidden!important}
+#homeRealHud .rhud-coins{left:33.35%!important;top:1.75%!important;width:9.7%!important;height:1.75%!important;background:rgba(9,22,34,.94)!important;border-radius:3px!important}
+#homeRealHud .rhud-gems{left:51.85%!important;top:1.75%!important;width:6.7%!important;height:1.75%!important;background:rgba(9,22,34,.94)!important;border-radius:3px!important}
+#homeRealHud .rhud-redgems{left:67.2%!important;top:1.75%!important;width:7.5%!important;height:1.75%!important;background:rgba(9,22,34,.94)!important;border-radius:3px!important}
+#homeRealHud .rhud-energy{left:36.5%!important;top:5.08%!important;width:15.6%!important;height:1.75%!important;background:#07151b!important;border-radius:4px!important;overflow:hidden!important}
 #homeRealHud .rhud-energy:before{content:"";position:absolute;inset:0;background:#07151b!important;z-index:0!important}
 #homeRealHud .rhud-energy i{position:absolute!important;left:0!important;top:0!important;width:var(--energy-fill,0%)!important;height:100%!important;background:linear-gradient(180deg,#32f53d,#0dbb24)!important;border-radius:4px!important;z-index:1!important;box-shadow:inset 0 1px rgba(255,255,255,.2)!important}
-#homeRealHud .rhud-energy span{position:relative!important;z-index:2!important;font-size:clamp(10px,1.95vw,16px)!important}
-
-#homeRealHud .rhud-xpbar{left:27.55%!important;top:66.05%!important;width:38.0%!important;height:1.85%!important;background:#07151b!important;border-radius:3px!important;overflow:hidden!important;justify-content:flex-start!important}
+#homeRealHud .rhud-energy span{position:relative!important;z-index:2!important;font-size:clamp(9px,1.9vw,15px)!important}
+#homeRealHud .rhud-xpbar{left:27.7%!important;top:66.18%!important;width:37.2%!important;height:1.65%!important;background:#07151b!important;border-radius:3px!important;overflow:hidden!important;justify-content:flex-start!important}
 #homeRealHud .rhud-xpbar i{display:block!important;height:100%!important;width:var(--xp-fill,0%)!important;background:linear-gradient(180deg,#34f63f,#0dbb25)!important;border-radius:3px!important;box-shadow:inset 0 1px rgba(255,255,255,.2)!important}
-#homeRealHud .rhud-xp{left:36.8%!important;top:65.82%!important;width:23.0%!important;height:2.4%!important;background:rgba(7,18,27,.58)!important;justify-content:center!important;z-index:92!important}
-#homeRealHud .rhud-bottom-level{left:66.6%!important;top:65.82%!important;width:9.0%!important;height:2.4%!important;background:rgba(7,18,27,.68)!important;justify-content:center!important;z-index:92!important}
-
-#homeRealHud .rhud-hp{left:4.1%!important;top:73.15%!important;width:14.0%!important;height:2.15%!important;background:rgba(92,0,0,.58)!important;border-radius:999px!important;justify-content:center!important;z-index:93!important}
-#homeRealHud .rhud-bottom-energy{left:85.2%!important;top:73.15%!important;width:11.6%!important;height:2.15%!important;background:rgba(0,52,112,.58)!important;border-radius:999px!important;justify-content:center!important;z-index:93!important}
-
-/* Item levels: cover only the old baked level captions, not the item art. */
+#homeRealHud .rhud-xp{left:35.0%!important;top:65.9%!important;width:25.0%!important;height:2.05%!important;background:rgba(7,18,27,.88)!important;justify-content:center!important;z-index:92!important}
+#homeRealHud .rhud-bottom-level{left:66.4%!important;top:65.9%!important;width:10.0%!important;height:2.05%!important;background:rgba(7,18,27,.88)!important;justify-content:center!important;z-index:92!important}
+#homeRealHud .rhud-hp{left:4.0%!important;top:72.95%!important;width:15.2%!important;height:2.15%!important;background:rgba(90,0,0,.82)!important;border-radius:999px!important;justify-content:center!important;z-index:93!important}
+#homeRealHud .rhud-bottom-energy{left:84.8%!important;top:72.95%!important;width:12.2%!important;height:2.15%!important;background:rgba(0,50,110,.82)!important;border-radius:999px!important;justify-content:center!important;z-index:93!important}
 #homeRealHud .rhud-item{top:74.55%!important;height:2.15%!important;background:linear-gradient(180deg,rgba(5,10,15,.15),rgba(5,10,15,.82))!important;border-radius:2px!important;justify-content:center!important;z-index:94!important}
 #homeRealHud .rhud-item.i1{left:17.2%!important;width:11.5%!important}
 #homeRealHud .rhud-item.i2{left:27.9%!important;width:11.5%!important}
@@ -87,31 +62,14 @@ body:has(#home.home-reference-active) .hud,body:has(#home.home-reference-active)
 #homeRealHud .rhud-item.i5{left:61.0%!important;width:11.5%!important}
 #homeRealHud .rhud-item.i6{left:72.0%!important;width:11.5%!important}
 #homeRealHud .rhud-item span{font-size:clamp(8px,1.55vw,13px)!important}
-
-/* Consumable counts: only the number area is live; timers remain artwork. */
 #homeRealHud .rhud-cons{top:81.0%!important;height:2.0%!important;background:rgba(7,15,21,.68)!important;border-radius:2px!important;justify-content:center!important;z-index:94!important}
 #homeRealHud .rhud-cons.c1{left:8.0%!important;width:5.0%!important}
 #homeRealHud .rhud-cons.c2{left:21.0%!important;width:5.0%!important}
 #homeRealHud .rhud-cons.c3{left:34.2%!important;width:5.0%!important}
 #homeRealHud .rhud-cons.c4{left:47.3%!important;width:5.0%!important}
 #homeRealHud .rhud-cons span{font-size:clamp(8px,1.55vw,13px)!important}
-
 @media(max-width:430px){
   #homeRealHud .rhud-name span,#homeRealHud .rhud-level span,#homeRealHud .rhud-vip span{font-size:9px!important}
   #homeRealHud .rhud-coins span,#homeRealHud .rhud-gems span,#homeRealHud .rhud-redgems span{font-size:10px!important}
   #homeRealHud .rhud-xp span,#homeRealHud .rhud-bottom-level span,#homeRealHud .rhud-hp span,#homeRealHud .rhud-bottom-energy span{font-size:9px!important}
 }
-/* v57.1 exact value masks — sized from the 866x1536 reference text windows. */
-#homeRealHud .rhud-name{left:15.0%!important;top:1.48%!important;width:9.2%!important;height:2.25%!important;background:rgba(17,31,44,.94)!important}
-#homeRealHud .rhud-level{left:15.0%!important;top:3.28%!important;width:8.5%!important;height:1.95%!important;background:rgba(17,31,44,.94)!important}
-#homeRealHud .rhud-vip{left:14.8%!important;top:5.08%!important;width:9.8%!important;height:2.15%!important;background:rgba(17,31,44,.88)!important}
-#homeRealHud .rhud-coins{left:33.35%!important;top:1.75%!important;width:9.7%!important;height:1.75%!important;background:rgba(9,22,34,.94)!important}
-#homeRealHud .rhud-gems{left:51.85%!important;top:1.75%!important;width:6.7%!important;height:1.75%!important;background:rgba(9,22,34,.94)!important}
-#homeRealHud .rhud-redgems{left:67.2%!important;top:1.75%!important;width:7.5%!important;height:1.75%!important;background:rgba(9,22,34,.94)!important}
-#homeRealHud .rhud-energy{left:36.5%!important;top:5.08%!important;width:15.6%!important;height:1.75%!important;background:#07151b!important}
-#homeRealHud .rhud-energy span{font-size:clamp(9px,1.9vw,15px)!important}
-#homeRealHud .rhud-xpbar{left:27.7%!important;top:66.18%!important;width:37.2%!important;height:1.65%!important;background:#07151b!important}
-#homeRealHud .rhud-xp{left:35.0%!important;top:65.9%!important;width:25.0%!important;height:2.05%!important;background:rgba(7,18,27,.88)!important}
-#homeRealHud .rhud-bottom-level{left:66.4%!important;top:65.9%!important;width:10.0%!important;height:2.05%!important;background:rgba(7,18,27,.88)!important}
-#homeRealHud .rhud-hp{left:4.0%!important;top:72.95%!important;width:15.2%!important;height:2.15%!important;background:rgba(90,0,0,.82)!important}
-#homeRealHud .rhud-bottom-energy{left:84.8%!important;top:72.95%!important;width:12.2%!important;height:2.15%!important;background:rgba(0,50,110,.82)!important}
