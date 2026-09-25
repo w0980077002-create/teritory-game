@@ -1,593 +1,137 @@
-/* TERITORY HOME UNIFIED 10
-   HOME is the single source of truth.
-   All HOME popups use one visual format.
-   Bottom buttons 42-48 are always mounted on HOME.
-*/
+/* Territory Game — HOME + isolated PvE runner
+   PvE runtime is runnerBattle. Arena runtime is arenaBattle in arena.js. */
 (function(){
-  "use strict";
-  const $=(s,r=document)=>r.querySelector(s);
-  const store=()=>window.TerritoryStore?.state||{};
-  const save=()=>window.TerritoryStore?.save?.();
-  const go=id=>typeof window.showScreen==="function" ? (window.showScreen(id),true) : false;
-  const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-  function close(){document.querySelector(".tr10-panel")?.remove()}
-  function panel(title,sub,body,after){
-    close();
-    const p=document.createElement("div");
-    p.className="tr10-panel";
-    p.innerHTML=`<div class="tr10-card" role="dialog" aria-modal="true">
-      <button class="tr10-x" type="button" aria-label="Закрыть">×</button>
-      <div class="tr10-head"><small>${esc(sub||"TERITORY")}</small><h2>${esc(title)}</h2></div>
-      <div class="tr10-body">${body}</div>
-    </div>`;
-    document.body.appendChild(p);
-    const mainMenu=document.getElementById("tr10-main-menu");
-    if(mainMenu) mainMenu.classList.remove("on-home");
-    const done=()=>{p.remove()};
-    $(".tr10-x",p).onclick=done;
-    p.addEventListener("click",e=>{if(e.target===p)done()});
-    if(after)after(p,done);
-    return p;
-  }
-  const btn=(label,attr="")=>`<button class="tr10-main" type="button" ${attr}>${label}</button>`;
-  function launch(title,sub,icon,text,button,labelAction){
-    panel(title,sub,
-      `<div class="tr10-resource"><b>${icon} ${esc(text)}</b><span>Все разделы HOME открываются в одном формате. Кнопка ниже запускает именно указанный раздел.</span></div>${btn(button,"data-launch")}`,
-      p=>{$("[data-launch]",p).onclick=()=>{p.remove();labelAction()}}
-    );
-  }
-  function resource(title,value,desc){panel(title,"РЕСУРС",`<div class="tr10-resource"><b>${esc(value)}</b><span>${esc(desc)}</span></div>`)}
-  function quests(){
-    const s=store();
-    panel("Квесты","ТЕКУЩИЕ ЗАДАНИЯ",
-      `<div class="tr10-row"><b>📜</b><span>2-7 · Пройти Северные земли<small>${Number(s.gameTaskProgress||0)>=1?"Выполнено":"Прогресс 0 / 1"}</small></span></div>
-       <div class="tr10-row"><b>🛡️</b><span>Задание Alex<small>${Number(s.alexQuest||0)>=1?"Активно":"Можно начать в городе"}</small></span></div>
-       ${btn("Открыть карту районов","data-go-districts")}`,
-      p=>{$("[data-go-districts]",p).onclick=()=>{p.remove();go("districts")}}
-    );
-  }
-  function daily(){
-    const s=store(), day=new Date().toISOString().slice(0,10), claimed=s.homeDailyClaim===day;
-    panel("Ежедневные награды","НАГРАДА",
-      `<div class="tr10-resource"><b>🎁 ${claimed?"Получено сегодня":"+100 🪙 · +10 XP"}</b><span>${claimed?"Следующая награда будет доступна завтра.":"Забери награду одним нажатием."}</span></div>
-       ${btn(claimed?"Получено":"Забрать награду","data-claim "+(claimed?"disabled":""))}`,
-      p=>{$("[data-claim]",p)?.addEventListener("click",()=>{s.coins=Number(s.coins||0)+100;s.exp=Number(s.exp||0)+10;s.homeDailyClaim=day;save();daily()})}
-    );
-  }
-  function friends(){
-    panel("Пригласить друзей","ДРУЗЬЯ",
-      `<div class="tr10-resource"><b>👥 Приглашение</b><span>Отправь ссылку на Teritory Game через Telegram или системное меню.</span></div>${btn("Поделиться","data-share")}`,
-      p=>{$("[data-share]",p).onclick=async()=>{try{if(navigator.share)await navigator.share({title:"Teritory Game",text:"Заходи в Teritory Game"});else if(navigator.clipboard)await navigator.clipboard.writeText("Teritory Game")}catch(_){}}}
-    );
-  }
-  function achievements(){
-    const s=store(), wins=Number(s.arenaWins||s.wins||0), rolls=Number(s.gameRolls||0);
-    const rows=[["⚔️","Первая победа",wins>=1],["🎲","Первый бросок",rolls>=1],["🎒","Первый предмет",Array.isArray(s.inventory)&&s.inventory.length>0],["🏆","10 побед",wins>=10]];
-    panel("Достижения","ПРОГРЕСС",rows.map(x=>`<div class="tr10-row ${x[2]?"done":""}"><b>${x[0]}</b><span>${x[1]}<small>${x[2]?"Получено":"Ещё не получено"}</small></span></div>`).join(""));
-  }
-  function messages(){
-    const s=store();
-    panel("Сообщения","ЦЕНТР СООБЩЕНИЙ",
-      `<div class="tr10-row"><b>✉️</b><span>Добро пожаловать, ${esc(s.name||"SSS")}!<small>Уровень ${Number(s.level||1)}</small></span></div>
-       <div class="tr10-row"><b>🎯</b><span>Текущая глава: Северные земли 2-7<small>Продолжай прохождение</small></span></div>`
-    );
-  }
-  function settings(){
-    const sound=localStorage.getItem("tg_sound")!=="0", vibr=localStorage.getItem("tg_vibration")!=="0";
-    panel("Настройки","ИГРОВЫЕ НАСТРОЙКИ",
-      `<div class="tr10-setting"><span>🔊 Звук</span><button class="tr10-toggle" data-k="tg_sound">${sound?"ВКЛ":"ВЫКЛ"}</button></div>
-       <div class="tr10-setting"><span>📳 Вибрация</span><button class="tr10-toggle" data-k="tg_vibration">${vibr?"ВКЛ":"ВЫКЛ"}</button></div>`,
-      p=>p.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{const k=b.dataset.k,on=localStorage.getItem(k)!=="0";localStorage.setItem(k,on?"0":"1");b.textContent=on?"ВЫКЛ":"ВКЛ"})
-    );
-  }
-  function chapter(stage=2){
-    panel("Глава 2 · Северные земли","ПРОХОЖДЕНИЕ",
-      `<div class="tr10-resource"><b>Этап ${stage} · Северные земли</b><span>${stage<6?"Этап открыт для просмотра.":"Боссовый этап."}</span></div>
-       ${btn(stage>=6?"Войти в бой":"Открыть этап","data-stage-go")}`,
-      p=>{$("[data-stage-go]",p).onclick=()=>{p.remove();go("arena")}}
-    );
-  }
-  function combat(){return go("arena")}
-  function streets(){
-    const s=store(), day=new Date().toISOString().slice(0,10);
-    s.streetClaims=s.streetClaims&&typeof s.streetClaims==="object"?s.streetClaims:{};
-    const data=[["Северная улица",75],["Рыночный переулок",90],["Портовая улица",110]];
-    panel("Захват улиц","ГОРОД",
-      `<p class="tr10-muted">Захват расходует 10 энергии и даёт монеты + репутацию.</p>
-       <div class="tr10-list">${data.map((x,i)=>{const done=s.streetClaims[i]===day;return `<div class="tr10-row"><b>⚔️</b><span>${x[0]}<small>${done?"Уже захвачена сегодня":"+"+x[1]+" 🪙 · +1 репутация"}</small></span><button class="tr10-toggle" data-street="${i}" ${done?"disabled":""}>${done?"Готово":"Захватить"}</button></div>`}).join("")}</div>`,
-      p=>p.querySelectorAll("[data-street]").forEach(b=>b.onclick=()=>{const i=Number(b.dataset.street);if(Number(s.energy||0)<10){b.textContent="Нет энергии";return}s.energy-=10;s.coins=Number(s.coins||0)+data[i][1];s.cityRep=Number(s.cityRep||0)+1;s.streetClaims[i]=day;save();streets()})
-    );
-  }
-  function consumable(slot){
-    const s=store(), defs=[["Красное зелье","Восстановить 30 HP","hp",30],["Синее зелье","Восстановить 25 энергии","energy",25],["Большое синее зелье","Восстановить 50 энергии","energy",50],["Щит","Восстановить 15 HP","hp",15]];
-    const d=defs[slot]||defs[0];
-    panel(d[0],"РАСХОДНИК",`<div class="tr10-resource"><b>🧪 ${d[1]}</b><span>Слот ${slot+1}. Использование применяет эффект к текущему герою.</span></div>${btn("Использовать")}`,
-      p=>p.querySelector(".tr10-main").onclick=()=>{if(d[2]==="hp")s.hp=Math.min(Number(s.maxHp||120),Number(s.hp||0)+d[3]);else s.energy=Math.min(200,Number(s.energy||0)+d[3]);save();p.querySelector(".tr10-resource span").textContent="Эффект применён."});
-  }
-  function locked(title){panel(title||"Слот закрыт","ЭКИПИРОВКА",`<div class="tr10-resource"><b>🔒 Пока закрыто</b><span>Этот слот остаётся закрытым до подключения соответствующей системы.</span></div>`)}
-  function speed(){
-    const s=store();s.battleSpeed=Number(s.battleSpeed||1);
-    panel("Скорость боя","БОЙ",`<div class="tr10-setting"><span>Скорость: <b data-speed>${s.battleSpeed}×</b></span><button class="tr10-toggle" data-speed-btn>Переключить</button></div>`,
-      p=>{$("[data-speed-btn]",p).onclick=()=>{s.battleSpeed=s.battleSpeed===1?2:1;save();$("[data-speed]",p).textContent=s.battleSpeed+"×"}})
-  }
-  function star(){const s=store();resource("Боевой бонус","⭐ Урон +"+Number(s.bonusDamage||0),"Бонус зависит от экипированного оружия.")}
-  function vip(){resource("VIP","VIP 6","Текущий VIP-уровень.")}
-  function sea(){panel("Морской набор","СОБЫТИЕ",`<div class="tr10-resource"><b>⛵ Морской набор</b><span>Раздел подготовлен под отдельную морскую систему.</span></div>`)}
-  function clan(){panel("Клан","СОЮЗ",`<div class="tr10-resource"><b>🏰 Клан</b><span>Клановая система будет подключаться отдельно. Старые элементы не используются.</span></div>`)}
-  function resourceInfo(k){
-    const s=store(), d={
-      coins:["Монеты",Number(s.coins||0)+" 🪙","Используются в рынке, кузнице и городских наградах."],
-      gems:["Кристаллы",Number(s.gems||0)+" 💎","Премиальный ресурс текущего события."],
-      redgems:["Красные кристаллы",Number(s.redGems||0)+" ♦️","Ресурс пока не расходуется в подключённых системах."],
-      energy:["Энергия",Number(s.energy||0)+" / 200","Расходуется в городских действиях и восстанавливается расходниками."],
-      hp:["Здоровье",Number(s.hp||0)+" / "+Number(s.maxHp||0),"Текущее здоровье героя."]
-    };
-    const x=d[k]||d.coins;resource(x[0],x[1],x[2]);
-  }
-  function action(n){
-    switch(n){
-      case"profile":return launch("Профиль","ГЕРОЙ","🧙","Профиль героя и экипировка","Открыть героя",()=>go("inventory"));
-      case"vip":return vip();
-      case"coins":return resourceInfo("coins");
-      case"gems":return resourceInfo("gems");
-      case"redgems":return resourceInfo("redgems");
-      case"energy":return resourceInfo("energy");
-      case"trophy":return achievements();
-      case"messages":return messages();
-      case"settings":return settings();
-      case"attack":return combat();
-      case"chapter":return chapter(2);
-      case"stage1":return chapter(1); case"stage2":return chapter(2); case"stage3":return chapter(3); case"stage4":return chapter(4); case"stage5":return chapter(5); case"boss":return chapter(6);
-      case"events":return launch("События","ГОРОД","🎪","Городские районы и события","Открыть город",()=>go("districts"));
-      case"daily":return daily(); case"quests":return quests(); case"friends":return friends(); case"sea":return sea();
-      case"shop":return launch("Магазин","ТОРГОВЛЯ","🛒","Магазин снаряжения","Открыть магазин",()=>go("market"));
-      case"forge":return launch("Кузница","СНАРЯЖЕНИЕ","🔨","Покупка и экипировка оружия", "Открыть кузницу",()=>{if(typeof window.openForgeV2==="function")window.openForgeV2();else go("market")});
-      case"challenges":return go("arena");
-      case"streets":return streets();
-      case"arena":return go("arena");
-      case"hp":return resourceInfo("hp"); case"equipment":return launch("Экипировка","ГЕРОЙ","🛡️","Текущий комплект героя","Открыть героя",()=>go("inventory"));
-      case"consumable1":return consumable(0); case"consumable2":return consumable(1); case"consumable3":return consumable(2); case"consumable4":return consumable(3);
-      case"lock1":return locked("Слот · уровень 90"); case"lock2":return locked("Слот · Арена"); case"lock3":return locked("Слот · позже");
-      case"quest":return quests(); case"speed":return speed(); case"refresh":return combat(); case"crown":return combat(); case"star":return star();
-      case"home":return go("home");
-      case"inventory":return launch("Инвентарь","ГЕРОЙ","🎒","Предметы и экипировка","Открыть инвентарь",()=>go("inventory"));
-      case"hero":return launch("Герой","ГЕРОЙ","🛡️","Характеристики и экипировка","Открыть героя",()=>go("inventory"));
-      case"battle":return go("arena");
-      case"bottomQuests":return quests();
-      case"game":return launch("Игры","СОБЫТИЕ","🎲","Монополия · зимнее событие","Открыть игры",()=>go("game"));
-      case"clan":return clan();
-    }
-  }
+  'use strict';
+  const S=()=>window.TerritoryStore?.state||{};
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  let runnerBattle=null;
 
-  /* 41 visual/side controls. Bottom 42-48 are mounted separately and always exist. */
-  const Z=[
-    ["profile",0,0,27.5,6.5],["coins",27.5,0,18,5.8],["gems",45.5,0,18,5.8],["redgems",63.5,0,16,5.8],["trophy",79.5,0,6.5,5.8],["messages",86,0,7,5.8],["settings",93,0,7,5.8],
-    ["vip",2,4,17,4.5],["energy",30,4.5,28,5.2],["attack",64,4.2,34,6.3],
-    ["chapter",30,9,41,5.5],["stage1",37.5,13,4.2,3.8],["stage2",42,13,4.2,3.8],["stage3",46.5,13,4.2,3.8],["stage4",51,13,4.2,3.8],["stage5",55.5,13,4.2,3.8],["boss",59.5,12.3,5.2,5],
-    ["events",0,9,13,8],["daily",0,16.2,13,8],["quests",0,23.4,13,8],["friends",0,30.6,13,8],["sea",0,38,13,8],
-    ["shop",87,9,13,8],["forge",87,16.2,13,8],["challenges",87,23.4,13,8],["streets",87,30.6,13,8],["arena",87,38,13,8],
-    ["hp",0,64,18,12],["equipment",18,64,65,12],["energy",83,64,17,12],
-    ["consumable1",0,76.2,14.4,8],["consumable2",14.5,76.2,14.4,8],["consumable3",29,76.2,14.4,8],["consumable4",43.5,76.2,14.4,8],
-    ["lock1",58,76.2,13.5,8],["lock2",72,76.2,13.5,8],["lock3",86,76.2,14,8],
-    ["quest",0,84.2,51,7.2],["speed",61,83.7,8.5,7],["refresh",70.5,83.7,8.5,7],["crown",80,83.7,8.5,7],["star",89.5,83.7,10.5,7]
+  const zones=[
+    ['profile',0,0,27.5,6.5],['coins',27.5,0,18,5.8],['gems',45.5,0,18,5.8],['redgems',63.5,0,16,5.8],['trophy',79.5,0,6.5,5.8],['messages',86,0,7,5.8],['settings',93,0,7,5.8],
+    ['energy',30,4.5,28,5.2],['attack',64,4.2,34,6.3],['chapter',30,9,41,5.5],
+    ['events',0,9,13,8],['daily',0,16.2,13,8],['quests',0,23.4,13,8],['friends',0,30.6,13,8],['sea',0,38,13,8],
+    ['shop',87,9,13,8],['forge',87,16.2,13,8],['challenges',87,23.4,13,8],['streets',87,30.6,13,8],['arena',87,38,13,8],
+    ['hp',0,64,18,12],['equipment',18,64,65,12],['energyBottom',83,64,17,12],
+    ['consumable1',0,76.2,14.4,8],['consumable2',14.5,76.2,14.4,8],['consumable3',29,76.2,14.4,8],['consumable4',43.5,76.2,14.4,8],
+    ['lock1',58,76.2,13.5,8],['lock2',72,76.2,13.5,8],['lock3',86,76.2,14,8],['quest',0,84.2,51,7.2],['speed',61,83.7,8.5,7],['refresh',70.5,83.7,8.5,7],['crown',80,83.7,8.5,7],['star',89.5,83.7,10.5,7]
   ];
-  const BOTTOM=[
-    ["home",0,91,14.28,9],["inventory",14.28,91,14.28,9],["hero",28.56,91,14.28,9],
-    ["battle",42.84,90,14.32,10],["bottomQuests",57.16,91,14.28,9],["game",71.44,91,14.28,9],["clan",85.72,91,14.28,9]
-  ];
-  function hideLegacy(){
-    const sels=[".hud",".live-side-ui",".live-city-title",".live-city-time",".home-v2-scene",".g141-photo-controls",".home-v2-scene-image",".real-home-image",".scene-hotspots",".home-v2-scene-overlay"];
-    document.querySelectorAll(sels.join(",")).forEach(e=>{e.style.setProperty("display","none","important");e.style.setProperty("pointer-events","none","important");e.style.setProperty("visibility","hidden","important")});
-  }
-  function addZone(layer,z,i,cls){
-    const b=document.createElement("button");b.type="button";b.className="hz "+(cls||"");b.dataset.hz=z[0];b.dataset.i=i;b.setAttribute("aria-label",z[0]);
-    b.style.left=z[1]+"%";b.style.top=z[2]+"%";b.style.width=z[3]+"%";b.style.height=z[4]+"%";layer.appendChild(b);
+  const bottom=[['home',0,91,14.28,9],['inventory',14.28,91,14.28,9],['hero',28.56,91,14.28,9],['battle',42.84,90,14.32,10],['bottomQuests',57.16,91,14.28,9],['game',71.44,91,14.28,9],['clan',85.72,91,14.28,9]];
+  const action={
+    home:()=>window.showScreen?.('home'),inventory:()=>window.showScreen?.('inventory'),hero:()=>window.showScreen?.('hero'),game:()=>window.showScreen?.('casino'),
+    bottomQuests:()=>window.showScreen?.('districts'),clan:()=>window.showScreen?.('districts'),
+    battle:()=>startRunner(false),attack:()=>startRunner(false),arena:()=>window.ArenaGame?.open?.(),challenges:()=>window.ArenaGame?.open?.(),
+    shop:()=>window.showScreen?.('market'),forge:()=>window.ForgeV2?.open?.()||window.showScreen?.('market'),events:()=>window.showScreen?.('districts'),daily:()=>window.showScreen?.('casino'),quests:()=>window.showScreen?.('districts'),friends:()=>window.showScreen?.('districts'),sea:()=>window.showScreen?.('districts'),
+    profile:()=>window.showScreen?.('hero'),equipment:()=>window.showScreen?.('hero'),
+    consumable1:()=>window.CombatItems?.use?.('elixir_hp'),consumable2:()=>window.CombatItems?.use?.('elixir_energy'),consumable3:()=>window.CombatItems?.use?.('elixir_attack'),consumable4:()=>window.CombatItems?.use?.('elixir_guard')
+  };
+
+  function initTelegram(){
+    const tg=window.Telegram?.WebApp;if(!tg||!window.TerritoryStore)return;
+    tg.ready?.();tg.expand?.();
+    window.TeritoryGameBot='@TeritoryGameBot';
+    try{tg.ready();tg.expand();tg.setHeaderColor('#07111b');tg.setBackgroundColor('#07111b');}catch(_){}
+    const u=tg.initDataUnsafe?.user;if(!u?.id)return;
+    const s=S(),p=s.profile||{},display=[u.first_name,u.last_name].filter(Boolean).join(' ').trim()||'Игрок';
+    s.profile=Object.assign(p,{displayName:display,telegramId:String(u.id),username:String(u.username||''),firstName:String(u.first_name||''),lastName:String(u.last_name||''),photoUrl:String(u.photo_url||''),languageCode:String(u.language_code||''),platform:String(tg.platform||'unknown'),premium:Boolean(u.is_premium)});
+    s.name=display;s.telegramUserId=String(u.id);s.telegramUsername=String(u.username||'');window.TerritoryStore.saveNow?.('telegram-profile');paint();
   }
   function mount(){
-    const home=$("#home");if(!home)return;
-    home.classList.add("home-reference-active");
-    home.innerHTML=`<div class="home-reference-host" id="homeReferenceHost"><img class="home-reference-image" src="territory_reference_bg.png?v=PROFILE02" alt="Teritory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones" aria-label="Нижнее меню 42-48"></div></div>`;
-    const layer=$(".home-hitzones",home), bottom=$(".home-bottom-zones",home);
-    Z.forEach((z,i)=>addZone(layer,z,i));
-    BOTTOM.forEach((z,i)=>addZone(bottom,z,42+i,"home-bottom-hz"));
-
-    const fire=(name,e)=>{
-      if(!name)return false;
-      e.preventDefault();
-      e.stopPropagation();
-      action(name);
-      return true;
-    };
-    const handle=e=>{const b=e.target.closest?.(".hz");if(!b)return;fire(b.dataset.hz,e)};
-    layer.addEventListener("click",handle,true);
-    bottom.addEventListener("click",handle,true);
-
-    let last=0;
-    const touch=e=>{
-      const b=e.target.closest?.(".hz");
-      if(!b)return;
-      const now=Date.now();
-      if(now-last<450)return;
-      last=now;
-      fire(b.dataset.hz,e);
-    };
-    layer.addEventListener("touchstart",touch,{capture:true,passive:false});
-    bottom.addEventListener("touchstart",touch,{capture:true,passive:false});
-
-    const bottomHit=(clientX,clientY)=>{
-      if(!home.classList.contains("active"))return null;
-      const rect=home.getBoundingClientRect();
-      if(!rect.width||!rect.height)return null;
-      const x=(clientX-rect.left)/rect.width*100;
-      const y=(clientY-rect.top)/rect.height*100;
-      if(x<0||x>100||y<89.5||y>100)return null;
-      for(const z of BOTTOM){
-        if(x>=z[1]&&x<=z[1]+z[3]&&y>=z[2]&&y<=z[2]+z[4])return z[0];
-      }
-      return null;
-    };
-    const globalPointer=e=>{
-      if(e.__teritoryBottomHandled)return;
-      const name=bottomHit(e.clientX,e.clientY);
-      if(!name)return;
-      e.__teritoryBottomHandled=true;
-      fire(name,e);
-    };
-    const globalTouch=e=>{
-      if(e.__teritoryBottomHandled)return;
-      const t=e.changedTouches?.[0];
-      if(!t)return;
-      const name=bottomHit(t.clientX,t.clientY);
-      if(!name)return;
-      e.__teritoryBottomHandled=true;
-      const now=Date.now();
-      if(now-last<450)return;
-      last=now;
-      fire(name,e);
-    };
-    document.addEventListener("pointerup",globalPointer,true);
-    document.addEventListener("touchend",globalTouch,{capture:true,passive:false});
-
-    hideLegacy();
-    if(window.Telegram?.WebApp){try{Telegram.WebApp.expand();Telegram.WebApp.setHeaderColor("#07111b");Telegram.WebApp.setBackgroundColor("#07111b")}catch(_) {}}
+    const home=document.getElementById('home');if(!home||home.dataset.mounted)return;
+    home.dataset.mounted='1';
+    home.innerHTML='<div id="homeReferenceHost" class="home-reference-host"><img src="territory_reference_bg.png?v=9001" class="home-reference-image" alt="Territory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones"></div><div id="homeRealHud" aria-hidden="true"></div></div>';
+    const layer=home.querySelector('.home-hitzones'),bot=home.querySelector('.home-bottom-zones');
+    zones.forEach((z,i)=>add(layer,z,i,false));bottom.forEach((z,i)=>add(bot,z,42+i,true));mountRealHud();
   }
-
-
-  /* Telegram identity foundation.
-     Uses Telegram Mini App user data for the local player profile.
-     Server-side authentication is intentionally deferred to the backend stage:
-     initDataUnsafe is display/local-state input only here. */
-  async function initTelegramIdentity(){
-    const loadTelegram=()=>new Promise((resolve,reject)=>{
-      if(window.Telegram?.WebApp)return resolve(window.Telegram.WebApp);
-      const existing=document.querySelector('script[data-teritory-telegram-sdk]');
-      if(existing){
-        existing.addEventListener("load",()=>resolve(window.Telegram?.WebApp||null),{once:true});
-        existing.addEventListener("error",reject,{once:true});
-        return;
-      }
-      const script=document.createElement("script");
-      script.src="https://telegram.org/js/telegram-web-app.js?63";
-      script.async=true;
-      script.dataset.teritoryTelegramSdk="1";
-      script.onload=()=>resolve(window.Telegram?.WebApp||null);
-      script.onerror=reject;
-      document.head.appendChild(script);
-    });
-    const parseInitUser=tg=>{
-      try{
-        const raw=String(tg?.initData||"");
-        const match=raw.match(/(?:^|&)user=([^&]+)/);
-        if(!match)return null;
-        const parsed=JSON.parse(decodeURIComponent(match[1]));
-        return parsed&&parsed.id?parsed:null;
-      }catch(_){return null}
-    };
-    const getUser=async tg=>{
-      for(let i=0;i<8;i++){
-        const u=tg?.initDataUnsafe?.user||parseInitUser(tg);
-        if(u?.id)return u;
-        await new Promise(r=>setTimeout(r,250));
-      }
-      return null;
-    };
-    try{
-      let tg=null;
-      try{tg=await loadTelegram();}catch(_){}
-      if(tg){
-        try{
-          tg.ready();
-          tg.expand();
-          tg.setHeaderColor("#07111b");
-          tg.setBackgroundColor("#07111b");
-        }catch(_){}
-      }
-
-      // Fast local fallback: after the first successful Telegram login, the
-      // player's own profile is already stored under their Telegram ID.
-      // This prevents a cached/slow WebView SDK from exposing the baked S$$/SSS.
-      let u=null;
-      let savedId="";
-      try{
-        savedId=String(localStorage.getItem("territory_active_profile")||"");
-        if(savedId){
-          const raw=localStorage.getItem(`territory_profile_v1_${savedId}`);
-          const saved=raw?JSON.parse(raw):null;
-          if(saved?.telegramUserId){
-            u={
-              id:saved.telegramUserId,
-              username:saved.telegramUsername||"",
-              first_name:saved.telegramFirstName||saved.name||"Игрок",
-              last_name:saved.telegramLastName||"",
-              photo_url:saved.telegramPhotoUrl||"",
-              language_code:saved.telegramLanguageCode||"",
-              is_premium:Boolean(saved.telegramPremium)
-            };
-          }
-        }
-      }catch(_){}
-      if(!u?.id && tg)u=await getUser(tg);
-      if(!u?.id){
-        console.warn("Telegram user data is unavailable; profile was not overwritten.");
-        return;
-      }
-
-      const id=String(u.id);
-      const key=`territory_profile_v1_${id}`;
-      const current=store();
-      const defaults={
-        coins:1000,gems:25,level:1,exp:0,hp:120,maxHp:120,enemyHp:100,
-        weapon:"Кулаки",bonusDamage:0,inventory:["🪓"],alexQuest:0,cityRep:0,
-        energy:100,strength:5,agility:5,defense:0
-      };
-
-      try{
-        const raw=localStorage.getItem(key);
-        if(raw){
-          const saved=JSON.parse(raw);
-          if(saved&&typeof saved==="object"){
-            Object.keys(current).forEach(k=>delete current[k]);
-            Object.assign(current,saved);
-          }
-        }else{
-          Object.assign(current,defaults);
-        }
-      }catch(_){}
-
-      const display=[u.first_name,u.last_name].filter(Boolean).join(" ").trim()
-        || (u.username?`@${u.username}`:"Игрок");
-
-      current.telegramUserId=id;
-      current.telegramUsername=String(u.username||"");
-      current.telegramFirstName=String(u.first_name||"");
-      current.telegramLastName=String(u.last_name||"");
-      current.telegramPhotoUrl=String(u.photo_url||"");
-      current.telegramLanguageCode=String(u.language_code||"");
-      current.telegramPlatform=String(tg.platform||"unknown");
-      current.telegramPremium=Boolean(u.is_premium);
-      current.name=display;
-
-      window.TerritoryIdentity={
-        id,
-        username:current.telegramUsername,
-        displayName:display,
-        photoUrl:current.telegramPhotoUrl,
-        platform:current.telegramPlatform,
-        initData:tg.initData||""
-      };
-
-      if(!window.__territoryTelegramSaveWrapped){
-        const original=window.TerritoryStore?.save;
-        if(typeof original==="function"){
-          window.__territoryTelegramSaveWrapped=true;
-          window.TerritoryStore.save=function(){
-            const result=original.apply(this,arguments);
-            try{
-              const activeId=window.TerritoryIdentity?.id;
-              if(activeId)localStorage.setItem(`territory_profile_v1_${activeId}`,JSON.stringify(store()));
-            }catch(_){}
-            return result;
-          };
-        }
-      }
-
-      try{
-        localStorage.setItem(key,JSON.stringify(current));
-        localStorage.setItem("territory_active_profile",id);
-      }catch(_){}
-
-      const setText=(selector,value)=>{
-        document.querySelectorAll(selector).forEach(el=>el.textContent=value);
-      };
-      setText("#playerName",display);
-      setText("#profileName",display);
-
-      const avatarUrl=current.telegramPhotoUrl;
-      if(avatarUrl){
-        document.querySelectorAll(".profile-avatar-big,.avatar").forEach(el=>{
-          el.textContent="";
-          el.style.backgroundImage=`url("${avatarUrl.replace(/"/g,"%22")}")`;
-          el.style.backgroundSize="cover";
-          el.style.backgroundPosition="center";
-          el.style.backgroundRepeat="no-repeat";
-        });
-      }
-
-      // Direct HOME overlay: this is intentionally independent of the
-      // legacy profile DOM/CSS, so the baked "S$$/SSS" cannot win the stack.
-      const host=document.getElementById("homeReferenceHost");
-      if(host){
-        let profile=host.querySelector("#telegramLiveProfile");
-        if(!profile){
-          profile=document.createElement("div");
-          profile.id="telegramLiveProfile";
-          profile.innerHTML='<div data-tg-photo></div><div data-tg-name></div><div data-tg-level></div>';
-          Object.assign(profile.style,{
-            position:"absolute",left:"1.4%",top:"0.55%",width:"25.5%",height:"7.0%",
-            zIndex:"120",pointerEvents:"none",fontFamily:"Arial,sans-serif",
-            color:"#fff",fontWeight:"900",textShadow:"0 1px 2px #000,0 0 3px #000",
-            display:"block"
-          });
-          const photo=profile.querySelector("[data-tg-photo]");
-          Object.assign(photo.style,{
-            position:"absolute",left:"0",top:"0",width:"25%",height:"100%",
-            borderRadius:"12%",background:"#172433 center/cover no-repeat",
-            boxShadow:"0 1px 4px rgba(0,0,0,.8)"
-          });
-          const name=profile.querySelector("[data-tg-name]");
-          Object.assign(name.style,{
-            position:"absolute",left:"29%",top:"9%",right:"0",height:"34%",
-            display:"flex",alignItems:"center",overflow:"hidden",whiteSpace:"nowrap",
-            fontSize:"clamp(10px,2.6vw,18px)"
-          });
-          const lvl=profile.querySelector("[data-tg-level]");
-          Object.assign(lvl.style,{
-            position:"absolute",left:"29%",top:"48%",right:"0",height:"27%",
-            display:"flex",alignItems:"center",overflow:"hidden",whiteSpace:"nowrap",
-            fontSize:"clamp(9px,2.1vw,15px)"
-          });
-          host.appendChild(profile);
-        }
-        const photo=profile.querySelector("[data-tg-photo]");
-        const name=profile.querySelector("[data-tg-name]");
-        const lvl=profile.querySelector("[data-tg-level]");
-        if(photo){
-          if(avatarUrl)photo.style.backgroundImage=`url("${avatarUrl.replace(/"/g,"%22")}")`;
-          else photo.style.backgroundImage="none";
-        }
-        if(name)name.textContent=display;
-        if(lvl)lvl.textContent=`Lv. ${Math.max(1,Number(current.level)||1)}`;
-      }
-
-      if(typeof window.TerritoryStore?.render==="function")window.TerritoryStore.render();
-    }catch(err){
-      console.warn("Telegram profile init failed",err);
-    }
-  }
-
+  function add(layer,z,i,isBottom){const b=document.createElement('button');b.type='button';b.className='hz '+(isBottom?'home-bottom-hz':'');b.dataset.action=z[0];b.dataset.index=i;b.style.left=z[1]+'%';b.style.top=z[2]+'%';b.style.width=z[3]+'%';b.style.height=z[4]+'%';layer.appendChild(b);}
   function mountRealHud(){
-    const home=$("#home");
-    const host=$("#homeReferenceHost",home);
-    if(!home||!host)return;
-    let hud=$("#homeRealHud",host);
-    if(!hud){
-      hud=document.createElement("div");
-      hud.id="homeRealHud";
-      hud.innerHTML=`
-        <div class="rhud-field rhud-name"><span></span></div>
-        <div class="rhud-field rhud-level"><span></span></div>
-        <div class="rhud-field rhud-coins"><span></span></div>
-        <div class="rhud-field rhud-gems"><span></span></div>
-        <div class="rhud-field rhud-redgems"><span></span></div>
-        <div class="rhud-field rhud-energy"><span></span></div>
-        <div class="rhud-field rhud-vip"><span></span></div>
-        <div class="rhud-field rhud-xp"><span></span></div>
-        <div class="rhud-field rhud-xpbar"><i></i></div>
-        <div class="rhud-field rhud-bottom-level"><span></span></div>
-        <div class="rhud-field rhud-hp"><span></span></div>
-        <div class="rhud-field rhud-bottom-energy"><span></span></div>
-        <div class="rhud-field rhud-item i1"><span></span></div>
-        <div class="rhud-field rhud-item i2"><span></span></div>
-        <div class="rhud-field rhud-item i3"><span></span></div>
-        <div class="rhud-field rhud-item i4"><span></span></div>
-        <div class="rhud-field rhud-item i5"><span></span></div>
-        <div class="rhud-field rhud-item i6"><span></span></div>
-        <div class="rhud-field rhud-cons c1"><span></span></div>
-        <div class="rhud-field rhud-cons c2"><span></span></div>
-        <div class="rhud-field rhud-cons c3"><span></span></div>
-        <div class="rhud-field rhud-cons c4"><span></span></div>`;
-      host.appendChild(hud);
-    }
-    const render=()=>{
-      const s=store();
-      const set=(cls,value)=>{const e=$(`.${cls} span`,hud);if(e)e.textContent=value};
-      const num=(v,d=0)=>Number.isFinite(Number(v))?Number(v):d;
-      const compact=v=>{
-        const n=Math.max(0,num(v));
-        if(n>=1e9)return (n/1e9).toFixed(n%1e9?1:0)+"B";
-        if(n>=1e6)return (n/1e6).toFixed(n%1e6?1:0)+"M";
-        if(n>=1e3)return (n/1e3).toFixed(n%1e3?1:0)+"K";
-        return String(Math.floor(n));
-      };
-      set("rhud-name",String(s.name||"SSS"));
-      set("rhud-level","Lv. "+Math.max(1,num(s.level,1)));
-      set("rhud-coins",compact(s.coins));
-      set("rhud-gems",compact(s.gems));
-      set("rhud-redgems",compact(s.redGems));
-      const energyMax=Math.max(1,num(s.maxEnergy,200));
-      const energyNow=Math.max(0,Math.min(energyMax,num(s.energy,0)));
-      set("rhud-energy",`${Math.floor(energyNow)}/${Math.floor(energyMax)}`);
-      const vipRaw=s.vipLevel??s.vip;
-      const vipEl=$(".rhud-vip",hud);
-      if(vipRaw!==undefined&&vipRaw!==null&&vipRaw!==""){vipEl.style.display="flex";set("rhud-vip","VIP "+Math.max(0,num(vipRaw)));}
-      else vipEl.style.display="none";
-      const xp=Math.max(0,num(s.exp,0));
-      const xpNeeded=Math.max(1,num(s.expToNext??s.maxExp,100));
-      const level=Math.max(1,num(s.level,1));
-      const hpMax=Math.max(1,num(s.maxHp,120));
-      const hp=Math.max(0,Math.min(hpMax,num(s.hp,0)));
-      set("rhud-xp",`${Math.floor(xp).toLocaleString("ru-RU")}/${Math.floor(xpNeeded).toLocaleString("ru-RU")}`);
-      set("rhud-bottom-level",`Lv.${level}`);
-      set("rhud-hp",`${Math.floor(hp).toLocaleString("ru-RU")} / ${Math.floor(hpMax).toLocaleString("ru-RU")}`);
-      set("rhud-bottom-energy",`${Math.floor(energyNow).toLocaleString("ru-RU")} / ${Math.floor(energyMax).toLocaleString("ru-RU")}`);
-      const xpb=$(".rhud-xpbar",hud);if(xpb)xpb.style.setProperty("--xp-fill",Math.max(0,Math.min(1,xp/xpNeeded))*100+"%");
-      const inv=Array.isArray(s.inventory)?s.inventory:[];
-      const items=Array.isArray(s.equipment)?s.equipment:[];
-      const itemValue=i=>{const x=items[i]??inv[i];if(x==null)return "—";if(typeof x==="object")return x.level!=null?`Lv.${Math.max(1,num(x.level))}`:(x.name||"—");return String(x)};
-      for(let i=0;i<6;i++)set(`i${i+1}`,itemValue(i));
-      const counts=Array.isArray(s.consumables)?s.consumables:[];
-      for(let i=0;i<4;i++){const x=counts[i];set(`c${i+1}`,x==null?"—":String(typeof x==="object"?(x.count??"—"):x));}
-    };
-    render();
-    clearInterval(window.__homeRealHudTimer);
-    window.__homeRealHudTimer=setInterval(render,500);
+    const host=document.getElementById('homeRealHud');if(!host)return;
+    host.innerHTML='<span class="hud-clean hud-name"></span><span class="hud-clean hud-level"></span><span class="hud-clean hud-vip">VIP</span><span class="hud-clean hud-coins"></span><span class="hud-clean hud-gems"></span><span class="hud-clean hud-redgems"></span><span class="hud-clean hud-energy"></span><span class="hud-clean hud-xp"></span><span class="hud-clean hud-bottom-level"></span><span class="hud-clean hud-hp"></span><span class="hud-clean hud-bottom-energy"></span>';
   }
+  function paint(){
+    const s=S(),p=s.profile||{},d=window.TerritoryStore?.getDerivedStats?.()||{},set=(q,v)=>{const e=document.querySelector(q);if(e)e.textContent=v};
+    set('.hud-name',p.displayName||s.name||'Игрок');set('.hud-level','Lv. '+(s.level||1));set('.hud-coins',compact(s.coins));set('.hud-gems',compact(s.gems));set('.hud-redgems',compact(s.redGems));set('.hud-energy',`${Math.floor(s.energy||0)}/${Math.floor(s.maxEnergy||200)}`);set('.hud-xp',`${Math.floor(s.exp||0)}/${Math.floor(s.expToNext||100)}`);set('.hud-bottom-level','Lv.'+(s.level||1));set('.hud-hp',`${Math.floor(s.hp||0)} / ${Math.floor(d.maxHp||s.maxHp||120)}`);set('.hud-bottom-energy',`${Math.floor(s.energy||0)} / ${Math.floor(s.maxEnergy||200)}`);
+    const hp=Math.max(0,Math.min(1,(s.hp||0)/Math.max(1,d.maxHp||s.maxHp||120))),en=Math.max(0,Math.min(1,(s.energy||0)/Math.max(1,s.maxEnergy||200))),xp=Math.max(0,Math.min(1,(s.exp||0)/Math.max(1,s.expToNext||100)));
+    [['.hud-hp',hp],['.hud-energy',en],['.hud-xp',xp]].forEach(([q,v])=>document.querySelector(q)?.style.setProperty('--fill',(v*100)+'%'));
+  }
+  function compact(v){const n=Math.max(0,Number(v)||0);return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(Math.floor(n));}
 
-  function installCleanValueLayer(){
-    const host=document.getElementById("homeReferenceHost");
-    if(!host)return;
-    let style=document.getElementById("territoryHomeCleanV2");
-    if(!style){
-      style=document.createElement("style");
-      style.id="territoryHomeCleanV2";
-      style.textContent=`
-        /* HOME CLEAN V2: remove baked dynamic captions without touching artwork or 42-48. */
-        /* Narrow label windows: never create one continuous black strip across the six item cards. */
-        #homeRealHud .rhud-item{top:74.55%!important;height:1.15%!important;background:rgba(10,16,22,.78)!important;border-radius:2px!important;box-shadow:none!important;padding:0!important;}
-        #homeRealHud .rhud-item.i1{left:19.7%!important;width:6.5%!important}
-        #homeRealHud .rhud-item.i2{left:30.5%!important;width:6.5%!important}
-        #homeRealHud .rhud-item.i3{left:41.5%!important;width:6.5%!important}
-        #homeRealHud .rhud-item.i4{left:52.5%!important;width:6.5%!important}
-        #homeRealHud .rhud-item.i5{left:63.5%!important;width:6.5%!important}
-        #homeRealHud .rhud-item.i6{left:74.5%!important;width:6.5%!important}
-        #homeRealHud .rhud-item span{font-size:clamp(7px,1.25vw,11px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
-        /* Consumable counts are small badges, not full-width masks. */
-        #homeRealHud .rhud-cons{top:80.9%!important;height:1.35%!important;background:rgba(9,15,21,.78)!important;border-radius:2px!important;box-shadow:none!important;padding:0!important;}
-        #homeRealHud .rhud-cons.c1{left:9.1%!important;width:3.4%!important}
-        #homeRealHud .rhud-cons.c2{left:22.2%!important;width:3.4%!important}
-        #homeRealHud .rhud-cons.c3{left:35.4%!important;width:3.4%!important}
-        #homeRealHud .rhud-cons.c4{left:48.5%!important;width:3.4%!important}
-        #homeRealHud .rhud-cons span{font-size:clamp(7px,1.25vw,11px)!important;color:#fff!important;text-shadow:0 1px 2px #000!important;}
-        #homeRealHud .rhud-xp{background:rgba(7,18,27,.92)!important;}
-        #homeRealHud .rhud-bottom-level{background:rgba(7,18,27,.92)!important;}
-        #homeRealHud .rhud-hp{background:rgba(72,0,0,.88)!important;}
-        #homeRealHud .rhud-bottom-energy{background:rgba(0,42,92,.88)!important;}
-        #homeRealHud .rhud-energy{background:#07151b!important;}
-        /* Only erase the baked text part of the profile. The live Telegram
-           layer sits above this patch and keeps the real photo/name visible. */
-        #telegramBakedProfileCleaner{position:absolute!important;left:0!important;top:.55%!important;width:27.5%!important;height:7.0%!important;z-index:110!important;pointer-events:none!important;background:#111f2c!important;opacity:1!important;border-radius:3px!important;box-shadow:none!important;mix-blend-mode:normal!important;}
-        #telegramLiveProfile{z-index:120!important;}
-      `;
-      document.head.appendChild(style);
-    }
-    if(!host.querySelector("#telegramBakedProfileCleaner")){
-      const cleaner=document.createElement("div");
-      cleaner.id="telegramBakedProfileCleaner";
-      host.appendChild(cleaner);
-    }
+  function followerData(){
+    const id=S().followers?.activeFollower;
+    const api=window.Followers;
+    if(!id||!api)return null;
+    const f=api.get?.(id),cfg=api.CATALOG?.[id],stats=api.getStats?.(id);
+    return f?.owned&&cfg&&stats?{id,name:cfg.name,icon:cfg.icon,role:cfg.role,level:f.level,stats}:null;
   }
-
-  function boot(){mount();hideLegacy();mountRealHud();installCleanValueLayer();initTelegramIdentity();
+  function runnerTemplate(root){
+    const s=S(),p=S().profile||{},f=followerData(),chapter=Math.max(1,Number(s.pve?.chapter)||1);
+    root.innerHTML=`<div class="runner-ui"><div><b>БОЙ · ГЛАВА ${chapter}</b><span data-run-status>Вперёд!</span></div><button type="button" data-run-close>×</button></div><div class="runner-chapter-hud"><div><small>ПРОГРЕСС ГЛАВЫ</small><b data-run-progress>0%</b></div><div class="runner-progress-track"><i data-run-progress-fill></i></div><button type="button" data-run-boss aria-label="Запустить босса">💀</button></div><div class="runner-stage"><div class="runner-character player-runner"><img src="./arena-assets/player-viking-approved.png" alt="" draggable="false"><span>${esc(p.displayName||s.name||'Игрок')}</span></div>${f?`<div class="runner-follower"><i>${esc(f.icon)}</i><b>${esc(f.name)}</b></div>`:''}<div class="runner-enemy" data-run-enemy><img src="./arena-assets/opponent-viking-approved.png" alt="" draggable="false"><span data-run-enemy-name>Разбойник</span></div><div class="runner-damage-layer"></div><div class="runner-impact-layer"></div></div>`;
   }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
+  function startRunner(forceBoss){
+    stopRunner();
+    const root=document.createElement('div');root.id='runnerScreen';root.className='runner-screen show';
+    runnerTemplate(root);document.body.appendChild(root);
+    runnerBattle={root,boss:Boolean(forceBoss||S().pve?.bossPending),running:true,enemyHp:0,enemyMaxHp:0,enemyIndex:0};
+    if(runnerBattle.boss){S().pve.bossActive=true;S().pve.bossPending=false;window.TerritoryStore.saveNow?.('pve-boss-start');}
+    tickRunner();
+  }
+  function stopRunner(){runnerBattle?.root?.remove();runnerBattle=null;}
+  function setProgress(v){const s=S();s.pve.progress=Math.max(0,Math.min(100,v));const root=runnerBattle?.root;if(!root)return;root.querySelector('[data-run-progress]').textContent=Math.floor(s.pve.progress)+'%';root.querySelector('[data-run-progress-fill]').style.width=s.pve.progress+'%';}
+  function spawnEnemy(){
+    if(!runnerBattle)return;
+    const s=S(),chapter=Math.max(1,Number(s.pve.chapter)||1),boss=runnerBattle.boss;
+    runnerBattle.enemyMaxHp=boss?220+chapter*35:70+chapter*12;runnerBattle.enemyHp=runnerBattle.enemyMaxHp;runnerBattle.enemyIndex++;
+    const names=boss?['Глава Севера','Железный Ярл','Кровавый Вождь']:['Разбойник','Северный воин','Наёмник','Лесной охотник'];
+    const e=runnerBattle.root.querySelector('[data-run-enemy]');if(e){e.classList.remove('runner-enemy-dead');e.classList.add('runner-enemy-enter');e.querySelector('[data-run-enemy-name]').textContent=boss?names[(chapter-1)%names.length]:names[(runnerBattle.enemyIndex-1)%names.length];}
+    const st=runnerBattle.root.querySelector('[data-run-status]');if(st)st.textContent=boss?'БОСС!':'Встреча с противником';
+  }
+  function damageText(value,critical){const l=runnerBattle?.root?.querySelector('.runner-damage-layer');if(!l)return;const e=document.createElement('div');e.className='runner-damage '+(critical?'critical':'');e.textContent=(critical?'💥 ':'')+'-'+value;l.appendChild(e);setTimeout(()=>e.remove(),850);}
+  function hitAnim(){const r=runnerBattle?.root;if(!r)return;r.classList.remove('runner-hit');void r.offsetWidth;r.classList.add('runner-hit');setTimeout(()=>r.classList.remove('runner-hit'),220);}
+  function awardBot(){
+    const s=S(),d=window.TerritoryStore?.getDerivedStats?.()||{},f=followerData();
+    s.coins+=20+Math.floor((d.strength||5)*1.5);s.exp+=8+Math.floor((d.strength||5)/2);
+    if(f)window.Followers?.addXp?.(f.id,5);
+    s.pve.progress=Math.min(100,Number(s.pve.progress||0)+10);
+    if(s.pve.progress>=100&&!runnerBattle.boss){s.pve.bossPending=true;}
+    window.TerritoryStore.saveNow?.('pve-bot-reward');window.TerritoryStore.render?.();setProgress(s.pve.progress);
+  }
+  function bossWin(){
+    const s=S();s.pve.bossActive=false;s.pve.bossPending=false;s.pve.bossDefeated++;s.pve.chapter++;s.pve.progress=0;s.coins+=250+s.pve.chapter*25;s.exp+=100;
+    window.TerritoryStore.saveNow?.('pve-boss-win');window.TerritoryStore.render?.();setProgress(0);
+    const st=runnerBattle.root.querySelector('[data-run-status]');if(st)st.textContent='🏆 БОСС ПОБЕЖДЁН · НОВАЯ ГЛАВА';
+    setTimeout(()=>{if(runnerBattle){runnerBattle.boss=false;spawnEnemy();}},900);
+  }
+  function bossLose(){const s=S();s.pve.bossActive=false;s.pve.bossPending=true;s.hp=Math.max(1,Math.floor((Number(s.maxHp)||120)*.35));window.TerritoryStore.saveNow?.('pve-boss-loss');window.TerritoryStore.render?.();const st=runnerBattle.root.querySelector('[data-run-status]');if(st)st.textContent='☠️ Босс победил. Возвращаемся к обычным противникам…';setTimeout(()=>{if(runnerBattle){runnerBattle.boss=false;spawnEnemy();}},1000);}
+  function tickRunner(){
+    if(!runnerBattle?.running)return;
+    const s=S(),base=window.TerritoryStore?.getDerivedStats?.()||{},f=followerData(),d={strength:Number(base.strength||s.strength||0),defense:Number(base.defense||s.defense||0),maxHp:Number(base.maxHp||s.maxHp||1),agility:Number(base.agility||s.agility||0),bonusDamage:Number(base.bonusDamage||s.bonusDamage||0)};
+    const enemy=runnerBattle.root.querySelector('[data-run-enemy]');
+    if(!runnerBattle.enemyMaxHp)spawnEnemy();
+    const power=Math.max(1,Number(d.strength)||5)+(Number(d.bonusDamage)||0);
+    const critical=Math.random()<Math.min(.35,.08+(Number(d.agility)||5)/200);
+    const dealt=runnerBattle.boss?(critical?Math.floor(power*1.8):power):Math.max(1,critical?Math.floor(power*1.55):power);
+    runnerBattle.enemyHp=Math.max(0,runnerBattle.enemyHp-dealt);damageText(dealt,critical);hitAnim();
+    const st=runnerBattle.root.querySelector('[data-run-status]');if(st)st.textContent=critical?'💥 КРИТ!':'⚔️ УДАР';
+    if(runnerBattle.enemyHp<=0){
+      enemy?.classList.add('runner-enemy-dead');
+      if(runnerBattle.boss){bossWin();setTimeout(tickRunner,1200);return;}
+      awardBot();
+      if(S().pve.bossPending){runnerBattle.boss=true;S().pve.bossActive=true;window.TerritoryStore.saveNow?.('pve-boss-ready');}
+      setTimeout(tickRunner,700);return;
+    }
+    const incoming=Math.max(1,(runnerBattle.boss?16+Number(S().pve.chapter||1)*2:7)-Math.floor((Number(d.defense)||0)/8));
+    if(Math.random()<.12&&followerData()?.id==='mort'){}else{
+      S().hp=Math.max(0,S().hp-incoming);
+      if(S().hp<=0){if(runnerBattle.boss){bossLose();return;}S().hp=Math.max(1,Math.floor((Number(d.maxHp)||120)*.35));window.TerritoryStore.saveNow?.('pve-runner-recover');const rs=runnerBattle.root.querySelector('[data-run-status]');if(rs)rs.textContent='☠️ Герой пал. Восстановление…';setTimeout(tickRunner,900);return;}
+    }
+    window.TerritoryStore.saveNow?.('pve-tick');
+    setTimeout(tickRunner,runnerBattle.boss?900:650);
+  }
+  document.addEventListener('click',e=>{
+    const hz=e.target.closest?.('.hz');if(hz){e.preventDefault();e.stopPropagation();action[hz.dataset.action]?.();return;}
+    if(e.target.closest?.('[data-run-close]')){stopRunner();return;}
+    if(e.target.closest?.('[data-run-boss]')&&S().pve?.bossPending){startRunner(true);return;}
+  });
+  document.addEventListener('territory:render',paint);
+  document.addEventListener('DOMContentLoaded',()=>{mount();paint();initTelegram();});
+  window.HomeRebuild={refresh:paint,startRunner};
 })();
