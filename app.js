@@ -137,6 +137,7 @@
     document.body.dataset.screen=target;
     if(target==='home'&&window.HomeRebuild?.refresh)window.HomeRebuild.refresh();
     window.TerritoryStore.render();
+    requestAnimationFrame(()=>window.MobileNavigation?.sync?.());
   };
 
   const cells=[['🏁','СТАРТ'],['💎','20'],['❓','?'],['💧','50'],['📜','7'],['🧰','1'],['❓','?'],['🪙','750'],['💧','30'],['💜','5'],['🪙','160'],['❓','?'],['📜','10'],['💧','30'],['🪙','750'],['💎','5'],['❓','?'],['🪙','300'],['💎','20'],['💧','40'],['📜','5'],['🪙','500'],['❓','?'],['💎','10'],['🧰','1'],['💧','60'],['🏁','ФИНИШ']];
@@ -159,6 +160,73 @@
     if(g)g.textContent=Math.floor(state.gems).toLocaleString('ru-RU');
     if(d)d.textContent=state.gameDice;
   }
+
+  /* CORE MOBILE NAVIGATION — back buttons + persistent bottom menu */
+  const mobileNavItems=[
+    ['home','Город','⌂'],['inventory','Инвентарь','🎒'],['hero','Герой','⚔'],
+    ['battle','Бой','⚔️'],['districts','Квесты','📜'],['casino','Игры','🎲'],['clan','Клан','🛡']
+  ];
+  function showClan(){
+    let m=document.getElementById('coreClanModal');
+    if(!m){
+      m=document.createElement('div');
+      m.id='coreClanModal';
+      m.innerHTML='<div class="core-clan-card"><button type="button" data-core-clan-close>×</button><b>КЛАН</b><span>Раздел в разработке.</span><button type="button" data-core-clan-close>ОК</button></div>';
+      document.body.appendChild(m);
+    }
+    m.classList.add('show');
+  }
+  function mountMobileNavigation(){
+    if(document.getElementById('coreMobileNav'))return;
+    const nav=document.createElement('nav');
+    nav.id='coreMobileNav';
+    nav.innerHTML=mobileNavItems.map(([id,label,icon])=>`<button type="button" data-core-nav="${id}"><i>${icon}</i><span>${label}</span></button>`).join('');
+    document.body.appendChild(nav);
+    const back=document.createElement('button');
+    back.id='coreBackButton';
+    back.type='button';
+    back.textContent='‹';
+    back.setAttribute('aria-label','Назад');
+    document.body.appendChild(back);
+
+    nav.addEventListener('click',e=>{
+      const b=e.target.closest('[data-core-nav]');if(!b)return;
+      e.preventDefault();e.stopPropagation();
+      const id=b.dataset.coreNav;
+      if(id==='battle'){window.HomeRebuild?.startRunner?.(false);return;}
+      if(id==='clan'){showClan();return;}
+      window.showScreen?.(id);
+    },true);
+
+    back.addEventListener('click',e=>{
+      e.preventDefault();e.stopPropagation();
+      window.showScreen?.('home');
+    },true);
+
+    document.addEventListener('click',e=>{
+      const close=e.target.closest('[data-core-clan-close]');
+      if(close){e.preventDefault();e.stopPropagation();document.getElementById('coreClanModal')?.classList.remove('show');return;}
+      const screenButton=e.target.closest?.('[data-screen]');
+      if(screenButton){
+        const target=screenButton.dataset.screen;
+        if(target){
+          e.preventDefault();e.stopPropagation();
+          window.showScreen?.(target);
+        }
+      }
+    },true);
+    window.MobileNavigation={sync};
+  }
+  function sync(){
+    const current=document.body.dataset.screen||document.documentElement.dataset.screen||'home';
+    const nav=document.getElementById('coreMobileNav'),back=document.getElementById('coreBackButton');
+    if(!nav||!back)return;
+    const isHome=current==='home';
+    nav.classList.toggle('home',isHome);
+    back.classList.toggle('show',!isHome);
+    nav.querySelectorAll('[data-core-nav]').forEach(b=>b.classList.toggle('active',b.dataset.coreNav===current));
+  }
+
   document.addEventListener('click',e=>{
     const roll=e.target.closest?.('[data-roll]');
     if(!roll)return;
@@ -169,6 +237,7 @@
     reward();save('casino-roll');renderCasino();
     const out=document.querySelector('[data-roll-result]');if(out)out.textContent=`🎲 Выпало ${n}`;
   });
-  document.addEventListener('territory:render',()=>{paint();renderCasino();});
-  document.addEventListener('DOMContentLoaded',()=>{paint();renderCasino();});
+
+  document.addEventListener('territory:render',()=>{paint();renderCasino();sync();});
+  document.addEventListener('DOMContentLoaded',()=>{paint();renderCasino();mountMobileNavigation();sync();});
 })();
