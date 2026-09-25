@@ -1,0 +1,81 @@
+
+.map-screen{background:#08131a!important;overflow:hidden}
+.map-scene{position:absolute;inset:0;overflow:hidden;background:#9cc4d7;touch-action:none}
+.map-layer{position:absolute;inset:-8%;width:116%;height:116%;pointer-events:none}
+.map-sky{background:linear-gradient(#9ecbe1 0%,#dbeaf0 42%,#c7d6dc 65%,#7d9aa1 100%)}
+.map-mountains{bottom:25%;top:auto;height:52%;inset-inline:-15%;width:130%;background-repeat:repeat-x;background-position:0 100%;background-size:900px 100%;will-change:transform}
+.map-mountains-back{opacity:.65;background-image:
+ radial-gradient(ellipse at 10% 85%,#526d79 0 10%,transparent 10.5%),
+ radial-gradient(ellipse at 25% 70%,#607985 0 13%,transparent 13.5%),
+ radial-gradient(ellipse at 45% 80%,#496572 0 16%,transparent 16.5%),
+ radial-gradient(ellipse at 70% 68%,#5f7881 0 14%,transparent 14.5%),
+ radial-gradient(ellipse at 90% 82%,#48616c 0 17%,transparent 17.5%)}
+.map-mountains-front{bottom:19%;height:40%;opacity:.92;background-image:
+ radial-gradient(ellipse at 8% 100%,#324b54 0 15%,transparent 15.5%),
+ radial-gradient(ellipse at 28% 95%,#3a555d 0 19%,transparent 19.5%),
+ radial-gradient(ellipse at 52% 100%,#2f474f 0 22%,transparent 22.5%),
+ radial-gradient(ellipse at 76% 92%,#3a555d 0 20%,transparent 20.5%),
+ radial-gradient(ellipse at 97% 100%,#2d444c 0 19%,transparent 19.5%)}
+.map-ground{top:auto;bottom:-5%;height:42%;background:
+ linear-gradient(166deg,transparent 0 27%,#e7eef0 27.5% 29%,transparent 29.5%),
+ repeating-linear-gradient(174deg,#78939a 0 10px,#718b92 11px 23px,#839ca2 24px 35px)}
+.map-road{top:auto;bottom:-5%;height:48%;left:30%;width:40%;transform:perspective(500px) rotateX(52deg);transform-origin:50% 100%;background:
+ repeating-linear-gradient(90deg,#52676e 0 16px,#5b7178 17px 34px);
+ border:2px solid #3d5258;box-shadow:0 -8px 25px #17272d88}
+.map-particles{position:absolute;inset:0;pointer-events:none;opacity:.65;background-image:
+ radial-gradient(circle,#fff 0 1px,transparent 1.5px),
+ radial-gradient(circle,#fff 0 1px,transparent 1.5px);
+ background-size:80px 110px,130px 160px;background-position:15px 20px,70px 50px}
+.map-hud{position:absolute;left:10px;right:10px;top:10px;height:66px;z-index:20;display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #a57a3d;border-radius:14px;background:#07131ddd;backdrop-filter:blur(5px)}
+.map-back{width:44px;height:44px;border:1px solid #8f6a39;border-radius:11px;background:#142733;color:#fff;font-size:30px}
+.map-title{display:flex;flex-direction:column;min-width:0}
+.map-title small{color:#e6bd62;font-size:9px;letter-spacing:2px}
+.map-title b{font-size:12px;white-space:nowrap}
+.map-progress{margin-left:auto;width:100px;height:8px;border-radius:10px;background:#17262d;overflow:hidden;border:1px solid #42535a}
+.map-progress i{display:block;width:70%;height:100%;background:#d9a84d}
+.map-stage-card{position:absolute;z-index:12;left:50%;top:105px;transform:translateX(-50%);width:min(330px,76%);padding:12px 15px;border:1px solid #b07e38;border-radius:14px;background:#081720dd;text-align:center;backdrop-filter:blur(5px)}
+.map-stage-card small{display:block;color:#e6bd62;font-size:9px;letter-spacing:1.5px}
+.map-stage-card b{display:block;margin-top:4px;font-size:16px}
+.map-stage-card span{display:block;color:#b7c4c8;font-size:11px;margin-top:3px}
+.traveller{position:absolute;z-index:15;bottom:24%;display:flex;flex-direction:column;align-items:center;will-change:left,transform}
+.hero-runner{left:23%;transition:left .15s linear}
+.follower{left:16%;bottom:22%;font-size:26px;color:#cde8ff;text-shadow:0 0 14px #fff}
+.hero-sprite,.bot-sprite{font-size:74px;filter:drop-shadow(0 12px 7px #1118);line-height:1}
+.nameplate{font-size:10px;font-weight:800;background:#07131ddd;border:1px solid #98713b;border-radius:8px;padding:3px 7px;margin-bottom:5px;white-space:nowrap}
+.encounter-bot{position:absolute;z-index:15;right:-20%;bottom:24%;display:flex;flex-direction:column;align-items:center;will-change:right,transform}
+.encounter-bot .bot-sprite{font-size:78px}
+.encounter-banner{position:absolute;z-index:25;left:50%;top:42%;transform:translate(-50%,-50%) scale(.7);opacity:0;display:flex;flex-direction:column;align-items:center;padding:14px 30px;border:2px solid #e1b451;border-radius:16px;background:#07131eee;box-shadow:0 0 35px #000a;pointer-events:none}
+.encounter-banner b{font-size:27px;color:#f1c966}
+.encounter-banner span{font-size:11px;margin-top:3px;color:#c7d0d3}
+.map-controls{position:absolute;z-index:30;left:50%;bottom:105px;transform:translateX(-50%);display:flex;gap:8px}
+.map-controls button{min-width:145px;padding:13px 18px;border-radius:12px;font-weight:900}
+.map-primary,.map-fight{border:1px solid #d7a94f;background:linear-gradient(#d6aa51,#704718);color:#fff}
+.map-secondary{border:1px solid #546a73;background:#10232d;color:#fff}
+.map-fight{box-shadow:0 0 20px #d9a84d66}
+.map-bottom-nav{position:absolute;z-index:40;left:0;right:0;bottom:0;height:76px;display:grid;grid-template-columns:repeat(7,1fr);background:#07131af5;border-top:1px solid #8c6838;backdrop-filter:blur(7px)}
+.map-bottom-nav button{border:0;border-right:1px solid #263a43;background:#0b1a23;color:#d3dcdf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:19px}
+.map-bottom-nav button span{font-size:9px}
+.map-bottom-nav button.active{background:linear-gradient(#3b2d19,#17170f);color:#f0c96e;box-shadow:inset 0 2px #d4a44c}
+.map-scene.is-moving .map-mountains-back{animation:mapParallaxBack 8s linear infinite}
+.map-scene.is-moving .map-mountains-front{animation:mapParallaxFront 4s linear infinite}
+.map-scene.is-moving .map-ground{animation:groundMove 1.2s linear infinite}
+.map-scene.is-moving .map-road{animation:roadMove .7s linear infinite}
+.map-scene.is-moving .map-particles{animation:snowMove 2.4s linear infinite}
+.map-scene.is-moving .hero-runner{animation:heroRun .65s ease-in-out infinite alternate}
+.map-scene.is-moving .follower{animation:followerRun .65s ease-in-out infinite alternate}
+.map-scene.is-encounter .hero-runner{left:44%;animation:none}
+.map-scene.is-encounter .follower{left:37%;animation:none}
+.map-scene.is-encounter .encounter-bot{right:40%;animation:none}
+.map-scene.is-encounter .encounter-banner{animation:encounterPop .45s ease-out forwards}
+@keyframes mapParallaxBack{to{transform:translateX(-280px)}}
+@keyframes mapParallaxFront{to{transform:translateX(-420px)}}
+@keyframes groundMove{to{transform:translateX(-80px)}}
+@keyframes roadMove{to{background-position:-70px 0}}
+@keyframes snowMove{to{background-position:-100px 180px,90px 240px}}
+@keyframes heroRun{from{transform:translateY(0) scaleX(1)}to{transform:translateY(-5px) scaleX(1.03)}}
+@keyframes followerRun{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+@keyframes encounterPop{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@media(max-width:430px){
+ .map-hud{top:8px}.map-stage-card{top:90px}.hero-sprite,.bot-sprite{font-size:62px}
+ .encounter-bot .bot-sprite{font-size:66px}.map-controls{bottom:88px}.map-bottom-nav{height:70px}
+}

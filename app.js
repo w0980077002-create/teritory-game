@@ -1,174 +1,33 @@
-/* Territory Game — unified state/runtime / Arena-PvE isolated rebuild */
-(function(){
-  'use strict';
-
-  const VERSION=8;
-  const TELEGRAM_BOT_USERNAME='TeritoryGameBot';
-  const TELEGRAM_BOT_HANDLE='@TeritoryGameBot';
-  const followerDefaults={
-    activeFollower:null,
-    items:{
-      liabro:{owned:false,level:1,xp:0,awakened:false,awakeningClaimed:false},
-      teralel:{owned:false,level:1,xp:0,awakened:false,awakeningClaimed:false},
-      king_cows:{owned:false,level:1,xp:0,awakened:false,awakeningClaimed:false},
-      mort:{owned:false,level:1,xp:0,awakened:false,awakeningClaimed:false},
-      stone_face:{owned:false,level:1,xp:0,awakened:false,awakeningClaimed:false}
-    }
-  };
-  const defaults={
-    schemaVersion:VERSION,
-    profile:{displayName:'',telegramId:'',username:'',firstName:'',lastName:'',photoUrl:'',languageCode:'',platform:'unknown',premium:false},
-    coins:1000,gems:25,redGems:0,level:1,exp:0,expToNext:100,
-    hp:120,maxHp:120,energy:200,maxEnergy:200,
-    strength:5,agility:5,defense:0,weapon:'Кулаки',bonusDamage:0,
-    ownedWeapons:['Кулаки'],inventory:[],equipment:[],consumables:{},
-    followers:followerDefaults,
-    arena:{rating:1000,wins:0,losses:0,battles:0,history:[],loadout:'crit',combatSlotsUnlocked:3},
-    pve:{chapter:1,progress:0,bossPending:false,bossActive:false,bossAttempts:0,bossDefeated:0},
-    gameDice:10,gameRolls:0,gameSteps:0,gamePos:0,gameLap:0
-  };
-  function clone(x){return JSON.parse(JSON.stringify(x));}
-  function normalize(x){
-    const s=Object.assign(clone(defaults),x||{});
-    s.schemaVersion=VERSION;
-    s.profile=Object.assign(clone(defaults.profile),x?.profile||{});
-    for(const k of ['coins','gems','redGems'])s[k]=Math.max(0,Number(s[k])||0);
-    s.level=Math.max(1,Math.floor(Number(s.level)||1));
-    s.exp=Math.max(0,Number(s.exp)||0);
-    s.expToNext=Math.max(1,Number(s.expToNext)||100);
-    s.maxHp=Math.max(1,Number(s.maxHp)||120);
-    s.hp=Math.max(0,Math.min(s.maxHp,Number(s.hp)||0));
-    s.maxEnergy=Math.max(1,Number(s.maxEnergy)||200);
-    s.energy=Math.max(0,Math.min(s.maxEnergy,Number(s.energy)||0));
-    s.strength=Math.max(1,Number(s.strength)||1);
-    s.agility=Math.max(1,Number(s.agility)||1);
-    s.defense=Math.max(0,Number(s.defense)||0);
-    s.bonusDamage=Math.max(0,Number(s.bonusDamage)||0);
-    s.weapon=String(s.weapon||'Кулаки');
-    s.ownedWeapons=Array.isArray(s.ownedWeapons)?[...new Set(s.ownedWeapons.map(String))]:['Кулаки'];
-    if(!s.ownedWeapons.includes('Кулаки'))s.ownedWeapons.unshift('Кулаки');
-    if(s.weapon!=='Кулаки'&&!s.ownedWeapons.includes(s.weapon))s.ownedWeapons.push(s.weapon);
-    s.inventory=Array.isArray(s.inventory)?s.inventory:[];
-    s.equipment=Array.isArray(s.equipment)?s.equipment:[];
-    s.consumables=(s.consumables&&typeof s.consumables==='object'&&!Array.isArray(s.consumables))?s.consumables:{};
-    s.followers=Object.assign(clone(followerDefaults),s.followers||{});
-    s.followers.items=Object.assign(clone(followerDefaults.items),s.followers.items||{});
-    Object.keys(followerDefaults.items).forEach(id=>{
-      s.followers.items[id]=Object.assign(clone(followerDefaults.items[id]),s.followers.items[id]||{});
-      s.followers.items[id].owned=Boolean(s.followers.items[id].owned);
-      s.followers.items[id].level=Math.max(1,Math.min(100,Math.floor(Number(s.followers.items[id].level)||1)));
-      s.followers.items[id].xp=Math.max(0,Number(s.followers.items[id].xp)||0);
-      s.followers.items[id].awakened=Boolean(s.followers.items[id].awakened);
-      s.followers.items[id].awakeningClaimed=Boolean(s.followers.items[id].awakeningClaimed);
-    });
-    if(!s.followers.items[s.followers.activeFollower]?.owned)s.followers.activeFollower=null;
-    s.arena=Object.assign(clone(defaults.arena),s.arena||{});
-    s.arena.rating=Math.max(0,Number(s.arena.rating)||1000);
-    s.arena.wins=Math.max(0,Number(s.arena.wins)||0);
-    s.arena.losses=Math.max(0,Number(s.arena.losses)||0);
-    s.arena.battles=Math.max(0,Number(s.arena.battles)||0);
-    s.arena.history=Array.isArray(s.arena.history)?s.arena.history:[];
-    s.pve=Object.assign(clone(defaults.pve),s.pve||{});
-    s.pve.chapter=Math.max(1,Math.floor(Number(s.pve.chapter)||1));
-    s.pve.progress=Math.max(0,Math.min(100,Number(s.pve.progress)||0));
-    s.pve.bossPending=Boolean(s.pve.bossPending);
-    s.pve.bossActive=Boolean(s.pve.bossActive);
-    s.pve.bossAttempts=Math.max(0,Math.floor(Number(s.pve.bossAttempts)||0));
-    s.pve.bossDefeated=Math.max(0,Math.floor(Number(s.pve.bossDefeated)||0));
-    s.gameDice=Math.max(0,Math.floor(Number(s.gameDice)||0));
-    s.gameRolls=Math.max(0,Math.floor(Number(s.gameRolls)||0));
-    s.gameSteps=Math.max(0,Math.floor(Number(s.gameSteps)||0));
-    s.gamePos=((s.gameSteps%27)+27)%27;
-    s.gameLap=Math.floor(s.gameSteps/27);
-    return s;
-  }
-
-  let state=normalize(null);
-  try{
-    const raw=localStorage.getItem('teritory_save_v1');
-    state=normalize(raw?JSON.parse(raw):null);
-  }catch(_){}
-
-  function save(reason){
-    try{localStorage.setItem('teritory_save_v1',JSON.stringify(state));}catch(_){}
-    document.dispatchEvent(new CustomEvent('territory:state',{detail:{reason:reason||'save'}}));
-    return state;
-  }
-  function followerStats(){
-    const id=state.followers?.activeFollower;
-    const api=window.Followers;
-    if(!id||!api?.getStats)return null;
-    return api.getStats(id)||null;
-  }
-  function getDerivedStats(){
-    const f=followerStats();
-    return {
-      strength:Math.max(0,Number(state.strength)||0)+(Number(f?.attack)||0),
-      defense:Math.max(0,Number(state.defense)||0)+(Number(f?.defense)||0),
-      maxHp:Math.max(1,Number(state.maxHp)||1)+(Number(f?.hp)||0),
-      agility:Math.max(0,Number(state.agility)||0),
-      bonusDamage:Math.max(0,Number(state.bonusDamage)||0),
-      follower:f
-    };
-  }
-
-  window.TerritoryStore={
-    get state(){return state;},
-    setState(v){state=normalize(v);return state;},
-    normalize,saveNow:save,save,
-    patch(p){state=normalize(Object.assign({},state,p||{}));return save('patch');},
-    getDerivedStats,
-    render(){document.dispatchEvent(new CustomEvent('territory:render'));},
-    version:VERSION,telegramBotUsername:TELEGRAM_BOT_USERNAME,telegramBotHandle:TELEGRAM_BOT_HANDLE
-  };
-
-  window.addEventListener('pagehide',()=>save('pagehide'));
-  window.addEventListener('storage',e=>{
-    if(e.key==='teritory_save_v1'&&e.newValue){
-      try{state=normalize(JSON.parse(e.newValue));window.TerritoryStore.render();}catch(_){}
-    }
-  });
-
-  window.showScreen=function(id){
-    const valid=['home','inventory','districts','market','casino','hero'];
-    const target=valid.includes(id)?id:'home';
-    document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id===target));
-    document.documentElement.dataset.screen=target;
-    document.body.dataset.screen=target;
-    if(target==='home'&&window.HomeRebuild?.refresh)window.HomeRebuild.refresh();
-    window.TerritoryStore.render();
-  };
-
-  const cells=[['🏁','СТАРТ'],['💎','20'],['❓','?'],['💧','50'],['📜','7'],['🧰','1'],['❓','?'],['🪙','750'],['💧','30'],['💜','5'],['🪙','160'],['❓','?'],['📜','10'],['💧','30'],['🪙','750'],['💎','5'],['❓','?'],['🪙','300'],['💎','20'],['💧','40'],['📜','5'],['🪙','500'],['❓','?'],['💎','10'],['🧰','1'],['💧','60'],['🏁','ФИНИШ']];
-  function renderCasino(){
-    const board=document.getElementById('casinoBoard');if(!board)return;
-    board.innerHTML=cells.map((c,i)=>`<button class="casino-cell ${i===state.gamePos?'active':''}" data-cell="${i}"><b>${c[0]}</b><span>${c[1]}</span></button>`).join('');
-  }
-  function reward(){
-    const c=cells[state.gamePos],v=Number(c[1])||0;
-    if(c[0]==='🪙')state.coins+=v;
-    else if(c[0]==='💎')state.gems+=v;
-    else if(c[0]==='💧')state.energy=Math.min(state.maxEnergy,state.energy+v);
-    else if(c[0]==='🧰')state.consumables.elixir_hp=Number(state.consumables.elixir_hp||0)+1;
-    else if(c[0]==='📜')state.exp+=v;
-    else if(c[0]==='❓'){state.coins+=50;state.exp+=5;}
-  }
-  function paint(){
-    const c=document.querySelector('[data-coins]'),g=document.querySelector('[data-gems]'),d=document.querySelector('[data-dice]');
-    if(c)c.textContent=Math.floor(state.coins).toLocaleString('ru-RU');
-    if(g)g.textContent=Math.floor(state.gems).toLocaleString('ru-RU');
-    if(d)d.textContent=state.gameDice;
-  }
-  document.addEventListener('click',e=>{
-    const roll=e.target.closest?.('[data-roll]');
-    if(!roll)return;
-    if(state.gameDice<=0)return;
-    state.gameDice--;state.gameRolls++;
-    const n=1+Math.floor(Math.random()*6);
-    state.gameSteps+=n;state.gamePos=state.gameSteps%27;state.gameLap=Math.floor(state.gameSteps/27);
-    reward();save('casino-roll');renderCasino();
-    const out=document.querySelector('[data-roll-result]');if(out)out.textContent=`🎲 Выпало ${n}`;
-  });
-  document.addEventListener('territory:render',()=>{paint();renderCasino();});
-  document.addEventListener('DOMContentLoaded',()=>{paint();renderCasino();});
+(function(){'use strict';
+const DEFAULT={profile:{displayName:'SSS',level:78,vip:6},coins:45000,gems:4500,energy:125,maxEnergy:200,hp:6850,maxHp:6850,xp:81431,xpNext:119500,dice:10,stage:7,equipment:0,activeFollower:null,auto:false};
+window.TerritoryStore=window.TerritoryStore||{};
+const Store=window.TerritoryStore;
+Store.state=Object.assign({},DEFAULT);
+try{const saved=JSON.parse(localStorage.getItem('territory_store_v1')||'null');if(saved) Store.state=Object.assign({},DEFAULT,saved,{profile:Object.assign({},DEFAULT.profile,saved.profile||{})});}catch(e){}
+Store.saveNow=function(){try{localStorage.setItem('territory_store_v1',JSON.stringify(Store.state));}catch(e){}};
+Store.getDerivedStats=function(){return {maxHp:Store.state.maxHp,strength:125,defense:98};};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function show(id){$$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));if(id==='roadmap')roadmap();if(id==='inventory')inventory();if(id==='shop')shop();if(id==='games')games();}
+function home(){show('home')}
+window.TerritoryUI={show:show,home:home};
+function modal(title,body){$('#modalBody').innerHTML='<h2>'+title+'</h2>'+body;$('#modal').classList.add('show')}
+$('#modalClose').onclick=()=>$('#modal').classList.remove('show');
+function setHomeZones(){const z=$('#homeZones');const add=(cls,x,y,w,h,fn)=>{const b=document.createElement('button');b.className='zone '+cls;b.style.cssText=`left:${x}%;top:${y}%;width:${w}%;height:${h}%;`;b.onclick=fn;z.appendChild(b)};
+add('events',1,12,13,10,()=>modal('События','<p>События откроются в следующем обновлении.</p>'));add('daily',1,23,13,10,()=>modal('Ежедневные награды','<p>Награда дня готова.</p><button class="gold" id="claim">ЗАБРАТЬ</button>'));add('quests',1,34,13,10,()=>show('quests'));add('friends',1,45,13,10,()=>modal('Пригласить друзей','<p>Приглашение друга скопировано.</p>'));add('sea',1,56,13,10,()=>modal('Морской набор','<p>Морской набор доступен в Лавке.</p>'));add('shop',88,12,11,10,()=>show('shop'));add('forge',88,23,11,10,()=>modal('Кузница','<p>Кузница готовит улучшения экипировки.</p>'));add('tests',88,34,11,10,()=>modal('Испытания','<p>Испытания доступны в текущей главе.</p>'));add('streets',88,45,11,10,()=>modal('Захват улиц','<p>Система улиц готовится.</p>'));add('arena',86,55,13,15,()=>show('arena'));add('roadmap',27,12,47,11,()=>show('roadmap'));add('inventory',14,88,14,11,()=>show('inventory'));add('hero',28,88,14,11,()=>show('hero'));add('battle',42,87,16,12,()=>show('arena'));add('questsBottom',57,88,14,11,()=>show('quests'));add('games',70,88,14,11,()=>show('games'));add('clan',84,88,16,11,()=>show('clan'));}
+function arenaZones(){const z=$('#arenaZones');const add=(cls,x,y,w,h,fn)=>{const b=document.createElement('button');b.className='zone '+cls;b.style.cssText=`left:${x}%;top:${y}%;width:${w}%;height:${h}%;`;b.onclick=fn;z.appendChild(b)};
+// 4 attack / 4 defense hit zones
+[['attack',0,15,11,10,'Голова'],['attack',0,27,11,10,'Грудь'],['attack',0,39,11,10,'Пояс'],['attack',0,51,11,10,'Ноги'],['def',89,15,11,10,'Голова'],['def',89,27,11,10,'Грудь'],['def',89,39,11,10,'Пояс'],['def',89,51,11,10,'Ноги']].forEach(a=>add(a[0],a[1],a[2],a[3],a[4],()=>modal('Тактика','<p>Выбрана зона: <b>'+a[5]+'</b>.</p>')));
+add('tactics',1,66,25,7,()=>modal('Тактика','<p>Выберите атаку и две зоны защиты.</p>'));add('auto',27,66,22,7,()=>{Store.state.auto=!Store.state.auto;Store.saveNow();modal('Авто-бой','<p>Авто-бой: <b>'+(Store.state.auto?'ВКЛ':'ВЫКЛ')+'</b></p>')});add('hit',49,66,25,7,()=>modal('Удар','<p>SSS наносит удар. Урон: <b>24</b>.</p>'));add('timer',76,66,23,7,()=>modal('Таймер','<p>Следующий ход через 15 секунд.</p>'));
+for(let i=0;i<7;i++)add('equip',1+i*12,73,11,7,()=>{Store.state.equipment=i;Store.saveNow();modal('Снаряжение','<p>Выбран слот '+(i+1)+' / 7.</p>')});for(let i=0;i<7;i++)add('cons',1+i*12,80,11,6,()=>modal('Предмет','<p>Предмет использован.</p>'));
+add('chat',1,86,98,8,()=>modal('Чат боя','<p>SSS: Удачи!</p><p>Ragnar: В бой!</p><input class="chatInput" placeholder="Сообщение"><button class="gold" id="send">ОТПРАВИТЬ</button>'));add('home',0,92,14,8,home);add('inventory',14,92,14,8,()=>show('inventory'));add('hero',28,92,14,8,()=>show('hero'));add('battle',42,92,14,8,()=>show('arena'));add('quests',56,92,14,8,()=>show('quests'));add('games',70,92,14,8,()=>show('games'));add('clan',84,92,16,8,()=>show('clan'));}
+function roadmap(){const n=$('#roadNodes');n.innerHTML='';for(let i=1;i<=7;i++){const b=document.createElement('button');b.className='node '+(i<Store.state.stage?'done ':'')+(i===Store.state.stage?'current':'');b.textContent=i;b.onclick=()=>{Store.state.stage=i;Store.saveNow();roadmap()};n.appendChild(b)}$('#stageTitle').textContent='2-'+Store.state.stage;}
+const inv=[['⚔️','Топор','Lv.102'],['🪖','Шлем','Lv.98'],['🛡️','Доспех','Lv.100'],['🎗️','Пояс','Lv.95'],['🥾','Сапоги','Lv.95'],['💍','Кольцо','Lv.97'],['🔮','Амулет','Lv.101'],['🧪','Эликсир HP','5/5']];
+function cards(id,arr){$(id).innerHTML=arr.map((x,i)=>`<button class="card" data-item="${i}"><div>${x[0]}</div><b>${x[1]}</b><span>${x[2]}</span></button>`).join('');$$('#'+id+' .card').forEach(b=>b.onclick=()=>modal('Предмет',`<p>${arr[Number(b.dataset.item)][1]}</p><button class="gold">ЭКИПИРОВАТЬ</button>`))}
+function inventory(){cards('inventoryGrid',inv)}
+function shop(){cards('shopGrid',[['🧪','Зелье HP','5/5'],['🔵','Энергия','3/3'],['🔴','Атака','1/5'],['🟡','Защита','2/5'],['🟣','Адреналин','1/5'],['💠','Ускорение','1/5']])}
+function games(){const b=$('#board');b.innerHTML='';for(let i=0;i<25;i++){const c=document.createElement('button');c.className='cell '+(i===Store.state.pos?'active':'');c.textContent=i+1;c.onclick=()=>{Store.state.pos=i;Store.saveNow();games()};b.appendChild(c)}$$('[data-dice]').forEach(x=>x.textContent=Store.state.dice)}
+$('#roll').onclick=()=>{if(!Store.state.dice){modal('Кубики','<p>Кубики закончились.</p>');return}Store.state.dice--;Store.state.pos=(Store.state.pos||0)+1+Math.floor(Math.random()*6);Store.state.pos%=25;Store.saveNow();games();$('#rollLog').textContent='Бросок выполнен. Позиция '+(Store.state.pos+1)};
+$('#followersBtn').onclick=()=>modal('Последователи','<div class="followers">'+['Лиабро — Крит','Тералель — Защита','Король-коров — Лечение','Морт — Уклонение','Каменное Лицо — Контроль'].map((x,i)=>`<button class="frow" data-f="${i}"><b>${x.split(' — ')[0]}</b><span>${x.split(' — ')[1]}</span></button>`).join('')+'</div>');
+$$('[data-home]').forEach(b=>b.onclick=home);$$('[data-roadmap]').forEach(b=>b.onclick=()=>show('roadmap'));
+setHomeZones();arenaZones();inventory();shop();games();
 })();
