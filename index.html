@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="pve-battle-10032.css">
 <link rel="stylesheet" href="map-progress.css">
 <link rel="stylesheet" href="boss-battle-10034.css">
+<link rel="stylesheet" href="next-chapter-10035.css">
 <link rel="stylesheet" href="boss.css">
 </head>
 <body>
@@ -150,6 +151,52 @@
 </section>
 
 
+  
+<section id="chapterComplete" class="screen chapter-complete-screen">
+  <div class="chapter-transition">
+    <div class="chapter-glow"></div>
+    <div class="chapter-card">
+      <div class="chapter-emblem">🏆</div>
+      <small>ГЛАВА ЗАВЕРШЕНА</small>
+      <h1>СЕВЕРНЫЕ ЗЕМЛИ</h1>
+      <div class="chapter-line"></div>
+      <p>Владыка повержен. Новая территория открыта.</p>
+      <div class="chapter-reward">🎁 Награда главы получена</div>
+      <button id="openNextChapter">ОТКРЫТЬ НОВУЮ ЛОКАЦИЮ</button>
+    </div>
+  </div>
+</section>
+
+<section id="nextChapter" class="screen next-chapter-screen">
+  <div class="next-chapter">
+    <div class="next-bg"></div>
+    <div class="next-top">
+      <button id="nextBack">‹</button>
+      <div><b>ГЛАВА 16</b><small>НОВАЯ ТЕРРИТОРИЯ</small></div>
+      <strong>0%</strong>
+    </div>
+    <div class="next-title">🌊 ЗАТЕРЯННЫЕ ФЬОРДЫ</div>
+    <div class="next-subtitle">Новая земля открыта</div>
+    <div class="next-route">
+      <div class="next-node active">1</div><i></i><div class="next-node">2</div><i></i><div class="next-node locked">👹</div>
+    </div>
+    <div class="next-info">
+      <b>ПЕРВЫЙ ЭТАП</b>
+      <span>Новая карта начинается здесь.</span>
+    </div>
+    <button id="startNextChapter">НАЧАТЬ ПУТЬ</button>
+    <nav class="next-nav">
+      <button data-next-nav="home">🏰<span>Город</span></button>
+      <button data-next-nav="inventory">🎒<span>Инвентарь</span></button>
+      <button data-next-nav="hero">🪖<span>Герой</span></button>
+      <button class="active" data-next-nav="map">🗺️<span>Карта</span></button>
+      <button data-next-nav="quests">📜<span>Квесты</span></button>
+      <button data-next-nav="games">🎲<span>Игры</span></button>
+      <button data-next-nav="clan">🚩<span>Клан</span></button>
+    </nav>
+  </div>
+</section>
+
   <section id="arena" class="screen"><img class="master-art" src="arena-master.jpg" alt=""><div id="arenaZones" class="zones"></div></section>
   <section id="map" class="screen map-screen">
     <div id="mapScene" class="map-scene" aria-label="Карта и движение">
@@ -213,5 +260,6 @@
 <script src="pve-battle.js"></script>
 <script src="boss.js"></script>
 <script src="boss-battle-10034.js"></script>
+<script src="next-chapter-10035.js"></script>
 </body>
 </html>

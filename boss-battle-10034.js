@@ -23,7 +23,7 @@ function result(win){
      const s=window.TerritoryStore?.state;
      if(s){s.mapProgress=100;s.chapterBossDefeated=true;s.chapterCompleted=true;window.TerritoryStore.saveNow?.();}
    }
-   window.TerritoryUI?.show('map');
+   window.TerritoryUI?.show('chapterComplete');
  };
 }
 function attack(){
