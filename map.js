@@ -102,3 +102,17 @@ window.TerritoryMap = {
   encounter: function(){ $('mapScene').classList.add('is-encounter'); }
 };
 })();
+
+// 100% completion unlocks the chapter boss.
+(function(){
+  const root=document;
+  function unlockBoss(){
+    const progress = document.querySelector('[data-map-progress], #mapProgress, .map-progress');
+    if(!progress) return;
+    const txt=(progress.textContent||'').replace(/\s/g,'');
+    if(txt.includes('100%')){
+      document.querySelectorAll('[data-boss], #mapBoss').forEach(x=>x.classList.add('unlocked'));
+    }
+  }
+  setInterval(unlockBoss,500);
+})();

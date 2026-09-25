@@ -1,0 +1,12 @@
+
+.boss-screen{background:#070d12!important}.boss-scene{position:absolute;inset:0;overflow:hidden;background:#0b151a}
+.boss-bg{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,#4b3130 0,#201d22 30%,#080e13 72%)}
+.boss-bg:before{content:"";position:absolute;inset:0;background:linear-gradient(165deg,transparent 0 48%,#17262c 49% 62%,#070d12 63%)}
+.boss-header{position:absolute;z-index:10;top:8px;left:7px;right:7px;height:50px;display:flex;align-items:center;gap:8px;padding:5px;background:#07131be8;border:1px solid #89683d;border-radius:10px;color:#fff}
+.boss-header button{width:38px;height:38px;border:1px solid #89683d;border-radius:9px;background:#10212a;color:#fff;font-size:27px}
+.boss-header div:nth-child(2){flex:1;display:flex;flex-direction:column}.boss-header b{font-size:10px;color:#e8c36b}.boss-header small{font-size:7px;color:#bdc8cb}.boss-progress{font-size:16px;color:#7fe08c;font-weight:900}
+.boss-title{position:absolute;z-index:5;top:76px;left:0;right:0;text-align:center;color:#e8c36b;font-size:14px;font-weight:1000;text-shadow:0 2px 4px #000}
+.boss-stage{position:absolute;top:105px;left:0;right:0;bottom:260px}.boss-hero,.boss-enemy{position:absolute;bottom:14%;font-size:84px;filter:drop-shadow(0 12px 7px #000b)}.boss-hero{left:20%}.boss-enemy{right:17%;font-size:105px}
+.boss-card{position:absolute;z-index:8;left:9%;right:9%;bottom:184px;padding:9px;text-align:center;background:#07131dec;border:1px solid #89683d;border-radius:10px;color:#fff}.boss-card b{display:block;font-size:11px;color:#e9c66f}.boss-card span{display:block;font-size:7px;color:#c0c8ca;margin:2px 0 6px}.boss-hp{height:8px;background:#2a1114;border-radius:8px;overflow:hidden}.boss-hp i{display:block;width:100%;height:100%;background:#ad3838}.boss-card small{font-size:7px}
+.boss-start{position:absolute;z-index:10;left:15%;right:15%;bottom:126px;height:43px;border:1px solid #e3b85d;border-radius:10px;background:linear-gradient(#d7aa52,#70481c);color:#fff;font-size:12px;font-weight:1000}
+.boss-bottom-nav{position:absolute;z-index:20;left:0;right:0;bottom:0;height:46px;display:grid;grid-template-columns:repeat(7,1fr);background:#07131af7;border-top:1px solid #856238}.boss-bottom-nav button{border:0;border-right:1px solid #263a43;background:#0b1a23;color:#d3dcdf;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center}.boss-bottom-nav span{font-size:7px}.boss-bottom-nav .active{color:#efc86d;background:#2a2115}

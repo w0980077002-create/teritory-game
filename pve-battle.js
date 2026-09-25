@@ -1,51 +1,26 @@
 
 (function(){
 'use strict';
-const Store=window.TerritoryStore;
-let selected=null, auto=false, seconds=60, tickId=null;
-
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-
-function reset(){
-  selected=null; seconds=60; auto=!!Store?.state?.auto;
-  $$('[data-pve-attack]').forEach(b=>b.classList.remove('selected'));
-  $('#pveTimer').innerHTML='⏱ <b>60</b>';
-  $('#pveLog').textContent='Встреча с противником. Выбери зону атаки.';
+let hp=78173,maxHp=119600,auto=false,seconds=60,selected=1;
+function render(){ $('#pvePlayerHp').style.width=(hp/maxHp*100)+'%'; $('#pvePlayerHpText').textContent=`${hp.toLocaleString('en-US')} / ${maxHp.toLocaleString('en-US')}`; $('#pveTimer').innerHTML=`⏱ <b>${seconds}</b>`; }
+function attack(){
+ const skill=document.querySelector('.skill32.selected'); const name=skill?.textContent?.trim()||'Навык';
+ const dmg=9000+Math.floor(Math.random()*16000);
+ hp=Math.max(0,hp-dmg);
+ const f=$('.battle32-field'); f.classList.remove('hit'); void f.offsetWidth; f.classList.add('hit');
+ const fl=$('#pveFloat32'); fl.textContent='−'+Math.round(dmg/1000)+'K'; fl.classList.remove('show'); void fl.offsetWidth; fl.classList.add('show');
+ $('#pveLog').textContent=`${name} — нанесён урон ${dmg.toLocaleString('en-US')}.`;
+ if(hp===0){$('#pveLog').textContent='Бой завершён. Победа!'; auto=false;}
+ render();
 }
-function hit(){
-  if(!selected){$('#pveLog').textContent='Сначала выбери зону атаки.';return}
-  const max=124, cur=Number($('#pveEnemyHpText').textContent.split('/')[0])||max;
-  const amount=18+Math.floor(Math.random()*13), next=Math.max(0,cur-amount);
-  $('#pveEnemyHpText').textContent=`${next} / ${max}`;
-  $('#pveEnemyHp').style.width=`${next/max*100}%`;
-  $('#pveTurn').textContent=String(Number($('#pveTurn').textContent)+1);
-  const stage=$('.pve-stage'); stage.classList.remove('hit'); void stage.offsetWidth; stage.classList.add('hit');
-  const d=$('#pveDamage'); d.textContent='−'+amount; d.classList.remove('show'); void d.offsetWidth; d.classList.add('show');
-  $('#pveLog').textContent=`Удар в зону «${selected}». Урон: ${amount}.`;
-  seconds=60; $('#pveTimer').innerHTML='⏱ <b>60</b>';
-}
-$$('[data-pve-attack]').forEach(b=>b.addEventListener('click',()=>{
-  $$('[data-pve-attack]').forEach(x=>x.classList.remove('selected'));
-  b.classList.add('selected'); selected=b.textContent;
-}));
-$('#pveAttack').addEventListener('click',hit);
-$('#pveAuto').addEventListener('click',()=>{
-  auto=!auto; $('#pveAuto').classList.toggle('on',auto);
-  if(Store?.state){Store.state.auto=auto;Store.saveNow?.();}
-  $('#pveLog').textContent=auto?'Авто-бой включён.':'Авто-бой выключен.';
-});
-$('#pveTactic').addEventListener('click',()=>$('#pveLog').textContent='Тактика: выбери зону, затем УДАР.');
-$('#pveTimer').addEventListener('click',()=>{seconds=Math.max(30,seconds-10);$('#pveTimer').innerHTML=`⏱ <b>${seconds}</b>`});
+$$('.skill32').forEach(b=>b.addEventListener('click',()=>{ $$('.skill32').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selected=b.dataset.skill; }));
+$('#pveAttack').addEventListener('click',attack);
+$('#pveAuto').addEventListener('click',()=>{auto=!auto;$('#pveAuto').classList.toggle('on',auto);$('#pveLog').textContent=auto?'Авто-бой включён.':'Авто-бой выключен.'});
+$('#pveTactic').addEventListener('click',()=>$('#pveLog').textContent='Выбор навыка: нажми и выбери нужную способность.');
+$('#pveTimer').addEventListener('click',()=>{seconds=Math.max(30,seconds-10);render()});
 $('#pveBack').addEventListener('click',()=>window.TerritoryUI?.show('map'));
-$$('[data-pve-nav]').forEach(b=>b.addEventListener('click',()=>{
-  const r=b.dataset.pveNav; window.TerritoryUI?.show(r==='map'?'map':r);
-}));
-tickId=setInterval(()=>{
-  seconds=Math.max(0,seconds-1); $('#pveTimer').innerHTML=`⏱ <b>${seconds}</b>`;
-  if(seconds===0){seconds=60;if(auto&&selected)hit();}
-},1000);
-document.addEventListener('click',e=>{
-  if(e.target.closest('#pveBattle')) reset();
-},{capture:true});
-reset();
+$$('[data-pve-nav]').forEach(b=>b.addEventListener('click',()=>window.TerritoryUI?.show(b.dataset.pveNav==='map'?'map':b.dataset.pveNav)));
+setInterval(()=>{seconds=Math.max(0,seconds-1);if(seconds===0){seconds=60;if(auto)attack()}render()},1000);
+render();
 })();

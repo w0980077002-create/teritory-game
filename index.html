@@ -9,60 +9,65 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="map.css">
 <link rel="stylesheet" href="pve-battle.css">
+<link rel="stylesheet" href="pve-battle-10032.css">
+<link rel="stylesheet" href="boss.css">
 </head>
 <body>
 <div id="app">
   <section id="home" class="screen active"><img class="master-art" src="home-master.png" alt=""><div id="homeZones" class="zones"></div></section>
   
 <section id="pveBattle" class="screen pve-battle-screen">
-  <div class="pve-scene">
-    <div class="pve-world"></div>
-    <div class="pve-hud">
-      <button id="pveBack">‹</button>
-      <div class="pve-fighter">
-        <b>SSS</b><small>Lv. 78 · VIP 6</small>
-        <div class="pve-bar"><i id="pvePlayerHp"></i></div>
-        <span id="pvePlayerHpText">138 / 138</span>
-      </div>
-      <div class="pve-turn">ХОД <b id="pveTurn">1</b></div>
-      <div class="pve-fighter enemy">
-        <b>Победитель Камней</b><small>Lv. 72</small>
-        <div class="pve-bar"><i id="pveEnemyHp"></i></div>
-        <span id="pveEnemyHpText">124 / 124</span>
-      </div>
+  <div class="battle32">
+    <div class="battle32-bg"></div>
+    <div class="battle32-top">
+      <button id="pveBack">✕</button>
+      <div class="stage32">[Волнорез 15] <b>Золотой Священный Город</b><small>181-6</small></div>
+      <div class="res32">🪙 86.41M　💎 12,284</div>
     </div>
 
-    <div class="pve-stage">
-      <div id="pveHero" class="pve-character hero">⚔️</div>
-      <div id="pveEnemy" class="pve-character enemy-char">🪓</div>
-      <div id="pveDamage" class="pve-damage"></div>
+    <div class="battle32-field">
+      <div class="fighter32 ally"><span>1P</span><b>SSS</b></div>
+      <div class="fighter32 ally2"><span>2P</span><b>Спутник</b></div>
+      <div class="fighter32 enemy"><span>ВРАГ</span><b>Победитель Камней</b></div>
+      <div id="pveHit32" class="hit32"></div>
+      <div id="pveFloat32" class="float32"></div>
     </div>
 
-    <div class="pve-zones">
-      <div class="pve-zone-title">ВЫБЕРИ АТАКУ</div>
-      <div class="pve-zone-grid">
-        <button data-pve-attack="head">Голова</button>
-        <button data-pve-attack="chest">Грудь</button>
-        <button data-pve-attack="belt">Пояс</button>
-        <button data-pve-attack="legs">Ноги</button>
-      </div>
+    <div class="battle32-bars">
+      <div class="orb red"></div>
+      <div class="hp32"><b>Lv. 78</b><i id="pvePlayerHp"></i><span id="pvePlayerHpText">78,173 / 119.6K</span></div>
+      <div class="orb blue"></div>
     </div>
 
-    <div class="pve-actions">
-      <button id="pveTactic">Тактика</button>
-      <button id="pveAuto">Авто</button>
-      <button id="pveAttack" class="primary">⚔ УДАР</button>
+    <div class="skills32">
+      <button class="skill32 selected" data-skill="1">⚔<small>Lv.1029</small></button>
+      <button class="skill32" data-skill="2">❄<small>Lv.1036</small></button>
+      <button class="skill32" data-skill="3">🪓<small>Lv.1045</small></button>
+      <button class="skill32" data-skill="4">🛡<small>Lv.1040</small></button>
+      <button class="skill32" data-skill="5">🩸<small>Lv.1042</small></button>
+      <button class="skill32" data-skill="6">🧪<small>Lv.1045</small></button>
+      <button class="skill32" data-skill="7">🔧<small>Lv.1046</small></button>
+      <button class="skill32" data-skill="8">🥊<small>Lv.1037</small></button>
+    </div>
+
+    <div class="battle32-controls">
+      <button id="pveAuto">AUTO</button>
+      <button id="pveAttack" class="hitbtn">УДАР</button>
       <button id="pveTimer">⏱ <b>60</b></button>
+      <button id="pveTactic">НАВЫКИ</button>
     </div>
 
-    <div id="pveLog" class="pve-log">Встреча с противником. Выбери зону атаки.</div>
+    <div id="pveLog" class="battle32-log">Выбери навык и нажми «УДАР».</div>
 
-    <div class="pve-equip">
-      <button>⚔</button><button>🪖</button><button>🛡</button>
-      <button>🥋</button><button>🥾</button><button>💍</button><button>🔮</button>
+    <div class="battle32-bottom">
+      <button>⚓<small>Порт</small></button>
+      <button>📖<small>Навыки</small></button>
+      <button class="crest">⚔</button>
+      <button>🗺<small>Приключения</small></button>
+      <button>🛒<small>Магазин</small></button>
     </div>
 
-    <nav class="pve-bottom-nav">
+    <nav class="pve32-nav">
       <button data-pve-nav="home">🏰<span>Город</span></button>
       <button data-pve-nav="inventory">🎒<span>Инвентарь</span></button>
       <button data-pve-nav="hero">🪖<span>Герой</span></button>
@@ -70,6 +75,39 @@
       <button data-pve-nav="quests">📜<span>Квесты</span></button>
       <button data-pve-nav="games">🎲<span>Игры</span></button>
       <button data-pve-nav="clan">🚩<span>Клан</span></button>
+    </nav>
+  </div>
+</section>
+
+  
+<section id="bossBattle" class="screen boss-screen">
+  <div class="boss-scene">
+    <div class="boss-bg"></div>
+    <header class="boss-header">
+      <button id="bossBack">‹</button>
+      <div><b>БОСС ЛОКАЦИИ</b><small>Карта пройдена на 100%</small></div>
+      <div class="boss-progress">100%</div>
+    </header>
+    <div class="boss-title">⚔ ПОСЛЕДНИЙ СТРАЖ ⚔</div>
+    <div class="boss-stage">
+      <div class="boss-hero">⚔️</div>
+      <div class="boss-enemy">👹</div>
+    </div>
+    <div class="boss-card">
+      <b>ВЛАДЫКА СЕВЕРНЫХ ЗЕМЕЛЬ</b>
+      <span>Особый босс главы</span>
+      <div class="boss-hp"><i id="bossHp"></i></div>
+      <small id="bossHpText">500 / 500</small>
+    </div>
+    <button id="bossStart" class="boss-start">НАЧАТЬ БОЙ</button>
+    <nav class="boss-bottom-nav">
+      <button data-boss-nav="home">🏰<span>Город</span></button>
+      <button data-boss-nav="inventory">🎒<span>Инвентарь</span></button>
+      <button data-boss-nav="hero">🪖<span>Герой</span></button>
+      <button class="active" data-boss-nav="map">🗺️<span>Карта</span></button>
+      <button data-boss-nav="quests">📜<span>Квесты</span></button>
+      <button data-boss-nav="games">🎲<span>Игры</span></button>
+      <button data-boss-nav="clan">🚩<span>Клан</span></button>
     </nav>
   </div>
 </section>
@@ -135,5 +173,6 @@
 <script src="app.js"></script>
 <script src="map.js"></script>
 <script src="pve-battle.js"></script>
+<script src="boss.js"></script>
 </body>
 </html>
