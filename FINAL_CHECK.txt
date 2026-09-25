@@ -1,0 +1,11 @@
+Teritory Game — FINAL REPAIRED PHONE BUILD 10000
+
+Base: TeritoryGame_REPAIRED_PHONE.zip
+Final correction:
+- Removed the incorrect castle/Sdolars baked HOME background.
+- HOME/PvE now uses the verified gameplay-video reference background.
+- Disabled duplicate synthetic HUD over the baked gameplay reference.
+- Removed the incorrect territory_reference_bg.png from the package.
+- Arena assets and existing game systems preserved.
+
+Do not mix files from older ZIPs into this build.

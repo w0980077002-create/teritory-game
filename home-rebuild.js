@@ -38,7 +38,7 @@
   function mount(){
     const home=document.getElementById('home');if(!home||home.dataset.mounted)return;
     home.dataset.mounted='1';
-    home.innerHTML='<div id="homeReferenceHost" class="home-reference-host"><img src="home-master.png?v=10001" class="home-reference-image" alt="Territory Game HOME" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones"></div><div id="homeRealHud" aria-hidden="true"></div></div>';
+    home.innerHTML='<div id="homeReferenceHost" class="home-reference-host"><img src="home-master.png?v=10001" class="home-reference-image" alt="Territory Game HOME MASTER" draggable="false"><div class="home-hitzones"></div><div class="home-bottom-zones"></div><div id="homeRealHud" aria-hidden="true"></div></div>';
     const layer=home.querySelector('.home-hitzones'),bot=home.querySelector('.home-bottom-zones');
     zones.forEach((z,i)=>add(layer,z,i,false));bottom.forEach((z,i)=>add(bot,z,42+i,true));mountRealHud();
   }
@@ -64,7 +64,7 @@
   }
   function runnerTemplate(root){
     const s=S(),p=S().profile||{},f=followerData(),chapter=Math.max(1,Number(s.pve?.chapter)||1);
-    root.innerHTML=`<div class="runner-ui"><div><b>БОЙ · ГЛАВА ${chapter}</b><span data-run-status>Вперёд!</span></div><button type="button" data-run-close>×</button></div><div class="runner-chapter-hud"><div><small>ПРОГРЕСС ГЛАВЫ</small><b data-run-progress>0%</b></div><div class="runner-progress-track"><i data-run-progress-fill></i></div><button type="button" data-run-boss aria-label="Запустить босса">💀</button></div><div class="runner-stage"><div class="runner-character player-runner"><img src="./arena-assets/player-viking-approved.png" alt="" draggable="false"><span>${esc(p.displayName||s.name||'Игрок')}</span></div>${f?`<div class="runner-follower"><i>${esc(f.icon)}</i><b>${esc(f.name)}</b></div>`:''}<div class="runner-enemy" data-run-enemy><img src="./arena-assets/opponent-viking-approved.png" alt="" draggable="false"><span data-run-enemy-name>Разбойник</span></div><div class="runner-damage-layer"></div><div class="runner-impact-layer"></div></div>`;
+    root.innerHTML=`<div class="runner-ui"><div><b>БОЙ · ГЛАВА ${chapter}</b><span data-run-status>Вперёд!</span></div><button type="button" data-run-close>×</button></div><div class="runner-chapter-hud"><div><small>ПРОГРЕСС ГЛАВЫ</small><b data-run-progress>0%</b></div><div class="runner-progress-track"><i data-run-progress-fill></i></div><button type="button" data-run-boss aria-label="Запустить босса">💀</button></div><div class="runner-stage"><div class="runner-character player-runner"><img src="./player-viking-approved.png" alt="" draggable="false"><span>${esc(p.displayName||s.name||'Игрок')}</span></div>${f?`<div class="runner-follower"><i>${esc(f.icon)}</i><b>${esc(f.name)}</b></div>`:''}<div class="runner-enemy" data-run-enemy><img src="./opponent-viking-approved.png" alt="" draggable="false"><span data-run-enemy-name>Разбойник</span></div><div class="runner-damage-layer"></div><div class="runner-impact-layer"></div></div>`;
   }
   function startRunner(forceBoss){
     stopRunner();

@@ -28,3 +28,13 @@ html,body{background:#07111b!important}
 
 /* FINAL 10000: use the verified gameplay-video city/PvE reference; no duplicate HUD over baked art */
 #homeRealHud{display:none!important}
+
+/* FINAL HOME ISOLATION — HOME artwork is the only visible HOME layer. */
+html[data-screen="home"], body[data-screen="home"]{background:#000!important;overflow:hidden!important}
+body[data-screen="home"] #app{background:transparent!important;overflow:hidden!important}
+body[data-screen="home"] #home{display:block!important;visibility:visible!important;opacity:1!important;z-index:1000!important;background:transparent!important}
+body[data-screen="home"] #homeReferenceHost{display:block!important;visibility:visible!important;opacity:1!important;background:transparent!important}
+body[data-screen="home"] .screen:not(#home){display:none!important;visibility:hidden!important}
+body[data-screen="home"] #arenaModal{display:none!important;visibility:hidden!important;opacity:0!important}
+body[data-screen="home"] #runnerScreen{display:none!important;visibility:hidden!important;opacity:0!important}
+#homeReferenceHost,.home-reference-image{border:0!important;border-radius:0!important;box-shadow:none!important}
