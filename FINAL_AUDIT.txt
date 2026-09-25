@@ -1,0 +1,7 @@
+FINAL AUDIT 10008
+- Based on the current clean flat build, not an old build.
+- navigation-final.js added as the last local script so it owns global HOME hitzone and persistent bottom-nav routing at window capture level.
+- Persistent 7-button mobile nav is forced visible and arena-bottom-nav is hidden to prevent duplicate navigation.
+- Panel screens receive bottom padding so the fixed nav does not cover content.
+- JS syntax checked for every JS file.
+- Every local script/stylesheet referenced by index.html verified present.
