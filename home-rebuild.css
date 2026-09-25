@@ -25,3 +25,6 @@ html,body{background:#07111b!important}
 #homeRealHud .hud-hp{left:4%!important;top:72.8%!important;width:15.2%!important;height:2.4%!important;border-radius:999px!important;background:linear-gradient(90deg,#d72a2a var(--fill,0%),rgba(45,5,5,.22) var(--fill,0%))!important;z-index:93!important}
 #homeRealHud .hud-bottom-energy{left:84.8%!important;top:72.8%!important;width:12.2%!important;height:2.4%!important;border-radius:999px!important;background:linear-gradient(90deg,#1688e8 var(--fill,0%),rgba(0,30,65,.22) var(--fill,0%))!important;z-index:93!important}
 @media(max-width:430px){#homeRealHud .hud-name,#homeRealHud .hud-level,#homeRealHud .hud-vip{font-size:9px!important}#homeRealHud .hud-coins,#homeRealHud .hud-gems,#homeRealHud .hud-redgems,#homeRealHud .hud-xp,#homeRealHud .hud-bottom-level,#homeRealHud .hud-hp,#homeRealHud .hud-bottom-energy{font-size:9px!important}}
+
+/* FINAL 10000: use the verified gameplay-video city/PvE reference; no duplicate HUD over baked art */
+#homeRealHud{display:none!important}
