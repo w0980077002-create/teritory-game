@@ -1,12 +1,9 @@
-10050 — FINAL REAL BATTLE FLOW
-Replace/add these files in the repository root.
-- index.html
-- pve-battle.js
-- battle-flow-10050.js
-- battle-flow-10050.css
-- player-viking-approved.png
-- opponent-viking-approved.png
-- home-master.png
-- pve-reference-scene.jpg
-Flow: HOME -> Battle -> full-screen movement -> bot -> ordinary PvE (no timer) -> next bot -> 100% -> HOME -> skull -> Boss (timer). Arena untouched.
-Combat stones: 1 hit = 1 stone; default 30 if absent. When 0, further bot attacks are blocked and no reward is granted.
+10051 — DIRECT HOME BATTLE
+
+Replace these files at repository root:
+index.html
+pve-battle.js
+battle-flow-10051.js
+battle-flow-10051.css
+
+Flow: HOME -> Бой -> full-screen run scene -> bot -> PvE. No intermediate start button. PvE has no timer. 1 hit = 1 combat stone. After victory the next bot starts automatically. At 100% the skull opens the Boss; only Boss keeps the timer.

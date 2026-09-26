@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-let enemyHp=1,enemyMax=1,playerHp=6850,playerMax=6850,auto=false,finished=false,selected=1;
+let enemyHp=1,enemyMax=1,playerHp=6850,playerMax=6850,auto=false,finished=false,selected=1,rewarded=false;
 function stones(){const s=window.TerritoryStore?.state;if(!s)return 0;if(!Number.isFinite(Number(s.battleStones)))s.battleStones=30;return Number(s.battleStones);}
 function save(){window.TerritoryStore?.saveNow?.('battle-stone');}
 function getState(){return window.TerritoryChaptersAPI?.state?.()||window.TerritoryStore?.state||{currentChapter:1,chapterStage:1,chapterProgress:0}}
@@ -28,21 +28,22 @@ function render(){
  const atk=$('#pveAttack');if(atk)atk.disabled=finished||stones()<=0;
 }
 function finish(win){
- finished=true;auto=false;$('#pveAuto')?.classList.remove('on');
+ finished=true;rewarded=false;auto=false;$('#pveAuto')?.classList.remove('on');
  if(win){
+   if(!rewarded){rewarded=true;const rs=getState();rs.coins=Math.max(0,Number(rs.coins)||0)+100+Number(rs.currentChapter||1)*15;rs.exp=Math.max(0,Number(rs.exp)||0)+25+Math.floor((Number(rs.currentChapter)||1)*2);save();}
    window.TerritoryChaptersAPI?.completeStage?.();
    const s=getState(); const done=Number(s.chapterProgress)>=100;
    $('#pveLog').textContent=done?'100% на ботах. ☠️ Босс теперь открывается только через череп на карте.':'Победа! Следующий бот уже впереди.';
    let b=$('#pveVictory');if(!b){b=document.createElement('button');b.id='pveVictory';b.className='pve-victory-btn';$('.battle32').appendChild(b)}
    b.textContent=done?'☠️ БОСС ОТКРЫТ':'СЛЕДУЮЩИЙ БОТ';
-   b.onclick=()=>window.BattleFlow10050?.afterPveWin?.(done);
-   if(window.BattleFlow10050?.afterPveWin){setTimeout(()=>{if(finished)window.BattleFlow10050.afterPveWin(done);},650)}
+   b.onclick=()=>window.BattleFlow10051?.victory?.(done);
+   if(window.BattleFlow10051?.victory){setTimeout(()=>{if(finished)window.BattleFlow10051.victory(done);},650)}
  }else $('#pveLog').textContent='Герой повержен. Вернись на карту и повтори этап.';
  window.dispatchEvent(new CustomEvent('territory:state-changed'));render();
 }
 function attack(){
  if(finished)return; const ch=getChapter();if(!ch)return;
- if(stones()<=0){finished=true;auto=false;$('#pveAuto')?.classList.remove('on');$('#pveLog').textContent='⛔ Боевые камни закончились. Следующий бот закрыт. Монеты и опыт за него не начисляются.';render();return;}
+ if(stones()<=0){finished=true;rewarded=false;auto=false;$('#pveAuto')?.classList.remove('on');$('#pveLog').textContent='⛔ Боевые камни закончились. Следующий бот закрыт. Монеты и опыт за него не начисляются.';render();return;}
  const ss=window.TerritoryStore?.state;if(ss)ss.battleStones=Math.max(0,Number(ss.battleStones)-1);save();
  const skill=document.querySelector('.skill32.selected');const mult={1:1,2:1.08,3:1.18,4:.7,5:1.28,6:.55,7:1.12,8:1.2}[selected]||1;
  const dmg=Math.max(1,Math.round(enemyMax*(.16+Math.random()*.08)*mult)); enemyHp=Math.max(0,enemyHp-dmg);

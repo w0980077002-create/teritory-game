@@ -1,0 +1,18 @@
+/* 10051 direct HOME -> cinematic run -> PvE */
+#map .fjords-route,#map .fjords-stage-card{display:none!important}
+#map .fjords-encounter{pointer-events:none!important}
+#map .fjords-map.moving .fjords-bg{animation:bf51bg 1.8s linear infinite!important;transform:translateX(-7%)}
+#map .fjords-map.moving .fjords-hero{left:53%!important;animation:bf51run .32s ease-in-out infinite alternate}
+#map .fjords-map.moving .fjords-companion{left:43%!important;animation:bf51run .32s ease-in-out infinite alternate-reverse}
+#map .fjords-map.moving .fjords-enemy{left:64%!important;animation:bf51enemy 1.8s cubic-bezier(.2,.8,.2,1) forwards}
+#map .fjords-map.encounter .fjords-hero{left:42%!important;animation:none}
+#map .fjords-map.encounter .fjords-companion{left:31%!important;animation:none}
+#map .fjords-map.encounter .fjords-enemy{left:57%!important;animation:none}
+#map .fjords-map.moving:after{content:'⚔️  БОЙ';position:absolute;z-index:60;left:50%;top:44%;transform:translate(-50%,-50%);padding:8px 18px;border:2px solid #d33b32;border-radius:10px;background:#6e1610dd;color:#fff;font-weight:1000;letter-spacing:1px;animation:bf51pulse .5s ease-in-out infinite alternate}
+#map .fjords-top{z-index:70}
+#mapChapterSkull{display:block!important}
+#pveChapterMap{display:none!important}
+@keyframes bf51bg{to{transform:translateX(-13%)}}
+@keyframes bf51run{to{transform:translateY(-7px) scale(1.03)}}
+@keyframes bf51enemy{0%{transform:translateX(0)}100%{transform:translateX(-18vw)}}
+@keyframes bf51pulse{from{opacity:.72;transform:translate(-50%,-50%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1.04)}}
