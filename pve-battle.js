@@ -16,7 +16,7 @@ function setup(){
  $('.fighter32.enemy b').textContent=`Противник · Lv.${ch.enemy.level}`;
  let bar=$('#pveEnemyHp'); if(!bar){bar=document.createElement('div');bar.id='pveEnemyHp';bar.className='pve-enemy-hp';$('.battle32-field').appendChild(bar)}
  bar.innerHTML='<i></i><span></span>';
- let mapBtn=$('#pveChapterMap');if(!mapBtn){mapBtn=document.createElement('button');mapBtn.id='pveChapterMap';mapBtn.className='chapter-map-link';mapBtn.textContent='☠️';mapBtn.title='Карта глав';$('.battle32').appendChild(mapBtn);mapBtn.onclick=()=>window.TerritoryUI?.show('map')}
+ 
  $('#pveLog').textContent=`${ch.name} · этап ${stage}. 1 удар = 1 боевой камень.`;
  let stone=$('#pveStoneCount');if(!stone){stone=document.createElement('div');stone.id='pveStoneCount';stone.className='pve-stone-count';$('.battle32').appendChild(stone)}
  render();
@@ -58,7 +58,7 @@ function attack(){
 $$('.skill32').forEach(b=>b.addEventListener('click',()=>{$$('.skill32').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selected=Number(b.dataset.skill)}));
 $('#pveAttack')?.addEventListener('click',attack);
 $('#pveAuto')?.addEventListener('click',()=>{auto=!auto;$('#pveAuto').classList.toggle('on',auto);$('#pveLog').textContent=auto?'Авто-бой включён.':'Авто-бой выключен.';if(auto){const loop=()=>{if(!auto||finished)return;attack();if(!finished)setTimeout(loop,650)};loop()}});
-$('#pveTactic')?.addEventListener('click',()=>$('#pveLog').textContent='Выбери навык. Карта ☠️ всегда доступна сверху.');
+$('#pveTactic')?.addEventListener('click',()=>$('#pveLog').textContent='Выбери навык. Бой продолжается, пока глава не достигнет 100%.');
 $('#pveBack')?.addEventListener('click',()=>window.TerritoryUI?.show('map'));
 $$('[data-pve-nav]').forEach(b=>b.addEventListener('click',()=>window.TerritoryUI?.show(b.dataset.pveNav==='map'?'map':b.dataset.pveNav)));
 window.addEventListener('territory:screen',e=>{if(e.detail==='pveBattle')setup()});

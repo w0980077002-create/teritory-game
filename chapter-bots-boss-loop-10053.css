@@ -1,0 +1,31 @@
+/* 10053 — positions from the approved HOME scene: companion, hero, two incoming bots */
+#runnerScreen.home-battle-overlay .runner-follower{
+  left:7%!important;bottom:6%!important;width:17%!important;
+}
+#runnerScreen.home-battle-overlay .runner-character{
+  left:21%!important;bottom:5%!important;width:29%!important;
+}
+#runnerScreen.home-battle-overlay .runner-enemy{
+  right:11%!important;bottom:5%!important;width:25%!important;
+}
+#runnerScreen.home-battle-overlay .runner-enemy.runner-enemy-enter{
+  animation:homeEnemyApproach10053 3.4s cubic-bezier(.2,.75,.25,1) forwards!important;
+}
+#runnerScreen.home-battle-overlay .runner-enemy-rear{
+  position:absolute!important;
+  right:-13%!important;
+  bottom:8%!important;
+  width:23%!important;
+  z-index:9!important;
+  transform:translateX(0)!important;
+  filter:drop-shadow(0 5px 5px #0009)!important;
+  opacity:.98!important;
+}
+#runnerScreen.home-battle-overlay .runner-enemy-rear img{
+  width:100%!important;height:auto!important;display:block!important;
+}
+@keyframes homeEnemyApproach10053{
+  0%{right:-23%;transform:translateX(0) scale(.90)}
+  48%{right:10%;transform:translateX(0) scale(1)}
+  100%{right:26%;transform:translateX(0) scale(1)}
+}

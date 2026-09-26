@@ -1,0 +1,30 @@
+/* 10054 — exact formation: companion, hero, bot 1, bot 2 */
+#runnerScreen.home-battle-overlay .runner-follower{
+ left:7%!important;bottom:6%!important;width:17%!important;z-index:14!important;
+}
+#runnerScreen.home-battle-overlay .runner-character{
+ left:21%!important;bottom:5%!important;width:29%!important;z-index:15!important;
+}
+#runnerScreen.home-battle-overlay .runner-enemy{
+ right:9%!important;bottom:5%!important;width:25%!important;z-index:13!important;
+}
+#runnerScreen.home-battle-overlay .runner-enemy.runner-enemy-enter{
+ animation:bot1Approach10054 3.2s cubic-bezier(.2,.75,.25,1) forwards!important;
+}
+#runnerScreen.home-battle-overlay .runner-enemy-rear{
+ position:absolute!important;right:-28%!important;bottom:8%!important;width:23%!important;
+ z-index:12!important;opacity:.98!important;filter:drop-shadow(0 5px 5px #0009)!important;
+ animation:bot2Approach10054 3.2s cubic-bezier(.2,.75,.25,1) forwards!important;
+}
+#runnerScreen.home-battle-overlay .runner-enemy-rear img{width:100%!important;height:auto!important;display:block!important}
+#runnerScreen.home-battle-overlay.runner-meet .runner-enemy-rear{animation:none!important;right:23%!important}
+@keyframes bot1Approach10054{
+ 0%{right:-24%;transform:scale(.9)}
+ 52%{right:12%;transform:scale(1)}
+ 100%{right:27%;transform:scale(1)}
+}
+@keyframes bot2Approach10054{
+ 0%{right:-34%;transform:scale(.88)}
+ 55%{right:-2%;transform:scale(.96)}
+ 100%{right:13%;transform:scale(1)}
+}
