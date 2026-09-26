@@ -60,6 +60,12 @@ body{display:block!important;position:relative!important;}
 #runnerScreen.home-battle-overlay{width:100vw!important;min-width:100vw!important;max-width:none!important;height:100dvh!important;min-height:100dvh!important;}
 #hardMobileNav{left:0!important;right:0!important;width:100vw!important;max-width:none!important;box-sizing:border-box!important;}
 @media (orientation:landscape){.screen{width:100vw!important;min-width:100vw!important}.home-reference-image{width:100%!important;height:100%!important;object-fit:fill!important}}
+
+/* INTERACTION SAFETY: one transparent hitzone per action, never block real controls. */
+.home-hitzones,.home-bottom-zones{pointer-events:none!important;}
+.home-hitzones .hz,.home-bottom-zones .hz{pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;}
+#homeRealHud{pointer-events:none!important;}
+.panel button,.panel [role="button"],.modal button,.arena-modal button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 </style>
 </head>
 <body>

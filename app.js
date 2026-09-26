@@ -56,8 +56,20 @@ function roadmap(){
 }
 const inv=[['⚔️','Топор','Оружие'],['🪖','Шлем','Броня'],['🛡️','Доспех','Броня'],['🎗️','Пояс','Аксессуар'],['🥾','Сапоги','Аксессуар'],['💍','Кольцо','Аксессуар'],['🔮','Амулет','Аксессуар'],['🧪','Эликсир HP','Предмет']];
 function cards(id,arr){const el=$(id);if(!el)return;el.innerHTML=arr.map((x,i)=>`<button class="card" data-item="${i}"><div>${x[0]}</div><b>${x[1]}</b><span>${x[2]}</span></button>`).join('');$$('#'+id+' .card').forEach(b=>b.onclick=()=>modal('Предмет',`<p>${arr[+b.dataset.item][1]}</p>`))}
-function inventory(){cards('#inventoryGrid',inv)}
-function shop(){cards('#shopGrid',[['🧪','Зелье HP','Восстановление'],['🔵','Энергия','Восстановление'],['🔴','Атака','Бафф'],['🟡','Защита','Бафф'],['🟣','Адреналин','Возрождение'],['💠','Ускорение','Бой']]);$$('[data-coins]').forEach(e=>e.textContent=Math.floor(Store.state.coins).toLocaleString('ru-RU'))}
+function inventory(){
+ const groups={Оружие:inv.slice(0,1),Броня:inv.slice(1,3),Аксессуары:inv.slice(3,7),Предметы:inv.slice(7)};
+ const tabs=$$('#inventory .tabs button');
+ tabs.forEach((b,i)=>b.onclick=()=>{tabs.forEach(x=>x.classList.remove('active'));b.classList.add('active');cards('#inventoryGrid',groups[b.textContent.trim()]||inv)});
+ cards('#inventoryGrid',groups[tabs.find(x=>x.classList.contains('active'))?.textContent.trim()||'Оружие']||inv);
+}
+function shop(){
+ const items=[['🧪','Зелье HP','Восстановление'],['🔵','Энергия','Восстановление'],['🔴','Атака','Бафф'],['🟡','Защита','Бафф'],['🟣','Адреналин','Возрождение'],['💠','Ускорение','Бой']];
+ const groups={Эликсиры:items.slice(0,2),Оружие:items.slice(2,3),Броня:items.slice(3,4),Боевые:items.slice(4)};
+ const tabs=$$('#shop .tabs button');
+ tabs.forEach(b=>b.onclick=()=>{tabs.forEach(x=>x.classList.remove('active'));b.classList.add('active');cards('#shopGrid',groups[b.textContent.trim()]||items)});
+ cards('#shopGrid',groups[tabs.find(x=>x.classList.contains('active'))?.textContent.trim()||'Эликсиры']||items);
+ $$('[data-coins]').forEach(e=>e.textContent=Math.floor(Store.state.coins).toLocaleString('ru-RU'))
+}
 function games(){const b=$('#board');if(!b)return;b.innerHTML='';for(let i=0;i<25;i++){const c=document.createElement('button');c.className='cell '+(i===Store.state.pos?'active':'');c.textContent=i+1;c.onclick=()=>{Store.state.pos=i;Store.saveNow();games()};b.appendChild(c)}$$('[data-dice]').forEach(x=>x.textContent=Store.state.dice)}
 $('#roll').onclick=()=>{if(!Store.state.dice)return modal('Кубики','<p>Кубики закончились.</p>');Store.state.dice--;Store.state.pos=(Store.state.pos+1+Math.floor(Math.random()*6))%25;Store.saveNow();games();$('#rollLog').textContent='Позиция '+(Store.state.pos+1)};
 $('#followersBtn').onclick=()=>modal('Последователи','<p>Лиабро — Крит</p><p>Тералель — Защита</p><p>Король-коров — Лечение</p><p>Морт — Уклонение</p><p>Каменное Лицо — Контроль</p>');

@@ -4,10 +4,11 @@ const S=()=>window.TerritoryStore?.state||{};
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 let battle=null,boss=null;
 const zones=[
-['profile',0,0,27.5,6.5],['coins',27.5,0,18,5.8],['gems',45.5,0,18,5.8],['redgems',63.5,0,16,5.8],['trophy',79.5,0,6.5,5.8],['messages',86,0,7,5.8],['settings',93,0,7,5.8],
-['energy',30,4.5,28,5.2],['attack',64,4.2,34,6.3],['chapter',30,9,41,5.5],['events',0,9,13,8],['daily',0,16.2,13,8],['quests',0,23.4,13,8],['friends',0,30.6,13,8],['sea',0,38,13,8],
-['shop',87,9,13,8],['forge',87,16.2,13,8],['challenges',87,23.4,13,8],['streets',87,30.6,13,8],['arena',87,38,13,8],['hp',0,64,18,12],['equipment',18,64,65,12],['energyBottom',83,64,17,12],
-['quest',0,84.2,51,7.2],['speed',61,83.7,8.5,7],['refresh',70.5,83.7,8.5,7],['crown',80,83.7,8.5,7],['star',89.5,83.7,10.5,7],
+['profile',0,0,27.5,6.3],['coins',27.5,0,18,6.3],['gems',45.5,0,18,6.3],['redgems',63.5,0,16,6.3],['trophy',79.5,0,6.5,6.3],['messages',86,0,7,6.3],['settings',93,0,7,6.3],
+['energy',30,6.3,28,2.7],['attack',64,6.3,36,2.7],['chapter',30,9,41,5.5],['events',0,9,13,7.2],['daily',0,16.2,13,7.2],['quests',0,23.4,13,7.2],['friends',0,30.6,13,7.2],['sea',0,37.8,13,8.0],
+['shop',87,9,13,7.2],['forge',87,16.2,13,7.2],['challenges',87,23.4,13,7.2],['streets',87,30.6,13,7.2],['arena',87,37.8,13,8.0],
+['hp',0,64,18,12],['equipment',18,64,65,12],['energyBottom',83,64,17,12],
+['quest',0,84.2,51,6.8],['speed',61,83.7,8.5,7],['refresh',70.5,83.7,8.5,7],['crown',80,83.7,8.5,7],['star',89.5,83.7,10.5,7],
 ['skull',55,18,13,12]
 ];
 const bottom=[['home',0,91,14.28,9],['inventory',14.28,91,14.28,9],['hero',28.56,91,14.28,9],['battle',42.84,90,14.32,10],['quests',57.16,91,14.28,9],['games',71.44,91,14.28,9],['clan',85.72,91,14.28,9]];
@@ -24,7 +25,7 @@ function mount(){
  const home=document.getElementById('home');if(!home||home.dataset.mounted)return;home.dataset.mounted='1';
  home.innerHTML='<div class="home-reference-host"><img src="home-master.png" class="home-reference-image" alt=""><div id="homeRealHud"></div><div class="home-hitzones"></div><div class="home-bottom-zones"></div></div>';
  const layer=home.querySelector('.home-hitzones'),bot=home.querySelector('.home-bottom-zones');
- [...zones,...bottom].forEach((z,i)=>{const b=document.createElement('button');b.type='button';b.className='hz';b.dataset.action=z[0];b.style.cssText=`left:${z[1]}%;top:${z[2]}%;width:${z[3]}%;height:${z[4]}%;`;(i<zones.length?layer:bot).appendChild(b)});
+ [...zones,...bottom].forEach((z,i)=>{const b=document.createElement('button');b.type='button';b.className='hz';b.dataset.action=z[0];b.setAttribute('aria-label',z[0]);b.style.cssText=`left:${z[1]}%;top:${z[2]}%;width:${z[3]}%;height:${z[4]}%;`;(i<zones.length?layer:bot).appendChild(b)});
  document.getElementById('homeRealHud').innerHTML='<span class="hud-clean hud-name"></span><span class="hud-clean hud-level"></span><span class="hud-clean hud-vip"></span><span class="hud-clean hud-coins"></span><span class="hud-clean hud-gems"></span><span class="hud-clean hud-redgems"></span><span class="hud-clean hud-energy"></span><span class="hud-clean hud-xp"></span><span class="hud-clean hud-hp"></span><span class="hud-clean hud-stones"></span>';
  paint();
 }
