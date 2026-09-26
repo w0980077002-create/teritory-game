@@ -16,6 +16,15 @@
 <link rel="stylesheet" href="next-chapter-10035.css">
 <link rel="stylesheet" href="fjords-map-10036.css">
 <link rel="stylesheet" href="boss.css">
+
+<style id="battle-home-hard-fix-10045">
+#runnerScreen.home-battle-overlay{position:fixed!important;left:0!important;top:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;background-color:transparent!important;box-shadow:none!important;overflow:hidden!important;z-index:2147483000!important;pointer-events:none!important;}
+#runnerScreen.home-battle-overlay::before,#runnerScreen.home-battle-overlay::after{content:none!important;display:none!important;}
+#runnerScreen.home-battle-overlay .runner-stage{position:absolute!important;left:0!important;top:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;background-color:transparent!important;box-shadow:none!important;overflow:hidden!important;}
+#runnerScreen.home-battle-overlay .runner-stage::before,#runnerScreen.home-battle-overlay .runner-stage::after{content:none!important;display:none!important;}
+#runnerScreen.home-battle-overlay .runner-character,#runnerScreen.home-battle-overlay .runner-follower,#runnerScreen.home-battle-overlay .runner-enemy{background:transparent!important;background-color:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;}
+#runnerScreen.home-battle-overlay .runner-scene-status{display:none!important;}
+</style>
 </head>
 <body>
 <div id="app">
@@ -265,5 +274,7 @@
 <script src="fjords-map-10036.js"></script>
 <script src="chapters-240.js"></script>
 <script src="chapters-240-integration.js"></script>
+<script src="home-rebuild.js"></script>
+<script src="navigation-final.js"></script>
 </body>
 </html>
