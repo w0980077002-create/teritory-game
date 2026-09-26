@@ -79,10 +79,10 @@ const Z=[
 function isHome(){return (document.body.dataset.screen||'home')==='home'&&!document.getElementById('arenaModal')?.classList.contains('show')&&!document.getElementById('runnerScreen');}
 function homePointAction(e){
  if(!isHome())return null;
- const host=document.getElementById('homeReferenceHost')||document.getElementById('home');
+ const host=document.getElementById('homeReferenceHost')||document.querySelector('.home-reference-host')||document.getElementById('home');
  if(!host)return null;
  const r=host.getBoundingClientRect(); if(!r.width||!r.height)return null;
- const x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;
+ const pt=e.touches?.[0]||e.changedTouches?.[0]||e; const x=(pt.clientX-r.left)/r.width*100,y=(pt.clientY-r.top)/r.height*100;
  for(let i=Z.length-1;i>=0;i--){const z=Z[i];if(x>=z[1]&&x<=z[1]+z[3]&&y>=z[2]&&y<=z[2]+z[4])return z[0];}
  return null;
 }
@@ -127,7 +127,7 @@ function sync(){
 
 /* Android/iOS: pointerdown is the primary path, touchstart is a fallback. */
 document.addEventListener('pointerdown',handlePointer,true);
-document.addEventListener('touchstart',handlePointer,{capture:true,passive:false});
+document.addEventListener('touchend',handlePointer,{capture:true,passive:false});
 document.addEventListener('click',e=>{
  if(performance.now()<suppressClickUntil){e.preventDefault();e.stopImmediatePropagation();return;}
  if(direct(e.target)){e.preventDefault();e.stopImmediatePropagation();}
@@ -143,7 +143,7 @@ const st=document.createElement('style');st.textContent=`
 #hardMobileNav button i{font-style:normal;font-size:18px;line-height:18px}#hardMobileNav button span{font-size:8px;line-height:10px;white-space:nowrap}#hardMobileNav button.active{border-color:#d1ad55;background:#2a2114;color:#f2d77d}
 /* Android WebView hit-test fix: transparent buttons stay fully hit-testable. */
 .home-hitzones,.home-bottom-zones{pointer-events:none!important;z-index:2147482000!important}.home-hitzones .hz,.home-bottom-zones .hz{pointer-events:auto!important;opacity:1!important;color:transparent!important;background:transparent!important;border:0!important;outline:0!important;box-shadow:none!important;display:block!important;visibility:visible!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important}
-#homeReferenceHost{position:absolute!important;inset:0!important;touch-action:manipulation!important}
+#homeReferenceHost,.home-reference-host{position:absolute!important;inset:0!important;touch-action:manipulation!important;pointer-events:none!important}.home-reference-image{pointer-events:none!important}
 .screen.panel{z-index:2}.screen.panel header,.screen.panel button{position:relative;z-index:20;pointer-events:auto!important;touch-action:manipulation!important}
 `;
 document.head.appendChild(st);

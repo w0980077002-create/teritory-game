@@ -24,7 +24,7 @@ home:()=>window.showScreen?.('home'),inventory:()=>window.showScreen?.('inventor
 function info(t,b){const m=document.getElementById('modal'),body=document.getElementById('modalBody');if(!m||!body)return;body.innerHTML='<h2>'+t+'</h2><p>'+b+'</p>';m.classList.add('show')}
 function mount(){
  const home=document.getElementById('home');if(!home||home.dataset.mounted)return;home.dataset.mounted='1';
- home.innerHTML='<div class="home-reference-host"><img src="home-master.png" class="home-reference-image" alt=""><div id="homeRealHud"></div><div class="home-hitzones"></div><div class="home-bottom-zones"></div></div>';
+ home.innerHTML='<div id="homeReferenceHost" class="home-reference-host"><img src="home-master.png" class="home-reference-image" alt=""><div id="homeRealHud"></div><div class="home-hitzones"></div><div class="home-bottom-zones"></div></div>';
  const layer=home.querySelector('.home-hitzones'),bot=home.querySelector('.home-bottom-zones');
  [...zones,...bottom].forEach((z,i)=>{const b=document.createElement('button');b.type='button';b.className='hz';b.dataset.action=z[0];b.setAttribute('aria-label',z[0]);b.style.cssText=`left:${z[1]}%;top:${z[2]}%;width:${z[3]}%;height:${z[4]}%;`;(i<zones.length?layer:bot).appendChild(b)});
  document.getElementById('homeRealHud').innerHTML='<span class="hud-clean hud-name"></span><span class="hud-clean hud-level"></span><span class="hud-clean hud-vip"></span><span class="hud-clean hud-coins"></span><span class="hud-clean hud-gems"></span><span class="hud-clean hud-redgems"></span><span class="hud-clean hud-energy"></span><span class="hud-clean hud-xp"></span><span class="hud-clean hud-hp"></span><span class="hud-clean hud-stones"></span>';
