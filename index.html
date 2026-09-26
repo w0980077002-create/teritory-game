@@ -300,3 +300,44 @@
 </script>
 </body>
 </html>
+<!-- 10048 FINAL CHAPTER BATTLE FLOW: HOME Battle -> auto movement -> PvE -> next bot -> skull boss -->
+<style id="battle-flow-10048">
+  /* The map is a short cinematic transition, not a menu. */
+  body.chapter-auto-run #map .fjords-stage-card,
+  body.chapter-auto-run #map .fjords-nav,
+  body.chapter-auto-run #map #fjordsStart,
+  body.chapter-auto-run #map #fjordsFight { display:none!important; }
+  body.chapter-auto-run #map .fjords-encounter { display:none!important; }
+  body.chapter-auto-run #map .fjords-top { opacity:.96; }
+  body.chapter-auto-run #map .fjords-map { cursor:default!important; }
+  #battleFlowToast{position:fixed;z-index:2147483005;left:50%;top:31%;transform:translateX(-50%);padding:9px 18px;border:1px solid #d9aa50;border-radius:12px;background:#07131de8;color:#f4d171;font-weight:900;font-size:14px;pointer-events:none;opacity:0;transition:opacity .2s}
+  #battleFlowToast.show{opacity:1}
+</style>
+<script>
+(function(){'use strict';
+  function flow(){
+    document.body.classList.add('chapter-auto-run');
+    window.TerritoryUI?.show('map');
+    setTimeout(function(){ window.TerritoryMap240?.movement?.(); },80);
+  }
+  function patch(){
+    if(window.__battleFlow10048)return;
+    window.__battleFlow10048=true;
+    window.HomeRebuild=window.HomeRebuild||{};
+    window.HomeRebuild.startRunner=function(){flow();};
+    window.addEventListener('click',function(e){
+      const z=e.target.closest?.('.zone.battle');
+      if(z){e.preventDefault();e.stopImmediatePropagation();flow();}
+    },true);
+    window.addEventListener('territory:screen',function(e){
+      if(e.detail==='map')document.body.classList.add('chapter-auto-run');
+      else document.body.classList.remove('chapter-auto-run');
+    });
+    document.addEventListener('DOMContentLoaded',function(){
+      const nav=document.getElementById('hardMobileNav');
+      if(nav)nav.addEventListener('click',function(e){if(e.target.closest('[data-global-nav="battle"]')){e.preventDefault();e.stopImmediatePropagation();flow();}},true);
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patch,{once:true});else patch();
+})();
+</script>

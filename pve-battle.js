@@ -29,9 +29,10 @@ function finish(win){
    const s=getState(); const done=Number(s.chapterProgress)>=100;
    $('#pveLog').textContent=done?'100% на ботах. ☠️ Босс теперь открывается только через череп на карте.':'Победа! Следующий бот уже впереди.';
    let b=$('#pveVictory');if(!b){b=document.createElement('button');b.id='pveVictory';b.className='pve-victory-btn';$('.battle32').appendChild(b)}
-   b.textContent=done?'ВЕРНУТЬСЯ НА КАРТУ':'ИДТИ К СЛЕДУЮЩЕМУ БОТУ';
-   b.onclick=()=>{window.TerritoryUI?.show('map');if(!done)setTimeout(()=>window.TerritoryMap240?.movement?.(),120)};
-   if(!done){setTimeout(()=>{if(!finished)return;window.TerritoryUI?.show('map');setTimeout(()=>window.TerritoryMap240?.movement?.(),180)},900)}
+   b.textContent=done?'☠️ БОСС ОТКРЫТ':'СЛЕДУЮЩИЙ БОТ';
+   b.onclick=()=>{if(done){window.TerritoryUI?.show('home');return;}window.TerritoryUI?.show('map');setTimeout(()=>window.TerritoryMap240?.movement?.(),120)};
+   if(!done){setTimeout(()=>{if(!finished)return;window.TerritoryUI?.show('map');setTimeout(()=>window.TerritoryMap240?.movement?.(),180)},650)}
+   else {setTimeout(()=>{if(!finished)return;window.TerritoryUI?.show('home');},700)}
  }else $('#pveLog').textContent='Герой повержен. Вернись на карту и повтори этап.';
  window.dispatchEvent(new CustomEvent('territory:state-changed'));render();
 }
