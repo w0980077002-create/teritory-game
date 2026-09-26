@@ -1,15 +1,16 @@
-TERRITORY GAME — CLICK REPAIR V3
+TERITORY GAME — FINAL CLICK REPAIR
 
-Replace exactly these 3 files:
-- index.html
-- home-rebuild.js
-- navigation-final.js
+Replace these 5 runtime files in GitHub together:
+1. index.html
+2. app.js
+3. home-rebuild.js
+4. navigation-final.js
+5. fjords-map-10036.js
 
-Important: do NOT delete the existing game CSS/JS/assets. This ZIP contains the corrected input layer only.
-
-Fixes:
-- HOME host no longer intercepts touches.
-- HOME hitzones remain transparent but clickable.
-- Touchend/pointerup coordinate fallback works on Android/iPhone WebView.
-- HOME coordinate fallback uses the real host element.
-- Global navigation remains deterministic without disabling native buttons.
+IMPORTANT:
+- Do NOT add old battle-flow-*, chapter-run-*, mobile-nav-fix*, button-fix.js or reference-ui* files back.
+- Keep all existing game assets and the existing arena/forge/hero/follower/combat files.
+- This package uses one deterministic mobile input layer.
+- HOME actions are routed from screen coordinates on touchstart/pointerdown.
+- Ordinary buttons inside Inventory/Shop/Games/Arena are left to their own handlers.
+- The bottom mobile navigation is only shown outside HOME and is always above panels.
