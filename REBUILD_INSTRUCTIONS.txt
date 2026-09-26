@@ -1,0 +1,75 @@
+TERITORY GAME — CLEAN REBUILD 2026-09-26
+
+REPLACE TOGETHER (5 files):
+1. index.html
+2. app.js
+3. home-rebuild.js
+4. navigation-final.js
+5. fjords-map-10036.js
+
+DELETE FROM REPOSITORY (obsolete runtime files):
+battle-flow-10050.js
+battle-flow-10050.css
+battle-flow-10051.js
+battle-flow-10051.css
+battle-button-stones-fix-10052.js
+battle-button-stones-fix-10052.css
+chapter-bots-boss-loop-10053.js
+chapter-bots-boss-loop-10053.css
+chapter-bots-boss-loop-visual-10053.js
+chapter-run-stable-10054.js
+chapter-run-stable-10054.css
+chapter-run-visual-10054.js
+pve-battle.js
+pve-battle.css
+pve-battle-10032.css
+map-progress.css
+boss.js
+boss.css
+boss-battle-10034.js
+boss-battle-10034.css
+next-chapter-10035.js
+next-chapter-10035.css
+map.js
+mobile-nav-fix.js
+mobile-nav-fix.css
+mobile-core-nav.css
+button-fix.js
+reference-ui.js
+reference-ui.css
+battle-on-home-fix-10043.css
+battle-overlay-fix-10044.css
+
+DO NOT DELETE:
+home-master.png
+player-viking-approved.png
+opponent-viking-approved.png
+arena-night-approved.png
+arena-master.jpg
+style.css
+home-rebuild.css
+arena.js
+arena.css
+followers.js
+follower-arena.js
+follower-arena.css
+combat-items.js
+forge-v2.js
+forge-v2.css
+hero.js
+hero.css
+chapters-240.js
+chapters-240.json
+chapters-240-integration.js
+fjords-map-10036.css
+map.css
+Dockerfile
+nginx.conf
+
+IMPORTANT:
+- Replace all 5 runtime files in one pass.
+- Do not add old battle/chapter/mobile/button/reference files back.
+- HOME PvE and ARENA remain separate systems.
+- Resource persistence uses window.TerritoryStore.state.
+- Normal PvE: 1 actual hit = 1 battle stone.
+- The ZIP does not contain the binary art assets; keep the existing repository assets listed above.

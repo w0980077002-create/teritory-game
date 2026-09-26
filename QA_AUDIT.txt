@@ -1,0 +1,23 @@
+QA AUDIT — 2026-09-26
+
+Repository audited: w0980077002-create/teritory-game
+Default branch: main
+Current commit observed: a62de60d4644d235d069a11880265c6b8c1c790e
+
+KEY FINDINGS
+1. The repository still contains multiple obsolete battle/navigation modules. They are not needed by the current index and create maintenance/confusion risk.
+2. Current index loads one navigation layer (navigation-final.js) and the core Home/PvE layer (home-rebuild.js). Obsolete battle-flow/chapter-run/mobile-nav/button/reference modules are not part of the intended runtime and should be removed.
+3. The previous click architecture had competing document-level handlers. The supplied navigation-final.js is the single mobile input layer: HOME actions are resolved on touchstart/pointerdown by coordinates; ordinary panel buttons are not globally intercepted.
+4. home-rebuild.js owns HOME hitzones and the automatic PvE runner. It keeps PvE separate from Arena.
+5. TerritoryStore is the canonical persistence object for gameplay resources.
+6. XP is normalized to xp/xpNext and mirrored to exp/expToNext; level is normalized to state.level; equipment is normalized to seven slots.
+7. Normal PvE consumes exactly one battle stone per actual damaging hit. When stones reach zero, no new bot starts and the run returns to HOME.
+8. Arena remains a separate module (arena.js/arena.css) and is not replaced by the HOME PvE runner.
+
+STATIC VALIDATION PERFORMED
+- All 5 replacement JavaScript files pass Node syntax validation.
+- ZIP contents were verified after packaging.
+- Replacement files contain no references to the obsolete battle-flow/chapter-run/mobile-nav/button/reference runtime filenames.
+
+LIMITATION
+A live Telegram WebView/browser session is not available in this environment, so real-device touch rendering cannot be certified here. The package is intended for the user's actual Telegram/iPhone/Android test.
