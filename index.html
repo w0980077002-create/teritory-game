@@ -24,6 +24,9 @@
 #runnerScreen.home-battle-overlay .runner-stage::before,#runnerScreen.home-battle-overlay .runner-stage::after{content:none!important;display:none!important;}
 #runnerScreen.home-battle-overlay .runner-character,#runnerScreen.home-battle-overlay .runner-follower,#runnerScreen.home-battle-overlay .runner-enemy{background:transparent!important;background-color:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;}
 #runnerScreen.home-battle-overlay .runner-scene-status{display:none!important;}
+
+/* 10047: ordinary PvE has NO timer. Timer belongs only to Boss and Arena. */
+#pveTimer{display:none!important}
 </style>
 </head>
 <body>
@@ -267,7 +270,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
 <script src="app.js"></script>
 <script src="map.js"></script>
-<script src="pve-battle.js"></script>
+<script src="pve-battle.js?v=10047"></script>
 <script src="boss.js"></script>
 <script src="boss-battle-10034.js"></script>
 <script src="next-chapter-10035.js"></script>
