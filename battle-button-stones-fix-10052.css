@@ -1,25 +1,2 @@
-/* Territory Game — HOME INPUT FIX 10058 */
-#homeInputFix10058{
- position:fixed!important;left:0!important;top:0!important;width:100vw!important;height:100vh!important;
- z-index:2147483640!important;pointer-events:none!important;touch-action:manipulation!important;
-}
-#homeInputFix10058 button{
- position:absolute!important;display:block!important;box-sizing:border-box!important;
- margin:0!important;padding:0!important;border:0!important;background:transparent!important;
- opacity:0!important;pointer-events:auto!important;touch-action:manipulation!important;
- -webkit-tap-highlight-color:transparent!important;appearance:none!important;
-}
-#homeInputFix10058 button:focus,#homeInputFix10058 button:active{
- outline:none!important;background:transparent!important;
-}
-#battleStone10058{
- left:52%!important;top:83.6%!important;width:8.5%!important;height:7.2%!important;
- display:flex!important;align-items:center!important;justify-content:center!important;
- opacity:1!important;pointer-events:auto!important;cursor:pointer!important;
- color:#fff!important;font:bold clamp(10px,2.8vw,17px) Arial,sans-serif!important;
- text-shadow:0 2px 3px #000!important;
- background:linear-gradient(#8b6234cc,#432716dd)!important;
- border:1px solid #d0a35b!important;border-radius:7px!important;
- box-shadow:0 3px 8px #0008!important;
-}
-body:not([data-screen="home"]) #homeInputFix10058{display:none!important}
+/* 10059 — remove competing HOME input layers */
+#homeInputFix10058,#homeInputFix10057,#battleTapFix10056,#battleStoneButton10056,#battleStoneBadge10052{display:none!important}
