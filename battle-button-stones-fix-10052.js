@@ -1,69 +1,89 @@
-/* 10052 — reliable HOME battle button + visible combat-stone status */
+/* 10056 — HOME Battle hard-fix + real combat-stone button */
 (function(){
 'use strict';
 
-function store(){ return window.TerritoryStore?.state || {}; }
-function stones(){
-  const s=store();
-  if(!Number.isFinite(Number(s.battleStones))) s.battleStones=30;
-  return Math.max(0,Number(s.battleStones));
-}
-function save(){ window.TerritoryStore?.saveNow?.('battle-stones-init-10052'); }
+const S=()=>window.TerritoryStore?.state||{};
 
-let launching=false;
-function launchBattle(e){
-  e?.preventDefault?.();
-  e?.stopPropagation?.();
-  if(launching)return;
-  const n=stones();
-  if(n<=0){
-    showMessage('⚔️ БОЕВЫЕ КАМНИ ЗАКОНЧИЛИСЬ','Нужно восстановить боевые камни, чтобы продолжить прохождение.');
+function getStones(){
+  const s=S();
+  if(!Number.isFinite(Number(s.battleStones))) s.battleStones=30;
+  return Math.max(0,Math.floor(Number(s.battleStones)));
+}
+
+function save(){
+  window.TerritoryStore?.saveNow?.('battle-stones-10056');
+}
+
+function startBattle(){
+  if(getStones()<=0){
+    showMessage('⚔️ БОЕВЫЕ КАМНИ ЗАКОНЧИЛИСЬ','Без боевых камней прохождение ботов остановлено.');
     return;
   }
-  launching=true;
+
   try{
-    window.HomeRebuild?.startRunner?.(false);
-  }catch(_){
-    try{ window.BattleFlow10051?.start?.(); }catch(__){}
+    if(typeof window.BattleFlow10054?.startFarm==='function'){
+      window.BattleFlow10054.startFarm();
+      return;
+    }
+    if(typeof window.HomeRebuild?.startRunner==='function'){
+      window.HomeRebuild.startRunner(false);
+      return;
+    }
+    if(typeof window.BattleFlow10051?.start==='function'){
+      window.BattleFlow10051.start();
+    }
+  }catch(err){
+    console.error('Battle start 10056:',err);
   }
-  setTimeout(()=>{launching=false;},500);
 }
 
 function ensure(){
   const home=document.getElementById('home');
-  if(!home) return;
+  if(!home)return;
 
-  let btn=document.getElementById('battleTapFix10052');
-  if(!btn){
-    btn=document.createElement('button');
-    btn.id='battleTapFix10052';
-    btn.type='button';
-    btn.setAttribute('aria-label','Бой');
-    document.body.appendChild(btn);
-    btn.addEventListener('pointerdown',launchBattle,{passive:false});
-    btn.addEventListener('click',launchBattle,{passive:false});
+  let hit=document.getElementById('battleTapFix10056');
+  if(!hit){
+    hit=document.createElement('button');
+    hit.id='battleTapFix10056';
+    hit.type='button';
+    hit.setAttribute('aria-label','Бой');
+    document.body.appendChild(hit);
+    hit.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      startBattle();
+    },true);
   }
 
-  let badge=document.getElementById('battleStoneBadge10052');
-  if(!badge){
-    badge=document.createElement('div');
-    badge.id='battleStoneBadge10052';
-    document.body.appendChild(badge);
+  let stones=document.getElementById('battleStoneButton10056');
+  if(!stones){
+    stones=document.createElement('button');
+    stones.id='battleStoneButton10056';
+    stones.type='button';
+    stones.innerHTML='<b>⚔️</b><span></span>';
+    stones.setAttribute('aria-label','Боевые камни');
+    document.body.appendChild(stones);
+    stones.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      showMessage('⚔️ БОЕВЫЕ КАМНИ',`Осталось: ${getStones()}. Один удар расходует 1 камень.`);
+    },true);
   }
-  badge.textContent='⚔️ '+stones();
+
+  stones.querySelector('span').textContent=getStones();
 
   const isHome=(document.body.dataset.screen||'home')==='home';
-  btn.style.display=isHome?'block':'none';
-  badge.style.display=isHome?'block':'none';
+  hit.style.display=isHome?'block':'none';
+  stones.style.display=isHome?'flex':'none';
 
-  if(!Number.isFinite(Number(store().battleStones))) save();
+  if(!Number.isFinite(Number(S().battleStones)))save();
 }
 
 function showMessage(title,text){
-  let m=document.getElementById('battleStoneMessage10052');
+  let m=document.getElementById('battleStoneMessage10056');
   if(!m){
     m=document.createElement('div');
-    m.id='battleStoneMessage10052';
+    m.id='battleStoneMessage10056';
     m.innerHTML='<div><b></b><span></span><button>OK</button></div>';
     document.body.appendChild(m);
     m.querySelector('button').onclick=()=>m.classList.remove('show');
@@ -73,13 +93,10 @@ function showMessage(title,text){
   m.classList.add('show');
 }
 
-document.addEventListener('DOMContentLoaded',ensure,{once:true});
+document.addEventListener('DOMContentLoaded',ensure);
 window.addEventListener('territory:render',ensure);
 window.addEventListener('territory:state-changed',ensure);
-window.addEventListener('click',function(e){
-  const target=e.target?.closest?.('#battleTapFix10052');
-  if(target) launchBattle(e);
-},true);
-window.BattleButton10052={refresh:ensure};
-setTimeout(ensure,300);
+setInterval(ensure,1000);
+
+window.BattleButton10056={refresh:ensure,start:startBattle};
 })();
