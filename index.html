@@ -276,5 +276,24 @@
 <script src="chapters-240-integration.js"></script>
 <script src="home-rebuild.js"></script>
 <script src="navigation-final.js"></script>
+<style id="battle-route-final-10046">
+#runnerScreen{display:none!important;visibility:hidden!important;pointer-events:none!important}
+</style>
+<script id="battle-route-final-10046">
+(function(){
+  function bind(){
+    function directBattle(){
+      try{document.getElementById("runnerScreen")?.remove();}catch(e){}
+      const api=window.TerritoryMap240;
+      if(!api?.movement){window.TerritoryUI?.show("map");return;}
+      window.TerritoryUI?.show("map");
+      setTimeout(function(){api.movement();},120);
+    }
+    if(window.HomeRebuild){window.HomeRebuild.startRunner=directBattle;}
+    window.TerritoryDirectBattle=directBattle;
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind,{once:true});else bind();
+})();
+</script>
 </body>
 </html>
