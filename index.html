@@ -4,283 +4,103 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#07111b">
-<meta name="telegram-bot" content="@TeritoryGameBot">
 <title>Teritory Game</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="home-rebuild.css">
 <link rel="stylesheet" href="map.css">
-<link rel="stylesheet" href="pve-battle.css">
-<link rel="stylesheet" href="pve-battle-10032.css">
-<link rel="stylesheet" href="map-progress.css">
-<link rel="stylesheet" href="boss-battle-10034.css">
-<link rel="stylesheet" href="next-chapter-10035.css">
 <link rel="stylesheet" href="fjords-map-10036.css">
-<link rel="stylesheet" href="boss.css">
-
-<style id="battle-home-hard-fix-10045">
-#runnerScreen.home-battle-overlay{position:fixed!important;left:0!important;top:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;background-color:transparent!important;box-shadow:none!important;overflow:hidden!important;z-index:2147483000!important;pointer-events:none!important;}
-#runnerScreen.home-battle-overlay::before,#runnerScreen.home-battle-overlay::after{content:none!important;display:none!important;}
-#runnerScreen.home-battle-overlay .runner-stage{position:absolute!important;left:0!important;top:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;background-color:transparent!important;box-shadow:none!important;overflow:hidden!important;}
-#runnerScreen.home-battle-overlay .runner-stage::before,#runnerScreen.home-battle-overlay .runner-stage::after{content:none!important;display:none!important;}
-#runnerScreen.home-battle-overlay .runner-character,#runnerScreen.home-battle-overlay .runner-follower,#runnerScreen.home-battle-overlay .runner-enemy{background:transparent!important;background-color:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;}
-#runnerScreen.home-battle-overlay .runner-scene-status{display:none!important;}
-
-/* 10047: ordinary PvE has NO timer. Timer belongs only to Boss and Arena. */
-#pveTimer{display:none!important}
+<link rel="stylesheet" href="arena.css">
+<link rel="stylesheet" href="follower-arena.css">
+<link rel="stylesheet" href="forge-v2.css">
+<link rel="stylesheet" href="hero.css">
+<style>
+#bossBattle{background:#07111b;color:#fff}
+.clean-boss{position:relative;width:100%;height:100%;min-height:100vh;overflow:hidden;background:radial-gradient(circle at 50% 35%,#3b1a17,#07111b 70%)}
+.clean-boss:before{content:"";position:absolute;inset:0;background:url("arena-night-approved.png") center/cover no-repeat;opacity:.42}
+.clean-boss>*{position:relative;z-index:1}
+.clean-boss-top{height:74px;display:flex;align-items:center;gap:12px;padding:12px 14px}
+.clean-boss-top button{width:44px;height:44px;border-radius:50%;border:1px solid #80633a;background:#15120e;color:#fff;font-size:25px}
+.clean-boss-title{flex:1;text-align:center}.clean-boss-title b{display:block;font-size:18px}.clean-boss-title small{opacity:.7}
+.clean-boss-skull{font-size:27px}
+.clean-boss-field{position:absolute;left:0;right:0;top:120px;bottom:205px}
+.clean-boss-player,.clean-boss-enemy{position:absolute;bottom:70px;text-align:center}
+.clean-boss-player{left:10%;}.clean-boss-enemy{right:8%}
+.clean-boss-player img,.clean-boss-enemy img{width:min(31vw,180px);max-height:260px;object-fit:contain}
+.clean-boss-player span,.clean-boss-enemy span{display:block;font-weight:800;text-shadow:0 2px 5px #000}
+.clean-boss-hps{position:absolute;left:8%;right:8%;bottom:20px;display:grid;gap:10px}
+.clean-boss-bar{height:18px;border:1px solid #8c7040;background:#17120c;border-radius:10px;overflow:hidden}
+.clean-boss-bar i{display:block;height:100%;width:100%;background:#b53a2e}
+.clean-boss-bar.player i{background:#3c9b54}
+.clean-boss-bar span{display:block;font-size:12px;text-align:center;margin-top:-17px;position:relative;text-shadow:0 1px 3px #000}
+.clean-boss-actions{position:absolute;left:10px;right:10px;bottom:82px;display:flex;justify-content:center;gap:10px}
+.clean-boss-actions button{min-height:48px;border-radius:12px;border:1px solid #8c7040;background:#17120c;color:#fff;padding:0 18px;font-weight:800}
+.clean-boss-result{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.65);z-index:5}
+.clean-boss-result.hidden{display:none}.clean-boss-card{width:min(88%,390px);padding:25px;border:1px solid #a98245;border-radius:18px;background:#111820;text-align:center;box-shadow:0 15px 60px #000}
+.clean-boss-card h2{margin:8px 0}.clean-boss-card p{opacity:.82}.clean-boss-card button{margin-top:12px;width:100%;height:48px;border-radius:12px;border:0;background:#b18442;color:#fff;font-weight:900}
+.home-reference-host{position:relative;width:100%;height:100%;overflow:hidden}.home-reference-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.home-hitzones,.home-bottom-zones{position:absolute;inset:0;z-index:10;pointer-events:none}.home-hitzones .hz,.home-bottom-zones .hz{position:absolute;pointer-events:auto;background:transparent!important;border:0!important;outline:0!important;box-shadow:none!important;padding:0;margin:0}
+.home-hitzones .hz:focus,.home-bottom-zones .hz:focus{outline:none}
+#homeRealHud{position:absolute;inset:0;pointer-events:none;z-index:9}.hud-clean{position:absolute;color:#fff;font-weight:800;text-shadow:0 2px 4px #000;white-space:nowrap}
+.hud-name{left:8%;top:2.2%;font-size:clamp(11px,3.2vw,18px)}.hud-stones{left:70%;top:67%;font-size:10px}.hud-level{left:8%;top:5.1%;font-size:12px}.hud-vip{left:23%;top:5.1%;font-size:11px}
+.hud-coins{left:31%;top:2.1%;font-size:12px}.hud-gems{left:49%;top:2.1%;font-size:12px}.hud-redgems{left:67%;top:2.1%;font-size:12px}
+.hud-energy{left:33%;top:6.0%;font-size:11px}.hud-xp{left:31%;top:10.0%;font-size:10px}.hud-hp{left:2%;top:67%;font-size:10px}.hud-bottom-energy{left:85%;top:67%;font-size:10px}.hud-bottom-level{left:4%;top:67%;font-size:10px}
+#runnerScreen.home-battle-overlay{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:hidden!important;z-index:2147483000!important;pointer-events:none!important}
+#runnerScreen .runner-stage{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;background:transparent!important;overflow:hidden!important}
+#runnerScreen .runner-character,#runnerScreen .runner-follower,#runnerScreen .runner-enemy{background:transparent!important;border:0!important;box-shadow:none!important}
 </style>
-<link rel="stylesheet" href="battle-flow-10050.css?v=10050">
-<link rel="stylesheet" href="battle-flow-10051.css?v=10051"><link rel="stylesheet" href="battle-button-stones-fix-10052.css?v=10052">
-<link rel="stylesheet" href="chapter-bots-boss-loop-10053.css?v=10053"><link rel="stylesheet" href="chapter-run-stable-10054.css?v=10054"><script src="chapter-run-stable-10054.js?v=10054"></script><script src="chapter-run-visual-10054.js?v=10054"></script></head>
+</head>
 <body>
 <div id="app">
-  <section id="home" class="screen active"><img class="master-art" src="home-master.png" alt=""><div id="homeZones" class="zones"></div></section>
-  
-<section id="pveBattle" class="screen pve-battle-screen">
-  <div class="battle32">
-    <div class="battle32-bg"></div>
-    <div class="battle32-top">
-      <button id="pveBack">✕</button>
-      <div class="stage32">[Волнорез 15] <b>Золотой Священный Город</b><small>181-6</small></div>
-      <div class="res32">🪙 86.41M　💎 12,284</div>
-    </div>
-
-    <div class="battle32-field">
-      <div class="fighter32 ally"><span>1P</span><b>SSS</b></div>
-      <div class="fighter32 ally2"><span>2P</span><b>Спутник</b></div>
-      <div class="fighter32 enemy"><span>ВРАГ</span><b>Победитель Камней</b></div>
-      <div id="pveHit32" class="hit32"></div>
-      <div id="pveFloat32" class="float32"></div>
-    </div>
-
-    <div class="battle32-bars">
-      <div class="orb red"></div>
-      <div class="hp32"><b>Lv. 78</b><i id="pvePlayerHp"></i><span id="pvePlayerHpText">78,173 / 119.6K</span></div>
-      <div class="orb blue"></div>
-    </div>
-
-    <div class="skills32">
-      <button class="skill32 selected" data-skill="1">⚔<small>Lv.1029</small></button>
-      <button class="skill32" data-skill="2">❄<small>Lv.1036</small></button>
-      <button class="skill32" data-skill="3">🪓<small>Lv.1045</small></button>
-      <button class="skill32" data-skill="4">🛡<small>Lv.1040</small></button>
-      <button class="skill32" data-skill="5">🩸<small>Lv.1042</small></button>
-      <button class="skill32" data-skill="6">🧪<small>Lv.1045</small></button>
-      <button class="skill32" data-skill="7">🔧<small>Lv.1046</small></button>
-      <button class="skill32" data-skill="8">🥊<small>Lv.1037</small></button>
-    </div>
-
-    <div class="battle32-controls">
-      <button id="pveAuto">AUTO</button>
-      <button id="pveAttack" class="hitbtn">УДАР</button>
-      <button id="pveTimer">⏱ <b>60</b></button>
-      <button id="pveTactic">НАВЫКИ</button>
-    </div>
-
-    <div id="pveLog" class="battle32-log">Выбери навык и нажми «УДАР».</div>
-
-    <div class="battle32-bottom">
-      <button>⚓<small>Порт</small></button>
-      <button>📖<small>Навыки</small></button>
-      <button class="crest">⚔</button>
-      <button>🗺<small>Приключения</small></button>
-      <button>🛒<small>Магазин</small></button>
-    </div>
-
-    <nav class="pve32-nav">
-      <button data-pve-nav="home">🏰<span>Город</span></button>
-      <button data-pve-nav="inventory">🎒<span>Инвентарь</span></button>
-      <button data-pve-nav="hero">🪖<span>Герой</span></button>
-      <button class="active" data-pve-nav="map">🗺️<span>Карта</span></button>
-      <button data-pve-nav="quests">📜<span>Квесты</span></button>
-      <button data-pve-nav="games">🎲<span>Игры</span></button>
-      <button data-pve-nav="clan">🚩<span>Клан</span></button>
-    </nav>
-  </div>
+<section id="home" class="screen active">
+  <img class="master-art" src="home-master.png" alt="">
+  <div id="homeZones" class="zones"></div>
 </section>
 
-  
+<section id="inventory" class="screen panel"><header><button data-home>‹</button><div><small>ГЕРОЙ</small><h1>ИНВЕНТАРЬ</h1></div></header><div class="tabs"><button class="active">Оружие</button><button>Броня</button><button>Аксессуары</button><button>Предметы</button></div><div id="inventoryGrid" class="grid"></div></section>
+<section id="hero" class="screen panel"><header><button data-home>‹</button><div><small>ПЕРСОНАЖ</small><h1>ГЕРОЙ</h1></div></header><div class="heroVisual"><div class="heroEmoji">⚔️</div><b id="heroName">SSS</b><span id="heroLevel">Lv. 1</span></div><div class="statGrid"><div>СИЛА <b>125</b></div><div>ЗАЩИТА <b>98</b></div><div>ЛОВКОСТЬ <b>101</b></div><div>ЗДОРОВЬЕ <b id="heroHp">0</b></div></div><button class="gold wide" id="followersBtn">ПОСЛЕДОВАТЕЛИ</button></section>
+<section id="shop" class="screen panel"><header><button data-home>‹</button><div><small>ТОРГОВЛЯ</small><h1>ЛАВКА</h1></div><b class="wallet">🪙 <span data-coins>0</span></b></header><div class="tabs"><button class="active">Эликсиры</button><button>Оружие</button><button>Броня</button><button>Боевые</button></div><div id="shopGrid" class="grid"></div></section>
+<section id="quests" class="screen panel"><header><button data-home>‹</button><div><small>ЗАДАНИЯ</small><h1>КВЕСТЫ</h1></div></header><div class="quest"><b>Текущая глава</b><span id="questProgress">0%</span><div class="progress"><i id="questBar" style="width:0%"></i></div><button class="gold" data-roadmap>ОТКРЫТЬ КАРТУ</button></div></section>
+<section id="games" class="screen panel"><header><button data-home>‹</button><div><small>РАЗВЛЕЧЕНИЯ</small><h1>ИГРОВОЙ ЗАЛ</h1></div></header><div class="monopoly"><h2>МОНОПОЛИЯ</h2><div id="board" class="board"></div><div class="diceLine"><span>Кубики: <b data-dice>0</b></span><button class="gold" id="roll">БРОСИТЬ</button></div><p id="rollLog">Готов к броску.</p></div></section>
+<section id="clan" class="screen panel"><header><button data-home>‹</button><div><small>СООБЩЕСТВО</small><h1>КЛАН</h1></div></header><div class="dev"><div>⚔️</div><b>В РАЗРАБОТКЕ</b><span>Клановая система будет добавлена позже.</span></div></section>
+<section id="roadmap" class="screen panel"><header><button data-home>‹</button><div><small>ПРОХОЖДЕНИЕ</small><h1>КАРТА</h1></div></header><div class="roadmap"><div class="chapter" id="roadChapter">ГЛАВА 1</div><div id="roadNodes" class="roadNodes"></div><div class="stageBox"><b id="stageTitle">1-1</b><span id="stageProgress">0%</span></div><button class="gold wide" id="roadBattle">БОЙ</button><button class="gold wide" id="roadBoss" style="display:none">☠️ БОСС</button></div></section>
 
-<section id="bossBattle" class="screen boss-fight-screen">
-  <div class="bossfight">
-    <div class="bossfight-bg"></div>
-
-    <header class="bf-top">
-      <button id="bossBack">‹</button>
-      <div class="bf-chapter"><b>БОСС ГЛАВЫ</b><small>Карта пройдена на 100%</small></div>
-      <div class="bf-progress">100%</div>
-    </header>
-
-    <div class="bf-title">ВЛАДЫКА СЕВЕРНЫХ ЗЕМЕЛЬ</div>
-
-    <div class="bf-field">
-      <div class="bf-player">
-        <div class="bf-avatar">⚔️</div>
-        <b>SSS</b><small>Lv. 78 · VIP 6</small>
-      </div>
-      <div class="bf-boss">
-        <div class="bf-avatar">👹</div>
-        <b>ВЛАДЫКА</b><small>БОСС · Lv. 80</small>
-      </div>
-      <div id="bfFloat" class="bf-float"></div>
-    </div>
-
-    <div class="bf-hp-row">
-      <div class="bf-hp player"><span id="bfPlayerText">119.6K / 119.6K</span><i id="bfPlayerHp"></i></div>
-      <div class="bf-hp boss"><span id="bfBossText">500K / 500K</span><i id="bfBossHp"></i></div>
-    </div>
-
-    <div class="bf-skills">
-      <button class="bf-skill selected" data-skill="axe">⚔<small>УДАР</small></button>
-      <button class="bf-skill" data-skill="ice">❄<small>ЛЁД</small></button>
-      <button class="bf-skill" data-skill="shield">🛡<small>ЩИТ</small></button>
-      <button class="bf-skill" data-skill="rage">🔥<small>ЯРОСТЬ</small></button>
-      <button class="bf-skill" data-skill="heal">🧪<small>ЛЕЧЕНИЕ</small></button>
-    </div>
-
-    <div class="bf-actions">
-      <button id="bfAuto">AUTO</button>
-      <button id="bfHit">⚔ УДАР БОССА</button>
-      <button id="bfTimer">⏱ <b>60</b></button>
-    </div>
-
-    <div id="bfLog" class="bf-log">Выбери навык и атакуй босса.</div>
-
-    <div id="bfResult" class="bf-result hidden">
-      <div class="bf-result-card">
-        <div id="bfResultIcon">🏆</div>
-        <b id="bfResultTitle">БОСС ПОБЕЖДЁН!</b>
-        <span id="bfResultText">Глава завершена.</span>
-        <button id="bfReward">ЗАБРАТЬ НАГРАДУ</button>
-      </div>
-    </div>
-
-    <nav class="bf-nav">
-      <button data-bf-nav="home">🏰<span>Город</span></button>
-      <button data-bf-nav="inventory">🎒<span>Инвентарь</span></button>
-      <button data-bf-nav="hero">🪖<span>Герой</span></button>
-      <button class="active" data-bf-nav="map">🗺️<span>Карта</span></button>
-      <button data-bf-nav="quests">📜<span>Квесты</span></button>
-      <button data-bf-nav="games">🎲<span>Игры</span></button>
-      <button data-bf-nav="clan">🚩<span>Клан</span></button>
-    </nav>
-  </div>
-</section>
-
-
-  
-<section id="chapterComplete" class="screen chapter-complete-screen">
-  <div class="chapter-transition">
-    <div class="chapter-glow"></div>
-    <div class="chapter-card">
-      <div class="chapter-emblem">🏆</div>
-      <small>ГЛАВА ЗАВЕРШЕНА</small>
-      <h1>СЕВЕРНЫЕ ЗЕМЛИ</h1>
-      <div class="chapter-line"></div>
-      <p>Владыка повержен. Новая территория открыта.</p>
-      <div class="chapter-reward">🎁 Награда главы получена</div>
-      <button id="openNextChapter">ОТКРЫТЬ НОВУЮ ЛОКАЦИЮ</button>
-    </div>
-  </div>
-</section>
-
-<section id="nextChapter" class="screen next-chapter-screen">
-  <div class="next-chapter">
-    <div class="next-bg"></div>
-    <div class="next-top">
-      <button id="nextBack">‹</button>
-      <div><b>ГЛАВА 16</b><small>НОВАЯ ТЕРРИТОРИЯ</small></div>
-      <strong>0%</strong>
-    </div>
-    <div class="next-title">🌊 ЗАТЕРЯННЫЕ ФЬОРДЫ</div>
-    <div class="next-subtitle">Новая земля открыта</div>
-    <div class="next-route">
-      <div class="next-node active">1</div><i></i><div class="next-node">2</div><i></i><div class="next-node locked">👹</div>
-    </div>
-    <div class="next-info">
-      <b>ПЕРВЫЙ ЭТАП</b>
-      <span>Новая карта начинается здесь.</span>
-    </div>
-    <button id="startNextChapter">НАЧАТЬ ПУТЬ</button>
-    <nav class="next-nav">
-      <button data-next-nav="home">🏰<span>Город</span></button>
-      <button data-next-nav="inventory">🎒<span>Инвентарь</span></button>
-      <button data-next-nav="hero">🪖<span>Герой</span></button>
-      <button class="active" data-next-nav="map">🗺️<span>Карта</span></button>
-      <button data-next-nav="quests">📜<span>Квесты</span></button>
-      <button data-next-nav="games">🎲<span>Игры</span></button>
-      <button data-next-nav="clan">🚩<span>Клан</span></button>
-    </nav>
-  </div>
-</section>
-
-  <section id="arena" class="screen"><img class="master-art" src="arena-master.jpg" alt=""><div id="arenaZones" class="zones"></div></section>
-  <section id="map" class="screen fjords-screen">
+<section id="map" class="screen fjords-screen">
   <div class="fjords-map">
     <div class="fjords-bg"></div>
-    <header class="fjords-top">
-      <button id="fjordsBack">‹</button>
-      <div><b>ГЛАВА 16 · ЗАТЕРЯННЫЕ ФЬОРДЫ</b><small>Северный путь</small></div>
-      <strong id="fjordsPct">0%</strong>
-    </header>
-
-    <div class="fjords-route">
-      <div class="route-node active" data-stage="1"><b>1</b><small>Берег</small></div><i></i>
-      <div class="route-node" data-stage="2"><b>2</b><small>Причал</small></div><i></i>
-      <div class="route-node" data-stage="3"><b>3</b><small>Фьорд</small></div><i></i>
-      <div class="route-node" data-stage="4"><b>4</b><small>Лагерь</small></div><i></i>
-      <div class="route-node boss" data-stage="5"><b>👹</b><small>Босс</small></div>
-    </div>
-
-    <div class="fjords-hero" id="fjordsHero">⚔️</div>
-    <div class="fjords-companion">🛡️</div>
-    <div class="fjords-enemy" id="fjordsEnemy">👹</div>
-
-    <button id="mapChapterSkull" class="chapter-map-link" aria-label="Карта глав">☠️</button>
-    <div class="fjords-stage-card">
-      <small id="fjordsStageLabel">ЭТАП 1</small>
-      <b id="fjordsStageName">Берег Затерянных Фьордов</b>
-      <span id="fjordsStageText">Путь открыт. Впереди первый противник.</span>
-      <button id="fjordsStart">НАЧАТЬ ДВИЖЕНИЕ</button>
-    </div>
-
-    <div id="fjordsEncounter" class="fjords-encounter hidden">
-      <b>ВРАГ НА ПУТИ</b>
-      <span>Победитель Камней</span>
-      <button id="fjordsFight">В БОЙ</button>
-    </div>
-
-    <nav class="fjords-nav">
-      <button data-fj-nav="home">🏰<span>Город</span></button>
-      <button data-fj-nav="inventory">🎒<span>Инвентарь</span></button>
-      <button data-fj-nav="hero">🪖<span>Герой</span></button>
-      <button class="active" data-fj-nav="map">🗺️<span>Карта</span></button>
-      <button data-fj-nav="quests">📜<span>Квесты</span></button>
-      <button data-fj-nav="games">🎲<span>Игры</span></button>
-      <button data-fj-nav="clan">🚩<span>Клан</span></button>
-    </nav>
+    <header class="fjords-top"><button id="fjordsBack">‹</button><div><b id="fjordsChapter">ГЛАВА 1</b><small id="fjordsStage">Автоматический путь</small></div><strong id="fjordsPct">0%</strong></header>
+    <div class="fjords-stage-card"><small>ПУТЬ</small><b>Автоматическое прохождение</b><span>Герой и последователь идут навстречу противникам.</span><button id="fjordsStart">НАЧАТЬ БОЙ</button><button id="mapChapterSkull" style="display:none">☠️ БОСС</button></div>
+    <nav class="fjords-nav"><button data-fj-nav="home">🏰<span>Город</span></button><button data-fj-nav="inventory">🎒<span>Инвентарь</span></button><button data-fj-nav="hero">🪖<span>Герой</span></button><button class="active" data-fj-nav="map">🗺️<span>Карта</span></button><button data-fj-nav="quests">📜<span>Квесты</span></button><button data-fj-nav="games">🎲<span>Игры</span></button><button data-fj-nav="clan">🚩<span>Клан</span></button></nav>
   </div>
 </section>
-  <section id="roadmap" class="screen panel"><header><button data-home>‹</button><div><small>ПРОХОЖДЕНИЕ</small><h1>ДОРОЖНАЯ КАРТА</h1></div></header><div class="roadmap"><div class="chapter">ГЛАВА 2<small>Северные земли</small></div><div id="roadNodes" class="roadNodes"></div><div class="stageBox"><b id="stageTitle">2-7</b><span>Пройти Северные земли</span></div></div></section>
-  <section id="inventory" class="screen panel"><header><button data-home>‹</button><div><small>ГЕРОЙ</small><h1>ИНВЕНТАРЬ</h1></div></header><div class="tabs" id="invTabs"><button class="active">Оружие</button><button>Броня</button><button>Аксессуары</button><button>Предметы</button></div><div id="inventoryGrid" class="grid"></div></section>
-  <section id="hero" class="screen panel"><header><button data-home>‹</button><div><small>ПЕРСОНАЖ</small><h1>ГЕРОЙ</h1></div></header><div class="heroVisual"><div class="heroEmoji">⚔️</div><b>SSS</b><span>Lv. 78 · VIP 6</span></div><div class="statGrid"><div>СИЛА <b>125</b></div><div>ЗАЩИТА <b>98</b></div><div>ЛОВКОСТЬ <b>101</b></div><div>ЗДОРОВЬЕ <b>6 850</b></div></div><button class="gold wide" id="followersBtn">ПОСЛЕДОВАТЕЛИ</button></section>
-  <section id="shop" class="screen panel"><header><button data-home>‹</button><div><small>ТОРГОВЛЯ</small><h1>ЛАВКА</h1></div><b class="wallet">🪙 <span data-coins>45 000</span></b></header><div class="tabs" id="shopTabs"><button class="active">Эликсиры</button><button>Оружие</button><button>Броня</button><button>Боевые</button></div><div id="shopGrid" class="grid"></div></section>
-  <section id="quests" class="screen panel"><header><button data-home>‹</button><div><small>ЗАДАНИЯ</small><h1>КВЕСТЫ</h1></div></header><div class="quest"><b>2-7 Пройти Северные земли</b><span>0 / 1</span><div class="progress"><i style="width:0%"></i></div><button class="gold" data-roadmap>ОТКРЫТЬ ГЛАВУ</button></div><div class="quest"><b>Ежедневная тренировка</b><span>0 / 3</span><div class="progress"><i style="width:0%"></i></div></div></section>
-  <section id="games" class="screen panel"><header><button data-home>‹</button><div><small>РАЗВЛЕЧЕНИЯ</small><h1>ИГРОВОЙ ЗАЛ</h1></div></header><div class="monopoly"><h2>МОНОПОЛИЯ</h2><div id="board" class="board"></div><div class="diceLine"><span>Кубики: <b data-dice>10</b></span><button class="gold" id="roll">БРОСИТЬ</button></div><p id="rollLog">Готов к броску.</p></div></section>
-  <section id="clan" class="screen panel"><header><button data-home>‹</button><div><small>СООБЩЕСТВО</small><h1>КЛАН</h1></div></header><div class="dev"><div>⚔️</div><b>В РАЗРАБОТКЕ</b><span>Клановая система будет добавлена позже.</span></div></section>
-</div>
+
+<section id="arena" class="screen"><img class="master-art" src="arena-master.jpg" alt=""><div id="arenaZones" class="zones"></div></section>
+
+<section id="bossBattle" class="screen">
+ <div class="clean-boss">
+  <header class="clean-boss-top"><button id="bossBack">‹</button><div class="clean-boss-title"><b>БОСС ГЛАВЫ</b><small id="bossChapterText">Череп открыт</small></div><div class="clean-boss-skull">☠️</div></header>
+  <div class="clean-boss-field">
+   <div class="clean-boss-player"><img src="player-viking-approved.png" alt=""><span id="bossPlayerName">Игрок</span></div>
+   <div class="clean-boss-enemy"><img src="opponent-viking-approved.png" alt=""><span id="bossName">Владыка Севера</span></div>
+   <div class="clean-boss-hps"><div class="clean-boss-bar player"><i id="bossPlayerHpBar"></i><span id="bossPlayerHpText"></span></div><div class="clean-boss-bar"><i id="bossHpBar"></i><span id="bossHpText"></span></div></div>
+  </div>
+  <div class="clean-boss-actions"><button id="bossAuto">AUTO</button><button id="bossHit">⚔️ БИТЬ БОССА</button><button id="bossLeave">ВЕРНУТЬСЯ</button></div>
+  <div id="bossResult" class="clean-boss-result hidden"><div class="clean-boss-card"><div id="bossResultIcon">☠️</div><h2 id="bossResultTitle"></h2><p id="bossResultText"></p><button id="bossResultBtn"></button></div></div>
+ </div>
+</section>
+
 <div id="modal" class="modal"><div class="modalCard"><button id="modalClose" class="close">×</button><div id="modalBody"></div></div></div>
+<div id="arenaModal" class="arena-modal" aria-hidden="true"><div class="arena-sheet"><header class="arena-modal-head"><h2>⚔️ АРЕНА</h2><button class="arena-close" id="arenaClose">×</button></header><main id="arenaModalBody"></main></div></div>
+</div>
 <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
 <script src="app.js"></script>
-<script src="map.js"></script>
-<script src="pve-battle.js?v=10047"></script>
-<script src="boss.js"></script>
-<script src="boss-battle-10034.js"></script>
-<script src="next-chapter-10035.js"></script>
-<script src="fjords-map-10036.js"></script>
 <script src="chapters-240.js"></script>
 <script src="chapters-240-integration.js"></script>
+<script src="followers.js"></script>
+<script src="combat-items.js"></script>
+<script src="forge-v2.js"></script>
+<script src="hero.js"></script>
+<script src="arena.js"></script>
 <script src="home-rebuild.js"></script>
 <script src="navigation-final.js"></script>
-<script src="battle-flow-10051.js?v=10051"></script><script src="battle-button-stones-fix-10052.js?v=10052"></script>
-
-</html>
+<script src="fjords-map-10036.js"></script>
+</body></html>

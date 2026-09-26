@@ -1,36 +1,72 @@
-(function(){'use strict';
-const DEFAULT={profile:{displayName:'SSS',level:78,vip:6},coins:45000,gems:4500,energy:125,maxEnergy:200,hp:6850,maxHp:6850,xp:81431,xpNext:119500,dice:10,stage:7,equipment:0,activeFollower:null,auto:false,pve:{chapter:1,stage:1,progress:0,bossPending:false,bossActive:false,bossDefeated:0}};
+(function(){
+'use strict';
+const DEFAULT={
+ profile:{displayName:'Игрок',level:1,vip:0},
+ level:1,coins:0,gems:0,redGems:0,battleStones:30,energy:100,maxEnergy:100,hp:100,maxHp:100,
+ xp:0,xpNext:100,exp:0,expToNext:100,dice:10,pos:0,equipment:Array(7).fill(null),
+ activeFollower:null,auto:false,
+ currentChapter:1,chapterStage:1,chapterProgress:0,chapterBossUnlocked:false,chapterBossDefeated:false,chapterCompleted:false,
+ pve:{chapter:1,stage:1,progress:0,bossPending:false,bossActive:false,bossDefeated:0}
+};
 window.TerritoryStore=window.TerritoryStore||{};
 const Store=window.TerritoryStore;
-Store.state=Object.assign({},DEFAULT); Store.state.pve=Object.assign({},DEFAULT.pve);
-try{const saved=JSON.parse(localStorage.getItem('territory_store_v1')||'null');if(saved) Store.state=Object.assign({},DEFAULT,saved,{profile:Object.assign({},DEFAULT.profile,saved.profile||{}),pve:Object.assign({},DEFAULT.pve,saved.pve||{})});}catch(e){}
-Store.saveNow=function(){try{localStorage.setItem('territory_store_v1',JSON.stringify(Store.state));}catch(e){}};
-Store.getDerivedStats=function(){return {maxHp:Store.state.maxHp,strength:125,defense:98};};
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-function show(id){$$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));document.body.dataset.screen=id;window.dispatchEvent(new CustomEvent('territory:screen',{detail:id}));if(id==='roadmap')roadmap();if(id==='inventory')inventory();if(id==='shop')shop();if(id==='games')games();}
-function home(){show('home')}
-window.TerritoryUI={show:show,home:home}; window.showScreen=show;
+function clone(v){return JSON.parse(JSON.stringify(v))}
+function normalize(saved){
+ const s=Object.assign(clone(DEFAULT),saved||{});
+ s.profile=Object.assign({},DEFAULT.profile,s.profile||{});
+ s.level=Math.max(1,Number(s.level||s.profile.level)||1);s.profile.level=s.level;
+ s.xp=Math.max(0,Number(s.xp??s.exp)||0);s.xpNext=Math.max(1,Number(s.xpNext??s.expToNext)||100);
+ s.exp=s.xp;s.expToNext=s.xpNext;
+ s.coins=Math.max(0,Number(s.coins)||0);s.gems=Math.max(0,Number(s.gems)||0);s.redGems=Math.max(0,Number(s.redGems)||0);s.battleStones=Math.max(0,Number(s.battleStones??30)||0);
+ s.energy=Math.max(0,Number(s.energy)||0);s.maxEnergy=Math.max(1,Number(s.maxEnergy)||100);
+ s.maxHp=Math.max(1,Number(s.maxHp)||100);s.hp=Math.max(0,Math.min(s.maxHp,Number(s.hp??s.maxHp)||s.maxHp));
+ s.equipment=Array.isArray(s.equipment)?s.equipment.slice(0,7):Array(7).fill(null);while(s.equipment.length<7)s.equipment.push(null);
+ s.currentChapter=Math.max(1,Math.min(240,Number(s.currentChapter||s.pve?.chapter)||1));
+ s.chapterStage=Math.max(1,Number(s.chapterStage||s.pve?.stage)||1);
+ s.chapterProgress=Math.max(0,Math.min(100,Number(s.chapterProgress??s.pve?.progress)||0));
+ s.chapterBossUnlocked=Boolean(s.chapterBossUnlocked||s.pve?.bossPending||s.chapterProgress>=100);
+ s.chapterBossDefeated=Boolean(s.chapterBossDefeated||false);
+ s.pve=Object.assign({},DEFAULT.pve,s.pve||{},{chapter:s.currentChapter,stage:s.chapterStage,progress:s.chapterProgress,bossPending:s.chapterBossUnlocked,bossActive:Boolean(s.pve?.bossActive)});
+ return s;
+}
+let saved=null;try{saved=JSON.parse(localStorage.getItem('territory_store_v1')||'null')}catch(_){}
+Store.state=normalize(saved);
+Store.saveNow=function(){try{localStorage.setItem('territory_store_v1',JSON.stringify(Store.state))}catch(_){};window.dispatchEvent(new CustomEvent('territory:state-changed'))};
+Store.addXp=function(amount){
+ let s=Store.state;s.xp+=Math.max(0,Number(amount)||0);
+ while(s.xp>=s.xpNext){s.xp-=s.xpNext;s.level++;s.profile.level=s.level;s.xpNext=Math.floor(s.xpNext*1.12+25)}
+ s.exp=s.xp;s.expToNext=s.xpNext;Store.saveNow()
+};
+Store.getDerivedStats=function(){return {maxHp:Store.state.maxHp,strength:125+Store.state.level*2,defense:98+Store.state.level,agility:101+Store.state.level}};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function show(id){
+ const aliases={market:'shop',casino:'games',districts:'quests'};id=aliases[id]||id;
+ $$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));
+ document.body.dataset.screen=id;window.dispatchEvent(new CustomEvent('territory:screen',{detail:id}));
+ if(id==='roadmap')roadmap();if(id==='inventory')inventory();if(id==='shop')shop();if(id==='games')games();
+}
+window.TerritoryUI={show,home:()=>show('home')};window.showScreen=show;
 function modal(title,body){$('#modalBody').innerHTML='<h2>'+title+'</h2>'+body;$('#modal').classList.add('show')}
 $('#modalClose').onclick=()=>$('#modal').classList.remove('show');
-function setHomeZones(){const z=$('#homeZones');const add=(cls,x,y,w,h,fn)=>{const b=document.createElement('button');b.className='zone '+cls;b.style.cssText=`left:${x}%;top:${y}%;width:${w}%;height:${h}%;`;b.onclick=fn;z.appendChild(b)};
-add('events',1,12,13,10,()=>modal('События','<p>События откроются в следующем обновлении.</p>'));add('daily',1,23,13,10,()=>modal('Ежедневные награды','<p>Награда дня готова.</p><button class="gold" id="claim">ЗАБРАТЬ</button>'));add('quests',1,34,13,10,()=>show('quests'));add('friends',1,45,13,10,()=>modal('Пригласить друзей','<p>Приглашение друга скопировано.</p>'));add('sea',1,56,13,10,()=>modal('Морской набор','<p>Морской набор доступен в Лавке.</p>'));add('shop',88,12,11,10,()=>show('shop'));add('forge',88,23,11,10,()=>modal('Кузница','<p>Кузница готовит улучшения экипировки.</p>'));add('tests',88,34,11,10,()=>modal('Испытания','<p>Испытания доступны в текущей главе.</p>'));add('streets',88,45,11,10,()=>modal('Захват улиц','<p>Система улиц готовится.</p>'));add('arena',86,55,13,15,()=>show('arena'));add('roadmap',27,12,47,11,()=>show('roadmap'));add('chapterMap',33,18,25,10,()=>show('map'));add('chapterSkull',57,18,10,10,()=>{const p=Number(window.TerritoryChaptersAPI?.state?.()?.chapterProgress||0);show(p>=100?'bossBattle':'map')});add('inventory',14,88,14,11,()=>show('inventory'));add('hero',28,88,14,11,()=>show('hero'));add('battle',42,87,16,12,()=>{show('map');setTimeout(()=>window.TerritoryMap240?.movement?.(),80);});add('questsBottom',57,88,14,11,()=>show('quests'));add('games',70,88,14,11,()=>show('games'));add('clan',84,88,16,11,()=>show('clan'));}
-function arenaZones(){const z=$('#arenaZones');const add=(cls,x,y,w,h,fn)=>{const b=document.createElement('button');b.className='zone '+cls;b.style.cssText=`left:${x}%;top:${y}%;width:${w}%;height:${h}%;`;b.onclick=fn;z.appendChild(b)};
-// 4 attack / 4 defense hit zones
-[['attack',0,15,11,10,'Голова'],['attack',0,27,11,10,'Грудь'],['attack',0,39,11,10,'Пояс'],['attack',0,51,11,10,'Ноги'],['def',89,15,11,10,'Голова'],['def',89,27,11,10,'Грудь'],['def',89,39,11,10,'Пояс'],['def',89,51,11,10,'Ноги']].forEach(a=>add(a[0],a[1],a[2],a[3],a[4],()=>modal('Тактика','<p>Выбрана зона: <b>'+a[5]+'</b>.</p>')));
-add('tactics',1,66,25,7,()=>modal('Тактика','<p>Выберите атаку и две зоны защиты.</p>'));add('auto',27,66,22,7,()=>{Store.state.auto=!Store.state.auto;Store.saveNow();modal('Авто-бой','<p>Авто-бой: <b>'+(Store.state.auto?'ВКЛ':'ВЫКЛ')+'</b></p>')});add('hit',49,66,25,7,()=>modal('Удар','<p>SSS наносит удар. Урон: <b>24</b>.</p>'));add('timer',76,66,23,7,()=>modal('Таймер','<p>Следующий ход через 15 секунд.</p>'));
-for(let i=0;i<7;i++)add('equip',1+i*12,73,11,7,()=>{Store.state.equipment=i;Store.saveNow();modal('Снаряжение','<p>Выбран слот '+(i+1)+' / 7.</p>')});for(let i=0;i<7;i++)add('cons',1+i*12,80,11,6,()=>modal('Предмет','<p>Предмет использован.</p>'));
-add('chat',1,86,98,8,()=>modal('Чат боя','<p>SSS: Удачи!</p><p>Ragnar: В бой!</p><input class="chatInput" placeholder="Сообщение"><button class="gold" id="send">ОТПРАВИТЬ</button>'));add('home',0,92,14,8,home);add('inventory',14,92,14,8,()=>show('inventory'));add('hero',28,92,14,8,()=>show('hero'));add('battle',42,92,14,8,()=>show('arena'));add('quests',56,92,14,8,()=>show('quests'));add('games',70,92,14,8,()=>show('games'));add('clan',84,92,16,8,()=>show('clan'));}
-function roadmap(){const n=$('#roadNodes');n.innerHTML='';for(let i=1;i<=7;i++){const b=document.createElement('button');b.className='node '+(i<Store.state.stage?'done ':'')+(i===Store.state.stage?'current':'');b.textContent=i;b.onclick=()=>{Store.state.stage=i;Store.saveNow();roadmap()};n.appendChild(b)}$('#stageTitle').textContent='2-'+Store.state.stage;}
-const inv=[['⚔️','Топор','Lv.102'],['🪖','Шлем','Lv.98'],['🛡️','Доспех','Lv.100'],['🎗️','Пояс','Lv.95'],['🥾','Сапоги','Lv.95'],['💍','Кольцо','Lv.97'],['🔮','Амулет','Lv.101'],['🧪','Эликсир HP','5/5']];
-function cards(id,arr){$(id).innerHTML=arr.map((x,i)=>`<button class="card" data-item="${i}"><div>${x[0]}</div><b>${x[1]}</b><span>${x[2]}</span></button>`).join('');$$('#'+id+' .card').forEach(b=>b.onclick=()=>modal('Предмет',`<p>${arr[Number(b.dataset.item)][1]}</p><button class="gold">ЭКИПИРОВАТЬ</button>`))}
-function inventory(){cards('inventoryGrid',inv)}
-function shop(){cards('shopGrid',[['🧪','Зелье HP','5/5'],['🔵','Энергия','3/3'],['🔴','Атака','1/5'],['🟡','Защита','2/5'],['🟣','Адреналин','1/5'],['💠','Ускорение','1/5']])}
-function games(){const b=$('#board');b.innerHTML='';for(let i=0;i<25;i++){const c=document.createElement('button');c.className='cell '+(i===Store.state.pos?'active':'');c.textContent=i+1;c.onclick=()=>{Store.state.pos=i;Store.saveNow();games()};b.appendChild(c)}$$('[data-dice]').forEach(x=>x.textContent=Store.state.dice)}
-$('#roll').onclick=()=>{if(!Store.state.dice){modal('Кубики','<p>Кубики закончились.</p>');return}Store.state.dice--;Store.state.pos=(Store.state.pos||0)+1+Math.floor(Math.random()*6);Store.state.pos%=25;Store.saveNow();games();$('#rollLog').textContent='Бросок выполнен. Позиция '+(Store.state.pos+1)};
-$('#followersBtn').onclick=()=>modal('Последователи','<div class="followers">'+['Лиабро — Крит','Тералель — Защита','Король-коров — Лечение','Морт — Уклонение','Каменное Лицо — Контроль'].map((x,i)=>`<button class="frow" data-f="${i}"><b>${x.split(' — ')[0]}</b><span>${x.split(' — ')[1]}</span></button>`).join('')+'</div>');
-$$('[data-home]').forEach(b=>b.onclick=home);$$('[data-roadmap]').forEach(b=>b.onclick=()=>show('roadmap'));
-setHomeZones();arenaZones();inventory();shop();games();
-function loadRuntime(src){return new Promise((resolve,reject)=>{if(document.querySelector('script[src=\"'+src+'\"]'))return resolve();const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.body.appendChild(s);});}
-function bootFinalRuntime(){const css=document.createElement('link');css.rel='stylesheet';css.href='home-rebuild.css?v=10040';document.head.appendChild(css);loadRuntime('home-rebuild.js?v=10040').then(()=>loadRuntime('navigation-final.js?v=10040')).catch(()=>{});}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootFinalRuntime,{once:true});else bootFinalRuntime();
+function roadmap(){
+ const s=Store.state,n=$('#roadNodes');if(!n)return;n.innerHTML='';
+ for(let i=1;i<=4;i++){const b=document.createElement('button');b.className='node '+(i<s.chapterStage?'done ':'')+(i===Math.min(4,s.chapterStage)?'current':'');b.textContent=i;b.onclick=()=>{s.chapterStage=i;Store.saveNow();roadmap()};n.appendChild(b)}
+ $('#roadChapter').textContent='ГЛАВА '+s.currentChapter;$('#stageTitle').textContent=s.currentChapter+'-'+Math.min(4,s.chapterStage);$('#stageProgress').textContent=s.chapterProgress+'%';
+ $('#roadBoss').style.display=s.chapterBossUnlocked?'block':'none';
+}
+const inv=[['⚔️','Топор','Оружие'],['🪖','Шлем','Броня'],['🛡️','Доспех','Броня'],['🎗️','Пояс','Аксессуар'],['🥾','Сапоги','Аксессуар'],['💍','Кольцо','Аксессуар'],['🔮','Амулет','Аксессуар'],['🧪','Эликсир HP','Предмет']];
+function cards(id,arr){const el=$(id);if(!el)return;el.innerHTML=arr.map((x,i)=>`<button class="card" data-item="${i}"><div>${x[0]}</div><b>${x[1]}</b><span>${x[2]}</span></button>`).join('');$$('#'+id+' .card').forEach(b=>b.onclick=()=>modal('Предмет',`<p>${arr[+b.dataset.item][1]}</p>`))}
+function inventory(){cards('#inventoryGrid',inv)}
+function shop(){cards('#shopGrid',[['🧪','Зелье HP','Восстановление'],['🔵','Энергия','Восстановление'],['🔴','Атака','Бафф'],['🟡','Защита','Бафф'],['🟣','Адреналин','Возрождение'],['💠','Ускорение','Бой']]);$$('[data-coins]').forEach(e=>e.textContent=Math.floor(Store.state.coins).toLocaleString('ru-RU'))}
+function games(){const b=$('#board');if(!b)return;b.innerHTML='';for(let i=0;i<25;i++){const c=document.createElement('button');c.className='cell '+(i===Store.state.pos?'active':'');c.textContent=i+1;c.onclick=()=>{Store.state.pos=i;Store.saveNow();games()};b.appendChild(c)}$$('[data-dice]').forEach(x=>x.textContent=Store.state.dice)}
+$('#roll').onclick=()=>{if(!Store.state.dice)return modal('Кубики','<p>Кубики закончились.</p>');Store.state.dice--;Store.state.pos=(Store.state.pos+1+Math.floor(Math.random()*6))%25;Store.saveNow();games();$('#rollLog').textContent='Позиция '+(Store.state.pos+1)};
+$('#followersBtn').onclick=()=>modal('Последователи','<p>Лиабро — Крит</p><p>Тералель — Защита</p><p>Король-коров — Лечение</p><p>Морт — Уклонение</p><p>Каменное Лицо — Контроль</p>');
+$$('[data-home]').forEach(b=>b.onclick=()=>show('home'));$$('[data-roadmap]').forEach(b=>b.onclick=()=>show('map'));
+$('#roadBattle').onclick=()=>window.HomeRebuild?.startRunner?.(false);$('#roadBoss').onclick=()=>window.HomeRebuild?.openBoss?.();
+function paintGlobal(){
+ const s=Store.state,p=s.profile||{};$('#heroName').textContent=p.displayName||'Игрок';$('#heroLevel').textContent='Lv. '+s.level+' · VIP '+(p.vip||0);$('#heroHp').textContent=Math.floor(s.hp).toLocaleString('ru-RU');$$('[data-coins]').forEach(e=>e.textContent=Math.floor(s.coins).toLocaleString('ru-RU'));
+ const pct=s.chapterProgress;const qp=$('#questProgress');if(qp)qp.textContent=pct+'%';const qb=$('#questBar');if(qb)qb.style.width=pct+'%';
+}
+window.addEventListener('territory:state-changed',paintGlobal);
+inventory();shop();games();paintGlobal();
 })();
