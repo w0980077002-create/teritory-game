@@ -10,6 +10,25 @@ function stones(){
 }
 function save(){ window.TerritoryStore?.saveNow?.('battle-stones-init-10052'); }
 
+let launching=false;
+function launchBattle(e){
+  e?.preventDefault?.();
+  e?.stopPropagation?.();
+  if(launching)return;
+  const n=stones();
+  if(n<=0){
+    showMessage('⚔️ БОЕВЫЕ КАМНИ ЗАКОНЧИЛИСЬ','Нужно восстановить боевые камни, чтобы продолжить прохождение.');
+    return;
+  }
+  launching=true;
+  try{
+    window.HomeRebuild?.startRunner?.(false);
+  }catch(_){
+    try{ window.BattleFlow10051?.start?.(); }catch(__){}
+  }
+  setTimeout(()=>{launching=false;},500);
+}
+
 function ensure(){
   const home=document.getElementById('home');
   if(!home) return;
@@ -20,27 +39,22 @@ function ensure(){
     btn.id='battleTapFix10052';
     btn.type='button';
     btn.setAttribute('aria-label','Бой');
-    home.appendChild(btn);
-    btn.addEventListener('pointerdown',function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      const n=stones();
-      if(n<=0){
-        showMessage('⚔️ БОЕВЫЕ КАМНИ ЗАКОНЧИЛИСЬ','Нужно восстановить боевые камни, чтобы продолжить прохождение.');
-        return;
-      }
-      try{ window.HomeRebuild?.startRunner?.(false); }
-      catch(_){ try{ window.BattleFlow10051?.start?.(); }catch(__){} }
-    },{passive:false});
+    document.body.appendChild(btn);
+    btn.addEventListener('pointerdown',launchBattle,{passive:false});
+    btn.addEventListener('click',launchBattle,{passive:false});
   }
 
   let badge=document.getElementById('battleStoneBadge10052');
   if(!badge){
     badge=document.createElement('div');
     badge.id='battleStoneBadge10052';
-    home.appendChild(badge);
+    document.body.appendChild(badge);
   }
   badge.textContent='⚔️ '+stones();
+
+  const isHome=(document.body.dataset.screen||'home')==='home';
+  btn.style.display=isHome?'block':'none';
+  badge.style.display=isHome?'block':'none';
 
   if(!Number.isFinite(Number(store().battleStones))) save();
 }
@@ -62,6 +76,10 @@ function showMessage(title,text){
 document.addEventListener('DOMContentLoaded',ensure,{once:true});
 window.addEventListener('territory:render',ensure);
 window.addEventListener('territory:state-changed',ensure);
+window.addEventListener('click',function(e){
+  const target=e.target?.closest?.('#battleTapFix10052');
+  if(target) launchBattle(e);
+},true);
 window.BattleButton10052={refresh:ensure};
 setTimeout(ensure,300);
 })();

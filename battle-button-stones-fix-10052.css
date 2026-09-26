@@ -1,10 +1,10 @@
 /* 10052 — exact mobile hit target for the center bottom ⚔️ button */
 #battleTapFix10052{
-  position:absolute!important;
+  position:fixed!important;
   left:42.2%!important;
   bottom:0!important;
   width:15.8%!important;
-  height:12.5%!important;
+  height:12.5vh!important;
   z-index:2147483005!important;
   border:0!important;
   background:transparent!important;
@@ -16,9 +16,9 @@
   -webkit-tap-highlight-color:transparent!important;
 }
 #battleStoneBadge10052{
-  position:absolute!important;
-  left:43.2%!important;
-  bottom:10.5%!important;
+  position:fixed!important;
+  left:52.2%!important;
+  bottom:10.5vh!important;
   z-index:2147483004!important;
   min-width:58px!important;
   padding:4px 8px!important;
