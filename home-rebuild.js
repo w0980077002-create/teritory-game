@@ -4,19 +4,20 @@ const S=()=>window.TerritoryStore?.state||{};
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 let battle=null,boss=null;
 const zones=[
-['profile',0,0,27.5,6.3],['coins',27.5,0,18,6.3],['gems',45.5,0,18,6.3],['redgems',63.5,0,16,6.3],['trophy',79.5,0,6.5,6.3],['messages',86,0,7,6.3],['settings',93,0,7,6.3],
-['energy',30,6.3,28,2.7],['attack',64,6.3,36,2.7],['chapter',30,9,41,5.5],['events',0,9,13,7.2],['daily',0,16.2,13,7.2],['quests',0,23.4,13,7.2],['friends',0,30.6,13,7.2],['sea',0,37.8,13,8.0],
-['shop',87,9,13,7.2],['forge',87,16.2,13,7.2],['challenges',87,23.4,13,7.2],['streets',87,30.6,13,7.2],['arena',87,37.8,13,8.0],
-['hp',0,64,18,12],['equipment',18,64,65,12],['energyBottom',83,64,17,12],
-['quest',0,84.2,51,6.8],['speed',61,83.7,8.5,7],['refresh',70.5,83.7,8.5,7],['crown',80,83.7,8.5,7],['star',89.5,83.7,10.5,7],
-['skull',55,18,13,12]
+['profile',0,0,18,6.2],['coins',18,0,24,6.2],['gems',42,0,20,6.2],['redgems',62,0,14,6.2],['trophy',76,0,7,6.2],['messages',83,0,8,6.2],['settings',91,0,9,6.2],
+['energy',28,5.2,37,3.2],['attack',65,5.2,35,3.2],['chapter',28,9,44,5.2],
+['events',0.4,9.0,10.5,6.3],['daily',0.4,15.8,10.5,6.3],['quests',0.4,22.7,10.5,6.3],['friends',0.4,29.5,10.5,6.3],['sea',0.4,36.4,10.5,7.0],
+['shop',89.0,9.0,10.5,6.3],['forge',89.0,15.8,10.5,6.3],['challenges',89.0,22.7,10.5,6.3],['streets',89.0,29.5,10.5,6.3],['arena',89.0,36.4,10.5,7.0],
+['hp',0,64,17,12],['equip1',17,64,9.4,12],['equip2',26.4,64,9.4,12],['equip3',35.8,64,9.4,12],['equip4',45.2,64,9.4,12],['equip5',54.6,64,9.4,12],['equip6',64.0,64,9.4,12],['equip7',73.4,64,9.4,12],['energyBottom',83,64,17,12],
+['quest',0,84.0,52,6.8],['speed',61,83.5,8.5,7],['refresh',70.0,83.5,8.5,7],['crown',79.0,83.5,9,7],['star',88.5,83.5,11.5,7],
+['skull',55,18,13,10]
 ];
 const bottom=[['home',0,91,14.28,9],['inventory',14.28,91,14.28,9],['hero',28.56,91,14.28,9],['battle',42.84,90,14.32,10],['quests',57.16,91,14.28,9],['games',71.44,91,14.28,9],['clan',85.72,91,14.28,9]];
 const action={
 profile:()=>window.showScreen?.('hero'),coins:()=>info('ЗОЛОТО','Монеты используются для развития героя.'),gems:()=>info('АЛМАЗЫ','Премиальная валюта.'),redgems:()=>info('КРАСНЫЕ КРИСТАЛЛЫ','Редкая валюта.'),trophy:()=>info('РЕЙТИНГ','Рейтинг игрока.'),messages:()=>info('СООБЩЕНИЯ','Сообщения.'),settings:()=>info('НАСТРОЙКИ','Настройки игры.'),
 energy:()=>info('ЭНЕРГИЯ',`${Math.floor(S().energy)}/${S().maxEnergy}`),energyBottom:()=>info('ЭНЕРГИЯ',`${Math.floor(S().energy)}/${S().maxEnergy}`),hp:()=>info('ЗДОРОВЬЕ',`${Math.floor(S().hp)}/${Math.floor(S().maxHp)}`),
 attack:()=>startRunner(false),chapter:()=>window.showScreen?.('map'),skull:()=>S().chapterBossUnlocked?openBoss():window.showScreen?.('map'),
-events:()=>info('СОБЫТИЯ','События.'),daily:()=>info('ЕЖЕДНЕВНЫЕ НАГРАДЫ','Ежедневная награда.'),quests:()=>window.showScreen?.('quests'),friends:()=>info('ДРУЗЬЯ','Приглашения.'),sea:()=>info('МОРСКОЙ НАБОР','Набор.'),shop:()=>window.showScreen?.('shop'),forge:()=>window.ForgeV2?.open?.(),challenges:()=>window.ArenaGame?.open?.(),streets:()=>info('УЛИЦЫ','Раздел готовится.'),arena:()=>window.ArenaGame?.open?.(),equipment:()=>window.showScreen?.('inventory'),
+events:()=>info('СОБЫТИЯ','События.'),daily:()=>info('ЕЖЕДНЕВНЫЕ НАГРАДЫ','Ежедневная награда.'),quests:()=>window.showScreen?.('quests'),friends:()=>info('ДРУЗЬЯ','Приглашения.'),sea:()=>info('МОРСКОЙ НАБОР','Набор.'),shop:()=>window.showScreen?.('shop'),forge:()=>window.ForgeV2?.open?.(),challenges:()=>window.ArenaGame?.open?.(),streets:()=>info('УЛИЦЫ','Раздел готовится.'),arena:()=>window.ArenaGame?.open?.(),equipment:()=>window.showScreen?.('inventory'),equip1:()=>window.showScreen?.('inventory'),equip2:()=>window.showScreen?.('inventory'),equip3:()=>window.showScreen?.('inventory'),equip4:()=>window.showScreen?.('inventory'),equip5:()=>window.showScreen?.('inventory'),equip6:()=>window.showScreen?.('inventory'),equip7:()=>window.showScreen?.('inventory'),
 quest:()=>window.showScreen?.('quests'),speed:()=>info('УСКОРЕНИЕ','Ускорение боя.'),refresh:()=>info('ОБНОВИТЬ','Задание обновлено.'),crown:()=>info('НАГРАДЫ','Награды.'),star:()=>info('ПРЕМИУМ','Премиум.'),
 home:()=>window.showScreen?.('home'),inventory:()=>window.showScreen?.('inventory'),hero:()=>window.showScreen?.('hero'),battle:()=>startRunner(false),quests:()=>window.showScreen?.('quests'),games:()=>window.showScreen?.('games'),clan:()=>window.showScreen?.('clan')
 };
@@ -63,7 +64,8 @@ function ensureBattleCss(){
 #runnerScreen .pve-vfx{position:absolute;left:62%;top:43%;width:70px;height:70px;border-radius:50%;z-index:17;pointer-events:none;animation:pveBurst .35s ease-out forwards;background:radial-gradient(circle,#fff 0 8%,#ffd83d 10% 25%,#ff6b20 28% 40%,transparent 65%)}
 #runnerScreen .pve-panel{position:absolute;left:0;right:0;bottom:0;height:39%;min-height:245px;background:linear-gradient(#202326ee,#17191ccc 12%,#e8dfd0 12.5%,#e8dfd0 76%,#171b1eee 76.5%);z-index:25;border-top:2px solid #9b7440;padding:7px 7px env(safe-area-inset-bottom)}
 #runnerScreen .pve-status{height:34px;display:flex;align-items:center;gap:7px}.pve-status .orb{width:40px;height:40px;border-radius:50%;border:3px solid #7b1a16;background:radial-gradient(circle at 35% 30%,#ff6d5c,#9f0000 65%,#350000);box-shadow:0 2px 8px #000}.pve-status .orb.blue{border-color:#165d86;background:radial-gradient(circle at 35% 30%,#61cfff,#0067aa 65%,#032e51)}.pve-bars{flex:1}.pve-bar{height:9px;border-radius:7px;background:#1b1717;border:1px solid #090909;overflow:hidden;margin:2px 0}.pve-bar i{display:block;height:100%;background:#25c85e}.pve-bar.xp i{background:#4d9dff}.pve-bars b{font-size:10px;color:#fff;text-shadow:0 1px 2px #000}.pve-stone-count{font-size:12px;font-weight:1000;color:#ffe15b;background:#392a12;border:1px solid #9c7530;border-radius:8px;padding:5px 7px}
-#runnerScreen .pve-slots{height:94px;display:flex;gap:4px;align-items:center;overflow:hidden;padding:3px 0}.pve-slot{flex:1;min-width:0;height:82px;border:2px solid #5f5140;border-radius:8px;background:linear-gradient(#6e6050,#292622);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px #b5a88e}.pve-slot b{font-size:23px}.pve-slot span{font-size:8px;color:#fff;margin-top:2px}.pve-slot small{font-size:8px;color:#f0d35d}.pve-slot.lock{opacity:.45}
+#runnerScreen .pve-slots{height:94px;display:flex;gap:4px;align-items:center;overflow:hidden;padding:3px 0}
+#runnerScreen .pve-slot{font:inherit;color:inherit;padding:0;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}#runnerScreen .pve-skill{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.pve-slot{flex:1;min-width:0;height:82px;border:2px solid #5f5140;border-radius:8px;background:linear-gradient(#6e6050,#292622);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px #b5a88e}.pve-slot b{font-size:23px}.pve-slot span{font-size:8px;color:#fff;margin-top:2px}.pve-slot small{font-size:8px;color:#f0d35d}.pve-slot.lock{opacity:.45}
 #runnerScreen .pve-skills{height:50px;display:flex;gap:6px;align-items:center;justify-content:center}.pve-skill{width:44px;height:44px;border-radius:9px;border:2px solid #76562b;background:linear-gradient(#725021,#271b10);color:#fff;font-size:20px;box-shadow:0 2px 5px #000}.pve-skill:active{transform:scale(.94)}.pve-skill.main{width:58px;border-color:#d5aa48;background:linear-gradient(#a16e1d,#3e2508);font-size:24px}
 #runnerScreen .pve-bottom-nav{height:46px;display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:4px}.pve-bottom-nav button{border:1px solid #6f5939;background:#171b1f;color:#f7ead4;border-radius:5px;font-size:8px;font-weight:900}.pve-bottom-nav button.active{background:#3b2c17;border-color:#d1a23f;color:#ffe177}.pve-bottom-nav i{display:block;font-size:16px;font-style:normal}
 #runnerScreen .pve-reward{position:absolute;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:#0008}.pve-reward.show{display:flex}.pve-reward-card{width:min(88vw,390px);border:2px solid #d7ad55;border-radius:16px;background:linear-gradient(#30281d,#141414);padding:20px;text-align:center;box-shadow:0 12px 40px #000}.pve-reward-card h2{margin:0 0 10px;color:#ffd66b;font-size:22px}.pve-reward-card .reward-line{display:flex;justify-content:center;gap:18px;font-size:18px;margin:12px 0}.pve-reward-card button{width:100%;height:46px;border:1px solid #d6ad56;border-radius:10px;background:#694918;color:#fff;font-weight:1000}
@@ -87,8 +89,8 @@ function startRunner(forceBoss){
    <div class="pve-unit pve-enemy" data-run-enemy><div class="pve-hp"><i data-enemy-hpbar style="width:100%"></i></div><img src="opponent-viking-approved.png" alt=""><span class="pve-name" data-run-enemy-name>Разбойник</span></div>
  </main>
  <section class="pve-panel"><div class="pve-status"><div class="orb"></div><div class="pve-bars"><b data-pve-hptext>${Math.floor(s.hp)}/${Math.floor(s.maxHp)}</b><div class="pve-bar"><i data-pve-hpbar style="width:${Math.max(0,Math.min(100,s.hp/s.maxHp*100))}%"></i></div><div class="pve-bar xp"><i data-pve-xpbar style="width:${Math.max(0,Math.min(100,s.xp/s.xpNext*100))}%"></i></div></div><div class="orb blue"></div><div class="pve-stone-count">🪨 <span data-panel-stones>${Math.floor(s.battleStones||0)}</span></div></div>
-   <div class="pve-slots" data-pve-slots>${Array.from({length:7},(_,i)=>`<div class="pve-slot ${Array.isArray(s.equipment)&&!s.equipment[i]?'lock':''}"><b>${['🗡️','🛡️','🪓','🪖','🧤','💍','🧿'][i]}</b><small>Lv.${Array.isArray(s.equipment)&&s.equipment[i]?s.level:0}</small><span>${Array.isArray(s.equipment)&&s.equipment[i]?'ЭКИП':'ПУСТО'}</span></div>`).join('')}</div>
-   <div class="pve-skills"><button class="pve-skill">⚡</button><button class="pve-skill">🔥</button><button class="pve-skill main" data-skill>⚔️</button><button class="pve-skill">💚</button><button class="pve-skill">🌀</button><button class="pve-skill">×2</button><button class="pve-skill" data-pve-auto>AUTO</button></div>
+   <div class="pve-slots" data-pve-slots>${Array.from({length:7},(_,i)=>`<button type="button" class="pve-slot ${Array.isArray(s.equipment)&&!s.equipment[i]?'lock':''}" data-pve-equip="${i}" aria-label="Слот экипировки ${i+1}"><b>${['🗡️','🛡️','🪓','🪖','🧤','💍','🧿'][i]}</b><small>Lv.${Array.isArray(s.equipment)&&s.equipment[i]?s.level:0}</small><span>${Array.isArray(s.equipment)&&s.equipment[i]?'ЭКИП':'ПУСТО'}</span></button>`).join('')}</div>
+   <div class="pve-skills"><button type="button" class="pve-skill" data-pve-skill="lightning">⚡</button><button type="button" class="pve-skill" data-pve-skill="fire">🔥</button><button type="button" class="pve-skill main" data-pve-skill="attack">⚔️</button><button type="button" class="pve-skill" data-pve-skill="heal">💚</button><button type="button" class="pve-skill" data-pve-skill="magic">🌀</button><button type="button" class="pve-skill" data-pve-skill="x2">×2</button><button type="button" class="pve-skill" data-pve-auto>AUTO</button></div>
    <nav class="pve-bottom-nav">${[['home','🏰','Город'],['inventory','🎒','Инвентарь'],['hero','⚔️','Герой'],['battle','⚔️','Бой'],['quests','📜','Квесты'],['games','🎲','Игры'],['clan','🚩','Клан']].map(x=>`<button data-pve-nav="${x[0]}" class="${x[0]==='battle'?'active':''}"><i>${x[1]}</i>${x[2]}</button>`).join('')}</nav>
  </section><div class="pve-reward" data-pve-reward><div class="pve-reward-card"><h2>Победа!</h2><div class="reward-line"><span>🪙 <b data-reward-coins>0</b></span><span>⭐ <b data-reward-xp>0</b></span></div><button data-pve-next>СЛЕДУЮЩИЙ БОЙ</button></div></div>`;
  document.body.appendChild(root);document.getElementById('hardMobileNav')?.classList.add('pve-hidden');
@@ -119,6 +121,25 @@ function nextBot(){if(!battle)return;const s=S();battle.root.querySelector('[dat
 function finishNoStones(){if(!battle)return;battle.running=false;const st=battle.root.querySelector('[data-run-status]');if(st)st.textContent='⚠️ Боевые камни закончились';setTimeout(()=>{stopRunner();window.showScreen?.('home');paint()},1000)}
 function spawnVfx(){if(!battle)return;const e=document.createElement('div');e.className='pve-vfx';battle.root.querySelector('.pve-field').appendChild(e);setTimeout(()=>e.remove(),380)}
 function floatDamage(v,heal){const l=battle?.root?.querySelector('.pve-damage-layer');if(!l)return;const e=document.createElement('div');e.className='pve-damage'+(heal?' pve-heal':'');e.textContent=(heal?'+':'-')+v;l.appendChild(e);setTimeout(()=>e.remove(),760)}
+function battleAction(kind){
+ if(!battle||!battle.running)return;
+ const s=S();
+ if(kind==='heal'){
+   const gain=Math.max(10,Math.floor(s.maxHp*.08));s.hp=Math.min(s.maxHp,s.hp+gain);window.TerritoryStore.saveNow?.('pve-skill-heal');floatDamage(gain,true);renderBattleHud();return;
+ }
+ if(kind==='x2'){battle.multiplier=battle.multiplier===2?1:2;const el=battle.root.querySelector('[data-pve-skill="x2"]');if(el)el.textContent=battle.multiplier===2?'×2✓':'×2';return;}
+ if(Number(s.battleStones||0)<=0){finishNoStones();return;}
+ const quality=equipmentPower(s),d=window.TerritoryStore.getDerivedStats();
+ const base=Math.max(8,Math.floor((d.strength||10)*(.9+Math.random()*.5)));const bonus={lightning:1.05,fire:1.2,attack:1,magic:1.1}[kind]||1;const dmg=Math.max(1,Math.floor(base*quality*bonus*(battle.multiplier||1)));
+ s.battleStones=Math.max(0,Number(s.battleStones)-1);battle.enemyHp=Math.max(0,battle.enemyHp-dmg);window.TerritoryStore.saveNow?.('pve-skill-hit');spawnVfx();floatDamage(dmg,false);renderBattleHud();
+ if(battle.enemyHp<=0){const enemy=battle.root.querySelector('[data-run-enemy]');enemy.classList.add('defeat');s.coins+=25+Math.floor(s.level*2);const gain=12+Math.floor(s.currentChapter*2);window.TerritoryStore.addXp?.(gain);window.TerritoryChaptersAPI?.completeStage?.();sync();paint();renderBattleHud();showReward(25+Math.floor(s.level*2),gain);}
+}
+function battleEquip(i){
+ if(!battle)return;const s=S();s.equipment=Array.isArray(s.equipment)?s.equipment.slice(0,7):Array(7).fill(null);while(s.equipment.length<7)s.equipment.push(null);
+ s.equipment[i]=s.equipment[i]?null:{id:'test-'+(i+1),name:'Тестовый предмет '+(i+1),level:s.level};window.TerritoryStore.saveNow?.('pve-equipment-slot');
+ const btn=battle.root.querySelector(`[data-pve-equip="${i}"]`);if(btn){btn.classList.toggle('lock',!s.equipment[i]);btn.querySelector('small').textContent='Lv.'+(s.equipment[i]?s.level:0);btn.querySelector('span').textContent=s.equipment[i]?'ЭКИП':'ПУСТО';}
+ renderBattleHud();
+}
 function openBoss(){
  sync();const s=S();if(!s.chapterBossUnlocked)return;
  stopRunner();s.pve=s.pve||{};s.pve.bossPending=true;s.pve.bossActive=true;window.TerritoryStore.saveNow?.('boss-open');window.showScreen?.('bossBattle');initBoss();
@@ -154,13 +175,14 @@ document.addEventListener('click',e=>{
  if(e.target.closest?.('#bossAuto')){if(!boss)return;boss.auto=!boss.auto;renderBoss();if(boss.auto)bossHit();return}
  if(e.target.closest?.('[data-pve-close]')){stopRunner();window.showScreen?.('home');paint();return}
  if(e.target.closest?.('[data-pve-next]')){nextBot();return}
+ if(e.target.closest?.('[data-pve-equip]')){e.preventDefault();e.stopImmediatePropagation();battleEquip(Number(e.target.closest('[data-pve-equip]').dataset.pveEquip));return}
  if(e.target.closest?.('[data-pve-auto]')){if(!battle)return;battle.auto=!battle.auto;e.target.textContent=battle.auto?'AUTO':'РУЧНОЙ';if(battle.auto&&!battle.running)scheduleHit(300);return}
- if(e.target.closest?.('[data-skill]')){if(!battle||!battle.running)return;const s=S();if(Number(s.battleStones||0)<=0){finishNoStones();return}const heal=Math.max(5,Math.floor(s.maxHp*.04));s.hp=Math.min(s.maxHp,s.hp+heal);window.TerritoryStore.saveNow?.('pve-skill-heal');floatDamage(heal,true);renderBattleHud();return}
+ if(e.target.closest?.('[data-pve-skill]')){battleAction(e.target.closest('[data-pve-skill]').dataset.pveSkill);return}
  if(e.target.closest?.('[data-pve-nav]')){const id=e.target.closest('[data-pve-nav]').dataset.pveNav;if(id==='battle')return;if(id==='home'){stopRunner();window.showScreen?.('home');paint();return}stopRunner();window.showScreen?.(id);return}
  if(e.target.closest?.('#fjordsStart')){startRunner(false);return}
  if(e.target.closest?.('#mapChapterSkull')){openBoss();return}
 });
 window.addEventListener('territory:state-changed',()=>{sync();paint()});
 document.addEventListener('DOMContentLoaded',()=>{mount();sync();paint();window.showScreen?.('home')});
-window.HomeRebuild={refresh:paint,startRunner,openBoss};
+window.HomeRebuild={refresh:paint,startRunner,stopRunner,openBoss};
 })();
