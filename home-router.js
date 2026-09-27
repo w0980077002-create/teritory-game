@@ -1,4 +1,4 @@
-/* Territory Game — HOME INPUT ROUTER 10060
+/* Territory Game — HOME INPUT ROUTER 10065
    Single touch/pointer/click fallback for the baked HOME artwork.
    No transparent overlay is created. */
 (function(){
@@ -28,7 +28,7 @@
     ['events',0,9,14,8],['daily',0,16.5,14,8],['leftQuests',0,24,14,8],['friends',0,31.5,14,8],['sea',0,39,14,8],
     ['shop',87,9,13,8],['forge',87,16.2,13,8],['challenges',87,23.4,13,8],['streets',87,30.6,13,8],['arena',87,38,13,8],
     ['gear0',18,64,10.6,12],['gear1',28.8,64,10.6,12],['gear2',39.6,64,10.6,12],
-    ['gear3',50.4,64,10.6,12],['gear4',61.2,64,10.6,12],['gear5',72,64,10.6,12],
+    ['gear3',50.4,64,10.6,12],['gear4',61.2,64,10.6,12],['gear5',72,64,10.6,12],['gear6',82.8,64,10.6,12],
     ['elixir0',0,76,14.2,8],['elixir1',14.5,76,14.2,8],['elixir2',29,76,14.2,8],['elixir3',43.5,76,14.2,8],
     ['inventory',14.28,91,14.28,9],['hero',28.56,91,14.28,9],['battle',42.84,90,14.32,10],
     ['bottomQuests',57.16,91,14.28,9],['games',71.44,91,14.28,9],['clan',85.72,91,14.28,9],['home',0,91,14.28,9]
@@ -41,7 +41,7 @@
     return null;
   }
 
-  function show(id){ window.showScreen?.(id); }
+  function show(id){ if(typeof window.showScreen==='function') window.showScreen(id); }
 
   function loadArena(){
     /* Current index.html has no arenaModal and no arena.css.
@@ -54,15 +54,15 @@
       m.innerHTML='<div class="arena-sheet"><header class="arena-modal-head"><h2>⚔️ АРЕНА</h2><button type="button" class="arena-close" id="arenaClose">×</button></header><main id="arenaModalBody"></main></div>';
       document.body.appendChild(m);
     }
-    if(!document.getElementById('arenaCss10060')){
+    if(!document.getElementById('arenaCss10065')){
       const css=document.createElement('link');
-      css.id='arenaCss10060';
+      css.id='arenaCss10065';
       css.rel='stylesheet';
-      css.href='arena.css?v=10060';
+      css.href='arena.css?v=10065';
       document.head.appendChild(css);
     }
     if(window.ArenaGame?.open) return window.ArenaGame.open();
-    const old=document.querySelector('script[data-arena-input-10060]');
+    const old=document.querySelector('script[data-arena-input-10065]');
     if(old) return;
     const s=document.createElement('script');
     s.dataset.arenaInput10060='1';
@@ -77,10 +77,10 @@
   }
 
   function loadPvE(){
-    const cssId='pveCss10060', flowId='pveFlow10060', battleId='pveBattle10060';
-    const addCss=(id,href)=>{if(document.getElementById(id))return;const l=document.createElement('link');l.id=id;l.rel='stylesheet';l.href=href+'?v=10060';document.head.appendChild(l)};
-    const addJs=(id,src)=>new Promise(resolve=>{const old=document.getElementById(id);if(old){resolve();return}const s=document.createElement('script');s.id=id;s.src=src+'?v=10060';s.onload=()=>resolve();s.onerror=()=>resolve();document.body.appendChild(s)});
-    addCss(cssId,'pve-flow.css');addCss('pveBattleCss10060','pve-battle.css');
+    const cssId='pveCss10065', flowId='pveFlow10065', battleId='pveBattle10065';
+    const addCss=(id,href)=>{if(document.getElementById(id))return;const l=document.createElement('link');l.id=id;l.rel='stylesheet';l.href=href+'?v=10065';document.head.appendChild(l)};
+    const addJs=(id,src)=>new Promise(resolve=>{const old=document.getElementById(id);if(old){resolve();return}const s=document.createElement('script');s.id=id;s.src=src+'?v=10065';s.onload=()=>resolve();s.onerror=()=>resolve();document.body.appendChild(s)});
+    addCss(cssId,'pve-flow.css');addCss('pveBattleCss10065','pve-battle.css');
     return addJs(flowId,'pve-flow.js').then(()=>addJs(battleId,'pve-battle.js'));
   }
 
@@ -119,32 +119,43 @@
     }
   }
 
-  function handle(e){
-    if(!isHome()) return;
+  function isNativeControl(e){
+    const t=e.target?.closest?.('button,a,input,select,textarea,[role="button"]');
+    return !!t;
+  }
+
+  let lastActivation=0;
+  let lastKey='';
+  function activate(e){
+    if(!isHome() || isNativeControl(e)) return;
     const {x,y}=coords(e);
     const k=hit(x,y);
-    if(!k) return;
-    if(performance.now()<busyUntil) return;
-    busyUntil=performance.now()+500;
-    if(e.cancelable) e.preventDefault();
+    if(!k)return;
+    const now=performance.now();
+    const key=k+'|'+Math.round(x*10)+'|'+Math.round(y*10);
+    if(now-lastActivation<650 && key===lastKey)return;
+    lastActivation=now;lastKey=key;
+    if(e.cancelable)e.preventDefault();
     e.stopImmediatePropagation();
     route(k);
   }
 
-  /* Android WebView / Telegram fallback: use all three event types. */
-  window.addEventListener('touchstart',handle,{capture:true,passive:false});
-  window.addEventListener('pointerdown',handle,{capture:true,passive:false});
-  window.addEventListener('pointerup',function(e){
-    if(isHome() && performance.now()>=busyUntil) handle(e);
-  },{capture:true,passive:false});
+  /* One activation path: pointerup on modern Android/WebView, touchend fallback for older WebViews. */
+  window.addEventListener('pointerup',activate,{capture:true,passive:false});
+  window.addEventListener('touchend',activate,{capture:true,passive:false});
   window.addEventListener('click',function(e){
-    if(performance.now()<busyUntil){
+    if(!isHome() || isNativeControl(e))return;
+    const {x,y}=coords(e),k=hit(x,y);
+    if(!k)return;
+    const now=performance.now(),key=k+'|'+Math.round(x*10)+'|'+Math.round(y*10);
+    if(now-lastActivation<650 && key===lastKey){
       if(e.cancelable)e.preventDefault();
       e.stopImmediatePropagation();
+      return;
     }
+    activate(e);
   },{capture:true});
 
-  /* If another script recreates HOME, keep the router alive without rebuilding DOM. */
-  window.addEventListener('territory:screen',()=>{busyUntil=0;});
-  window.addEventListener('territory:render',()=>{busyUntil=0;});
+  window.addEventListener('territory:screen',()=>{lastActivation=0;lastKey='';});
+  window.addEventListener('territory:render',()=>{lastActivation=0;lastKey='';});
 })();
