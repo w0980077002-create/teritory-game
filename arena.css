@@ -81,8 +81,7 @@
 .battle-chat{margin:3px 0 0;max-height:142px;overflow:auto;border:1px solid #2b414d;border-radius:9px;background:#08151e;padding:6px;font-size:8px}.battle-chat.collapsed{display:none}.chat-line{padding:2px 0;color:#d3dce0}.chat-line.system{color:#91a4ad}
 .chat-compose{display:flex;gap:4px;margin-top:5px}.chat-compose input{flex:1;min-width:0;height:30px;border:1px solid #344b57;border-radius:7px;background:#0d1d27;color:#fff;padding:0 7px;font-size:8px}.chat-compose button{width:34px;border:1px solid #c59e4d;border-radius:7px;background:#9c711f;color:#171107;font-weight:900}
 .arena-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:100000;height:60px;display:grid;grid-template-columns:repeat(7,1fr);background:linear-gradient(#111e29,#07111b);border-top:1px solid rgba(232,199,107,.32)}
-.arena-bottom-nav button{min-width:0;height:60px;border:0;border-right:1px solid rgba(70,91,103,.28);background:transparent;color:#aebbc2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px;touch-action:manipulation}
-
+.arena-bottom-nav button{min-width:0;height:60px;border:0;border-right:1px solid rgba(70,91,103,.28);background:transparent;color:#aebbc2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px;touch-action:manipulation}.arena-bottom-nav button span{font-size:19px}.arena-bottom-nav button b{font-size:6.5px;white-space:nowrap}
 
 .battle-follower{position:absolute;z-index:25;pointer-events:none}
 .runner-screen{position:fixed;inset:0;z-index:120000;background:#07131a;overflow:hidden;color:#fff;touch-action:none}
