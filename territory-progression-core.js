@@ -279,3 +279,27 @@ function init(){bind();window.addEventListener('territory:state-changed',bind)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 window.TerritoryHeroSlotChanger={open,close};
 })();
+
+
+/* TERRITORY PASS 40 — FOLLOWER BUILD CENTER
+ * Uses canonical Followers/TerritoryStore data. UI-only follower selection; no combat math changes.
+ */
+(()=>{
+'use strict';
+const KEY='territory_follower_center_40';
+function S(){return window.TerritoryStore?.state||window.TerritoryStore?.getState?.()||{};}
+function followers(){const F=window.Followers; if(!F)return[]; const s=S(); const owned=s.ownedFollowers||s.followersOwned||s.followers?.owned; if(Array.isArray(owned)){return owned.map(x=>typeof x==='string'?F.get?.(x):x).filter(Boolean)} const cat=F.catalog||F.list||{}; if(Array.isArray(cat))return cat; return Object.values(cat||{}).filter(Boolean).slice(0,5);}
+function activeId(){const s=S();return s.activeFollower||s.activeFollowerId||s.followerId||s.followers?.active||'liabro';}
+function idOf(f){return f?.id||f?.key||f?.uid||f?.code;}
+function name(f){return f?.name||f?.title||f?.label||'Спутник';}
+function role(f){return f?.role||f?.type||'Спутник';}
+function icon(f){return f?.icon||f?.emoji||f?.symbol||'👥';}
+function esc(x){return String(x??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function style(){if(document.getElementById('territory-follower-center-style'))return;const st=document.createElement('style');st.id='territory-follower-center-style';st.textContent=`
+#hero .tfc{margin:10px 0 10px;padding:12px;border-radius:16px;background:rgba(255,255,255,.025);border:1px solid rgba(220,184,104,.16);color:#eef3f5}.tfc-title{font-size:10px;letter-spacing:1px;opacity:.6}.tfc-active{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px;border-radius:12px;background:rgba(220,184,104,.055);border:1px solid rgba(220,184,104,.13)}.tfc-active .face{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:rgba(255,255,255,.05);font-size:21px}.tfc-active b{display:block;font-size:12px}.tfc-active small{font-size:8px;opacity:.55}.tfc-list{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}.tfc-card{border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.035);color:inherit;border-radius:11px;padding:8px;text-align:left;display:flex;align-items:center;gap:7px}.tfc-card.active{border-color:rgba(220,184,104,.42);box-shadow:0 0 14px rgba(220,184,104,.07)}.tfc-card .ficon{font-size:18px}.tfc-card b{display:block;font-size:9px}.tfc-card small{display:block;font-size:7px;opacity:.5;margin-top:2px}.tfc-hint{margin-top:7px;font-size:8px;opacity:.45}.tfc-toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);z-index:14000;padding:9px 13px;border-radius:12px;background:rgba(12,18,22,.96);border:1px solid rgba(220,184,104,.32);color:#fff;font-size:10px;font-weight:900;box-shadow:0 10px 28px rgba(0,0,0,.4)}@media(max-width:380px){.tfc-list{grid-template-columns:1fr}}
+`;document.head.appendChild(st)}
+function setActive(f){const id=idOf(f);if(!id)return false;const s=S(); if(typeof window.TerritoryStore?.setActiveFollower==='function')window.TerritoryStore.setActiveFollower(id); else {s.activeFollower=id;window.TerritoryStore?.save?.();window.dispatchEvent(new CustomEvent('territory:state-changed'));} window.dispatchEvent(new CustomEvent('territory:follower-changed',{detail:{id,follower:f}}));return true}
+function render(){const host=document.getElementById('hero');if(!host)return;style();let box=host.querySelector('.tfc');if(!box){box=document.createElement('section');box.className='tfc';host.appendChild(box)}const list=followers();const aid=activeId();const active=list.find(f=>idOf(f)===aid)||list[0];box.innerHTML=`<div class="tfc-title">👥 СПУТНИК</div><div class="tfc-active"><div class="face">${esc(icon(active))}</div><div><b>${esc(name(active))}</b><small>${esc(role(active))} · активен в бою</small></div></div><div class="tfc-list">${list.map(f=>{const on=idOf(f)===idOf(active);return `<button class="tfc-card ${on?'active':''}" data-tfc-id="${esc(idOf(f))}"><span class="ficon">${esc(icon(f))}</span><span><b>${esc(name(f))}</b><small>${esc(role(f))}${on?' · ✓':''}</small></span></button>`}).join('')}</div><div class="tfc-hint">Выбор спутника меняет только активного спутника через существующую систему Followers.</div>`;box.querySelectorAll('[data-tfc-id]').forEach(b=>b.onclick=()=>{const f=list.find(x=>String(idOf(x))===String(b.dataset.tfcId));if(!f)return;if(setActive(f)){render();const t=document.createElement('div');t.className='tfc-toast';t.textContent='👥 Активен: '+name(f);document.body.appendChild(t);setTimeout(()=>t.remove(),1300)}})}
+function mount(){const tick=()=>setTimeout(render,120);window.addEventListener('territory:state-changed',tick);window.addEventListener('territory:follower-changed',tick);const obs=new MutationObserver(()=>{if(document.getElementById('hero')?.classList.contains('active'))render()});obs.observe(document.body,{childList:true,subtree:true});setTimeout(render,700)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();window.TerritoryFollowerCenter={render,setActive};
+})();

@@ -37,3 +37,5 @@ background:radial-gradient(circle at 50% 0,#49351d,#111a22 52%,#081017);box-shad
 /* PASS 36 — small visual emphasis for comparison-ready loot */
 #inventory .loot-item{transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
 #inventory .loot-item:active{transform:scale(.98)}
+
+/* PASS40 follower styles are injected by JS to avoid index changes. */
