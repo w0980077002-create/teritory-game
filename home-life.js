@@ -1370,3 +1370,424 @@ document.addEventListener('DOMContentLoaded',init);
 
   window.TerritoryFollowerForgeShop={open,items:ITEMS};
 })();
+
+
+/* TERRITORY PASS 26 - VIP FOUNDATION */
+(function(){
+  'use strict';
+
+  const KEY='territory_vip_v1';
+
+  const TIERS={
+    0:{name:'Без VIP',icon:'◇',bonusXp:0,energy:0},
+    1:{name:'VIP I',icon:'◆',bonusXp:0.05,energy:5},
+    2:{name:'VIP II',icon:'◆',bonusXp:0.10,energy:10},
+    3:{name:'VIP III',icon:'◆',bonusXp:0.15,energy:15},
+    4:{name:'VIP IV',icon:'◆',bonusXp:0.20,energy:20},
+    5:{name:'VIP V',icon:'◆',bonusXp:0.25,energy:25}
+  };
+
+  function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}');}catch(e){return {};}}
+  function write(v){try{localStorage.setItem(KEY,JSON.stringify(v));}catch(e){}}
+  function get(){
+    const s=read();
+    return {level:Math.max(0,Math.min(5,Number(s.level)||0)),lifetime:s.lifetime||0};
+  }
+  function tier(){return TIERS[get().level]||TIERS[0];}
+
+  window.TerritoryVIP={
+    tiers:TIERS,
+    get:get,
+    current:tier,
+    setLevel:function(level){
+      level=Math.max(0,Math.min(5,Number(level)||0));
+      const s=read();s.level=level;write(s);
+      try{window.dispatchEvent(new CustomEvent('territory:vip-change',{detail:{level,tier:TIERS[level]}}));}catch(e){}
+      return get();
+    },
+    // Purchase systems can award VIP entitlement later; no real-money
+    // payment handling is implemented in this overlay.
+    grantLifetime:function(amount){
+      const s=read();s.lifetime=(Number(s.lifetime)||0)+Math.max(0,Number(amount)||0);write(s);
+      return get();
+    }
+  };
+
+  // Central, transparent VIP bonus hooks for future canonical systems.
+  window.TerritoryVIPEffects={
+    xpMultiplier:function(){return 1+(tier().bonusXp||0);},
+    energyBonus:function(){return tier().energy||0;}
+  };
+
+  function open(){
+    const v=get(), t=tier();
+    let modal=document.querySelector('.territory-vip-modal');
+    if(modal) modal.remove();
+
+    modal=document.createElement('div');
+    modal.className='territory-vip-modal';
+    modal.innerHTML=
+      '<div class="tvm-backdrop"></div>'+
+      '<section class="tvm-card">'+
+        '<button class="tvm-close">×</button>'+
+        '<div class="tvm-icon">'+t.icon+'</div>'+
+        '<div class="tvm-title">TERRITORY VIP</div>'+
+        '<div class="tvm-tier">'+t.name+' • уровень '+v.level+'</div>'+
+        '<div class="tvm-current">'+
+          '<div><small>Бонус XP</small><b>+'+Math.round(t.bonusXp*100)+'%</b></div>'+
+          '<div><small>Энергия</small><b>+'+t.energy+'</b></div>'+
+        '</div>'+
+        '<div class="tvm-note">VIP — отдельная система привилегий. Покупная премиальная валюта не тратится автоматически.</div>'+
+        '<div class="tvm-coming">👑 Следующий слой: VIP-привилегии и уровни наград</div>'+
+      '</section>';
+
+    document.body.appendChild(modal);
+    modal.querySelector('.tvm-close').onclick=()=>modal.remove();
+    modal.querySelector('.tvm-backdrop').onclick=()=>modal.remove();
+  }
+
+  window.TerritoryVIP.open=open;
+
+  // Make existing top VIP action open the new panel when available.
+  document.addEventListener('click',function(e){
+    const el=e.target&&e.target.closest?e.target.closest('[data-home-action="vip"], [data-action="vip"], [data-home-action="profile-vip"]'):null;
+    if(el){e.preventDefault();open();}
+  });
+})();
+
+
+/* TERRITORY PASS 27 - VIP DAILY REWARDS */
+(function(){
+  'use strict';
+
+  const KEY='territory_vip_daily_v1';
+  const REWARDS={
+    0:{coins:25,xp:0,tag:'Обычный день'},
+    1:{coins:45,xp:5,tag:'VIP I'},
+    2:{coins:70,xp:10,tag:'VIP II'},
+    3:{coins:100,xp:15,tag:'VIP III'},
+    4:{coins:140,xp:20,tag:'VIP IV'},
+    5:{coins:190,xp:25,tag:'VIP V'}
+  };
+
+  function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}');}catch(e){return {};}}
+  function write(v){try{localStorage.setItem(KEY,JSON.stringify(v));}catch(e){}}
+  function today(){
+    const d=new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function vip(){
+    try{return window.TerritoryVIP.get().level||0;}catch(e){return 0;}
+  }
+  function state(){try{return window.TerritoryStore.getState();}catch(e){return null;}}
+  function save(s){try{window.TerritoryStore.saveState(s);return true;}catch(e){return false;}}
+
+  function get(){
+    const s=read();
+    return {claimed:s.claimedDate===today(),claimedDate:s.claimedDate||null,streak:Number(s.streak)||0};
+  }
+
+  function claim(){
+    const current=get();
+    if(current.claimed) return {ok:false,reason:'claimed'};
+
+    const r=REWARDS[vip()]||REWARDS[0];
+    const s=state();
+    if(!s) return {ok:false,reason:'store'};
+
+    s.coins=(Number(s.coins)||0)+r.coins;
+    if(!save(s)) return {ok:false,reason:'save'};
+
+    const all=read();
+    all.claimedDate=today();
+    all.streak=(Number(all.streak)||0)+1;
+    write(all);
+
+    try{window.dispatchEvent(new CustomEvent('territory:vip-daily-claimed',{detail:{vip:vip(),reward:r,streak:all.streak}}));}catch(e){}
+    return {ok:true,reward:r,streak:all.streak};
+  }
+
+  window.TerritoryVIPDaily={
+    get:get,
+    reward:function(){return Object.assign({},REWARDS[vip()]||REWARDS[0]);},
+    claim:claim
+  };
+
+  function open(){
+    let modal=document.querySelector('.vip-daily-modal');
+    if(modal) modal.remove();
+
+    const v=vip(), r=REWARDS[v]||REWARDS[0], d=get();
+    modal=document.createElement('div');
+    modal.className='vip-daily-modal';
+    modal.innerHTML=
+      '<div class="vdm-backdrop"></div>'+
+      '<section class="vdm-card">'+
+        '<button class="vdm-close">×</button>'+
+        '<div class="vdm-icon">🎁</div>'+
+        '<div class="vdm-title">ЕЖЕДНЕВНАЯ НАГРАДА</div>'+
+        '<div class="vdm-vip">'+r.tag+' • серия '+d.streak+'</div>'+
+        '<div class="vdm-reward"><span>🪙</span><b>'+r.coins+'</b><small>монет</small></div>'+
+        '<div class="vdm-line">Каждый день — новая награда. VIP повышает её размер.</div>'+
+        '<button class="vdm-claim" type="button">'+(d.claimed?'✓ УЖЕ ПОЛУЧЕНО':'ЗАБРАТЬ НАГРАДУ')+'</button>'+
+      '</section>';
+
+    document.body.appendChild(modal);
+    modal.querySelector('.vdm-close').onclick=()=>modal.remove();
+    modal.querySelector('.vdm-backdrop').onclick=()=>modal.remove();
+    const btn=modal.querySelector('.vdm-claim');
+    btn.disabled=d.claimed;
+    btn.onclick=()=>{
+      const result=claim();
+      if(result.ok){
+        btn.textContent='✓ ПОЛУЧЕНО • '+result.reward.coins+' 🪙';
+        btn.disabled=true;
+        modal.querySelector('.vdm-vip').textContent=r.tag+' • серия '+result.streak;
+      }
+    };
+  }
+
+  window.TerritoryVIPDaily.open=open;
+})();
+
+
+/* TERRITORY PASS 28 - VIP CENTER 10 TIERS */
+(function(){
+  'use strict';
+
+  const KEY='territory_vip_v2';
+
+  // Prices are configuration only. Payment/Telegram entitlement verification
+  // remains a separate server-side responsibility.
+  const TIERS={
+    0:{name:'Без VIP',price:0,icon:'◇',xp:0,energy:0,daily:25},
+    1:{name:'VIP I',price:1,icon:'◆',xp:5,energy:5,daily:45},
+    2:{name:'VIP II',price:3,icon:'◆',xp:8,energy:8,daily:60},
+    3:{name:'VIP III',price:7,icon:'◆',xp:12,energy:10,daily:80},
+    4:{name:'VIP IV',price:15,icon:'◆',xp:16,energy:13,daily:105},
+    5:{name:'VIP V',price:30,icon:'◆',xp:20,energy:16,daily:135},
+    6:{name:'VIP VI',price:55,icon:'◆',xp:25,energy:20,daily:170},
+    7:{name:'VIP VII',price:90,icon:'◆',xp:30,energy:24,daily:215},
+    8:{name:'VIP VIII',price:140,icon:'◆',xp:36,energy:28,daily:270},
+    9:{name:'VIP IX',price:200,icon:'◆',xp:42,energy:33,daily:335},
+    10:{name:'VIP X',price:300,icon:'◆',xp:50,energy:40,daily:420}
+  };
+
+  function read(){
+    try{return JSON.parse(localStorage.getItem(KEY)||'{}');}
+    catch(e){return {};}
+  }
+  function write(v){try{localStorage.setItem(KEY,JSON.stringify(v));}catch(e){}}
+  function level(){
+    const v=read();
+    return Math.max(0,Math.min(10,Number(v.level)||0));
+  }
+  function current(){return TIERS[level()]||TIERS[0];}
+
+  window.TerritoryVIP10={
+    tiers:TIERS,
+    get:function(){return {level:level(),tier:current(),lifetime:read().lifetime||0};},
+    // Local/dev entitlement hook only. Production purchases must be verified
+    // by the server before calling the entitlement layer.
+    setEntitlement:function(lvl){
+      lvl=Math.max(0,Math.min(10,Number(lvl)||0));
+      const v=read(); v.level=lvl; write(v);
+      try{window.dispatchEvent(new CustomEvent('territory:vip10-change',{detail:{level:lvl,tier:TIERS[lvl]}}));}catch(e){}
+      return this.get();
+    },
+    next:function(){
+      const n=level()+1;
+      return n<=10 ? TIERS[n] : null;
+    },
+    xpMultiplier:function(){return 1+(current().xp/100);},
+    energyBonus:function(){return current().energy;},
+    dailyReward:function(){return current().daily;}
+  };
+
+  function open(){
+    let modal=document.querySelector('.vip-center-modal');
+    if(modal) modal.remove();
+
+    const lv=level(), t=current(), next=lv<10?TIERS[lv+1]:null;
+    modal=document.createElement('div');
+    modal.className='vip-center-modal';
+    modal.innerHTML=
+      '<div class="vcm-backdrop"></div>'+
+      '<section class="vcm-card">'+
+        '<button class="vcm-close">×</button>'+
+        '<div class="vcm-crown">👑</div>'+
+        '<div class="vcm-title">TERRITORY VIP</div>'+
+        '<div class="vcm-current">'+t.icon+' '+t.name+' <span>• '+lv+'/10</span></div>'+
+        '<div class="vcm-stats">'+
+          '<div><small>XP</small><b>+'+t.xp+'%</b></div>'+
+          '<div><small>Энергия</small><b>+'+t.energy+'</b></div>'+
+          '<div><small>Ежедневно</small><b>'+t.daily+' 🪙</b></div>'+
+        '</div>'+
+        '<div class="vcm-section-title">УРОВНИ VIP</div>'+
+        '<div class="vcm-levels">'+Object.keys(TIERS).filter(k=>k>0).map(k=>{
+          const x=TIERS[k], active=Number(k)===lv, unlocked=Number(k)<=lv;
+          return '<button class="vcm-level '+(active?'active ':'')+(unlocked?'unlocked':'')+'" data-vip-level="'+k+'">'+
+            '<span>'+x.icon+'</span><b>VIP '+k+'</b><small>$'+x.price+'</small>'+
+          '</button>';
+        }).join('')+'</div>'+
+        (next
+          ? '<div class="vcm-next"><span>Следующий: <b>VIP '+(lv+1)+'</b></span><span>$'+next.price+'</span></div>'
+          : '<div class="vcm-max">👑 VIP X — максимальный уровень</div>')+
+        '<p class="vcm-note">Цены отображаются как настройки VIP. Реальная покупка должна подтверждаться сервером.</p>'+
+      '</section>';
+
+    document.body.appendChild(modal);
+    modal.querySelector('.vcm-close').onclick=()=>modal.remove();
+    modal.querySelector('.vcm-backdrop').onclick=()=>modal.remove();
+
+    // Only opens a preview of a tier; it does not grant paid VIP.
+    modal.querySelectorAll('[data-vip-level]').forEach(btn=>{
+      btn.onclick=()=>{
+        const n=Number(btn.dataset.vipLevel), x=TIERS[n];
+        modal.querySelector('.vcm-current').textContent=x.icon+' '+x.name+' • '+n+'/10';
+        modal.querySelector('.vcm-note').textContent=
+          'VIP '+n+': +'+x.xp+'% XP • +'+x.energy+' энергии • '+x.daily+' 🪙 в ежедневной награде. Покупка требует серверного подтверждения.';
+      };
+    });
+  }
+
+  window.TerritoryVIPCenter={open};
+})();
+
+
+/* TERRITORY PASS 29 - VIP PERSONALITY */
+(function(){
+  'use strict';
+
+  const TIERS={
+    1:{title:'Искра',color:'violet',aura:'✨',cosmetic:'Мягкое сияние'},
+    2:{title:'Знак',color:'violet',aura:'💫',cosmetic:'След света'},
+    3:{title:'Страж',color:'blue',aura:'🛡️',cosmetic:'Аура стража'},
+    4:{title:'Герой',color:'blue',aura:'⚔️',cosmetic:'Боевой след'},
+    5:{title:'Мастер',color:'gold',aura:'🔥',cosmetic:'Пламенный след'},
+    6:{title:'Легенда',color:'gold',aura:'🌟',cosmetic:'Золотая аура'},
+    7:{title:'Владыка',color:'gold',aura:'👑',cosmetic:'Королевское сияние'},
+    8:{title:'Титан',color:'red',aura:'💎',cosmetic:'Алмазный след'},
+    9:{title:'Архонт',color:'red',aura:'🌌',cosmetic:'Космическая аура'},
+    10:{title:'Император',color:'red',aura:'👑',cosmetic:'Императорская аура'}
+  };
+
+  function level(){
+    try{return window.TerritoryVIP10.get().level||0;}catch(e){return 0;}
+  }
+  function data(){return TIERS[level()]||null;}
+
+  window.TerritoryVIPPersonality={
+    get:function(){
+      const d=data();
+      return d ? Object.assign({level:level()},d) : {level:0,title:'Обычный игрок',aura:'◇',cosmetic:'Без VIP-ауры'};
+    }
+  };
+
+  function applyHomeAura(){
+    const d=data();
+    const host=document.querySelector('.home-reference-host, .home-life, #home, .home-screen');
+    if(!host || !d) return;
+    host.classList.remove('vip-aura-1','vip-aura-2','vip-aura-3','vip-aura-4','vip-aura-5','vip-aura-6','vip-aura-7','vip-aura-8','vip-aura-9','vip-aura-10');
+    host.classList.add('vip-aura-'+level());
+    host.dataset.vipTitle=d.title;
+  }
+
+  function badge(){
+    const d=data();
+    if(!d) return;
+    let el=document.querySelector('.vip-personality-badge');
+    if(!el){
+      el=document.createElement('div');
+      el.className='vip-personality-badge';
+      document.body.appendChild(el);
+    }
+    el.innerHTML='<span>'+d.aura+'</span><b>VIP '+level()+' • '+d.title+'</b><small>'+d.cosmetic+'</small>';
+  }
+
+  function refresh(){
+    applyHomeAura();
+    badge();
+  }
+
+  window.addEventListener('territory:vip10-change',refresh);
+  window.addEventListener('territory:vip-change',refresh);
+  setTimeout(refresh,180);
+})();
+
+
+/* TERRITORY PASS 30 - VIP HERO & FOLLOWER COSMETICS */
+(function(){
+  'use strict';
+
+  const TIERS={
+    1:{hero:'✨',follower:'✦',label:'Искра'},
+    2:{hero:'💫',follower:'✦',label:'Знак'},
+    3:{hero:'🛡️',follower:'🛡️',label:'Страж'},
+    4:{hero:'⚔️',follower:'⚔️',label:'Герой'},
+    5:{hero:'🔥',follower:'🔥',label:'Мастер'},
+    6:{hero:'🌟',follower:'🌟',label:'Легенда'},
+    7:{hero:'👑',follower:'👑',label:'Владыка'},
+    8:{hero:'💎',follower:'💎',label:'Титан'},
+    9:{hero:'🌌',follower:'🌌',label:'Архонт'},
+    10:{hero:'👑',follower:'💎',label:'Император'}
+  };
+
+  function level(){
+    try{return window.TerritoryVIP10.get().level||0;}catch(e){return 0;}
+  }
+
+  function data(){return TIERS[level()]||null;}
+
+  window.TerritoryVIPCosmetics={
+    get:function(){
+      const d=data();
+      return d ? Object.assign({level:level()},d) : {level:0};
+    }
+  };
+
+  function findHero(){
+    return document.querySelector('.life-hero,.home-hero,.living-hero,[data-home-action="hero"]');
+  }
+  function findFollower(){
+    return document.querySelector('.life-follower,.home-follower,.living-follower,[data-home-action="follower"]');
+  }
+
+  function apply(){
+    const d=data();
+    if(!d) return;
+    const hero=findHero(), follower=findFollower();
+
+    if(hero){
+      hero.classList.add('vip-cosmetic-hero');
+      hero.dataset.vipLevel=level();
+      hero.dataset.vipAura=d.hero;
+    }
+    if(follower){
+      follower.classList.add('vip-cosmetic-follower');
+      follower.dataset.vipLevel=level();
+      follower.dataset.vipAura=d.follower;
+    }
+
+    let scene=document.querySelector('.vip-scene-aura');
+    if(!scene){
+      scene=document.createElement('div');
+      scene.className='vip-scene-aura';
+      document.body.appendChild(scene);
+    }
+    scene.dataset.vipLevel=level();
+    scene.innerHTML='<span>'+d.hero+'</span><span>'+d.follower+'</span>';
+  }
+
+  function refresh(){
+    // Give the living scene time to mount before applying cosmetics.
+    setTimeout(apply,50);
+  }
+
+  window.addEventListener('territory:vip10-change',refresh);
+  window.addEventListener('territory:vip-change',refresh);
+  document.addEventListener('click',function(){
+    if(level()>0) setTimeout(apply,80);
+  });
+  setTimeout(apply,220);
+})();

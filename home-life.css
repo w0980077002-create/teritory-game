@@ -493,3 +493,175 @@
 .ffm-item strong{font-size:10px}
 .ffm-bought{opacity:.65}
 .ffm-hint{text-align:center;font-size:9px;opacity:.42;margin:12px 0 0}
+
+
+/* TERRITORY PASS 26 - VIP FOUNDATION CSS */
+.territory-vip-modal{
+  position:fixed;inset:0;z-index:100020;
+  display:flex;align-items:center;justify-content:center;padding:18px;
+}
+.tvm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(9px)}
+.tvm-card{
+  position:relative;width:min(420px,100%);padding:24px 19px;
+  border-radius:24px;border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg,rgba(24,29,46,.99),rgba(8,12,20,.99));
+  color:#fff;text-align:center;box-shadow:0 28px 100px rgba(0,0,0,.6);
+  animation:tvmIn .22s ease-out;
+}
+@keyframes tvmIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.tvm-close{
+  position:absolute;right:9px;top:8px;width:34px;height:34px;
+  border:0;border-radius:50%;background:rgba(255,255,255,.07);color:#fff;font-size:22px;
+}
+.tvm-icon{font-size:38px;margin-top:2px}
+.tvm-title{font-weight:1000;font-size:19px;letter-spacing:1px;margin-top:5px}
+.tvm-tier{font-size:11px;opacity:.58;margin-top:4px}
+.tvm-current{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+.tvm-current>div{padding:12px;border-radius:14px;background:rgba(255,255,255,.05)}
+.tvm-current small{display:block;font-size:9px;opacity:.5;margin-bottom:4px}
+.tvm-current b{font-size:16px}
+.tvm-note,.tvm-coming{
+  margin-top:12px;padding:10px;border-radius:12px;
+  background:rgba(255,255,255,.035);font-size:9px;opacity:.6;line-height:1.4;
+}
+.tvm-coming{opacity:.78;font-weight:800}
+
+
+/* TERRITORY PASS 27 - VIP DAILY REWARDS CSS */
+.vip-daily-modal{
+  position:fixed;inset:0;z-index:100030;
+  display:flex;align-items:center;justify-content:center;padding:18px;
+}
+.vdm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(9px)}
+.vdm-card{
+  position:relative;width:min(390px,100%);padding:23px 18px;
+  border-radius:24px;border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg,rgba(24,29,46,.99),rgba(8,12,20,.99));
+  color:#fff;text-align:center;box-shadow:0 28px 100px rgba(0,0,0,.6);
+  animation:vdmIn .22s ease-out;
+}
+@keyframes vdmIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.vdm-close{
+  position:absolute;right:9px;top:8px;width:34px;height:34px;
+  border:0;border-radius:50%;background:rgba(255,255,255,.07);color:#fff;font-size:22px;
+}
+.vdm-icon{font-size:42px}
+.vdm-title{font-size:18px;font-weight:1000;margin-top:4px}
+.vdm-vip{font-size:10px;opacity:.56;margin-top:4px}
+.vdm-reward{
+  margin:18px auto 12px;width:130px;padding:14px 8px;border-radius:16px;
+  background:rgba(255,255,255,.05);display:flex;flex-direction:column;gap:2px;
+}
+.vdm-reward span{font-size:23px}.vdm-reward b{font-size:24px}.vdm-reward small{font-size:9px;opacity:.5}
+.vdm-line{font-size:10px;opacity:.56;line-height:1.4}
+.vdm-claim{
+  width:100%;margin-top:15px;padding:12px;border:0;border-radius:13px;
+  background:rgba(255,255,255,.1);color:#fff;font-size:11px;font-weight:900;
+}
+.vdm-claim:disabled{opacity:.55}
+
+
+/* TERRITORY PASS 28 - VIP CENTER CSS */
+.vip-center-modal{
+  position:fixed;inset:0;z-index:100040;
+  display:flex;align-items:center;justify-content:center;padding:14px;
+}
+.vcm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(10px)}
+.vcm-card{
+  position:relative;width:min(450px,100%);max-height:92vh;overflow:auto;
+  padding:20px 16px;border-radius:24px;border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg,rgba(24,30,48,.99),rgba(7,11,19,.99));
+  color:#fff;box-shadow:0 30px 110px rgba(0,0,0,.65);
+  animation:vcmIn .22s ease-out;
+}
+@keyframes vcmIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.vcm-close{
+  position:absolute;right:9px;top:8px;width:34px;height:34px;border:0;
+  border-radius:50%;background:rgba(255,255,255,.07);color:#fff;font-size:22px;
+}
+.vcm-crown{text-align:center;font-size:40px}
+.vcm-title{text-align:center;font-size:19px;font-weight:1000;letter-spacing:1px}
+.vcm-current{text-align:center;margin-top:5px;font-size:12px;font-weight:900}
+.vcm-current span{opacity:.5;font-weight:700}
+.vcm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:16px}
+.vcm-stats>div{padding:10px 5px;border-radius:12px;background:rgba(255,255,255,.045);text-align:center}
+.vcm-stats small{display:block;font-size:8px;opacity:.5;margin-bottom:4px}
+.vcm-stats b{font-size:12px}
+.vcm-section-title{margin:17px 2px 8px;font-size:9px;letter-spacing:.8px;opacity:.5;font-weight:900}
+.vcm-levels{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.vcm-level{
+  display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:5px;
+  padding:9px 8px;border:1px solid rgba(255,255,255,.07);border-radius:11px;
+  background:rgba(255,255,255,.035);color:#fff;text-align:left;
+}
+.vcm-level.active{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
+.vcm-level.unlocked{opacity:1}
+.vcm-level:not(.unlocked){opacity:.55}
+.vcm-level span{font-size:13px}.vcm-level b{font-size:10px}.vcm-level small{font-size:9px;opacity:.65}
+.vcm-next,.vcm-max{
+  display:flex;justify-content:space-between;align-items:center;margin-top:11px;
+  padding:10px;border-radius:11px;background:rgba(255,255,255,.04);
+  font-size:10px;
+}
+.vcm-max{justify-content:center;font-weight:900}
+.vcm-note{text-align:center;font-size:8px;line-height:1.4;opacity:.4;margin:11px 4px 0}
+
+
+/* TERRITORY PASS 29 - VIP PERSONALITY CSS */
+.vip-personality-badge{
+  position:fixed;right:10px;top:58px;z-index:9990;
+  display:flex;align-items:center;gap:6px;
+  padding:6px 9px;border-radius:11px;
+  background:rgba(7,10,18,.72);
+  border:1px solid rgba(255,255,255,.11);
+  color:#fff;backdrop-filter:blur(8px);
+  font-size:9px;box-shadow:0 5px 22px rgba(0,0,0,.24);
+  pointer-events:none;
+}
+.vip-personality-badge span{font-size:13px}
+.vip-personality-badge b{font-size:9px}
+.vip-personality-badge small{font-size:8px;opacity:.5}
+
+.vip-aura-1,.vip-aura-2{box-shadow:inset 0 0 80px rgba(160,120,255,.06)}
+.vip-aura-3,.vip-aura-4{box-shadow:inset 0 0 90px rgba(80,150,255,.07)}
+.vip-aura-5,.vip-aura-6,.vip-aura-7{box-shadow:inset 0 0 100px rgba(255,190,80,.08)}
+.vip-aura-8,.vip-aura-9,.vip-aura-10{box-shadow:inset 0 0 120px rgba(255,90,90,.08)}
+
+
+/* TERRITORY PASS 30 - VIP COSMETICS CSS */
+.vip-scene-aura{
+  position:fixed;left:50%;bottom:16%;z-index:17;
+  transform:translateX(-50%);
+  display:flex;gap:95px;align-items:center;
+  pointer-events:none;opacity:.24;
+  filter:drop-shadow(0 0 12px rgba(255,255,255,.25));
+  font-size:13px;
+  animation:vipSceneFloat 3.5s ease-in-out infinite;
+}
+@keyframes vipSceneFloat{
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(-4px)}
+}
+.vip-cosmetic-hero,.vip-cosmetic-follower{
+  filter:drop-shadow(0 0 8px rgba(255,255,255,.12));
+}
+.vip-cosmetic-hero[data-vip-level="5"],
+.vip-cosmetic-hero[data-vip-level="6"],
+.vip-cosmetic-hero[data-vip-level="7"]{
+  filter:drop-shadow(0 0 12px rgba(255,190,80,.28));
+}
+.vip-cosmetic-hero[data-vip-level="8"],
+.vip-cosmetic-hero[data-vip-level="9"],
+.vip-cosmetic-hero[data-vip-level="10"]{
+  filter:drop-shadow(0 0 14px rgba(255,100,100,.28));
+}
+.vip-cosmetic-follower[data-vip-level="7"],
+.vip-cosmetic-follower[data-vip-level="8"],
+.vip-cosmetic-follower[data-vip-level="9"],
+.vip-cosmetic-follower[data-vip-level="10"]{
+  animation:vipFollowerPulse 2.8s ease-in-out infinite;
+}
+@keyframes vipFollowerPulse{
+  0%,100%{filter:drop-shadow(0 0 7px rgba(255,255,255,.12))}
+  50%{filter:drop-shadow(0 0 15px rgba(255,255,255,.3))}
+}
