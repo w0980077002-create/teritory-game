@@ -1,0 +1,26 @@
+.tpc-modal{position:fixed;inset:0;z-index:260000;display:none;align-items:center;justify-content:center;padding:18px}
+.tpc-modal.show{display:flex}.tpc-backdrop{position:absolute;inset:0;background:#02070bd9;backdrop-filter:blur(5px)}
+.tpc-card{position:relative;width:min(92vw,430px);padding:25px 20px;border:1px solid #a77d3d;border-radius:20px;
+background:radial-gradient(circle at 50% 0,#49351d,#111a22 52%,#081017);box-shadow:0 25px 70px #000b,0 0 35px #d5a84c22;text-align:center;color:#eef2f4}
+.tpc-glow{font-size:36px;color:#f3cc70;text-shadow:0 0 25px #e4b24f;margin-bottom:3px}.tpc-card small{letter-spacing:2px;color:#bca46c;font-size:9px}
+.tpc-card h2{margin:8px 0;color:#f1ce73;font-size:23px}.tpc-card p{margin:0 4px 18px;color:#b8c3c9;font-size:13px;line-height:1.45}
+.tpc-card .wide{width:100%;margin-top:7px;min-height:44px}
+
+/* PASS 34 — equipment feedback on the living home */
+.territory-home-loadout{position:absolute;left:50%;top:68.2%;transform:translateX(-50%);z-index:28;width:min(76%,285px);pointer-events:none;text-align:center;font-family:system-ui,sans-serif;filter:drop-shadow(0 5px 10px #0009)}
+.loadout-title{display:inline-block;padding:3px 9px;border:1px solid #a8874d99;border-radius:8px;background:#07131be8;color:#f0d18a;font-size:8px;font-weight:900;letter-spacing:1px}
+.loadout-slots{display:flex;justify-content:center;gap:4px;margin-top:5px}
+.loadout-slot{width:29px;height:31px;border:1px solid #63717a99;border-radius:7px;background:#071018dd;box-shadow:0 3px 8px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:.55}
+.loadout-slot.filled{opacity:1}
+.loadout-slot span{font-size:14px;line-height:14px}.loadout-slot small{font-size:6px;color:#aeb9bf;margin-top:2px}
+.loadout-slot.rarity-uncommon{border-color:#76ad7c}.loadout-slot.rarity-rare{border-color:#65a9dc;box-shadow:0 0 8px #4c9cdb33}.loadout-slot.rarity-epic{border-color:#b184dc;box-shadow:0 0 10px #a56be044}.loadout-slot.rarity-legendary{border-color:#e0b75f;box-shadow:0 0 13px #e0b75f55}
+.loadout-caption{margin-top:3px;color:#aeb8bd;font-size:7px;text-shadow:0 2px 3px #000}
+.territory-equip-toast{position:absolute;left:50%;top:34%;transform:translate(-50%,8px) scale(.84);z-index:70;padding:7px 12px;border:1px solid #d7ad55;border-radius:10px;background:#07131bf2;color:#f7df9e;font:800 10px system-ui,sans-serif;white-space:nowrap;opacity:0;pointer-events:none;box-shadow:0 7px 18px #000a}
+.territory-equip-toast.show{animation:territoryEquipToast 1.5s ease-out forwards}
+.home-reference-host.home-gear-rare .life-hero .hero-aura,.home-reference-host.home-gear-epic .life-hero .hero-aura,.home-reference-host.home-gear-legendary .life-hero .hero-aura{opacity:.7}
+.home-reference-host.home-gear-epic .life-hero{filter:drop-shadow(0 14px 12px #0008) drop-shadow(0 0 10px #9a6ed855)}
+.home-reference-host.home-gear-legendary .life-hero{filter:drop-shadow(0 14px 12px #0008) drop-shadow(0 0 15px #e2bd6255)}
+.home-reference-host.home-gear-epic .life-hero .hero-weapon,.home-reference-host.home-gear-legendary .life-hero .hero-weapon{filter:drop-shadow(0 5px 3px #000b) drop-shadow(0 0 6px #e2bd6266)}
+@keyframes territoryEquipToast{0%{opacity:0;transform:translate(-50%,9px) scale(.84)}18%{opacity:1;transform:translate(-50%,0) scale(1)}72%{opacity:1;transform:translate(-50%,-3px) scale(1)}100%{opacity:0;transform:translate(-50%,-18px) scale(.94)}}
+@media(max-width:390px){.territory-home-loadout{top:69.2%;width:min(82%,285px)}.loadout-slot{width:27px;height:29px}.loadout-slot span{font-size:13px}.territory-equip-toast{top:33%;font-size:9px}}
+@media(prefers-reduced-motion:reduce){.territory-equip-toast.show{animation:none;opacity:1}}
