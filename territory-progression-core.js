@@ -434,3 +434,27 @@ function render(){const host=document.getElementById('hero');if(!host)return;sty
 function mount(){const tick=()=>setTimeout(render,180);['territory:state-changed','territory:inventory-equipped'].forEach(e=>window.addEventListener(e,tick));const obs=new MutationObserver(()=>{if(document.getElementById('hero')?.classList.contains('active'))render()});obs.observe(document.body,{childList:true,subtree:true});setTimeout(render,1900)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();window.TerritoryForgeAdvisor={render,analyze};
 })();
+
+/* TERRITORY PASS 47 — ELIXIR LOADOUT CENTER
+ * UI-only loadout overview. Reads existing elixir state; never grants, consumes, or changes elixirs automatically.
+ */
+(function(){
+'use strict';
+const NS='territory-elixir-loadout';
+const S=()=>window.TerritoryStore?.state||{};
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function list(){const s=S(),raw=s.elixirs;let arr=[];
+ if(Array.isArray(raw)) arr=raw.map((x,i)=>({x,i}));
+ else if(raw&&typeof raw==='object') arr=Object.entries(raw).map(([k,x],i)=>({x,i,key:k}));
+ else if(Number(raw)>0) arr=[{x:Number(raw),i:0}];
+ return arr.filter(a=>a.x!=null&&a.x!==false&&a.x!=='');
+}
+function label(a){const x=a.x;if(typeof x==='string')return x;if(typeof x==='number')return `Эликсир ×${x}`;return x?.name||x?.title||x?.label||a.key||`Эликсир ${a.i+1}`}
+function qty(a){const x=a.x;if(typeof x==='number')return x;return Number(x?.count??x?.qty??x?.amount??x?.quantity??1)||1}
+function style(){if(document.getElementById(NS+'-style'))return;const st=document.createElement('style');st.id=NS+'-style';st.textContent=`
+#hero .tel{margin:10px 0;padding:12px;border-radius:16px;background:linear-gradient(180deg,rgba(90,190,170,.055),rgba(255,255,255,.018));border:1px solid rgba(90,190,170,.17);color:#eef3f5}.tel-head{display:flex;align-items:center;gap:9px}.tel-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:rgba(90,190,170,.09);font-size:20px}.tel-head b{display:block;font-size:11px;letter-spacing:.8px}.tel-head small{display:block;margin-top:3px;font-size:8px;opacity:.48}.tel-count{margin-left:auto;text-align:center;padding:6px 8px;border-radius:9px;background:rgba(255,255,255,.04);font-size:7px;opacity:.7}.tel-count b{display:block;font-size:13px;opacity:1}.tel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:9px}.tel-item{min-height:42px;padding:8px;border-radius:10px;background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.055)}.tel-item b{display:block;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tel-item small{display:block;margin-top:3px;font-size:7px;opacity:.48}.tel-ready{margin-top:8px;padding:9px;border-radius:10px;background:rgba(90,190,170,.045);border:1px solid rgba(90,190,170,.13);font-size:8px}.tel-ready strong{font-size:10px}.tel-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}.tel-actions button{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.045);color:inherit;border-radius:10px;padding:9px 5px;font-size:8px;font-weight:900}.tel-actions .primary{border-color:rgba(90,190,170,.27);background:rgba(90,190,170,.09)}.tel-note{margin-top:7px;text-align:center;font-size:7px;opacity:.38}@media(max-width:380px){.tel-grid{gap:4px}.tel-item{padding:7px}}
+`;document.head.appendChild(st)}
+function render(){const host=document.getElementById('hero');if(!host)return;style();let box=host.querySelector('.tel');if(!box){box=document.createElement('section');box.className='tel';host.appendChild(box)}const a=list(),total=a.reduce((n,v)=>n+qty(v),0),slots=a.length;const names=a.slice(0,6).map(v=>`<div class="tel-item"><b>🧪 ${esc(label(v))}</b><small>В наличии: ${qty(v)}</small></div>`).join('');box.innerHTML=`<div class="tel-head"><div class="tel-icon">🧪</div><div><b>ЭЛИКСИРЫ — БОЕВОЙ НАБОР</b><small>Быстрый контроль расходников перед боем</small></div><div class="tel-count"><b>${total}</b>ШТ.</div></div>${slots?`<div class="tel-grid">${names}</div>`:`<div class="tel-ready">🧪 <strong>Набор пока пуст.</strong><br>Эликсиры можно открыть через существующий магазин.</div>`}<div class="tel-ready">${slots?`⚡ <strong>${slots} вида${slots===1?'':'ов'} готовы к использованию.</strong> Перед боем проверь набор и не трать расходники зря.`:'💡 Собери первый набор — это отдельная механика Territory.'}</div><div class="tel-actions"><button class="primary" data-tel="shop">🧪 ОТКРЫТЬ ЭЛИКСИРЫ</button><button data-tel="battle">⚔️ В БОЙ</button></div><div class="tel-note">Блок только показывает существующее состояние. Ничего не покупает, не выдаёт и не расходует автоматически.</div>`;box.querySelector('[data-tel="shop"]').onclick=()=>window.TerritoryNavigation?.go?.('shop');box.querySelector('[data-tel="battle"]').onclick=()=>{if(window.TerritoryNavigation?.go)window.TerritoryNavigation.go('battle');else window.HomeRebuild?.startRunner?.()}}
+function mount(){const tick=()=>setTimeout(render,220);['territory:state-changed','territory:inventory-equipped'].forEach(e=>window.addEventListener(e,tick));const obs=new MutationObserver(()=>{if(document.getElementById('hero')?.classList.contains('active'))render()});obs.observe(document.body,{childList:true,subtree:true});setTimeout(render,2100)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();window.TerritoryElixirLoadout={render,list};
+})();
