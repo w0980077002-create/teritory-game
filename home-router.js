@@ -1,24 +1,22 @@
-/* Territory Game — HOME INPUT ROUTER 10065
-   Single touch/pointer/click fallback for the baked HOME artwork.
-   No transparent overlay is created. */
+/* Territory Game — HOME ROUTER 10066
+   Mobile-safe single-action router.
+   Goals: one tap = one action, safe missing-screen fallback, no accidental
+   Forge/shop double route, and background PvE preload to reduce white loading.
+*/
 (function(){
   'use strict';
 
   const S=()=>window.TerritoryStore?.state||{};
   let busyUntil=0;
+  let preloadPromise=null;
 
-  function isHome(){
-    return !!document.querySelector('#home.screen.active');
-  }
+  function isHome(){ return !!document.querySelector('#home.screen.active'); }
 
   function coords(e){
-    const p=e.touches?.[0] || e.changedTouches?.[0] || e;
+    const p=e.changedTouches?.[0] || e.touches?.[0] || e;
     const w=Math.max(1,window.innerWidth||document.documentElement.clientWidth||1);
     const h=Math.max(1,window.innerHeight||document.documentElement.clientHeight||1);
-    return {
-      x:(Number(p.clientX)||0)/w*100,
-      y:(Number(p.clientY)||0)/h*100
-    };
+    return {x:(Number(p?.clientX)||0)/w*100,y:(Number(p?.clientY)||0)/h*100};
   }
 
   const Z=[
@@ -36,126 +34,128 @@
 
   function hit(x,y){
     for(const z of Z){
-      if(x>=z[1] && x<=z[1]+z[3] && y>=z[2] && y<=z[2]+z[4]) return z[0];
+      if(x>=z[1]&&x<=z[1]+z[3]&&y>=z[2]&&y<=z[2]+z[4]) return z[0];
     }
     return null;
   }
 
-  function show(id){ if(typeof window.showScreen==='function') window.showScreen(id); }
+  function panel(title,body,buttonText='🏠 ВЕРНУТЬСЯ'){
+    let p=document.getElementById('homeRouterPanel10066');
+    if(!p){
+      p=document.createElement('div');p.id='homeRouterPanel10066';
+      p.style.cssText='position:fixed;inset:0;z-index:12000;background:rgba(7,12,18,.98);color:#fff;display:none;align-items:center;justify-content:center;padding:22px;font-family:system-ui,sans-serif';
+      document.body.appendChild(p);
+    }
+    p.innerHTML='<div style="width:min(520px,100%);border:1px solid rgba(255,255,255,.16);border-radius:22px;padding:24px;background:linear-gradient(180deg,#172331,#0d141d);box-shadow:0 20px 60px rgba(0,0,0,.45)"><h2 style="margin:0 0 12px">'+title+'</h2><div style="line-height:1.5;opacity:.9">'+body+'</div><button id="homeRouterPanelClose10066" style="margin-top:20px;width:100%;padding:14px;border:0;border-radius:14px;font-weight:800;font-size:16px">'+buttonText+'</button></div>';
+    p.style.display='flex';
+    p.querySelector('#homeRouterPanelClose10066').onclick=()=>{p.style.display='none';window.showScreen?.('home')};
+  }
+
+  function safeShow(id,title){
+    const aliases={market:'shop',casino:'games',districts:'quests'};
+    const target=aliases[id]||id;
+    if(document.getElementById(target)){window.showScreen?.(target);return true;}
+    panel(title||'Раздел',`Раздел <b>${target}</b> пока не подключён к текущему экрану. Игра продолжает работать без пустого экрана.`);
+    return false;
+  }
 
   function loadArena(){
-    /* Current index.html has no arenaModal and no arena.css.
-       Build those missing runtime pieces before loading ArenaGame. */
-    if(!document.getElementById('arenaModal')){
-      const m=document.createElement('div');
-      m.id='arenaModal';
-      m.className='arena-modal';
-      m.setAttribute('aria-hidden','true');
+    if(!document.getElementById('arenaModal10066') && !document.getElementById('arenaModal')){
+      const m=document.createElement('div');m.id='arenaModal';m.className='arena-modal';m.setAttribute('aria-hidden','true');
       m.innerHTML='<div class="arena-sheet"><header class="arena-modal-head"><h2>⚔️ АРЕНА</h2><button type="button" class="arena-close" id="arenaClose">×</button></header><main id="arenaModalBody"></main></div>';
       document.body.appendChild(m);
     }
-    if(!document.getElementById('arenaCss10065')){
-      const css=document.createElement('link');
-      css.id='arenaCss10065';
-      css.rel='stylesheet';
-      css.href='arena.css?v=10065';
-      document.head.appendChild(css);
+    if(!document.getElementById('arenaCss10066')){
+      const css=document.createElement('link');css.id='arenaCss10066';css.rel='stylesheet';css.href='arena.css?v=10066';document.head.appendChild(css);
     }
-    if(window.ArenaGame?.open) return window.ArenaGame.open();
-    const old=document.querySelector('script[data-arena-input-10065]');
-    if(old) return;
-    const s=document.createElement('script');
-    s.dataset.arenaInput10060='1';
-    s.src='arena.js?v=10060';
-    s.onload=()=>window.ArenaGame?.open?.();
-    s.onerror=()=>show('arena');
-    document.body.appendChild(s);
-  }
-
-  function battle(){
-    return loadPvE().then(()=>window.PvEFlow?.startRunner?.());
+    if(window.ArenaGame?.open)return Promise.resolve(window.ArenaGame.open());
+    const old=document.querySelector('script[data-arena-input-10066]');
+    if(old)return new Promise(resolve=>{let n=0;const t=setInterval(()=>{if(window.ArenaGame?.open){clearInterval(t);window.ArenaGame.open();resolve()}if(++n>80){clearInterval(t);resolve()}},25)});
+    return new Promise(resolve=>{
+      const s=document.createElement('script');s.dataset.arenaInput10066='1';s.src='arena.js?v=10066';
+      s.onload=()=>{window.ArenaGame?.open?.();resolve()};s.onerror=()=>{panel('Арена','Не удалось загрузить модуль Арены.');resolve()};document.body.appendChild(s);
+    });
   }
 
   function loadPvE(){
-    const cssId='pveCss10065', flowId='pveFlow10065', battleId='pveBattle10065';
-    const addCss=(id,href)=>{if(document.getElementById(id))return;const l=document.createElement('link');l.id=id;l.rel='stylesheet';l.href=href+'?v=10065';document.head.appendChild(l)};
-    const addJs=(id,src)=>new Promise(resolve=>{const old=document.getElementById(id);if(old){resolve();return}const s=document.createElement('script');s.id=id;s.src=src+'?v=10065';s.onload=()=>resolve();s.onerror=()=>resolve();document.body.appendChild(s)});
-    addCss(cssId,'pve-flow.css');addCss('pveBattleCss10065','pve-battle.css');
-    return addJs(flowId,'pve-flow.js').then(()=>addJs(battleId,'pve-battle.js'));
+    if(preloadPromise)return preloadPromise;
+    const addCss=(id,href)=>{if(document.getElementById(id))return;const l=document.createElement('link');l.id=id;l.rel='stylesheet';l.href=href+'?v=10066';document.head.appendChild(l)};
+    const addJs=(id,src)=>new Promise(resolve=>{const old=document.getElementById(id);if(old){resolve();return}const s=document.createElement('script');s.id=id;s.src=src+'?v=10066';s.onload=resolve;s.onerror=resolve;document.body.appendChild(s)});
+    addCss('pveCss10066','pve-flow.css');addCss('pveBattleCss10066','pve-battle.css');
+    preloadPromise=addJs('pveFlow10066','pve-flow.js').then(()=>addJs('pveBattle10066','pve-battle.js'));
+    return preloadPromise;
+  }
+
+  function preload(){
+    if(document.visibilityState==='hidden')return;
+    try{loadPvE()}catch(_){}
+  }
+
+  function battle(){
+    return loadPvE().then(()=>{
+      if(window.PvEFlow?.startRunner)return window.PvEFlow.startRunner();
+      panel('Бой','Модуль боя ещё загружается. Нажми «Бой» ещё раз через секунду.');
+    });
   }
 
   function gear(i){
-    const st=S();
-    st.selectedEquipmentSlot=Math.max(0,Math.min(6,Number(i)||0));
-    window.TerritoryStore?.saveNow?.('home-gear-select-10060');
-    if(window.showScreen) show('hero');
+    const st=S();st.selectedEquipmentSlot=Math.max(0,Math.min(6,Number(i)||0));
+    window.TerritoryStore?.saveNow?.('home-gear-select-10066');safeShow('hero','Герой');
   }
 
   function elixir(i){
     const ids=['elixir_hp','elixir_energy','elixir_attack','elixir_guard'];
     const fn=window.CombatItems?.use;
-    if(typeof fn==='function'){ try{fn.call(window.CombatItems,ids[i]);return;}catch(_){} }
-    show('shop');
+    if(typeof fn==='function'){try{fn.call(window.CombatItems,ids[i]);return}catch(_){}
+    }
+    safeShow('shop','Зелья');
   }
 
   function route(k){
-    if(k==='battle') return battle();
-    if(k==='arena') return loadArena();
-
-    if(k==='inventory') return show('inventory');
-    if(k==='hero'||k==='profile') return show('hero');
-    if(k==='bottomQuests'||k==='leftQuests') return show('quests');
-    if(k==='games') return show('games');
-    if(k==='clan') return show('clan');
-    if(k==='shop') return show('shop');
-    if(k==='forge') return window.ForgeV2?.open?.() || show('shop');
-    if(k==='chapter') return loadPvE().then(flow=>flow?.open?.());
-
-    if(k.startsWith('gear')) return gear(Number(k.slice(4)));
-    if(k.startsWith('elixir')) return elixir(Number(k.slice(6)));
-
-    if(['events','daily','friends','sea','challenges','streets'].includes(k)){
-      return show('districts');
+    if(k==='home')return safeShow('home','Главный экран');
+    if(k==='battle')return battle();
+    if(k==='arena')return loadArena();
+    if(k==='inventory')return safeShow('inventory','Инвентарь');
+    if(k==='hero'||k==='profile')return safeShow('hero','Герой');
+    if(k==='bottomQuests'||k==='leftQuests')return safeShow('quests','Квесты');
+    if(k==='games')return safeShow('games','Игры');
+    if(k==='clan')return safeShow('clan','Клан');
+    if(k==='shop')return safeShow('shop','Магазин');
+    if(k==='forge'){
+      if(typeof window.ForgeV2?.open==='function'){window.ForgeV2.open();return;}
+      return safeShow('shop','Кузница');
     }
+    if(k==='chapter')return loadPvE().then(()=>window.PvEFlow?.open?.());
+    if(k==='profile')return safeShow('hero','Герой');
+    if(['events','daily','friends','sea','challenges','streets'].includes(k))return safeShow('quests','Задания');
+    if(['coins','gems','redgems','energy'].includes(k))return panel('Ресурс',`Текущий баланс: <b>${k}</b>.`);
+    if(k==='trophy')return safeShow('roadmap','Достижения');
+    if(k==='messages')return panel('Сообщения','Здесь будет внутриигровая почта и системные уведомления.');
+    if(k==='settings')return panel('Настройки','Настройки игры подключим отдельным экраном.');
+    if(k.startsWith('gear'))return gear(Number(k.slice(4)));
+    if(k.startsWith('elixir'))return elixir(Number(k.slice(6)));
   }
 
-  function isNativeControl(e){
-    const t=e.target?.closest?.('button,a,input,select,textarea,[role="button"]');
-    return !!t;
-  }
-
-  let lastActivation=0;
-  let lastKey='';
-  function activate(e){
-    if(!isHome() || isNativeControl(e)) return;
-    const {x,y}=coords(e);
-    const k=hit(x,y);
-    if(!k)return;
-    const now=performance.now();
-    const key=k+'|'+Math.round(x*10)+'|'+Math.round(y*10);
-    if(now-lastActivation<650 && key===lastKey)return;
-    lastActivation=now;lastKey=key;
+  function handle(e){
+    if(!isHome())return;
+    if(performance.now()<busyUntil)return;
+    const {x,y}=coords(e),k=hit(x,y);if(!k)return;
+    busyUntil=performance.now()+650;
     if(e.cancelable)e.preventDefault();
     e.stopImmediatePropagation();
-    route(k);
+    try{route(k)}catch(err){panel('Ошибка перехода','Раздел не смог открыться. HOME сохранён, пустого экрана не будет.');}
   }
 
-  /* One activation path: pointerup on modern Android/WebView, touchend fallback for older WebViews. */
-  window.addEventListener('pointerup',activate,{capture:true,passive:false});
-  window.addEventListener('touchend',activate,{capture:true,passive:false});
+  /* One primary gesture only. This avoids touchstart/pointerdown/pointerup/click
+     firing the same HOME action several times on Android WebView. */
+  window.addEventListener('pointerup',handle,{capture:true,passive:false});
   window.addEventListener('click',function(e){
-    if(!isHome() || isNativeControl(e))return;
-    const {x,y}=coords(e),k=hit(x,y);
-    if(!k)return;
-    const now=performance.now(),key=k+'|'+Math.round(x*10)+'|'+Math.round(y*10);
-    if(now-lastActivation<650 && key===lastKey){
-      if(e.cancelable)e.preventDefault();
-      e.stopImmediatePropagation();
-      return;
-    }
-    activate(e);
-  },{capture:true});
+    if(performance.now()<busyUntil){if(e.cancelable)e.preventDefault();e.stopImmediatePropagation();return}
+    handle(e);
+  },{capture:true,passive:false});
 
-  window.addEventListener('territory:screen',()=>{lastActivation=0;lastKey='';});
-  window.addEventListener('territory:render',()=>{lastActivation=0;lastKey='';});
+  window.addEventListener('territory:screen',()=>{busyUntil=0});
+  window.addEventListener('territory:render',()=>{busyUntil=0});
+  window.addEventListener('load',()=>setTimeout(preload,900),{once:true});
+  setTimeout(preload,1400);
 })();

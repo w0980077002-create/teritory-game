@@ -1,20 +1,19 @@
-# TERRITORY REAL GAME HOTFIX 65
+# TERRITORY — HOTFIX 10066
 
-This patch is built from the actual `teritory-game` files supplied in chat.
+Цель: стабилизировать HOME и убрать лишние/двойные срабатывания на телефоне.
 
-## Fixes
-- HOME coordinate router now uses a single pointer-up/touch-end activation path instead of firing on touchstart + pointerdown + pointerup.
-- HOME router ignores real HTML controls, preventing the coordinate fallback from opening a different screen after a real button tap.
-- Duplicate taps are suppressed for a short window.
-- Added the 7th equipment slot to the HOME hit map.
-- Arena close/back taps get a dedicated pointer/touch fallback and de-duplication.
-- PvE battle close/back gets a dedicated pointer/touch fallback and always returns to HOME.
-- No gameplay balance or progression changes.
+Изменён только `home-router.js`.
 
-## Overlay
-Replace only:
-- home-router.js
-- arena.js
-- pve-battle.js
+Что сделано:
+- один основной мобильный жест `pointerup` + защищённый `click` fallback;
+- убраны touchstart/pointerdown, которые могли запускать один тап несколько раз;
+- безопасный `safeShow()` — отсутствующий экран больше не должен оставлять белый/пустой экран;
+- верхние кнопки HOME имеют маршруты/fallback;
+- добавлен `gear6`;
+- Forge больше не проваливается в Shop после успешного `ForgeV2.open()`;
+- PvE CSS/JS начинают загружаться в фоне после открытия игры, чтобы сократить белое окно загрузки;
+- Arena/PvE получают версию `10066` для обхода старого кэша;
+- старые игровые системы и данные не трогаются.
 
-Do not delete other files.
+Накладывать поверх текущего проекта с заменой `home-router.js`.
+Проверка JS: `node --check home-router.js`.
