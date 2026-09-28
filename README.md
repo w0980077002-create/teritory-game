@@ -1,19 +1,16 @@
-# TERRITORY — HOTFIX 10066
+# TERRITORY — BACK NAVIGATION HOTFIX 10068
 
-Цель: стабилизировать HOME и убрать лишние/двойные срабатывания на телефоне.
+Fixes Android/browser Back navigation for game screens opened from HOME.
 
-Изменён только `home-router.js`.
+## What changed
+- Adds one controlled history entry when opening HOME sections.
+- Android/browser Back now returns from Hero, Inventory, Quests, Shop, Forge fallback, Arena, PvE, Games, Clan and other routed screens to HOME.
+- Closes Arena/PvE overlays before returning HOME.
+- Avoids adding duplicate history entries during Back handling.
+- Does not modify TerritoryStore, combat rules, economy, progression, or save data.
 
-Что сделано:
-- один основной мобильный жест `pointerup` + защищённый `click` fallback;
-- убраны touchstart/pointerdown, которые могли запускать один тап несколько раз;
-- безопасный `safeShow()` — отсутствующий экран больше не должен оставлять белый/пустой экран;
-- верхние кнопки HOME имеют маршруты/fallback;
-- добавлен `gear6`;
-- Forge больше не проваливается в Shop после успешного `ForgeV2.open()`;
-- PvE CSS/JS начинают загружаться в фоне после открытия игры, чтобы сократить белое окно загрузки;
-- Arena/PvE получают версию `10066` для обхода старого кэша;
-- старые игровые системы и данные не трогаются.
+## Install
+Overlay `home-router.js` over the current project and replace the old file.
 
-Накладывать поверх текущего проекта с заменой `home-router.js`.
-Проверка JS: `node --check home-router.js`.
+## Version
+10068

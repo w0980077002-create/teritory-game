@@ -1,4 +1,4 @@
-/* Territory Game — HOME ROUTER 10066
+/* Territory Game — HOME ROUTER 10068
    Mobile-safe single-action router.
    Goals: one tap = one action, safe missing-screen fallback, no accidental
    Forge/shop double route, and background PvE preload to reduce white loading.
@@ -9,6 +9,9 @@
   const S=()=>window.TerritoryStore?.state||{};
   let busyUntil=0;
   let preloadPromise=null;
+  let historyReady=false;
+  let historyBusy=false;
+  const HISTORY_KEY='territory-screen-10068';
 
   function isHome(){ return !!document.querySelector('#home.screen.active'); }
 
@@ -39,50 +42,91 @@
     return null;
   }
 
+  function currentScreen(){
+    return document.body?.dataset?.screen || (document.querySelector('.screen.active')?.id) || 'home';
+  }
+
+  function closeOverlays(){
+    try{ window.ArenaGame?.close?.(); }catch(_){}
+    try{ window.PvEBattle?.close?.(); }catch(_){}
+    try{ window.PvEFlow?.close?.(); }catch(_){}
+    document.querySelectorAll('.arena-modal.show,.pve-battle.show,.pve-flow.show').forEach(x=>x.classList.remove('show'));
+    const panel=document.getElementById('homeRouterPanel10068');
+    if(panel)panel.style.display='none';
+  }
+
+  function initHistory(){
+    if(historyReady)return;
+    historyReady=true;
+    const st=history.state;
+    if(!st || st.__territoryRouter!==HISTORY_KEY){
+      history.replaceState({__territoryRouter:HISTORY_KEY,screen:'home',root:true},'',location.href);
+    }
+    window.addEventListener('popstate',function(){
+      historyBusy=true;
+      closeOverlays();
+      window.showScreen?.('home');
+      setTimeout(()=>{historyBusy=false;busyUntil=performance.now()+350},0);
+    },false);
+  }
+
+  function enterHistory(screen){
+    initHistory();
+    if(historyBusy)return;
+    const current=currentScreen();
+    if(screen==='home'){
+      if(current!=='home')history.back();
+      return;
+    }
+    if(current===screen)return;
+    history.pushState({__territoryRouter:HISTORY_KEY,screen},'',location.href);
+  }
+
   function panel(title,body,buttonText='🏠 ВЕРНУТЬСЯ'){
-    let p=document.getElementById('homeRouterPanel10066');
+    let p=document.getElementById('homeRouterPanel10068');
     if(!p){
-      p=document.createElement('div');p.id='homeRouterPanel10066';
+      p=document.createElement('div');p.id='homeRouterPanel10068';
       p.style.cssText='position:fixed;inset:0;z-index:12000;background:rgba(7,12,18,.98);color:#fff;display:none;align-items:center;justify-content:center;padding:22px;font-family:system-ui,sans-serif';
       document.body.appendChild(p);
     }
-    p.innerHTML='<div style="width:min(520px,100%);border:1px solid rgba(255,255,255,.16);border-radius:22px;padding:24px;background:linear-gradient(180deg,#172331,#0d141d);box-shadow:0 20px 60px rgba(0,0,0,.45)"><h2 style="margin:0 0 12px">'+title+'</h2><div style="line-height:1.5;opacity:.9">'+body+'</div><button id="homeRouterPanelClose10066" style="margin-top:20px;width:100%;padding:14px;border:0;border-radius:14px;font-weight:800;font-size:16px">'+buttonText+'</button></div>';
+    p.innerHTML='<div style="width:min(520px,100%);border:1px solid rgba(255,255,255,.16);border-radius:22px;padding:24px;background:linear-gradient(180deg,#172331,#0d141d);box-shadow:0 20px 60px rgba(0,0,0,.45)"><h2 style="margin:0 0 12px">'+title+'</h2><div style="line-height:1.5;opacity:.9">'+body+'</div><button id="homeRouterPanelClose10068" style="margin-top:20px;width:100%;padding:14px;border:0;border-radius:14px;font-weight:800;font-size:16px">'+buttonText+'</button></div>';
     p.style.display='flex';
-    p.querySelector('#homeRouterPanelClose10066').onclick=()=>{p.style.display='none';window.showScreen?.('home')};
+    p.querySelector('#homeRouterPanelClose10068').onclick=()=>{p.style.display='none';window.showScreen?.('home');enterHistory('home')};
   }
 
   function safeShow(id,title){
     const aliases={market:'shop',casino:'games',districts:'quests'};
     const target=aliases[id]||id;
-    if(document.getElementById(target)){window.showScreen?.(target);return true;}
+    if(document.getElementById(target)){enterHistory(target);window.showScreen?.(target);return true;}
     panel(title||'Раздел',`Раздел <b>${target}</b> пока не подключён к текущему экрану. Игра продолжает работать без пустого экрана.`);
     return false;
   }
 
   function loadArena(){
-    if(!document.getElementById('arenaModal10066') && !document.getElementById('arenaModal')){
+    enterHistory('arena');
+    if(!document.getElementById('arenaModal10068') && !document.getElementById('arenaModal')){
       const m=document.createElement('div');m.id='arenaModal';m.className='arena-modal';m.setAttribute('aria-hidden','true');
       m.innerHTML='<div class="arena-sheet"><header class="arena-modal-head"><h2>⚔️ АРЕНА</h2><button type="button" class="arena-close" id="arenaClose">×</button></header><main id="arenaModalBody"></main></div>';
       document.body.appendChild(m);
     }
-    if(!document.getElementById('arenaCss10066')){
-      const css=document.createElement('link');css.id='arenaCss10066';css.rel='stylesheet';css.href='arena.css?v=10066';document.head.appendChild(css);
+    if(!document.getElementById('arenaCss10068')){
+      const css=document.createElement('link');css.id='arenaCss10068';css.rel='stylesheet';css.href='arena.css?v=10068';document.head.appendChild(css);
     }
     if(window.ArenaGame?.open)return Promise.resolve(window.ArenaGame.open());
-    const old=document.querySelector('script[data-arena-input-10066]');
+    const old=document.querySelector('script[data-arena-input-10068]');
     if(old)return new Promise(resolve=>{let n=0;const t=setInterval(()=>{if(window.ArenaGame?.open){clearInterval(t);window.ArenaGame.open();resolve()}if(++n>80){clearInterval(t);resolve()}},25)});
     return new Promise(resolve=>{
-      const s=document.createElement('script');s.dataset.arenaInput10066='1';s.src='arena.js?v=10066';
+      const s=document.createElement('script');s.dataset.arenaInput10068='1';s.src='arena.js?v=10068';
       s.onload=()=>{window.ArenaGame?.open?.();resolve()};s.onerror=()=>{panel('Арена','Не удалось загрузить модуль Арены.');resolve()};document.body.appendChild(s);
     });
   }
 
   function loadPvE(){
     if(preloadPromise)return preloadPromise;
-    const addCss=(id,href)=>{if(document.getElementById(id))return;const l=document.createElement('link');l.id=id;l.rel='stylesheet';l.href=href+'?v=10066';document.head.appendChild(l)};
-    const addJs=(id,src)=>new Promise(resolve=>{const old=document.getElementById(id);if(old){resolve();return}const s=document.createElement('script');s.id=id;s.src=src+'?v=10066';s.onload=resolve;s.onerror=resolve;document.body.appendChild(s)});
-    addCss('pveCss10066','pve-flow.css');addCss('pveBattleCss10066','pve-battle.css');
-    preloadPromise=addJs('pveFlow10066','pve-flow.js').then(()=>addJs('pveBattle10066','pve-battle.js'));
+    const addCss=(id,href)=>{if(document.getElementById(id))return;const l=document.createElement('link');l.id=id;l.rel='stylesheet';l.href=href+'?v=10068';document.head.appendChild(l)};
+    const addJs=(id,src)=>new Promise(resolve=>{const old=document.getElementById(id);if(old){resolve();return}const s=document.createElement('script');s.id=id;s.src=src+'?v=10068';s.onload=resolve;s.onerror=resolve;document.body.appendChild(s)});
+    addCss('pveCss10068','pve-flow.css');addCss('pveBattleCss10068','pve-battle.css');
+    preloadPromise=addJs('pveFlow10068','pve-flow.js').then(()=>addJs('pveBattle10068','pve-battle.js'));
     return preloadPromise;
   }
 
@@ -92,6 +136,7 @@
   }
 
   function battle(){
+    enterHistory('pve');
     return loadPvE().then(()=>{
       if(window.PvEFlow?.startRunner)return window.PvEFlow.startRunner();
       panel('Бой','Модуль боя ещё загружается. Нажми «Бой» ещё раз через секунду.');
@@ -100,7 +145,7 @@
 
   function gear(i){
     const st=S();st.selectedEquipmentSlot=Math.max(0,Math.min(6,Number(i)||0));
-    window.TerritoryStore?.saveNow?.('home-gear-select-10066');safeShow('hero','Герой');
+    window.TerritoryStore?.saveNow?.('home-gear-select-10068');safeShow('hero','Герой');
   }
 
   function elixir(i){
@@ -125,7 +170,7 @@
       if(typeof window.ForgeV2?.open==='function'){window.ForgeV2.open();return;}
       return safeShow('shop','Кузница');
     }
-    if(k==='chapter')return loadPvE().then(()=>window.PvEFlow?.open?.());
+    if(k==='chapter'){enterHistory('chapter');return loadPvE().then(()=>window.PvEFlow?.open?.());}
     if(k==='profile')return safeShow('hero','Герой');
     if(['events','daily','friends','sea','challenges','streets'].includes(k))return safeShow('quests','Задания');
     if(['coins','gems','redgems','energy'].includes(k))return panel('Ресурс',`Текущий баланс: <b>${k}</b>.`);
@@ -154,6 +199,7 @@
     handle(e);
   },{capture:true,passive:false});
 
+  initHistory();
   window.addEventListener('territory:screen',()=>{busyUntil=0});
   window.addEventListener('territory:render',()=>{busyUntil=0});
   window.addEventListener('load',()=>setTimeout(preload,900),{once:true});
