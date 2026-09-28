@@ -185,3 +185,67 @@ function mount(){if(bound)return;bound=true;const tick=()=>setTimeout(render,80)
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
 window.TerritorySmartInventory={render};
 })();
+
+/* TERRITORY PASS 38 — HERO BUILD CENTER
+ * A compact build view on the existing #hero screen.
+ * Reads canonical TerritoryStore/equipment/follower data only.
+ */
+(function(){
+'use strict';
+const S=()=>window.TerritoryStore?.state||{};
+const slotNames=['Оружие','Шлем','Доспех','Пояс','Сапоги','Кольцо','Амулет'];
+const slotIcons=['⚔️','🪖','🛡️','🔗','🥾','💍','📿'];
+const statDefs=[['attack','⚔️','Атака',['attack','strength','damage','atk']],['defense','🛡️','Защита',['defense','def','armor','guard']],['agility','⚡','Ловкость',['agility','agi','speed']],['hp','❤️','Max HP',['maxHp','hp','health']]];
+const rarityRank={common:1,uncommon:2,rare:3,epic:4,legendary:5};
+let bound=false;
+function num(it,keys){if(!it||typeof it!=='object')return 0;for(const k of keys){const n=Number(it[k]);if(Number.isFinite(n))return n}return 0}
+function rarity(it){const r=String(it?.rarity||it?.quality||'common').toLowerCase();if(/legend/.test(r))return'legendary';if(/epic|эпич/.test(r))return'epic';if(/rare|редк/.test(r))return'rare';if(/uncommon|необыч/.test(r))return'uncommon';return'common'}
+function rLabel(r){return({common:'обычный',uncommon:'необычный',rare:'редкий',epic:'эпический',legendary:'легендарный'})[r]||r}
+function name(it){return it?.name||it?.title||'Слот пуст'}
+function power(it){if(!it)return 0;return Math.round(num(it,['attack','strength','damage','atk'])+num(it,['defense','def','armor','guard'])+num(it,['agility','agi','speed'])+num(it,['maxHp','hp','health'])/3+num(it,['critChance'])*3+num(it,['damageReduction'])*3+num(it,['bonusXp'])*2+Number(it?.level||1)*1.5+rarityRank[rarity(it)]*8)}
+function esc(v){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function go(action){window.TerritoryNavigation?.go?.(action)}
+function follower(){const f=S().activeFollower||S().follower; if(f&&typeof f==='object')return f;const id=S().activeFollowerId||S().followerId;const cat=window.Followers?.catalog||window.Followers?.list||[];return Array.isArray(cat)?cat.find(x=>x.id===id)||null:null}
+function followerName(f){return f?.name||f?.title||'Лиабро'}
+function followerRole(f){return f?.role||f?.class||'Спутник'}
+function derived(){
+ const ds=window.TerritoryStore?.getDerivedStats?.();
+ if(ds&&typeof ds==='object')return ds;
+ const eq=Array.isArray(S().equipment)?S().equipment:[];
+ return Object.fromEntries(statDefs.map(([k,, ,keys])=>[k,eq.reduce((a,it)=>a+num(it,keys),0)]));
+}
+function currentSet(){
+ const eq=Array.isArray(S().equipment)?S().equipment:[];const ids={};
+ eq.filter(Boolean).forEach(it=>{const id=it?.setId||it?.set||it?.setID;if(id)ids[id]=(ids[id]||0)+1});
+ const rows=Object.entries(ids).sort((a,b)=>b[1]-a[1]);return rows[0]||null;
+}
+function nextUpgrade(){
+ const inv=Array.isArray(S().inventoryItems)?S().inventoryItems:[],eq=Array.isArray(S().equipment)?S().equipment:[];
+ let best=null;
+ inv.forEach(it=>{const type=it?.type||it?.slot;const idx=slotNames.findIndex((_,i)=>['weapon','helmet','armor','belt','boots','ring','amulet'][i]===type);if(idx<0)return;const p=power(it),old=power(eq[idx]);if(p>old+0.5&&(!best||p-power(eq[best.idx])>p-power(eq[best.idx])))best={idx,item:it,p,delta:p-old}});
+ return best;
+}
+function style(){if(document.getElementById('territory-hero-build-style'))return;const st=document.createElement('style');st.id='territory-hero-build-style';st.textContent=`
+#hero .thb{margin:10px 0 88px;padding:12px;border-radius:18px;background:linear-gradient(180deg,rgba(20,25,31,.94),rgba(8,11,15,.94));border:1px solid rgba(220,184,104,.2);box-shadow:0 16px 40px rgba(0,0,0,.28);color:#eef3f5}
+.thb-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.thb-kicker{font-size:8px;letter-spacing:1.3px;opacity:.52}.thb-title{margin:2px 0 0;font-size:18px}.thb-level{font-size:9px;opacity:.62}
+.thb-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}.thb-stat{padding:8px 5px;text-align:center;border-radius:11px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06)}.thb-stat b{display:block;font-size:13px}.thb-stat small{font-size:7px;opacity:.5}
+.thb-section{margin-top:12px}.thb-section-title{font-size:9px;letter-spacing:.8px;opacity:.58;margin-bottom:7px}.thb-gear{display:grid;grid-template-columns:1fr 1fr;gap:6px}.thb-slot{display:flex;align-items:center;gap:8px;padding:8px;border-radius:11px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);min-width:0}.thb-slot b{font-size:9px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.thb-slot small{font-size:7px;opacity:.52;display:block;margin-top:2px}.thb-slot .ico{width:27px;height:27px;display:grid;place-items:center;border-radius:8px;background:rgba(255,255,255,.05);flex:0 0 auto}
+.thb-slot[data-rarity=rare]{border-color:rgba(90,150,255,.28)}.thb-slot[data-rarity=epic]{border-color:rgba(190,100,255,.3)}.thb-slot[data-rarity=legendary]{border-color:rgba(255,190,70,.38);box-shadow:0 0 16px rgba(255,190,70,.06)}
+.thb-follower{display:flex;align-items:center;gap:9px;padding:10px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06)}.thb-follower .face{font-size:24px}.thb-follower b{font-size:11px}.thb-follower small{display:block;font-size:8px;opacity:.55;margin-top:2px}
+.thb-set{padding:10px;border-radius:12px;background:rgba(220,184,104,.06);border:1px solid rgba(220,184,104,.14);font-size:9px}.thb-set strong{font-size:11px}.thb-set span{opacity:.58;margin-left:5px}.thb-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}.thb-actions button{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.045);color:inherit;border-radius:10px;padding:9px 4px;font-size:8px;font-weight:900}.thb-next{margin-top:9px;padding:10px;border-radius:12px;background:rgba(110,210,150,.055);border:1px solid rgba(110,210,150,.16);font-size:9px}.thb-next b{display:block;font-size:10px}.thb-next button{margin-top:7px;border:0;border-radius:9px;padding:8px 10px;background:rgba(110,210,150,.12);color:inherit;font-weight:900;font-size:8px}
+@media(max-width:380px){.thb-stats{grid-template-columns:repeat(2,1fr)}.thb-gear{grid-template-columns:1fr}.thb-actions button{font-size:7px}}
+`;document.head.appendChild(st)}
+function render(){const host=document.getElementById('hero');if(!host)return;style();let box=host.querySelector('.thb');if(!box){box=document.createElement('section');box.className='thb';host.appendChild(box)}
+ const s=S(),ds=derived(),eq=Array.isArray(s.equipment)?s.equipment:Array(7).fill(null),f=follower(),set=currentSet(),up=nextUpgrade(),level=Number(s.level||s.profile?.level)||1;
+ const displayStats=statDefs.map(([k,icon,label])=>`<div class="thb-stat"><b>${icon} ${Math.round(Number(ds?.[k]||0))}</b><small>${label}</small></div>`).join('');
+ const gear=eq.map((it,i)=>{const r=rarity(it);return `<button class="thb-slot" data-thb-slot="${i}" data-rarity="${r}"><span class="ico">${esc(it?.icon||it?.emoji||slotIcons[i])}</span><span style="min-width:0"><b>${esc(name(it))}</b><small>${it?`${rLabel(r)} · Lv.${Number(it.level)||1} · ⚡${power(it)}`:'Слот свободен'}</small></span></button>`}).join('');
+ const setHtml=set?`<div class="thb-set"><strong>🧩 Комплект: ${esc(set[0])}</strong><span>${set[1]} / 7 предметов</span></div>`:`<div class="thb-set"><strong>🧩 Комплект</strong><span>Собери предметы одного сета</span></div>`;
+ const upHtml=up?`<div class="thb-next"><b>⚡ Следующий апгрейд</b>${esc(name(up.item))} · +${up.delta} силы<button data-thb-action="inventory">🎒 ОТКРЫТЬ ИНВЕНТАРЬ</button></div>`:'';
+ box.innerHTML=`<div class="thb-head"><div><div class="thb-kicker">СБОРКА ГЕРОЯ</div><div class="thb-title">${esc(s.name||s.playerName||s.profile?.name||'Игрок')}</div></div><div class="thb-level">Lv.${level}</div></div><div class="thb-stats">${displayStats}</div><div class="thb-section"><div class="thb-section-title">ЭКИПИРОВКА</div><div class="thb-gear">${gear}</div></div><div class="thb-section"><div class="thb-section-title">СПУТНИК</div><div class="thb-follower"><div class="face">${esc(f?.icon||f?.emoji||'👥')}</div><div><b>${esc(followerName(f))}</b><small>${esc(followerRole(f))}</small></div></div></div><div class="thb-section"><div class="thb-section-title">КОМПЛЕКТ</div>${setHtml}</div>${upHtml}<div class="thb-actions"><button data-thb-action="inventory">🎒 Инвентарь</button><button data-thb-action="forge">🔨 Кузница</button><button data-thb-action="home">🏠 Главная</button></div>`;
+ box.querySelectorAll('[data-thb-action]').forEach(b=>b.onclick=()=>go(b.dataset.thbAction));
+ box.querySelectorAll('[data-thb-slot]').forEach(b=>b.onclick=()=>{const idx=Number(b.dataset.thbSlot),it=eq[idx];if(it&&window.TerritoryInventoryCompare?.open)window.TerritoryInventoryCompare.open(it);else go('inventory')});
+}
+function mount(){if(bound)return;bound=true;const tick=()=>setTimeout(render,100);window.addEventListener('territory:state-changed',tick);window.addEventListener('territory:inventory-equipped',tick);const obs=new MutationObserver(()=>{if(document.getElementById('hero')?.classList.contains('active'))render()});obs.observe(document.body,{childList:true,subtree:true});setTimeout(render,500)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+window.TerritoryHeroBuild={render};
+})();
