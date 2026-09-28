@@ -544,3 +544,28 @@ function render(){const host=document.getElementById('home');if(!host)return;sty
 function mount(){const tick=()=>setTimeout(render,180);['territory:state-changed','territory:inventory-equipped','territory:level-up'].forEach(e=>window.addEventListener(e,tick));const obs=new MutationObserver(()=>{if(document.getElementById('home')?.classList.contains('active'))render()});obs.observe(document.body,{childList:true,subtree:true});setTimeout(render,1400)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();window.TerritoryDailyFocus={render};
 })();
+
+/* TERRITORY PASS 52 — UNLOCK ROADMAP CENTER
+ * UI-only progression roadmap. Mirrors the existing progression-core milestones
+ * and never grants/unlocks anything by itself.
+ */
+(function(){
+'use strict';
+const NS='territory-unlock-roadmap';
+const S=()=>window.TerritoryStore?.state||{};
+const n=v=>Number.isFinite(Number(v))?Number(v):0;
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const items=[
+ {lv:2,icon:'⚔️',title:'Бой',sub:'Первый боевой шаг',action:'battle',label:'⚔️ В БОЙ'},
+ {lv:3,icon:'👥',title:'Спутник',sub:'Активный союзник героя',action:'hero',label:'👥 К ГЕРОЮ'},
+ {lv:5,icon:'🧪',title:'Эликсиры',sub:'Боевой набор Territory',action:'shop',label:'🧪 К ЭЛИКСИРАМ'},
+ {lv:10,icon:'🗺️',title:'Следующая ступень',sub:'Путь и карта',action:'map',label:'🗺️ ОТКРЫТЬ ПУТЬ'}
+];
+function style(){if(document.getElementById(NS+'-style'))return;const st=document.createElement('style');st.id=NS+'-style';st.textContent=`
+#home .turm{margin:0 auto 10px;max-width:720px;padding:11px;border-radius:16px;background:linear-gradient(180deg,rgba(75,155,190,.055),rgba(255,255,255,.018));border:1px solid rgba(75,155,190,.16);color:#eef3f5;position:relative;z-index:20}.turm-head{display:flex;align-items:center;gap:8px}.turm-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(75,155,190,.09);font-size:18px}.turm-head b{display:block;font-size:10px;letter-spacing:.8px}.turm-head small{display:block;margin-top:2px;font-size:7px;opacity:.45}.turm-badge{margin-left:auto;padding:6px 8px;border-radius:9px;background:rgba(75,155,190,.07);font-size:7px;text-align:center}.turm-badge b{display:block;font-size:12px}.turm-list{display:grid;gap:5px;margin-top:8px}.turm-row{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:7px;padding:7px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05)}.turm-row.done{border-color:rgba(110,210,150,.16);background:rgba(110,210,150,.025)}.turm-row.current{border-color:rgba(220,184,104,.2);background:rgba(220,184,104,.04)}.turm-row.locked{opacity:.48}.turm-row-icon{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:rgba(255,255,255,.04);font-size:14px}.turm-row b{display:block;font-size:8px}.turm-row small{display:block;margin-top:2px;font-size:6px;opacity:.46}.turm-state{font-size:6px;opacity:.55;text-align:right;white-space:nowrap}.turm-action{margin-top:7px;width:100%;border:1px solid rgba(75,155,190,.22);background:rgba(75,155,190,.08);color:inherit;border-radius:9px;padding:8px 5px;font-size:7px;font-weight:900}.turm-note{margin-top:6px;text-align:center;font-size:6px;opacity:.3}
+`;document.head.appendChild(st)}
+function go(a){if(a==='battle')window.TerritoryNavigation?.go?.('battle');else if(a==='map')window.TerritoryNavigation?.go?.('map');else if(a==='shop')window.TerritoryNavigation?.go?.('shop');else window.TerritoryNavigation?.go?.('hero')}
+function render(){const host=document.getElementById('home');if(!host)return;style();let box=host.querySelector('.turm');if(!box){box=document.createElement('section');box.className='turm';const a=host.querySelector('.tdf');a?a.insertAdjacentElement('afterend',box):host.insertBefore(box,host.firstChild)}const level=n(S().level??S().lvl)||1;let next=null;for(const x of items){if(level<x.lv){next=x;break}}const done=items.filter(x=>level>=x.lv).length;const focus=next||items[items.length-1];box.innerHTML=`<div class="turm-head"><div class="turm-icon">🧭</div><div><b>КАРТА РАЗВИТИЯ</b><small>Что уже открыто и что ждёт впереди</small></div><div class="turm-badge"><b>${done}/${items.length}</b>ШАГОВ</div></div><div class="turm-list">${items.map(x=>{const isDone=level>=x.lv,isCur=!isDone&&x===next;return `<div class="turm-row ${isDone?'done':isCur?'current':'locked'}"><div class="turm-row-icon">${isDone?'✓':x.icon}</div><div><b>Lv.${x.lv} · ${esc(x.title)}</b><small>${esc(x.sub)}</small></div><div class="turm-state">${isDone?'ОТКРЫТО':isCur?'СЛЕДУЮЩЕЕ':'ВПЕРЕДИ'}</div></div>`}).join('')}</div><button class="turm-action" data-turm="${focus.action}">${next?focus.label:'🧭 ПРОВЕРИТЬ ПУТЬ'}</button><div class="turm-note">Только показывает существующие этапы прогрессии. Сам ничего не открывает и не выдаёт.</div>`;box.querySelector('[data-turm]')?.addEventListener('click',e=>go(e.currentTarget.dataset.turm))}
+function mount(){const tick=()=>setTimeout(render,180);['territory:state-changed','territory:level-up'].forEach(e=>window.addEventListener(e,tick));const obs=new MutationObserver(()=>{if(document.getElementById('home')?.classList.contains('active'))render()});obs.observe(document.body,{childList:true,subtree:true});setTimeout(render,1600)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();window.TerritoryUnlockRoadmap={render};
+})();
