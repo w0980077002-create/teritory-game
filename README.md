@@ -1,16 +1,27 @@
-# TERRITORY — BACK NAVIGATION HOTFIX 10068
+# TERRITORY — CLEAN PLAYABLE BASELINE
 
-Fixes Android/browser Back navigation for game screens opened from HOME.
+Это чистая базовая сборка Territory без старых слоёв навигации.
 
-## What changed
-- Adds one controlled history entry when opening HOME sections.
-- Android/browser Back now returns from Hero, Inventory, Quests, Shop, Forge fallback, Arena, PvE, Games, Clan and other routed screens to HOME.
-- Closes Arena/PvE overlays before returning HOME.
-- Avoids adding duplicate history entries during Back handling.
-- Does not modify TerritoryStore, combat rules, economy, progression, or save data.
+## Архитектура
+- `app.js` — единый TerritoryStore и базовые экраны.
+- `navigation.js` — единственный глобальный навигатор.
+- `home-rebuild.js` — HOME и его кнопки.
+- `pve-flow.js` + `pve-battle.js` — отдельный PvE-цикл.
+- `arena.js` + `arena.css` — отдельная Arena 1×1.
+- `forge-v2.js` — безопасная точка входа кузницы.
 
-## Install
-Overlay `home-router.js` over the current project and replace the old file.
+## Правила боя
+- HOME → БОЙ запускает PvE.
+- PvE не открывает Arena.
+- 4 обычные победы дают 100% главы.
+- Босс открывается вручную после 100%.
+- Arena остаётся отдельным режимом.
 
-## Version
-10068
+## Убрано
+Старые `home-router`, `mobile-nav-fix`, `newnav10070`, `navigation-final` и прочие конкурирующие навигационные слои в этой сборке не используются.
+
+## Проверка
+Все JavaScript-файлы проходят `node --check`.
+
+## Важно
+Эта сборка собрана из доступных исходников и загруженных ассетов. В ней сознательно нет неподтверждённых старых хотфиксов и отсутствующих бинарных ассетов, которые нельзя было безопасно восстановить из неполной старой папки.

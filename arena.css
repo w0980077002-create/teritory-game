@@ -101,3 +101,5 @@
 .combat-fx{z-index:120!important;max-width:62%;text-align:center;color:#fff1b0;font-size:12px!important;line-height:1.05;font-weight:1000!important;letter-spacing:.2px;white-space:normal;pointer-events:none;filter:drop-shadow(0 2px 4px #000)}
 .fx-crit{color:#ff5b42!important;font-size:15px!important}.fx-block{color:#8fdcff!important}.fx-hit{color:#ffd36a!important}.fx-miss{color:#dce8ee!important}.fx-heal{color:#72ff9a!important}
 .battle-zone-controls button,.battle-command-row button,.combat-item-slot,.arena-bottom-nav button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.viking-fallback{position:absolute;left:50%;bottom:0;transform:translateX(-50%);font-size:110px;line-height:1;filter:drop-shadow(0 10px 8px #000)}
+.arena-modal.arena-in-battle .battle-stage{background-image:linear-gradient(#0002,#0005),url('./arena-night-approved.png');background-size:cover;background-position:center 54%}

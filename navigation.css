@@ -1,0 +1,2 @@
+/* Single global navigation owner */
+#territoryNav{padding-bottom:env(safe-area-inset-bottom)}#territoryNav.hidden{display:none!important}

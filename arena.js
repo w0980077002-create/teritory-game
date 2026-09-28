@@ -1,4 +1,4 @@
-/* Territory Game — Arena 1×1 isolated tactical engine / HOTFIX 65
+/* Territory Game — Arena 1×1 isolated tactical engine
    IMPORTANT: Arena state is ONLY arenaBattle. PvE runner never uses it. */
 (function(){
   'use strict';
@@ -22,7 +22,7 @@
   function roster(){const l=me().level,n=['Liam','Jack','Ethan','Oliver','Mason','Ryan','Валера','Людмила'];return n.map((name,i)=>({id:'arena-bot-'+i,name,level:Math.max(1,l+i%3-1),class:['duelist','berserker','tank','assassin'][i%4],rating:820+(7-i)*42,wins:18+i*7,losses:6+i*3,isBot:true}));}
   function profile(id){return id==='player'?me():roster().find(x=>x.id===id);}
   function playerFollower(){
-    const id=S().followers?.activeFollower ?? S().activeFollower;
+    const id=S().followers?.activeFollower;
     const f=id&&window.Followers?.get?.(id),cfg=id&&window.Followers?.CATALOG?.[id],stats=id&&window.Followers?.getStats?.(id);
     return f?.owned&&cfg&&stats?{id,data:f,cfg,stats}:null;
   }
@@ -39,14 +39,13 @@
     const d=derived(),s=S();
     const key=side==='player'?String(s.arena?.loadout||'crit'):(p.class==='tank'?'tank':p.class==='assassin'?'dodge':p.class==='berserker'?'crit':'resilience');
     const m=styles[key]||styles.crit;
-    const gs=side==='player'?(window.TerritoryStore?.getArenaGearStats?.()||{}):{};
-    const max=side==='player'?Math.max(1,Number(d.maxHp||s.maxHp)||120)+m.maxHp+Number(gs.maxHp||0):100+p.level*12+m.maxHp;
-    return{id:side,name:p.name,level:p.level,hp:max,maxHp:max,attack:(Number(d.strength)||8)+m.attack+Number(gs.attack||0),defense:(Number(d.defense)||3)+m.defense+Number(gs.defense||0),crit:.06+m.crit+Number(gs.critChance||0)/100,dodge:Math.max(0,.03+m.dodge+Math.min(.12,Number(gs.agility||0)/1000)),damageReduction:Math.min(.25,Number(gs.damageReduction||0)/100),style:key,gearCount:Number(gs.count||0)};
+    const max=side==='player'?Math.max(1,Number(d.maxHp||s.maxHp)||120)+m.maxHp:100+p.level*12+m.maxHp;
+    return{id:side,name:p.name,level:p.level,hp:max,maxHp:max,attack:(Number(d.strength)||8)+m.attack,defense:(Number(d.defense)||3)+m.defense,crit:.06+m.crit,dodge:Math.max(0,.03+m.dodge),style:key};
   }
   function open(){openHub();}
   function openHub(){
     stopTimer();arenaBattle=null;const r=root();if(!r)return;
-    r.modal.classList.remove('arena-in-battle');const gs=window.TerritoryStore?.getArenaGearStats?.()||{};const gearCount=Number(gs.count||0);r.body.innerHTML=`<div class="arena-hub"><div class="arena-hero"><div><small>СОРЕВНОВАТЕЛЬНАЯ АРЕНА</small><h1>⚔️ АРЕНА</h1><p>Тактический бой 1×1. PvE-путь сюда не попадает.</p></div><div class="arena-rating"><span>РЕЙТИНГ</span><b>${me().rating}</b><small>${me().wins} побед · ${me().losses} поражений</small></div></div><div style="margin:10px 0 14px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(220,184,104,.18)"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>⚔️ ARENA-BUILD</b><span style="opacity:.65;font-size:10px">${gearCount}/7 слотов</span></div><div style="margin-top:6px;font-size:10px;opacity:.75">⚔ +${Math.round(gs.attack||0)} · 🛡 +${Math.round(gs.defense||0)} · ⚡ +${Math.round(gs.agility||0)} · ❤️ +${Math.round(gs.maxHp||0)} · 💥 +${(Number(gs.critChance||0)).toFixed(1)}%</div><small style="display:block;margin-top:6px;opacity:.52">Снаряжение берётся из твоих реальных предметов. Кузница усиливает и Arena тоже.</small></div><button class="arena-start" data-arena-find>⚔️ НАЙТИ СОПЕРНИКА</button><div class="arena-section-title"><b>🏆 СОПЕРНИКИ</b></div><div class="arena-top">${roster().map((p,i)=>`<button class="arena-top-row" data-profile-id="${p.id}"><strong>${i+1}</strong><span class="arena-avatar">⚔️</span><span class="arena-player-copy"><b>${esc(p.name)}</b><small>Lv.${p.level} · ${esc(p.class)}</small></span><span class="arena-player-rating">${p.rating}</span></button>`).join('')}</div></div>`;
+    r.modal.classList.remove('arena-in-battle');r.body.innerHTML=`<div class="arena-hub"><div class="arena-hero"><div><small>СОРЕВНОВАТЕЛЬНАЯ АРЕНА</small><h1>⚔️ АРЕНА</h1><p>Тактический бой 1×1. PvE-путь сюда не попадает.</p></div><div class="arena-rating"><span>РЕЙТИНГ</span><b>${me().rating}</b><small>${me().wins} побед · ${me().losses} поражений</small></div></div><button class="arena-start" data-arena-find>⚔️ НАЙТИ СОПЕРНИКА</button><div class="arena-section-title"><b>🏆 СОПЕРНИКИ</b></div><div class="arena-top">${roster().map((p,i)=>`<button class="arena-top-row" data-profile-id="${p.id}"><strong>${i+1}</strong><span class="arena-avatar">⚔️</span><span class="arena-player-copy"><b>${esc(p.name)}</b><small>Lv.${p.level} · ${esc(p.class)}</small></span><span class="arena-player-rating">${p.rating}</span></button>`).join('')}</div></div>`;
     r.modal.classList.add('show');r.modal.setAttribute('aria-hidden','false');
   }
   function openProfile(id){
@@ -60,8 +59,8 @@
     prepareBotPlan();render();startTimer();
   }
   function fighterMarkup(u,side){
-    const src=side==='player'?'./player-viking-approved.png':'./opponent-viking-approved.png';
-    return `<div class="combat-fighter ${side}" data-fighter="${side}"><div class="fighter-name">${esc(u.name)} <small>Lv.${u.level}</small></div><div class="fighter-hp-top"><span class="hp-fill" style="width:${Math.round(u.hp/u.maxHp*100)}%"></span><b>${Math.ceil(u.hp)}/${Math.ceil(u.maxHp)} ❤️</b></div><img class="viking-art viking-image" src="${src}" alt="" draggable="false"><div class="fighter-shadow"></div></div>`;
+    const fallback=side==='player'?'🪓':'🛡️';
+    return `<div class="combat-fighter ${side}" data-fighter="${side}"><div class="fighter-name">${esc(u.name)} <small>Lv.${u.level}</small></div><div class="fighter-hp-top"><span class="hp-fill" style="width:${Math.round(u.hp/u.maxHp*100)}%"></span><b>${Math.ceil(u.hp)}/${Math.ceil(u.maxHp)} ❤️</b></div><div class="viking-fallback" aria-hidden="true">${fallback}</div><div class="fighter-shadow"></div></div>`;
   }
   function render(){
     const r=root();if(!r||!arenaBattle)return;
@@ -144,7 +143,7 @@
     else if(battleDefenseHas(arenaBattle.attackZone)){dmg=Math.max(1,Math.floor(dmg*.25));arenaBattle.logs.push(`🛡️ Блок: ${dmg}`);effect('block','bot',`БЛОК -${dmg}`);animate('bot','block');}
     else if(Math.random()<p.crit){dmg=Math.floor(dmg*1.8);arenaBattle.logs.push(`💥 Критический удар: ${dmg}`);effect('crit','bot',`КРИТИЧЕСКИЙ УДАР -${dmg}`);animate('bot','hurt');}
     else{arenaBattle.logs.push(`⚔️ Ты нанёс ${dmg} урона`);effect('hit','bot',`УДАР В ${zones.find(z=>z[0]===arenaBattle.attackZone)?.[1]?.toUpperCase()||'ЦЕЛЬ'} -${dmg}`);animate('bot','hurt');}
-    b.hp=Math.max(0,b.hp-dmg);arenaBattle.playerReadyAt=Date.now()+arenaBattle.baseCooldown;arenaBattle.botReadyAt=Date.now()+7000+Math.floor(Math.random()*5000);arenaBattle.attackZone=null;
+    b.hp=Math.max(0,b.hp-dmg);arenaBattle.playerReadyAt=Date.now()+arenaBattle.baseCooldown;arenaBattle.botReadyAt=Date.now()+7000+Math.floor(Math.random()*5000);arenaBattle.playerDefense=[];arenaBattle.attackZone=null;
     if(b.hp<=0){setTimeout(()=>finish(true),650);return;}
     setTimeout(()=>{if(!arenaBattle||arenaBattle.ended)return;arenaBattle.busy=false;render();},650);
   }
@@ -158,7 +157,7 @@
   function botTurn(){
     if(!arenaBattle||arenaBattle.ended||arenaBattle.busy)return;
     const p=arenaBattle.player,b=arenaBattle.bot;
-    const atk=arenaBattle.botAttackZone;let dmg=Math.max(1,b.attack-p.defense);dmg=Math.max(1,Math.floor(dmg*(1-(p.damageReduction||0))));
+    const atk=arenaBattle.botAttackZone;let dmg=Math.max(1,b.attack-p.defense);
     const f=playerFollower();
     if(f?.id==='teralel')dmg=Math.max(1,Math.floor(dmg*(1-Math.min(.35,Number(f.stats.defense||0)/200))));
     if(f?.id==='mort'&&Math.random()<Math.min(.4,Number(f.stats.dodge||0)/100)){arenaBattle.logs.push('💨 Морт: уклонение');effect('miss','player');animate('player','dodge');}
@@ -167,7 +166,7 @@
     else{p.hp=Math.max(0,p.hp-dmg);arenaBattle.logs.push(`⚔️ Соперник нанёс ${dmg}`);effect('hit','player');animate('player','hurt');}
     if(f?.id==='king_cows'&&p.hp<p.maxHp){const heal=Math.max(1,Math.round(Number(f.stats.heal||0)));p.hp=Math.min(p.maxHp,p.hp+heal);arenaBattle.logs.push(`❤️ Король Коров: +${heal} HP`);effect('heal','player');}
     if(p.hp<=0){setTimeout(()=>finish(false),650);return;}
-    arenaBattle.turn++;arenaBattle.playerDefense=[];arenaBattle.busy=true;arenaBattle.botReadyAt=0;prepareBotPlan();
+    arenaBattle.turn++;arenaBattle.busy=true;arenaBattle.botReadyAt=0;prepareBotPlan();
     setTimeout(()=>{if(!arenaBattle||arenaBattle.ended)return;arenaBattle.busy=false;render();},650);
   }
   function autoStep(){if(!arenaBattle||arenaBattle.busy||arenaBattle.ended||cooldownLeft()>0||!arenaBattle.auto)return;arenaBattle.playerDefense=[];while(arenaBattle.playerDefense.length<2){const z=zones[Math.floor(Math.random()*zones.length)][0];if(!arenaBattle.playerDefense.includes(z))arenaBattle.playerDefense.push(z);}arenaBattle.attackZone=zones[Math.floor(Math.random()*zones.length)][0];sync();setTimeout(()=>{if(arenaBattle?.auto)executeAttack();},180);}
@@ -175,10 +174,8 @@
   function finish(win){
     if(!arenaBattle||arenaBattle.ended)return;
     arenaBattle.ended=true;stopTimer();
-    const s=S();s.hp=Math.max(0,Math.min(s.maxHp,arenaBattle.player.hp));
-    s.arena=s.arena||{rating:1000,wins:0,losses:0,battles:0,combatSlotsUnlocked:3,loadout:'crit'};
-    s.arena.battles++;
-    if(win){s.arena.wins++;s.arena.rating+=25;s.coins+=50;window.TerritoryStore?.addXp?.(20);arenaBattle.logs.push('🏆 Победа!');}
+    const s=S();s.hp=Math.max(0,Math.min(s.maxHp,arenaBattle.player.hp));s.arena.battles++;
+    if(win){s.arena.wins++;s.arena.rating+=25;s.coins+=50;s.exp+=20;arenaBattle.logs.push('🏆 Победа!');}
     else{s.arena.losses++;s.arena.rating=Math.max(0,s.arena.rating-20);arenaBattle.logs.push('☠️ Поражение.');}
     save();render();sync();
   }
@@ -195,20 +192,11 @@
     else if(slot==='anti_speed_scroll')arenaBattle.playerReadyAt+=10000;
     save();render();
   }
-  function chooseGear(slot){
-    if(!arenaBattle||arenaBattle.ended)return;
-    const slots={weapon:0,helmet:1,armor:2,belt:3,boots:4,ring:5,amulet:6};
-    const index=slots[slot];if(index==null)return;
-    const item=window.TerritoryStore?.getArenaGear?.()?.[index]||S().equipment?.[index];
-    if(!item){arenaBattle.logs.push(`👕 ${gear.find(g=>g[0]===slot)?.[2]||slot}: слот пуст`);render();return;}
-    arenaBattle.logs.push(`👕 ${gear.find(g=>g[0]===slot)?.[2]||slot}: экипировано`);render();
-  }
+  function chooseGear(slot){if(!arenaBattle||arenaBattle.ended)return;const keys=Object.keys(styles),i=keys.indexOf(arenaBattle.player.style),next=keys[(i+1)%keys.length];arenaBattle.player.style=next;arenaBattle.logs.push(`👕 ${slot}: ${styles[next].name}`);render();}
   function toggleChat(t){const box=root()?.body.querySelector('[data-chat]');if(!box)return;const open=box.classList.toggle('collapsed')===false;t.setAttribute('aria-expanded',String(open));}
   function sendChat(){const i=$('[data-chat-input]');if(!i?.value.trim()||!arenaBattle)return;arenaBattle.chat.push({name:me().name,text:i.value.trim()});i.value='';render();root()?.body.querySelector('[data-chat]')?.classList.remove('collapsed');}
   function navigateArena(id){root()?.modal.classList.remove('show');const map={home:'home',inventory:'inventory',hero:'hero',game:'casino',quests:'districts',clan:'districts'};window.showScreen?.(map[id]||'home');}
   function exitBattle(){stopTimer();arenaBattle=null;openHub();}
-  // ONE navigation event path only: mobile browsers synthesize click after touch/pointer.
-  // Do not register pointerup/touchend alongside click — it double-fires Arena actions.
   document.addEventListener('click',e=>{
     const t=e.target.closest?.('button');if(!t)return;
     if(t.id==='arenaClose'){root()?.modal.classList.remove('show');stopTimer();arenaBattle=null;return;}

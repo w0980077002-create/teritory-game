@@ -9,7 +9,7 @@ const DEFAULT={
  followers:{activeFollower:null},
  consumables:{elixir_hp:0,elixir_energy:0,elixir_attack:0,elixir_guard:0,adrenaline:0,speed_scroll:0,anti_speed_scroll:0},
  arena:{rating:1000,wins:0,losses:0,battles:0,combatSlotsUnlocked:3,loadout:'crit',gear:Array(7).fill(null)},
- activeFollower:null,auto:false,
+ activeFollower:null,auto:false,consumables:{elixir_hp:3,elixir_energy:2,elixir_attack:1,elixir_guard:2,adrenaline:1,speed_scroll:1,anti_speed_scroll:1},arena:{rating:1000,wins:0,losses:0,battles:0,loadout:'crit'},
  currentChapter:1,chapterStage:1,chapterProgress:0,chapterBossUnlocked:false,chapterBossDefeated:false,chapterCompleted:false,
  pve:{chapter:1,stage:1,progress:0,bossPending:false,bossActive:false,bossDefeated:0,wins:0},
  forge:{materials:0,selectedId:null,successes:0,failStreak:0},
@@ -42,7 +42,7 @@ function normalize(saved){
  s.coins=Math.max(0,Number(s.coins)||0);s.gems=Math.max(0,Number(s.gems)||0);s.redGems=Math.max(0,Number(s.redGems)||0);s.battleStonesCap=StoreDailyBattleCap(s.level);s.battleStones=Math.max(0,Number(s.battleStones??s.battleStonesCap)||0);s.battleStonesBonus=Math.max(0,Number(s.battleStonesBonus)||0);
  s.energy=Math.max(0,Number(s.energy)||0);s.maxEnergy=Math.max(1,Number(s.maxEnergy)||100);
  s.maxHp=Math.max(1,Number(s.maxHp)||100);s.hp=Math.max(0,Math.min(s.maxHp,Number(s.hp??s.maxHp)||s.maxHp));
- s.equipment=Array.isArray(s.equipment)?s.equipment.slice(0,7):Array(7).fill(null);while(s.equipment.length<7)s.equipment.push(null);
+ s.equipment=Array.isArray(s.equipment)?s.equipment.slice(0,7):Array(7).fill(null);while(s.equipment.length<7)s.equipment.push(null);s.consumables=Object.assign({},DEFAULT.consumables,s.consumables||{});s.arena=Object.assign({},DEFAULT.arena,s.arena||{});
  s.inventoryItems=Array.isArray(s.inventoryItems)?s.inventoryItems.slice(0,100):[];
  s.followers=Object.assign({},DEFAULT.followers,s.followers||{});
  s.followers.activeFollower=s.followers.activeFollower??s.activeFollower??null;
