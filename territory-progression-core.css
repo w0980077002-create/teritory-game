@@ -6,21 +6,30 @@ background:radial-gradient(circle at 50% 0,#49351d,#111a22 52%,#081017);box-shad
 .tpc-card h2{margin:8px 0;color:#f1ce73;font-size:23px}.tpc-card p{margin:0 4px 18px;color:#b8c3c9;font-size:13px;line-height:1.45}
 .tpc-card .wide{width:100%;margin-top:7px;min-height:44px}
 
-/* PASS 34 — equipment feedback on the living home */
-.territory-home-loadout{position:absolute;left:50%;top:68.2%;transform:translateX(-50%);z-index:28;width:min(76%,285px);pointer-events:none;text-align:center;font-family:system-ui,sans-serif;filter:drop-shadow(0 5px 10px #0009)}
-.loadout-title{display:inline-block;padding:3px 9px;border:1px solid #a8874d99;border-radius:8px;background:#07131be8;color:#f0d18a;font-size:8px;font-weight:900;letter-spacing:1px}
-.loadout-slots{display:flex;justify-content:center;gap:4px;margin-top:5px}
-.loadout-slot{width:29px;height:31px;border:1px solid #63717a99;border-radius:7px;background:#071018dd;box-shadow:0 3px 8px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:.55}
-.loadout-slot.filled{opacity:1}
-.loadout-slot span{font-size:14px;line-height:14px}.loadout-slot small{font-size:6px;color:#aeb9bf;margin-top:2px}
-.loadout-slot.rarity-uncommon{border-color:#76ad7c}.loadout-slot.rarity-rare{border-color:#65a9dc;box-shadow:0 0 8px #4c9cdb33}.loadout-slot.rarity-epic{border-color:#b184dc;box-shadow:0 0 10px #a56be044}.loadout-slot.rarity-legendary{border-color:#e0b75f;box-shadow:0 0 13px #e0b75f55}
-.loadout-caption{margin-top:3px;color:#aeb8bd;font-size:7px;text-shadow:0 2px 3px #000}
-.territory-equip-toast{position:absolute;left:50%;top:34%;transform:translate(-50%,8px) scale(.84);z-index:70;padding:7px 12px;border:1px solid #d7ad55;border-radius:10px;background:#07131bf2;color:#f7df9e;font:800 10px system-ui,sans-serif;white-space:nowrap;opacity:0;pointer-events:none;box-shadow:0 7px 18px #000a}
-.territory-equip-toast.show{animation:territoryEquipToast 1.5s ease-out forwards}
-.home-reference-host.home-gear-rare .life-hero .hero-aura,.home-reference-host.home-gear-epic .life-hero .hero-aura,.home-reference-host.home-gear-legendary .life-hero .hero-aura{opacity:.7}
-.home-reference-host.home-gear-epic .life-hero{filter:drop-shadow(0 14px 12px #0008) drop-shadow(0 0 10px #9a6ed855)}
-.home-reference-host.home-gear-legendary .life-hero{filter:drop-shadow(0 14px 12px #0008) drop-shadow(0 0 15px #e2bd6255)}
-.home-reference-host.home-gear-epic .life-hero .hero-weapon,.home-reference-host.home-gear-legendary .life-hero .hero-weapon{filter:drop-shadow(0 5px 3px #000b) drop-shadow(0 0 6px #e2bd6266)}
-@keyframes territoryEquipToast{0%{opacity:0;transform:translate(-50%,9px) scale(.84)}18%{opacity:1;transform:translate(-50%,0) scale(1)}72%{opacity:1;transform:translate(-50%,-3px) scale(1)}100%{opacity:0;transform:translate(-50%,-18px) scale(.94)}}
-@media(max-width:390px){.territory-home-loadout{top:69.2%;width:min(82%,285px)}.loadout-slot{width:27px;height:29px}.loadout-slot span{font-size:13px}.territory-equip-toast{top:33%;font-size:9px}}
-@media(prefers-reduced-motion:reduce){.territory-equip-toast.show{animation:none;opacity:1}}
+/* PASS 35 — visible equipment on the living hero */
+.home-gear-visual{position:absolute;inset:0;z-index:11;pointer-events:none;font-style:normal}
+.home-gear-visual i,.home-gear-visual span{position:absolute;font-style:normal;display:block;opacity:0;transition:opacity .25s,transform .25s,filter .25s}
+.home-gear-visual .hg-helmet{left:25%;top:-2%;width:50%;height:31%;text-align:center;font-size:18px;line-height:36px;filter:drop-shadow(0 2px 3px #000)}
+.home-gear-visual .hg-armor{left:27%;top:35%;width:46%;height:30%;border-radius:35% 35% 24% 24%;border:2px solid #d0b06a;background:linear-gradient(135deg,#758893,#263640 55%,#101a21);box-shadow:inset 0 2px 4px #fff5,0 4px 7px #0009}
+.home-gear-visual .hg-belt{left:24%;top:61%;width:52%;height:7%;border-radius:5px;background:linear-gradient(#d5ad5d,#5d4527);border:1px solid #e0c27b;text-align:center;color:#f5d37e;font-size:9px;line-height:7px}
+.home-gear-visual .hg-boots{left:27%;bottom:6%;width:46%;height:17%;border-bottom:5px solid #8f7042;border-radius:0 0 15px 15px;text-align:center;color:#e2c47a}
+.home-gear-visual .hg-weapon{right:-20%;top:27%;font-size:35px;filter:drop-shadow(0 3px 4px #000);transform:rotate(-18deg)}
+.home-gear-visual .hg-ring{right:14%;top:55%;font-size:14px;color:#ffe08b;text-shadow:0 0 8px #ffd15a}
+.home-gear-visual .hg-amulet{left:45%;top:43%;font-size:13px;color:#8edfff;text-shadow:0 0 9px #67d8ff}
+.home-gear-visual .hg-spark{left:22%;top:20%;font-size:12px;color:#ffd96b;text-shadow:0 0 10px #ffd96b;animation:homeGearSpark 1.2s ease-in-out infinite}
+.home-gear-visual.has-helmet .hg-helmet,.home-gear-visual.has-armor .hg-armor,.home-gear-visual.has-belt .hg-belt,.home-gear-visual.has-boots .hg-boots,.home-gear-visual.has-weapon .hg-weapon,.home-gear-visual.has-ring .hg-ring,.home-gear-visual.has-amulet .hg-amulet{opacity:1}
+.home-gear-visual[data-weapon="bow"] .hg-weapon{font-size:32px;transform:rotate(-8deg)}
+.home-gear-visual[data-weapon="axe"] .hg-weapon{transform:rotate(12deg)}
+.home-gear-visual[data-weapon="hammer"] .hg-weapon{transform:rotate(18deg)}
+.home-gear-visual[data-weapon="spear"] .hg-weapon{transform:rotate(-4deg)}
+.home-gear-visual[data-weapon="dagger"] .hg-weapon{font-size:27px;transform:rotate(-28deg)}
+.home-gear-visual[data-rarity="uncommon"] .hg-armor{box-shadow:0 0 9px #6fd08b55,inset 0 2px 4px #fff5}
+.home-gear-visual[data-rarity="rare"] .hg-armor{box-shadow:0 0 12px #65bfff77,inset 0 2px 4px #fff5}
+.home-gear-visual[data-rarity="epic"] .hg-armor{box-shadow:0 0 16px #c37cff99,inset 0 2px 4px #fff5}
+.home-gear-visual[data-rarity="legendary"] .hg-armor{box-shadow:0 0 22px #ffd66caa,inset 0 2px 4px #fff7}
+.home-gear-visual[data-rarity="epic"] .hg-spark,.home-gear-visual[data-rarity="legendary"] .hg-spark{opacity:1}
+.home-gear-visual[data-rarity="legendary"] .hg-spark{font-size:15px}
+.home-gear-changed{animation:homeGearEquip .85s ease-out!important}
+@keyframes homeGearEquip{0%,100%{filter:drop-shadow(0 14px 12px #0008)}35%{filter:brightness(1.45) drop-shadow(0 0 20px #ffd66c)}60%{filter:brightness(1.12) drop-shadow(0 0 12px #9bdcff)}}
+@keyframes homeGearSpark{0%,100%{transform:translateY(2px) scale(.7);opacity:.25}50%{transform:translateY(-5px) scale(1.15);opacity:1}}
+@media(prefers-reduced-motion:reduce){.home-gear-visual .hg-spark{animation:none}.home-gear-changed{animation:none!important}}

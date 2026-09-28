@@ -50,89 +50,47 @@ window.TerritoryProgressionCore={check,open,unlocks:UNLOCKS};
 document.addEventListener('DOMContentLoaded',mount);
 })();
 
-/* TERRITORY PASS 34 — HOME EQUIPMENT ECHO
-   Uses the canonical PvE equipment state. No combat math or item generation here. */
+/* TERRITORY PASS 35 — REAL HOME EQUIPMENT VISUALS
+ * Uses the canonical TerritoryStore.equipment. No new equipment system.
+ */
 (function(){
-  'use strict';
-  const SIGN_KEY='territory_home_equipment_signature_v1';
-  let lastHomeSig='';
-  let first=true;
-
-  function store(){return window.TerritoryStore?.state||{};}
-  function equipment(){
-    const eq=Array.isArray(store().equipment)?store().equipment.slice(0,7):[];
-    while(eq.length<7)eq.push(null);
-    return eq;
-  }
-  function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-  function rarity(item){
-    const r=String(item?.rarity||'common').toLowerCase();
-    return ['common','uncommon','rare','epic','legendary'].includes(r)?r:'common';
-  }
-  function icon(item,i){return item?.icon||['🪓','🪖','🛡️','🎗️','🥾','💍','🔮'][i];}
-  function name(item,i){return item?.name||item?.title||['Оружие','Шлем','Доспех','Пояс','Сапоги','Кольцо','Амулет'][i];}
-  function sig(eq){return eq.map(x=>x?`${x.id||x.name||''}:${x.rarity||''}:${x.level||''}`:'-').join('|');}
-  function topRarity(eq){
-    const rank={common:0,uncommon:1,rare:2,epic:3,legendary:4};
-    return eq.reduce((a,x)=>rank[rarity(x)]>rank[a]?rarity(x):a,'common');
-  }
-  function home(){
-    const h=document.getElementById('home');
-    return h&&h.classList.contains('active')?h:null;
-  }
-  function ensure(){
-    const h=home();
-    if(!h)return null;
-    const host=h.querySelector('.home-reference-host');
-    if(!host)return null;
-    let box=host.querySelector('.territory-home-loadout');
-    if(!box){
-      box=document.createElement('div');
-      box.className='territory-home-loadout';
-      host.appendChild(box);
-    }
-    return {host,box};
-  }
-  function toast(message){
-    const h=home(); if(!h)return;
-    let t=h.querySelector('.territory-equip-toast');
-    if(!t){t=document.createElement('div');t.className='territory-equip-toast';h.querySelector('.home-reference-host')?.appendChild(t);}
-    t.textContent=message;
-    t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
-  }
-  function render(eq,announce){
-    const ui=ensure(); if(!ui)return;
-    const sig=sigOf(eq), top=topRarity(eq);
-    ui.host.classList.remove('home-gear-common','home-gear-uncommon','home-gear-rare','home-gear-epic','home-gear-legendary');
-    ui.host.classList.add('home-gear-'+top);
-    ui.host.dataset.equipmentSignature=sig;
-    ui.box.innerHTML=`<div class="loadout-title">⚔️ СНАРЯЖЕНИЕ</div><div class="loadout-slots">`+eq.map((item,i)=>{
-      const r=rarity(item); const label=name(item,i);
-      return `<div class="loadout-slot ${item?'filled':''} rarity-${r}" title="${esc(label)}"><span>${icon(item,i)}</span><small>${item?.level?'Lv.'+item.level:'—'}</small></div>`;
-    }).join('')+`</div><div class="loadout-caption">${eq.filter(Boolean).length}/7 слотов · ${top==='legendary'?'легендарное':top==='epic'?'эпическое':top==='rare'?'редкое':top==='uncommon'?'необычное':'обычное'} качество</div>`;
-    if(announce){
-      const changed=eq.find((x,i)=>x && lastHomeSig.split('|')[i]!==sig.split('|')[i]);
-      toast(changed?`🎁 Надето: ${name(changed,eq.indexOf(changed))}`:'🎁 Экипировка обновлена');
-    }
-  }
-  function sigOf(eq){return sig(eq);}
-  function tick(){
-    const eq=equipment(), s=sig(eq), h=home();
-    if(!h){ first=false; return; }
-    if(first){
-      lastHomeSig=s; first=false; render(eq,false); return;
-    }
-    if(s!==lastHomeSig){
-      render(eq,true);
-      lastHomeSig=s;
-      try{localStorage.setItem(SIGN_KEY,s);}catch(e){}
-    }else render(eq,false);
-  }
-  function start(){
-    try{lastHomeSig=localStorage.getItem(SIGN_KEY)||'';}catch(e){lastHomeSig='';}
-    setInterval(tick,900);
-    setTimeout(tick,260);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-  window.TerritoryHomeEquipment={refresh:function(){tick();}};
+'use strict';
+const S=()=>window.TerritoryStore?.state||{};
+const slots=['weapon','helmet','armor','belt','boots','ring','amulet'];
+function text(item){return typeof item==='string'?item:[item?.name,item?.title,item?.type,item?.icon,item?.emoji,item?.id].filter(Boolean).join(' ').toLowerCase()}
+function esc(v){return String(v??'').replace(/[<>&"]/g,'')}
+function rarity(item){const t=text(item);return /legendary|легендар/.test(t)?'legendary':/epic|эпич/.test(t)?'epic':/rare|редк/.test(t)?'rare':/uncommon|необыч/.test(t)?'uncommon':'common'}
+function weapon(item){const t=text(item);if(/bow|лук/.test(t))return'bow';if(/axe|топор/.test(t))return'axe';if(/hammer|молот|булав/.test(t))return'hammer';if(/spear|копь|пик/.test(t))return'spear';if(/dagger|кинжал/.test(t))return'dagger';return'sword'}
+function mountGear(){
+ const hero=document.querySelector('[data-life-hero]');if(!hero)return null;
+ let rack=hero.querySelector('[data-home-gear]');
+ if(!rack){rack=document.createElement('div');rack.className='home-gear-visual';rack.dataset.homeGear='1';rack.innerHTML='<i class="hg-helmet"></i><i class="hg-armor"></i><i class="hg-belt"></i><i class="hg-boots"></i><i class="hg-weapon"></i><i class="hg-ring"></i><i class="hg-amulet"></i><span class="hg-spark"></span>';hero.appendChild(rack)}
+ return rack;
+}
+let lastKey='';
+function apply(showToast){
+ const rack=mountGear();if(!rack)return;
+ const eq=Array.isArray(S().equipment)?S().equipment:Array(7).fill(null);
+ const key=eq.map((x,i)=>x?[(x.id||x.name||x.title||i),rarity(x)].join(':'):'-').join('|');
+ rack.dataset.weapon=eq[0]?weapon(eq[0]):'none';
+ rack.dataset.rarity=eq.filter(Boolean).map(rarity).sort((a,b)=>['common','uncommon','rare','epic','legendary'].indexOf(b)-['common','uncommon','rare','epic','legendary'].indexOf(a))[0]||'common';
+ slots.forEach((slot,i)=>rack.classList.toggle('has-'+slot,!!eq[i]));
+ rack.querySelector('.hg-helmet').textContent=eq[1]?.icon||eq[1]?.emoji||'';
+ rack.querySelector('.hg-armor').textContent=eq[2]?'◆':'';
+ rack.querySelector('.hg-belt').textContent=eq[3]?'━':'';
+ rack.querySelector('.hg-boots').textContent=eq[4]?'◆':'';
+ rack.querySelector('.hg-ring').textContent=eq[5]?'✦':'';
+ rack.querySelector('.hg-amulet').textContent=eq[6]?'◆':'';
+ rack.querySelector('.hg-weapon').textContent=eq[0]?.icon||eq[0]?.emoji||'⚔';
+ rack.querySelector('.hg-spark').textContent=rack.dataset.rarity==='legendary'?'✦ ✦':rack.dataset.rarity==='epic'?'✦':'';
+ if(showToast&&lastKey&&key!==lastKey){
+   const changed=eq.find((x,i)=>{const old=lastKey.split('|')[i]||'-';return x&&old!==key.split('|')[i]});
+   if(changed){const layer=document.querySelector('.home-life');const t=layer?.querySelector('[data-life-toast]');if(t){t.textContent='⚔️ Надето: '+(changed.name||changed.title||'новое снаряжение');t.dataset.kind='reward';t.classList.remove('show');void t.offsetWidth;t.classList.add('show')}}
+   document.querySelector('[data-life-hero]')?.classList.add('home-gear-changed');setTimeout(()=>document.querySelector('[data-life-hero]')?.classList.remove('home-gear-changed'),900);
+ }
+ lastKey=key;
+}
+function init(){apply(false);window.addEventListener('territory:state-changed',()=>setTimeout(()=>apply(true),30));setInterval(()=>apply(false),1200);}
+window.TerritoryHomeEquipment={apply};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
