@@ -33,3 +33,7 @@ background:radial-gradient(circle at 50% 0,#49351d,#111a22 52%,#081017);box-shad
 @keyframes homeGearEquip{0%,100%{filter:drop-shadow(0 14px 12px #0008)}35%{filter:brightness(1.45) drop-shadow(0 0 20px #ffd66c)}60%{filter:brightness(1.12) drop-shadow(0 0 12px #9bdcff)}}
 @keyframes homeGearSpark{0%,100%{transform:translateY(2px) scale(.7);opacity:.25}50%{transform:translateY(-5px) scale(1.15);opacity:1}}
 @media(prefers-reduced-motion:reduce){.home-gear-visual .hg-spark{animation:none}.home-gear-changed{animation:none!important}}
+
+/* PASS 36 — small visual emphasis for comparison-ready loot */
+#inventory .loot-item{transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
+#inventory .loot-item:active{transform:scale(.98)}
