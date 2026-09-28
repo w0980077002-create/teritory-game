@@ -249,3 +249,33 @@ function mount(){if(bound)return;bound=true;const tick=()=>setTimeout(render,100
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
 window.TerritoryHeroBuild={render};
 })();
+
+/* TERRITORY PASS 39 — HERO SLOT CHANGER
+ * Tapping an equipped slot opens only compatible inventory items for that slot.
+ * Uses the canonical inventory/equipment and the existing compare/equip layer.
+ */
+(function(){
+'use strict';
+const S=()=>window.TerritoryStore?.state||{};
+const types=['weapon','helmet','armor','belt','boots','ring','amulet'];
+const names=['Оружие','Шлем','Доспех','Пояс','Сапоги','Кольцо','Амулет'];
+const icons=['⚔️','🪖','🛡️','🔗','🥾','💍','📿'];
+const rarityRank={common:1,uncommon:2,rare:3,epic:4,legendary:5};
+let opened=false;
+function num(it,keys){if(!it||typeof it!=='object')return 0;for(const k of keys){const n=Number(it[k]);if(Number.isFinite(n))return n}return 0}
+function rarity(it){const r=String(it?.rarity||it?.quality||'common').toLowerCase();if(/legend/.test(r))return'legendary';if(/epic|эпич/.test(r))return'epic';if(/rare|редк/.test(r))return'rare';if(/uncommon|необыч/.test(r))return'uncommon';return'common'}
+function power(it){return Math.round(num(it,['attack','strength','damage','atk'])+num(it,['defense','def','armor','guard'])+num(it,['agility','agi','speed'])+num(it,['maxHp','hp','health'])/3+num(it,['critChance'])*3+num(it,['damageReduction'])*3+num(it,['bonusXp'])*2+Number(it?.level||1)*1.5+rarityRank[rarity(it)]*8)}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function close(){document.querySelector('.thc-backdrop')?.remove();opened=false}
+function style(){if(document.getElementById('territory-hero-slot-change-style'))return;const st=document.createElement('style');st.id='territory-hero-slot-change-style';st.textContent=`
+.thc-backdrop{position:fixed;inset:0;z-index:12500;display:flex;align-items:flex-end;justify-content:center;padding:10px;background:rgba(0,0,0,.68);backdrop-filter:blur(8px)}
+.thc{width:min(520px,100%);max-height:86vh;overflow:auto;border:1px solid rgba(220,184,104,.26);border-radius:20px;background:linear-gradient(180deg,#171b20,#090c10);color:#eef3f5;padding:13px;box-shadow:0 24px 70px rgba(0,0,0,.58)}
+.thc-head{display:flex;align-items:center;gap:9px}.thc-head b{font-size:13px}.thc-head small{display:block;margin-top:3px;font-size:8px;opacity:.5}.thc-close{margin-left:auto;width:34px;height:34px;border:0;border-radius:10px;background:rgba(255,255,255,.06);color:inherit;font-size:19px}
+.thc-list{display:grid;gap:6px;margin-top:11px}.thc-item{display:flex;align-items:center;gap:9px;width:100%;padding:9px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035);color:inherit;text-align:left}.thc-item.up{border-color:rgba(110,210,150,.28);background:rgba(110,210,150,.045)}.thc-icon{width:35px;height:35px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.05);font-size:20px;flex:0 0 auto}.thc-item b{display:block;font-size:10px}.thc-item small{display:block;margin-top:3px;font-size:8px;opacity:.55}.thc-power{margin-left:auto;font-size:10px;opacity:.72}.thc-empty{padding:18px;text-align:center;font-size:10px;opacity:.55}.thc-current{margin-top:8px;padding:8px;border-radius:10px;background:rgba(220,184,104,.055);font-size:8px;opacity:.65}
+`;document.head.appendChild(st)}
+function open(idx){style();close();opened=true;const s=S(),inv=Array.isArray(s.inventoryItems)?s.inventoryItems:[],eq=Array.isArray(s.equipment)?s.equipment:[],type=types[idx],current=eq[idx]||null;const items=inv.map((item,index)=>({item,index,p:power(item)})).filter(x=>(x.item?.type||x.item?.slot)===type).sort((a,b)=>b.p-a.p);const backdrop=document.createElement('div');backdrop.className='thc-backdrop';const list=items.length?items.map(x=>{const it=x.item,delta=x.p-power(current),up=delta>0;return `<button class="thc-item ${up?'up':''}" data-thc-index="${x.index}"><span class="thc-icon">${esc(it?.icon||it?.emoji||icons[idx])}</span><span style="min-width:0"><b>${esc(it?.name||it?.title||'Предмет')}</b><small>${String(rarity(it))} · Lv.${Number(it?.level)||1}${up?' · ⬆ лучше текущего':''}</small></span><span class="thc-power">⚡${x.p}</span></button>`}).join(''):`<div class="thc-empty">Подходящих предметов в инвентаре пока нет.</div>`;backdrop.innerHTML=`<section class="thc"><div class="thc-head"><span style="font-size:22px">${icons[idx]}</span><div><b>СМЕНИТЬ: ${names[idx].toUpperCase()}</b><small>Показываю только совместимые предметы</small></div><button class="thc-close">×</button></div>${current?`<div class="thc-current">Сейчас: <b>${esc(current.name||current.title||'Предмет')}</b> · ⚡${power(current)}</div>`:''}<div class="thc-list">${list}</div></section>`;document.body.appendChild(backdrop);backdrop.querySelector('.thc-close').onclick=close;backdrop.addEventListener('click',e=>{if(e.target===backdrop)close()});backdrop.querySelectorAll('[data-thc-index]').forEach(b=>b.onclick=()=>{const it=(S().inventoryItems||[])[Number(b.dataset.thcIndex)];if(it&&window.TerritoryInventoryCompare?.open){close();window.TerritoryInventoryCompare.open(it)}})}
+function bind(){const hero=document.getElementById('hero');if(!hero||hero.dataset.slotChanger39==='1')return;hero.dataset.slotChanger39='1';hero.addEventListener('click',e=>{const b=e.target.closest('.thb-slot');if(!b)return;const box=b.closest('.thb');if(!box)return;const idx=Number(b.dataset.thbSlot);if(!Number.isInteger(idx)||idx<0||idx>6)return;e.preventDefault();e.stopImmediatePropagation();open(idx)},true)}
+function init(){bind();window.addEventListener('territory:state-changed',bind)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+window.TerritoryHeroSlotChanger={open,close};
+})();
