@@ -99,3 +99,397 @@
 @keyframes weaponIdle{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(-13deg) translateY(-2px)}}
 @keyframes armorGlint{0%,65%,100%{opacity:0;transform:translateX(-5px)}75%{opacity:.8;transform:translateX(7px)}}
 @media (prefers-reduced-motion:reduce){.life-hero .life-body,.life-follower .life-follower-body,.life-hero .life-weapon,.life-hero .life-glint,.follower-glint{animation:none}}
+
+/* PASS 07 — combat character reactions */
+.home-life.life-react-hit .life-hero .life-body{animation:heroHit .82s ease-out}
+.home-life.life-react-hit .life-follower .life-follower-body{animation:followerHit .82s ease-out}
+.home-life.life-react-heal .life-hero .life-body{animation:heroHeal .82s ease-out}
+.home-life.life-react-heal .life-follower .life-follower-body{animation:followerHeal .82s ease-out}
+.home-life.life-react-reward .life-hero .life-glint{animation:rewardGlint .82s ease-out}
+.home-life.life-react-reward .life-fire{animation:rewardFire .82s ease-out}
+.home-life.life-react-level .life-hero{animation:levelRise .82s ease-out}
+.home-life.life-react-level .life-moon{animation:levelMoon .82s ease-out}
+.home-life.life-react-follow .life-follower{animation:followSwap .82s ease-out}
+@keyframes heroHit{0%,100%{transform:none}18%{transform:translateX(-7px) rotate(-3deg)}36%{transform:translateX(7px) rotate(3deg)}55%{transform:translateX(-3px) rotate(-1deg)}}
+@keyframes followerHit{0%,100%{transform:none}35%{transform:translateX(-4px) rotate(-2deg)}65%{transform:translateX(3px) rotate(2deg)}}
+@keyframes heroHeal{0%,100%{filter:none}35%{filter:brightness(1.65) drop-shadow(0 0 16px #7dffae99)}}
+@keyframes followerHeal{0%,100%{filter:none}35%{filter:brightness(1.5) drop-shadow(0 0 12px #7dffae77)}}
+@keyframes rewardGlint{0%{opacity:.2;transform:scale(.6)}45%{opacity:1;transform:scale(2.1)}100%{opacity:0;transform:scale(1)}}
+@keyframes rewardFire{0%,100%{filter:none}45%{filter:brightness(1.7) drop-shadow(0 0 14px #ffd66c88)}}
+@keyframes levelRise{0%,100%{transform:none}45%{transform:translateY(-10px) scale(1.035)}}
+@keyframes levelMoon{0%,100%{opacity:.35}45%{opacity:1;filter:drop-shadow(0 0 20px #e8d98d)}}
+@keyframes followSwap{0%{opacity:.55;transform:translateX(-9px) scale(.94)}45%{opacity:1;transform:translateX(3px) scale(1.04)}100%{transform:none}}
+
+/* PASS 08 — battle feedback bridge */
+.life-battle-fx{
+ position:absolute;left:50%;top:42%;z-index:80;
+ pointer-events:none;font-weight:900;font-size:clamp(18px,5vw,34px);
+ color:#f4d57a;text-shadow:0 3px 0 #1a0e05,0 0 12px #ffd86b;
+ animation:battleFloat .82s ease-out forwards;
+}
+.fx-crit{color:#ffed93;font-size:clamp(22px,6vw,42px);letter-spacing:1px}
+.fx-enemy-defeat{font-size:clamp(28px,8vw,55px)}
+.fx-heal{color:#8cffb1}
+.fx-block{color:#bde8ff}
+.home-life.battle-attack .life-hero .life-weapon{animation:battleWeapon .38s ease-out}
+.home-life.battle-crit .life-hero{animation:battleCrit .55s ease-out}
+.home-life.battle-enemy-hit .life-vignette{animation:enemyHitFlash .38s ease-out}
+.home-life.battle-enemy-defeat .life-moon{animation:defeatPulse .7s ease-out}
+.home-life.battle-skill .life-hero,.home-life.battle-skill .life-follower{animation:skillPulse .65s ease-out}
+.home-life.battle-block .life-hero{animation:blockPulse .5s ease-out}
+@keyframes battleFloat{0%{opacity:0;transform:translate(-50%,8px) scale(.7)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-55px) scale(1.08)}}
+@keyframes battleWeapon{0%{transform:rotate(-18deg)}45%{transform:rotate(18deg) translateY(-4px)}100%{transform:rotate(-18deg)}}
+@keyframes battleCrit{0%,100%{transform:none}35%{transform:scale(1.08) translateY(-6px)}}
+@keyframes enemyHitFlash{0%,100%{opacity:0}40%{opacity:.65;background:radial-gradient(circle,#fff2a655,#ff6b2c00 55%)}}
+@keyframes defeatPulse{0%,100%{opacity:.35}45%{opacity:1;filter:drop-shadow(0 0 25px #ffd66c)}}
+@keyframes skillPulse{0%,100%{filter:none}45%{filter:brightness(1.35) drop-shadow(0 0 16px #9bdcff99)}}
+@keyframes blockPulse{0%,100%{transform:none}45%{transform:scale(1.045)}}
+
+/* PASS 09 — PvE battle bridge visual polish */
+.life-battle-fx{font-family:system-ui,sans-serif;letter-spacing:.5px}
+.fx-attack{color:#ffe6a0}
+.fx-enemy-hit{color:#ff9c86}
+.fx-crit{transform-origin:50% 100%}
+.home-life.battle-enemy-defeat .life-hero .life-weapon{animation:victoryWeapon .7s ease-out}
+.home-life.battle-enemy-defeat .life-follower{animation:victoryFollower .7s ease-out}
+.home-life.battle-heal .life-follower .follower-glint{animation:healFollower .7s ease-out}
+@keyframes victoryWeapon{0%{transform:rotate(-18deg)}35%{transform:rotate(12deg) translateY(-7px)}65%{transform:rotate(-28deg)}100%{transform:rotate(-18deg)}}
+@keyframes victoryFollower{0%,100%{transform:none}35%{transform:translateY(-7px) scale(1.04)}65%{transform:translateY(-2px)}}
+@keyframes healFollower{0%,100%{opacity:.2;transform:scale(.7)}45%{opacity:1;transform:scale(2)}}
+
+/* PASS 10 — first encounter presentation */
+.life-encounter{position:absolute;left:50%;top:32%;transform:translate(-50%,-8px);z-index:72;pointer-events:none;opacity:0;transition:opacity .28s,transform .35s}
+.life-encounter.show{opacity:1;transform:translate(-50%,0)}
+.encounter-enemy{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:120px;padding:7px 12px;border:1px solid #a85d4c88;border-radius:12px;background:linear-gradient(#24171bdd,#0b1016ee);box-shadow:0 7px 18px #000a,inset 0 1px #fff2}
+.enemy-emoji{font-size:clamp(28px,8vw,52px);filter:drop-shadow(0 4px 3px #000)}
+.encounter-enemy b{font-size:clamp(11px,2.8vw,16px);color:#ffd2b9}
+.encounter-enemy small{color:#bfcbd0;font-size:10px}
+.encounter-vs{margin:5px auto;font-size:22px;text-align:center;color:#e7c76d;text-shadow:0 0 12px #ffd86c}
+.encounter-hint{font-size:9px;letter-spacing:2px;text-align:center;color:#e7c76d;text-shadow:0 2px 3px #000}
+.home-life.battle-attack .life-encounter .encounter-vs{animation:vsStrike .38s ease-out}
+.home-life.battle-enemy-hit .life-encounter .encounter-enemy{animation:enemyShake .38s ease-out}
+.home-life.battle-enemy-defeat .life-encounter{animation:encounterDefeat .8s ease-out forwards}
+@keyframes vsStrike{0%{transform:scale(.7) rotate(-15deg);opacity:.3}55%{transform:scale(1.35) rotate(8deg);opacity:1}100%{transform:scale(1)}}
+@keyframes enemyShake{0%,100%{transform:none}25%{transform:translateX(-7px) rotate(-3deg)}55%{transform:translateX(7px) rotate(3deg)}}
+@keyframes encounterDefeat{0%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-35px) scale(.75)}}
+
+/* PASS 11 — first playable encounter */
+.life-battle-panel{position:absolute;left:50%;bottom:10.5%;transform:translateX(-50%);z-index:90;width:min(84%,360px);display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:auto}
+.battle-status{display:flex;justify-content:space-between;width:100%;padding:4px 9px;border:1px solid #8b7046aa;border-radius:8px;background:#071018dd;color:#d8c176;font-size:9px;letter-spacing:1px}
+.battle-log{min-height:15px;color:#e6edf0;font-size:10px;text-shadow:0 2px 3px #000;text-align:center}
+.battle-action{width:150px;height:38px;border:1px solid #d8b65f;background:linear-gradient(#76551d,#38260e);color:#fff0c4;border-radius:10px;font-weight:900;letter-spacing:.5px;box-shadow:0 5px 12px #0009;touch-action:manipulation}
+.battle-action:active{transform:translateY(2px) scale(.98)}
+.life-next-enemy{position:absolute;left:50%;top:32%;transform:translate(-50%,-10px);opacity:0;z-index:73;display:flex;flex-direction:column;align-items:center;padding:8px 14px;border-radius:12px;border:1px solid #8b7046aa;background:#0b1218ee;box-shadow:0 7px 18px #000a;pointer-events:none}
+.life-next-enemy.show{opacity:1;transform:translate(-50%,0);transition:.35s}
+.life-next-enemy span{font-size:36px}.life-next-enemy b{font-size:12px;color:#e6cf83}.life-next-enemy small{font-size:9px;color:#adb9bf}
+
+/* PASS 12 — real Store-driven encounter */
+.life-real-battle{position:absolute;left:50%;top:30%;transform:translateX(-50%);z-index:92;width:min(82%,340px);display:flex;flex-direction:column;align-items:center;gap:7px;pointer-events:auto}
+.real-enemy{display:flex;flex-direction:column;align-items:center;padding:8px 18px 7px;border:1px solid #9b614faa;border-radius:13px;background:linear-gradient(#241713ee,#090f14f2);box-shadow:0 8px 20px #000a}
+.enemy-health{width:115px;height:6px;margin-bottom:6px;background:#28161a;border:1px solid #70434b;border-radius:6px;overflow:hidden}
+.enemy-health i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ef5c4e,#a91f2b);transition:width .25s}
+.enemy-icon{font-size:clamp(34px,9vw,58px);filter:drop-shadow(0 4px 3px #000)}
+.real-enemy b{font-size:13px;color:#ffd2b9}.real-enemy small{font-size:9px;color:#bfc9ce}
+.real-battle-log{min-height:18px;color:#e8eef0;font-size:11px;text-shadow:0 2px 3px #000;text-align:center}
+.real-attack{width:155px;height:40px;border:1px solid #d9b45c;border-radius:11px;background:linear-gradient(#76551d,#38260e);color:#fff0c4;font-weight:900;box-shadow:0 6px 14px #000a;touch-action:manipulation}
+.real-attack:disabled{opacity:.7}
+.life-real-battle.real-complete .real-enemy{filter:grayscale(.25);opacity:.75}
+.life-real-battle.real-complete .real-attack{background:linear-gradient(#315c3c,#163323);border-color:#75bb83}
+
+/* PASS 13 — follower role feedback */
+.life-real-battle:after{content:"";position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-size:10px;color:#d9c176;opacity:.0;pointer-events:none}
+.home-life.battle-crit .life-follower .follower-glint{animation:roleSpark .65s ease-out}
+.home-life.battle-block .life-follower{animation:roleBlock .65s ease-out}
+.home-life.battle-heal .life-follower{animation:roleHeal .7s ease-out}
+.home-life.battle-skill .life-follower{animation:roleControl .7s ease-out}
+@keyframes roleSpark{0%{opacity:0;transform:scale(.5)}45%{opacity:1;transform:scale(2)}100%{opacity:0;transform:scale(1)}}
+@keyframes roleBlock{0%,100%{transform:none}45%{transform:scale(1.08) translateY(-3px);filter:drop-shadow(0 0 12px #9bdcff)}}
+@keyframes roleHeal{0%,100%{filter:none}45%{filter:drop-shadow(0 0 16px #7dffae) brightness(1.35)}}
+@keyframes roleControl{0%,100%{transform:none}45%{transform:scale(1.08);filter:drop-shadow(0 0 14px #c99cff)}}
+
+
+/* PASS 14 — transparent follower combat role UI */
+.follower-combat-badge{display:flex;align-items:center;gap:5px;padding:5px 9px;border:1px solid #9b804c99;border-radius:9px;background:#071018e8;box-shadow:0 5px 14px #0009;max-width:92%;color:#e8d18a;text-align:center}
+.follower-combat-badge span{font-size:15px;line-height:1}.follower-combat-badge b{font-size:10px}.follower-combat-badge small{font-size:8px;color:#aebbc1;letter-spacing:.3px}
+.life-real-battle .follower-combat-badge{animation:badgeFloat 2.2s ease-in-out infinite}
+.home-life.battle-crit .follower-combat-badge{border-color:#e6c45c;box-shadow:0 0 18px #e6c45c44}
+.home-life.battle-block .follower-combat-badge{border-color:#82c7e9;box-shadow:0 0 18px #82c7e944}
+.home-life.battle-heal .follower-combat-badge{border-color:#78d89b;box-shadow:0 0 18px #78d89b44}
+.home-life.battle-skill .follower-combat-badge{border-color:#b98ee8;box-shadow:0 0 18px #b98ee844}
+@keyframes badgeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@media (prefers-reduced-motion:reduce){.life-real-battle .follower-combat-badge{animation:none}}
+
+
+/* TERRITORY PASS 15 - FOLLOWER PROGRESS CSS */
+.follower-progress-hud{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin:6px auto 8px;
+  padding:6px 10px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;
+  background:rgba(8,12,20,.64);
+  backdrop-filter:blur(8px);
+  font-size:11px;
+  color:rgba(255,255,255,.9);
+  box-shadow:0 0 18px rgba(0,0,0,.22);
+}
+.follower-progress-hud .fph-name{font-weight:800}
+.follower-progress-hud .fph-lvl{opacity:.95}
+.follower-progress-hud .fph-xp{opacity:.72}
+.follower-progress-hud .fph-meter{
+  font-weight:800;
+  letter-spacing:.2px;
+}
+
+
+/* TERRITORY PASS 16 - FOLLOWER ABILITIES CSS */
+.follower-ability-hud{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  margin:5px auto 7px;
+  padding:6px 9px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:11px;
+  background:rgba(10,14,24,.72);
+  box-shadow:0 0 16px rgba(0,0,0,.2);
+  font-size:11px;
+  color:rgba(255,255,255,.92);
+}
+.follower-ability-hud .fah-icon{font-size:14px}
+.follower-ability-hud .fah-name{font-weight:900}
+.follower-ability-hud .fah-rank{opacity:.68;font-weight:800}
+.follower-ability-hud .fah-power{font-weight:900}
+
+
+/* TERRITORY PASS 17 - ABILITY EFFECTS CSS */
+.follower-ability-pulse{
+  margin:4px auto 7px;
+  width:max-content;
+  max-width:90%;
+  padding:4px 8px;
+  border-radius:9px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.72);
+  font-size:10px;
+  font-weight:800;
+  animation:followerAbilityPulse .35s ease-out;
+}
+@keyframes followerAbilityPulse{
+  from{opacity:0;transform:translateY(-3px) scale(.97)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+
+/* TERRITORY PASS 18 - FOLLOWER DEVELOPMENT CSS */
+.follower-development-modal{
+  position:fixed;
+  inset:0;
+  z-index:99990;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  font-family:inherit;
+}
+.fdm-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.68);
+  backdrop-filter:blur(7px);
+}
+.fdm-card{
+  position:relative;
+  width:min(430px,100%);
+  padding:18px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:22px;
+  background:linear-gradient(180deg,rgba(19,25,38,.98),rgba(8,12,20,.98));
+  box-shadow:0 25px 80px rgba(0,0,0,.5);
+  color:#fff;
+  animation:fdmIn .22s ease-out;
+}
+@keyframes fdmIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+.fdm-close{
+  position:absolute;
+  right:10px;
+  top:8px;
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.07);
+  color:#fff;
+  font-size:23px;
+}
+.fdm-head{display:flex;align-items:center;gap:11px;padding-right:35px}
+.fdm-icon{font-size:40px;filter:drop-shadow(0 5px 12px rgba(0,0,0,.35))}
+.fdm-name{font-size:20px;font-weight:900}
+.fdm-role{font-size:12px;opacity:.62;margin-top:2px}
+.fdm-level{margin-left:auto;font-weight:900;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.07)}
+.fdm-xp{margin-top:17px}
+.fdm-xp>div:first-child{display:flex;justify-content:space-between;font-size:11px;opacity:.8}
+.fdm-bar{height:8px;margin-top:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.fdm-bar i{display:block;height:100%;border-radius:inherit;background:currentColor;transition:width .3s}
+.fdm-ability{display:flex;align-items:center;gap:10px;margin-top:15px;padding:12px;border-radius:15px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08)}
+.fdm-ability-icon{font-size:25px}
+.fdm-ability-main{display:flex;flex-direction:column;gap:2px;flex:1}
+.fdm-ability-main b{font-size:13px}
+.fdm-ability-main span{font-size:10px;opacity:.6}
+.fdm-power{font-weight:900}
+.fdm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.fdm-stats>div{padding:10px 7px;text-align:center;border-radius:13px;background:rgba(255,255,255,.045)}
+.fdm-stats small{display:block;font-size:9px;opacity:.55;margin-bottom:4px}
+.fdm-stats b{font-size:12px}
+.fdm-action{width:100%;margin-top:14px;padding:12px;border:0;border-radius:13px;background:rgba(255,255,255,.1);color:#fff;font-weight:900;font-size:11px}
+.fdm-action-done{background:rgba(255,255,255,.16)}
+.fdm-hint{text-align:center;font-size:9px;opacity:.48;margin:10px 0 0}
+
+
+/* TERRITORY PASS 19 - CHOICE UPGRADES CSS */
+.follower-choice-modal{
+  position:fixed;inset:0;z-index:100000;
+  display:flex;align-items:center;justify-content:center;padding:18px;
+}
+.fcm-backdrop{
+  position:absolute;inset:0;background:rgba(0,0,0,.7);
+  backdrop-filter:blur(8px);
+}
+.fcm-card{
+  position:relative;width:min(430px,100%);padding:20px;
+  border-radius:22px;border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg,rgba(22,29,44,.99),rgba(8,12,20,.99));
+  color:#fff;box-shadow:0 25px 80px rgba(0,0,0,.55);
+  animation:fcmIn .2s ease-out;
+}
+@keyframes fcmIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+.fcm-title{text-align:center;font-weight:1000;font-size:18px}
+.fcm-sub{text-align:center;font-size:11px;opacity:.58;margin:5px 0 16px}
+.fcm-options{display:grid;gap:9px}
+.fcm-option{
+  display:flex;align-items:center;gap:12px;width:100%;padding:12px;
+  border-radius:15px;border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.055);color:#fff;text-align:left;
+}
+.fcm-option:active{transform:scale(.985)}
+.fcm-icon{font-size:25px;width:30px;text-align:center}
+.fcm-option span:last-child{display:flex;flex-direction:column;gap:3px}
+.fcm-option b{font-size:13px}
+.fcm-option small{font-size:10px;opacity:.6}
+.fcm-hint{text-align:center;font-size:9px;opacity:.45;margin:12px 0 0}
+
+
+/* TERRITORY PASS 20 - CHOSEN UPGRADE CSS */
+.follower-choice-badge{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  width:max-content;
+  max-width:94%;
+  margin:3px auto 7px;
+  padding:5px 8px;
+  border-radius:9px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);
+  font-size:10px;
+  color:rgba(255,255,255,.86);
+}
+.follower-choice-badge b{font-size:10px}
+.follower-choice-badge small{font-size:9px;opacity:.55}
+
+
+/* TERRITORY PASS 21 - REAL EFFECT CSS */
+.follower-effect-live{
+  width:max-content;
+  max-width:94%;
+  margin:4px auto 8px;
+  padding:4px 8px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.035);
+  color:rgba(255,255,255,.62);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.25px;
+}
+
+
+/* TERRITORY PASS 22 - FOLLOWER MILESTONES CSS */
+.follower-milestone{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  max-width:96%;
+  margin:5px auto 8px;
+  padding:6px 8px;
+  border-radius:10px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  font-size:9px;
+}
+.follower-milestone b{font-size:10px}
+.follower-milestone small{opacity:.55;flex:1}
+.follower-milestone button{
+  border:0;
+  border-radius:8px;
+  padding:5px 7px;
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  font-size:8px;
+  font-weight:900;
+}
+
+
+/* TERRITORY PASS 23 - ECONOMY UI CSS */
+.follower-milestone .premium-locked{
+  opacity:.55;
+  font-size:8px;
+  letter-spacing:.2px;
+}
+
+
+/* TERRITORY PASS 24 - DEVELOPMENT ECONOMY CSS */
+.fdm-action:disabled{
+  opacity:.6;
+  filter:saturate(.65);
+}
+
+
+/* TERRITORY PASS 25 - FOLLOWER FORGE SHOP CSS */
+.follower-forge-modal{
+  position:fixed;inset:0;z-index:100010;
+  display:flex;align-items:center;justify-content:center;padding:18px;
+}
+.ffm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
+.ffm-card{
+  position:relative;width:min(440px,100%);padding:20px;
+  border-radius:23px;border:1px solid rgba(255,255,255,.13);
+  background:linear-gradient(180deg,rgba(22,29,44,.99),rgba(8,12,20,.99));
+  color:#fff;box-shadow:0 25px 90px rgba(0,0,0,.58);
+  animation:ffmIn .2s ease-out;
+}
+@keyframes ffmIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.ffm-close{
+  position:absolute;right:9px;top:8px;width:34px;height:34px;
+  border:0;border-radius:50%;background:rgba(255,255,255,.07);color:#fff;font-size:22px;
+}
+.ffm-title{text-align:center;font-weight:1000;font-size:17px}
+.ffm-sub{text-align:center;font-size:10px;opacity:.56;margin:5px 0 16px}
+.ffm-items{display:grid;gap:9px}
+.ffm-item{
+  display:flex;align-items:center;gap:10px;width:100%;padding:12px;
+  border-radius:15px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.05);color:#fff;text-align:left;
+}
+.ffm-icon{font-size:24px;width:30px;text-align:center}
+.ffm-main{display:flex;flex-direction:column;gap:3px;flex:1}
+.ffm-main b{font-size:12px}.ffm-main small{font-size:9px;opacity:.56}
+.ffm-item strong{font-size:10px}
+.ffm-bought{opacity:.65}
+.ffm-hint{text-align:center;font-size:9px;opacity:.42;margin:12px 0 0}
