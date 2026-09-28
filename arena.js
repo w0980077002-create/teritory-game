@@ -207,21 +207,16 @@
   function sendChat(){const i=$('[data-chat-input]');if(!i?.value.trim()||!arenaBattle)return;arenaBattle.chat.push({name:me().name,text:i.value.trim()});i.value='';render();root()?.body.querySelector('[data-chat]')?.classList.remove('collapsed');}
   function navigateArena(id){root()?.modal.classList.remove('show');const map={home:'home',inventory:'inventory',hero:'hero',game:'casino',quests:'districts',clan:'districts'};window.showScreen?.(map[id]||'home');}
   function exitBattle(){stopTimer();arenaBattle=null;openHub();}
-  let navTapGuard=0;
-  function handleArenaNavTap(e){
+  // ONE navigation event path only: mobile browsers synthesize click after touch/pointer.
+  // Do not register pointerup/touchend alongside click — it double-fires Arena actions.
+  document.addEventListener('click',e=>{
     const t=e.target.closest?.('button');if(!t)return;
-    if(e.type!=='click'&&performance.now()-navTapGuard<500)return;
-    if(e.type!=='click')navTapGuard=performance.now();
-    if(e.cancelable)e.preventDefault();
     if(t.id==='arenaClose'){root()?.modal.classList.remove('show');stopTimer();arenaBattle=null;return;}
     if(t.dataset.arenaFind){start(roster()[Math.floor(Math.random()*roster().length)]);return;}
     if(t.dataset.profileId){openProfile(t.dataset.profileId);return;}
     if(t.dataset.arenaHub){openHub();return;}
     if(t.dataset.profileFight){start(profile(t.dataset.profileFight));return;}
-  }
-  document.addEventListener('pointerup',handleArenaNavTap,{capture:true,passive:false});
-  document.addEventListener('touchend',handleArenaNavTap,{capture:true,passive:false});
-  document.addEventListener('click',handleArenaNavTap,{capture:true});
+  });
   document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeElement?.matches('[data-chat-input]'))sendChat();});
   window.ArenaGame={open,openHub,startBattle:start,close:()=>{stopTimer();arenaBattle=null;root()?.modal.classList.remove('show');}};
 })();
