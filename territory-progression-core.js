@@ -152,3 +152,36 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
   window.TerritoryInventoryCompare={open,equip,close};
 })();
+
+/* TERRITORY PASS 37 — SMART INVENTORY
+ * Adds filtering, sorting and upgrade-only view to the existing PvE loot inventory.
+ * Uses the canonical TerritoryStore.inventoryItems/equipment. No new inventory data model.
+ */
+(function(){
+'use strict';
+const S=()=>window.TerritoryStore?.state||{};
+const slotMap={weapon:0,helmet:1,armor:2,belt:3,boots:4,ring:5,amulet:6};
+const slotNames={weapon:'Оружие',helmet:'Шлем',armor:'Доспех',belt:'Пояс',boots:'Сапоги',ring:'Кольцо',amulet:'Амулет'};
+const rarityRank={common:1,uncommon:2,rare:3,epic:4,legendary:5};
+let filter='all',sort='new',bound=false;
+function num(it,keys){if(!it||typeof it!=='object')return 0;for(const k of keys){const n=Number(it[k]);if(Number.isFinite(n))return n}return 0}
+function rarity(it){const r=String(it?.rarity||it?.quality||'common').toLowerCase();if(/legend/.test(r))return'legendary';if(/epic|эпич/.test(r))return'epic';if(/rare|редк/.test(r))return'rare';if(/uncommon|необыч/.test(r))return'uncommon';return'common'}
+function rarityLabel(r){return({common:'обычный',uncommon:'необычный',rare:'редкий',epic:'эпический',legendary:'легендарный'})[r]||r}
+function name(it){return it?.name||it?.title||'Предмет'}
+function power(it){return Math.round(num(it,['attack','strength','damage','atk'])+num(it,['defense','def','armor','guard'])+num(it,['agility','agi','speed'])+num(it,['maxHp','hp','health'])/3+num(it,['critChance'])*3+num(it,['damageReduction'])*3+num(it,['bonusXp'])*2+Number(it?.level||1)*1.5+rarityRank[rarity(it)]*8)}
+function upgrade(it){const i=slotMap[it?.type||it?.slot];if(i===undefined)return false;const old=(S().equipment||[])[i];return power(it)>power(old)+0.5}
+function ensureStyle(){if(document.getElementById('territory-smart-inventory-style'))return;const st=document.createElement('style');st.id='territory-smart-inventory-style';st.textContent=`
+.tsi-controls{margin:10px 0 12px;padding:10px;border-radius:13px;background:rgba(255,255,255,.035);border:1px solid rgba(220,184,104,.16)}
+.tsi-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.tsi-head b{font-size:11px}.tsi-count{font-size:9px;opacity:.55}
+.tsi-row{display:flex;gap:5px;overflow:auto;padding-bottom:2px}.tsi-row+.tsi-row{margin-top:6px}.tsi-chip{flex:0 0 auto;border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:6px 8px;background:rgba(255,255,255,.035);color:inherit;font-size:9px;font-weight:800}.tsi-chip.active{border-color:rgba(220,184,104,.42);background:rgba(220,184,104,.12)}
+#inventory .loot-item.tsi-upgrade{border-color:rgba(110,210,150,.34);box-shadow:inset 0 0 12px rgba(110,210,150,.035)}#inventory .loot-item .tsi-mark{font-size:8px;opacity:.7;margin-left:4px}#inventory .loot-item .tsi-power{float:right;font-size:8px;opacity:.5}
+@media(max-width:380px){.tsi-chip{padding:6px 7px;font-size:8px}}
+`;document.head.appendChild(st)}
+function controls(panel){ensureStyle();let c=panel.querySelector('.tsi-controls');if(!c){c=document.createElement('div');c.className='tsi-controls';panel.insertBefore(c,panel.querySelector('.loot-items')||null)}c.innerHTML=`<div class="tsi-head"><b>🎒 Умный инвентарь</b><span class="tsi-count"></span></div><div class="tsi-row tsi-filters">${[['all','Все'],['weapon','Оружие'],['armor','Броня'],['accessory','Аксессуары'],['upgrade','⬆ Улучшения']].map(x=>`<button class="tsi-chip ${filter===x[0]?'active':''}" data-tsi-filter="${x[0]}">${x[1]}</button>`).join('')}</div><div class="tsi-row tsi-sorts">${[['new','🕘 Новые'],['power','⚔️ Сила'],['level','⭐ Уровень'],['rarity','💎 Редкость']].map(x=>`<button class="tsi-chip ${sort===x[0]?'active':''}" data-tsi-sort="${x[0]}">${x[1]}</button>`).join('')}</div>`;c.querySelectorAll('[data-tsi-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.tsiFilter;render()});c.querySelectorAll('[data-tsi-sort]').forEach(b=>b.onclick=()=>{sort=b.dataset.tsiSort;render()});return c}
+function filtered(items){return items.map((item,index)=>({item,index})).filter(x=>{const t=x.item?.type||x.item?.slot;if(filter==='all')return true;if(filter==='upgrade')return upgrade(x.item);if(filter==='armor')return ['helmet','armor'].includes(t);if(filter==='accessory')return ['belt','boots','ring','amulet'].includes(t);return t===filter})}
+function sorted(list){return list.sort((a,b)=>{if(sort==='power')return power(b.item)-power(a.item);if(sort==='level')return Number(b.item?.level||0)-Number(a.item?.level||0)||power(b.item)-power(a.item);if(sort==='rarity')return rarityRank[rarity(b.item)]-rarityRank[rarity(a.item)]||power(b.item)-power(a.item);return b.index-a.index})}
+function render(){const host=document.getElementById('inventory');if(!host)return;const panel=host.querySelector('.loot-inventory-panel');if(!panel)return;const list=panel.querySelector('.loot-items');if(!list)return;const items=Array.isArray(S().inventoryItems)?S().inventoryItems:[];controls(panel);const rows=sorted(filtered(items));const count=panel.querySelector('.tsi-count');if(count)count.textContent=`${rows.length} из ${items.length}`;if(!rows.length){list.innerHTML='<span style="opacity:.65;font-size:12px">В этом фильтре предметов пока нет.</span>';return}list.innerHTML=rows.slice(0,30).map(x=>{const it=x.item,r=rarity(it),up=upgrade(it),slot=slotNames[it?.type||it?.slot]||'Предмет';return `<button class="loot-item ${up?'tsi-upgrade':''}" data-loot-index="${x.index}"><span>${String(it?.icon||it?.emoji||'🎁')}</span><b>${String(name(it)).replace(/[&<>"']/g,'')}</b><small>${rarityLabel(r)} · ${slot} · Lv.${Number(it?.level)||1}<span class="tsi-power">⚡${power(it)}</span>${up?'<span class="tsi-mark">⬆ Лучше текущего</span>':''}</small></button>`}).join('');list.querySelectorAll('[data-loot-index]').forEach(b=>b.title='Открыть сравнение');}
+function mount(){if(bound)return;bound=true;const tick=()=>setTimeout(render,80);window.addEventListener('territory:state-changed',tick);window.addEventListener('territory:inventory-equipped',tick);const obs=new MutationObserver(()=>{if(document.querySelector('#inventory .loot-inventory-panel'))render()});obs.observe(document.body,{childList:true,subtree:true});setTimeout(render,400)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+window.TerritorySmartInventory={render};
+})();
