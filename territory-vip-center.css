@@ -1,0 +1,24 @@
+.tvip-launcher{
+ position:absolute;right:18%;top:6.2%;z-index:120;
+ min-width:52px;height:28px;border:1px solid #c99b4b;border-radius:14px;
+ background:linear-gradient(180deg,#3a2b18,#15100a);color:#f4d37d;
+ box-shadow:0 0 16px #d8aa4b55, inset 0 0 8px #0008;
+ display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;
+}
+.tvip-launcher span{font-size:14px}.tvip-launcher b{font-size:10px}
+.tvip-modal{position:fixed;inset:0;z-index:250000;display:none;align-items:center;justify-content:center;padding:18px}
+.tvip-modal.show{display:flex}.tvip-backdrop{position:absolute;inset:0;background:#02070bcc;backdrop-filter:blur(5px)}
+.tvip-card{position:relative;width:min(94vw,520px);max-height:90vh;overflow:auto;border:1px solid #8f6a35;
+ border-radius:22px;padding:22px;background:radial-gradient(circle at 50% 0,#44321d,#111820 48%,#091017);
+ color:#eef2f4;box-shadow:0 20px 70px #000b,0 0 40px #d1a44b22}
+.tvip-x{position:absolute;right:12px;top:10px;width:36px;height:36px;border:0;border-radius:50%;
+ background:#18232b;color:#ddd;font-size:25px}.tvip-crown{text-align:center;color:#f3cc70;font-size:36px;text-shadow:0 0 20px #d9a743}
+.tvip-kicker{text-align:center;font-size:10px;letter-spacing:3px;color:#bda66e}.tvip-card h2{text-align:center;margin:4px 0 0;font-size:28px}
+.tvip-title{text-align:center;color:#f1cf78;font-size:13px;margin:3px 0 8px}.tvip-status{text-align:center;color:#aebbc3;font-size:12px}
+.tvip-choice{margin:14px 0;padding:12px;border-radius:14px;background:#ffffff08;border:1px solid #ffffff12}
+.tvip-choice b{display:block;color:#f2d17b;margin-bottom:4px}.tvip-choice span{display:block;color:#b7c0c6;font-size:12px;line-height:1.45}
+.tvip-list{display:grid;gap:6px;margin:12px 0 16px}.tvip-list div{font-size:12px;color:#d5dde1}
+.tvip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.tvip-tier{padding:10px 8px;border:1px solid #ffffff15;border-radius:12px;background:#101a22;color:#dce3e7;text-align:left}
+.tvip-tier.active{border-color:#d7ac55;box-shadow:0 0 12px #d7ac5530}.tvip-tier strong{display:block;color:#f0cb70}.tvip-tier span{display:block;font-size:11px;color:#aeb8be;margin-top:2px}.tvip-tier em{display:block;font-style:normal;font-size:11px;color:#d5dce0;margin-top:5px}
+.tvip-note{margin-top:14px;padding:10px;border-radius:10px;background:#0b1218;color:#8fa0aa;font-size:10px;line-height:1.45}
+@media(max-width:390px){.tvip-launcher{right:17%;top:6%;min-width:46px}.tvip-card{padding:18px}}
