@@ -1,3 +1,6 @@
+/* Territory touch calibration v2 — coordinates matched to the supplied 689x1536 home reference.
+   The game image occupies the app viewport; the Telegram/Android chrome is outside the game.
+*/
 :root{--nav-gold:#e8c76b}
 .global-nav{position:fixed;left:0;right:0;bottom:0;width:100%;height:68px;z-index:130000;display:grid;grid-template-columns:repeat(7,1fr);background:linear-gradient(#162b38,#07111a);border-top:1px solid #806332;box-shadow:0 -8px 24px #0009}
 .global-nav.hidden{display:none}
@@ -5,21 +8,39 @@
 .global-nav button.active{color:var(--nav-gold);background:#49351b55}
 .global-nav span{font-size:21px;line-height:1}
 .global-nav b{font-size:9px;line-height:1.1}
+
 .home-reference-host{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#07131b}
 .home-reference-image{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;object-position:center top;display:block;pointer-events:none}
 .home-hit-layer{position:absolute;inset:0;z-index:30;pointer-events:none}
 .home-hit{position:absolute;display:block;border:0;background:transparent;box-shadow:none;padding:0;margin:0;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .home-hit:focus{outline:2px solid #e8c76b55}
-.home-hit.left{left:0;width:16%}
-.home-hit.right{right:0;width:16%}
-.home-hit.top{top:8%;height:8%}
-.home-hit.side1{top:15%;height:9%}
-.home-hit.side2{top:25%;height:9%}
-.home-hit.side3{top:35%;height:9%}
-.home-hit.side4{top:45%;height:9%}
-.home-hit.side5{top:55%;height:9%}
-.home-hit.center{left:22%;right:22%;top:14%;height:16%}
-.home-hit.bottom{bottom:0;height:13%;width:14.285%}
+
+/* Top controls — calibrated to the actual game area, not the Telegram header. */
+.home-hit.top{top:0;height:10%}
+.home-hit.top[aria-label="Профиль"]{left:0;width:28%}
+.home-hit.top[aria-label="Трофеи"]{left:80%;width:9%}
+.home-hit.top[aria-label="Почта"]{left:88.5%;width:7.5%}
+.home-hit.top[aria-label="Настройки"]{left:96%;width:4%}
+
+/* Left and right side buttons. Each row has its own lane so touches cannot fall into the row above. */
+.home-hit.left,.home-hit.right{width:16%;height:auto}
+.home-hit.left{left:0}
+.home-hit.right{right:0}
+.home-hit.side1{top:10.5%;height:7.2%}
+.home-hit.side2{top:18.3%;height:7.2%}
+.home-hit.side3{top:26.1%;height:6.9%}
+.home-hit.side4{top:33.5%;height:7.0%}
+.home-hit.side5{top:41.0%;height:7.0%}
+
+/* Chapter banner / progress area. */
+.home-hit.center{left:28%;right:28%;top:8.7%;height:8.0%}
+
+/* Bottom 7-button bar exactly covers the visible bottom navigation strip. */
+.home-hit.bottom{bottom:0;height:9.1%;width:14.285%}
 .home-hit.bottom.b1{left:0}.home-hit.bottom.b2{left:14.285%}.home-hit.bottom.b3{left:28.57%}.home-hit.bottom.b4{left:42.855%}.home-hit.bottom.b5{left:57.14%}.home-hit.bottom.b6{left:71.425%}.home-hit.bottom.b7{left:85.71%}
-.home-info-toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2147483640;width:min(86vw,390px);padding:20px;border:1px solid #a87b38;border-radius:18px;background:#0b1821ee;color:#fff;text-align:center;box-shadow:0 18px 70px #000}
-@media(max-width:390px){.global-nav{height:62px}.global-nav span{font-size:18px}.global-nav b{font-size:8px}}
+
+@media(max-width:390px){
+  .global-nav{height:62px}
+  .global-nav span{font-size:18px}
+  .global-nav b{font-size:8px}
+}
