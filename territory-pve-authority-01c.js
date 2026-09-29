@@ -1,62 +1,57 @@
-/* Territory FOUNDATION-01C — PvE reward authority bridge.
- * Server-issued battle session prevents reward replay and moves PvE currency awards
- * through the server economy ledger. It intentionally does not change battle math.
+/* Territory — FOUNDATION-COMPLETE-01 PvE authority bridge.
+ * One cumulative client-side bridge:
+ * - asks server for a battle session before PvE starts;
+ * - server consumes the battle stone;
+ * - watches the existing PvE engine for a completed stage/boss;
+ * - sends the session once for server-side reward;
+ * - refreshes the server economy after reward.
+ *
+ * It intentionally does not rewrite the existing combat math.
  */
 (function(){
-  'use strict';
-  const A=()=>window.TerritoryTelegramAuth||{};
-  const S=()=>window.TerritoryStore?.state||{};
-  let sessions=[];
-  let claiming=false;
-  async function api(path, body){
-    const tg=window.Telegram?.WebApp;
-    const base=String(A().getServerUrl?.()||window.location.origin).replace(/\/$/,'');
-    const r=await fetch(base+path,{method:'POST',headers:{'content-type':'application/json','x-telegram-init-data':tg?.initData||''},body:JSON.stringify(body||{})});
-    const d=await r.json().catch(()=>({}));
-    if(!r.ok)throw new Error(d.error||('HTTP '+r.status));
-    return d;
+'use strict';
+if(window.TerritoryPveAuthorityComplete01)return;
+const A=window.TerritoryTelegramAuth;
+if(!A||A.state!=='authenticated')return;
+let session=null,lastChapter=null,lastProgress=null,lastBoss=false,finishing=false;
+const S=()=>window.TerritoryStore?.state||{};
+async function startSession(chapter,stage,boss){
+  const r=await A.api('/api/pve/start',{method:'POST',body:JSON.stringify({chapter,stage,boss:!!boss})});
+  session={id:r.session_id,chapter:Number(chapter)||1,stage:Number(stage)||1,boss:!!boss};
+  if(r.state) { const economy={coins:S().coins,gems:S().gems,redGems:S().redGems}; Object.assign(S(),r.state); S().coins=economy.coins;S().gems=economy.gems;S().redGems=economy.redGems;window.TerritoryStore?.saveNow?.('pve-authority-start') }
+  return true;
+}
+async function completeSession(){
+  if(!session||finishing)return;
+  finishing=true;
+  try{
+    const r=await A.api('/api/pve/complete',{method:'POST',body:JSON.stringify({session_id:session.id})});
+    if(r.player){S().coins=Number(r.player.coins)||0;S().gems=Number(r.player.gems)||0;S().redGems=Number(r.player.red_gems)||0;S().profile=S().profile||{};S().profile.vip=Number(r.player.vip)||0}
+    session=null;window.TerritoryStore?.saveNow?.('pve-authority-reward');
+  }catch(e){console.warn('[Territory] PvE reward sync failed:',e.message||e)}finally{finishing=false}
+}
+function wrapStarts(){
+  if(!window.PvEBattle||window.PvEBattle.__authorityWrapped)return;
+  const originalStart=window.PvEBattle.start,originalBoss=window.PvEBattle.startBoss;
+  window.PvEBattle.start=async function(stage){
+    const s=S();try{await startSession(s.currentChapter||1,stage||s.chapterStage||1,false)}catch(e){console.warn('[Territory] battle rejected:',e.message||e);return false}
+    return originalStart(stage);
+  };
+  window.PvEBattle.startBoss=async function(){
+    const s=S();try{await startSession(s.currentChapter||1,4,true)}catch(e){console.warn('[Territory] boss rejected:',e.message||e);return false}
+    return originalBoss();
+  };
+  window.PvEBattle.__authorityWrapped=true;
+}
+function observe(){
+  const s=S();const chapter=Number(s.currentChapter)||1,progress=Number(s.chapterProgress)||0,boss=!!s.chapterBossDefeated;
+  if(lastChapter===null){lastChapter=chapter;lastProgress=progress;lastBoss=boss;return}
+  if(session&&!finishing){
+    if(progress>lastProgress||chapter>lastChapter||boss!==lastBoss)completeSession();
   }
-  async function begin(chapter,stage,boss){
-    if(A().state!=='authenticated')return null;
-    try{const d=await api('/api/pve/start',{chapter,stage,boss});sessions.push(d.session_id);return d.session_id;}catch(e){A().lastSyncError='PvE start: '+(e.message||e);return null}
-  }
-  async function claim(sessionId){
-    if(!sessionId||claiming)return null; claiming=true;
-    try{
-      const d=await api('/api/pve/complete',{session_id:sessionId});
-      if(d.economy){S().coins=Number(d.economy.coins)||0;S().gems=Number(d.economy.gems)||0;S().redGems=Number(d.economy.red_gems)||0;}
-      window.TerritoryStore?.saveNow?.('foundation-01c-pve-reward');
-      return d;
-    }catch(e){A().lastSyncError='PvE reward: '+(e.message||e);return null}
-    finally{claiming=false}
-  }
-  function install(){
-    if(window.TerritoryPvEAuthority01c)return;
-    const P=window.PvEBattle;
-    if(!P)return setTimeout(install,300);
-    const originalStart=P.start, originalBoss=P.startBoss;
-    P.start=async function(stage){
-      const s=S(); const sid=await begin(Number(s.currentChapter)||1,Number(stage)||Number(s.chapterStage)||1,false);
-      const ok=originalStart.call(P,stage);
-      if(!ok&&sid)await claim(sid).catch(()=>{});
-      if(sid){sessions.push('ACTIVE:'+sid);}
-      return ok;
-    };
-    P.startBoss=async function(){
-      const s=S(); const sid=await begin(Number(s.currentChapter)||1,4,true);
-      const ok=originalBoss.call(P);
-      if(!ok&&sid)await claim(sid).catch(()=>{});
-      if(sid)sessions.push('ACTIVE:'+sid);
-      return ok;
-    };
-    let lastWins=Number(S().pve?.wins)||0,lastBoss=Number(S().pve?.bossDefeated)||0;
-    window.addEventListener('territory:state-changed',async()=>{
-      const s=S(),wins=Number(s.pve?.wins)||0,bosses=Number(s.pve?.bossDefeated)||0;
-      if(wins>lastWins){lastWins=wins;const sid=sessions.find(x=>x&&x.indexOf('ACTIVE:')===0);if(sid){sessions=sessions.filter(x=>x!==sid);await claim(sid.slice(7));}}
-      if(bosses>lastBoss){lastBoss=bosses;const sid=sessions.find(x=>x&&x.indexOf('ACTIVE:')===0);if(sid){sessions=sessions.filter(x=>x!==sid);await claim(sid.slice(7));}}
-    });
-    window.TerritoryPvEAuthority01c=true;
-  }
-  window.TerritoryPvEAuthority01c={begin,claim,install};
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+  lastChapter=chapter;lastProgress=progress;lastBoss=boss;
+}
+function boot(){wrapStarts();setInterval(()=>{wrapStarts();observe()},350)}
+boot();
+window.TerritoryPveAuthorityComplete01={startSession,completeSession};
 })();
