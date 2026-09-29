@@ -1,7 +1,3 @@
-/* Territory Living Home — consolidated core PASS 32
- * One canonical home-life runtime. Legacy dead duplicate reaction handler removed.
- * VIP remains cosmetic/convenience oriented; paid entitlement must be server-authoritative.
- */
 (function(){
 'use strict';
 const S=()=>window.TerritoryStore?.state||{};
@@ -85,6 +81,29 @@ function burst(target,kind){
  const layer=ensure();if(!layer)return;
  const el=document.createElement('i');el.className='life-burst '+(kind||'gold');el.dataset.target=target;el.textContent=kind==='heal'?'♥':kind==='damage'?'✦':'✦';layer.appendChild(el);
  requestAnimationFrame(()=>el.classList.add('show'));setTimeout(()=>el.remove(),900);
+}
+function react(name,detail){
+ const layer=ensure();if(!layer)return;
+ const type=String(name||'').toLowerCase(), d=detail||{};
+ if(/level|level-up|levelup|xp/i.test(type)){layer.classList.add('level-up');worldPulse('gold');burst('hero','gold');toast('✨ Новый уровень!','level');setTimeout(()=>layer.classList.remove('level-up'),1100);return;}
+ if(/damage|hurt|hit|attack/i.test(type)){layer.classList.add('combat-hit');worldPulse('damage');burst('hero','damage');setTimeout(()=>layer.classList.remove('combat-hit'),420);return;}
+ if(/heal|recover|regen/i.test(type)){layer.classList.add('combat-heal');worldPulse('heal');burst('hero','heal');toast('♥ Восстановление','heal');setTimeout(()=>layer.classList.remove('combat-heal'),700);return;}
+ if(/reward|loot|coin|gem|chest/i.test(type)){worldPulse('gold');burst('hero','gold');toast(d.text||'🎁 Награда получена','reward');return;}
+}
+function bind(){
+ const layer=ensure();if(!layer||layer.dataset.bound)return;layer.dataset.bound='1';
+ layer.querySelector('[data-life-follower]')?.addEventListener('click',e=>{
+   e.preventDefault();e.stopPropagation();pulse(e);layer.classList.add('follower-hello');burst('follower','blue');
+   setTimeout(()=>layer.classList.remove('follower-hello'),650);
+   const f=activeFollower();window.TerritoryNavigation?.info?.('👥 '+f.name,'Твой последователь. Роль: '+f.role+'. Он находится слева и чуть позади героя и участвует в бою и развитии персонажа.');
+ });
+ layer.querySelector('[data-life-hero]')?.addEventListener('click',e=>{
+   e.preventDefault();e.stopPropagation();pulse(e);layer.classList.add('hero-hello');burst('hero','gold');
+   setTimeout(()=>layer.classList.remove('hero-hello'),700);window.TerritoryNavigation?.go?.('hero');
+ });
+ window.addEventListener('territory:state-changed',paint);
+ ['territory:level-up','territory:levelup','territory:damage','territory:hit','territory:heal','territory:reward'].forEach(ev=>window.addEventListener(ev,e=>react(ev,e?.detail)));
+ window.addEventListener('territory:combat-event',e=>react(e?.detail?.type,e?.detail));
 }
 function react(kind){
  const layer=document.querySelector('.home-life'); if(!layer)return;
@@ -308,7 +327,7 @@ function followerAssist(enemyHp,damage){
 window.TerritoryHomeBattleFX.followerAssist=followerAssist;
 
 function init(){
- bind();bindBattleBridge();bindPvEAutoBridge();paint();
+ bindBattleBridge();bindPvEAutoBridge();paint();
  const watch=watchState();watch();
  window.addEventListener('territory:state-changed',()=>{paint();watch()});
  document.addEventListener('territory:reward',()=>react('reward'));
@@ -318,7 +337,7 @@ function init(){
  document.addEventListener('territory:follower-changed',()=>react('follow'));
  setInterval(()=>{paint();watch()},1000);
 }
-function legacyInit(){bind();paint();setInterval(paint,1500);}
+function legacyInit(){paint();setInterval(paint,1500);}
 window.HomeLife={refresh:paint,react};
 document.addEventListener('DOMContentLoaded',init);
 })();
