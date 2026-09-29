@@ -1,20 +1,27 @@
-# Territory FIRST LIVE TEST 03
+TERRITORY — LIVE HOME FIX 02
 
-## Purpose
-Show the authenticated Telegram profile in the Hero screen using the server-loaded player data, with Telegram WebApp data as a fallback.
+Я нашёл точную причину в актуальном home-life.js:
+init() делает:
+  bind();bindBattleBridge();bindPvEAutoBridge();paint();
 
-## Replace / add
-- Replace `index.html` with the included file.
-- Add `territory-telegram-profile.js`.
-- Add `territory-telegram-profile.css`.
+Но bind() в этом файле отсутствует. Поэтому на DOMContentLoaded возникает
+ReferenceError и нормальный запуск HomeLife обрывается.
 
-No Cloudflare Worker change is included. Telegram webhook/auth backend remains untouched.
+Этот пакет чинит именно это место через отдельный совместимый runtime-файл,
+который загружается ДО home-life.js и предоставляет пустой bind(). После
+запуска дополнительно вызывает безопасный HomeLife.refresh().
 
-## Expected result
-Hero screen shows:
-- Telegram photo (when Telegram provides `photo_url`)
-- Telegram first name / username
-- Telegram ID
-- copy button for the player's own Telegram ID
+В ZIP:
+1) territory-home-bind-fix.js — новый фикс.
+2) index.html — уже изменённый порядок загрузки.
 
-The existing server profile bridge remains authoritative for the loaded player; the Telegram WebApp user object is only a fallback for UI when a field is not present yet.
+Что загрузить в GitHub:
+- заменить index.html этим;
+- добавить territory-home-bind-fix.js в корень репозитория.
+
+Другие файлы не трогать.
+
+После GitHub:
+Render → Deploy → дождаться Deploy succeeded → открыть игру в Telegram.
+
+Cloudflare, Telegram auth, экономика и боевая математика НЕ изменяются.
