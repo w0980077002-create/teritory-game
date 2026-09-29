@@ -1,0 +1,8 @@
+1. Cloudflare Worker: заменить worker.js и wrangler.toml в существующем territory-sdolars-server.
+2. НЕ менять secrets.
+3. НЕ удалять Durable Object migrations/bindings.
+4. Deploy Worker.
+5. Один раз открыть /api/setup-telegram-webhook.
+6. Проверить /api/telegram-webhook-info.
+7. В Render/GitHub заменить только файлы из territory-game/.
+8. Не удалять существующие игровые файлы.
