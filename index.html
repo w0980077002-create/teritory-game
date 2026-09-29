@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="pve-battle.css">
 <link rel="stylesheet" href="follower-arena.css">
 <link rel="stylesheet" href="forge-v2.css">
+<link rel="stylesheet" href="territory-progression-core.css">
+<link rel="stylesheet" href="territory-telegram-auth-pass54.css">
 </head>
 <body>
 <main id="app">
@@ -26,6 +28,7 @@
 </main>
 <div id="modal" class="modal"><div class="modal-card"><button id="modalClose" class="modal-close">×</button><div id="modalBody"></div></div></div>
 <div id="arenaModal" class="arena-modal" aria-hidden="true"><div id="arenaModalBody"></div><button id="arenaClose" class="arena-close" aria-label="Закрыть">×</button></div>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="app.js"></script>
 <script src="followers.js"></script>
 <script src="combat-items.js"></script>
@@ -37,6 +40,8 @@
 <script src="home-rebuild.js"></script>
 <script src="home-life.js"></script>
 <script src="navigation.js"></script>
+<script src="territory-progression-core.js"></script>
+<script src="territory-telegram-auth-pass54.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('mapStart')?.addEventListener('click',()=>window.PvEFlow?.startRunner?.());
