@@ -270,7 +270,15 @@
   window.addEventListener('territory:state-changed', () => pushState(false));
 
   function boot() {
-    setTimeout(authenticate, 250);
+    setTimeout(async () => {
+      const result = await authenticate();
+      if (result?.ok) {
+        const script = document.createElement('script');
+        script.src = 'territory-pve-authority-01c.js';
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    }, 250);
   }
 
   if (document.readyState === 'loading') {
