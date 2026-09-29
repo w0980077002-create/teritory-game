@@ -1,6 +1,0 @@
-1. In the Render / GitHub frontend repo, replace index.html.
-2. Add territory-telegram-profile.js.
-3. Add territory-telegram-profile.css.
-4. Commit/push and wait for Render deployment.
-5. Open @TeritoryGameBot -> 🎮 ИГРАТЬ.
-6. Open Герой and verify photo, name and Telegram ID.
