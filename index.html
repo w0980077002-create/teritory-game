@@ -14,13 +14,14 @@
 <link rel="stylesheet" href="forge-v2.css">
 <link rel="stylesheet" href="territory-progression-core.css">
 <link rel="stylesheet" href="territory-telegram-auth-pass54.css">
+<link rel="stylesheet" href="territory-telegram-profile.css">
 </head>
 <body>
 <main id="app">
 <section id="home" class="screen active"></section>
 <section id="map" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🗺️ Путь 240 глав</h1></header><div class="roadmap"><h2 id="roadChapter">ГЛАВА 1</h2><p style="text-align:center;color:#b8c4c9">4 победы обычных ботов = 100%. Босс открывается вручную после полного прогресса.</p><div class="road-nodes"><button class="road-node done">1</button><button class="road-node">2</button><button class="road-node">3</button><button class="road-node">4</button></div><div class="road-actions"><button class="gold-btn" id="mapStart">⚔️ Начать путь</button><button class="dark-btn" id="mapBoss">☠️ Босс главы</button></div></div></section>
 <section id="inventory" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🎒 Инвентарь</h1><span class="wallet">🪙 <span data-coins>0</span></span></header><div class="tabs"><button class="active">Оружие</button><button>Броня</button><button>Аксессуары</button><button>Предметы</button></div><div id="inventoryGrid" class="grid"></div></section>
-<section id="hero" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🪖 Герой</h1></header><div class="hero-card"><div class="avatar">🪓</div><h2 id="heroName">Игрок</h2><p id="heroLevel">Lv. 1 · VIP 0</p></div><div class="stat-grid"><div class="stat">❤️ HP <b id="heroHp">100</b></div><div class="stat">⚔️ Сила <b>127</b></div><div class="stat">🛡️ Защита <b>99</b></div><div class="stat">💨 Ловкость <b>102</b></div></div></section>
+<section id="hero" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🪖 Герой</h1></header><div class="hero-card"><div class="avatar">🪓</div><h2 id="heroName">Игрок</h2><p id="heroLevel">Lv. 1 · VIP 0</p></div><div id="telegramProfile" class="telegram-profile"><div class="telegram-profile-head"><img id="telegramProfilePhoto" class="telegram-profile-photo" alt="Telegram photo" hidden><div id="telegramProfileFallback" class="telegram-profile-fallback">👤</div><div class="telegram-profile-copy"><strong id="telegramProfileName">Игрок</strong><span id="telegramProfileUsername">Telegram</span></div></div><div class="telegram-profile-id"><span>🆔 Telegram ID</span><b id="telegramProfileId">не получен</b><button id="telegramProfileCopy" class="telegram-profile-copy-btn" type="button">Копировать</button></div></div><div class="stat-grid"><div class="stat">❤️ HP <b id="heroHp">100</b></div><div class="stat">⚔️ Сила <b>127</b></div><div class="stat">🛡️ Защита <b>99</b></div><div class="stat">💨 Ловкость <b>102</b></div></div></section>
 <section id="quests" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>📜 Квесты</h1></header><div class="hero-card"><h2>Путь воина</h2><p>Продолжай PvE-путь. Прогресс главы: <span id="questProgress">0%</span></p><button class="gold-btn" onclick="window.HomeRebuild?.startRunner?.(false)">⚔️ В бой</button></div></section>
 <section id="games" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🎲 Игры</h1></header><div class="hero-card"><h2>Кубики</h2><div id="board" class="grid"></div><div style="padding:12px"><button class="gold-btn" id="roll">🎲 Бросить · <span data-dice>10</span></button><p id="rollLog">Готово.</p></div></div></section>
 <section id="shop" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🛒 Магазин / Кузница</h1><span class="wallet">🪙 <span data-coins>0</span></span></header><div class="tabs"><button class="active">Эликсиры</button><button>Оружие</button><button>Броня</button><button>Боевые</button></div><div id="shopGrid" class="grid"></div></section>
@@ -42,6 +43,7 @@
 <script src="navigation.js"></script>
 <script src="territory-progression-core.js"></script>
 <script src="territory-telegram-auth-pass54.js"></script>
+<script src="territory-telegram-profile.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('mapStart')?.addEventListener('click',()=>window.PvEFlow?.startRunner?.());
