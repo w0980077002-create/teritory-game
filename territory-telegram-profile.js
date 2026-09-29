@@ -70,29 +70,3 @@
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
 })();
-
-/* Territory LIVE HOTFIX — recover the living home after the legacy init crash.
- * home-life.js currently calls a removed local bind() during DOMContentLoaded.
- * HomeLife.refresh() itself is safe and mounts the real living scene, so we
- * invoke that refresh after the normal home renderer has mounted the screen.
- * No Cloudflare/auth/economy logic is changed here.
- */
-(function(){
-  'use strict';
-  function fallback(){
-    const home=document.getElementById('home');
-    if(!home) return;
-    try { window.HomeLife?.refresh?.(); } catch(_) {}
-    if(home.querySelector('.home-life')) return;
-    if(home.querySelector('.territory-home-boot-fallback')) return;
-
-    const el=document.createElement('div');
-    el.className='territory-home-boot-fallback';
-    el.style.cssText='position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle at 50% 42%,#18384a 0,#08141d 48%,#02070b 100%);color:#e8c76b;font-family:Arial,sans-serif;text-align:center';
-    el.innerHTML='<div style="padding:20px"><div style="font-size:74px;filter:drop-shadow(0 8px 8px #000)">⚔️</div><div style="font-size:20px;font-weight:900">TERRITORY</div><div style="margin-top:7px;font-size:11px;color:#aebbc2">Город загружается…</div></div>';
-    home.appendChild(el);
-  }
-  function schedule(){ setTimeout(fallback,60); setTimeout(fallback,350); }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',schedule,{once:true});
-  else schedule();
-})();
