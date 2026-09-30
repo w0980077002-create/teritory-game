@@ -23,7 +23,7 @@ function sync(){
   cleanupArenaDuplicate();
   if(!bar)return;
   const active=activeId();
-  bar.classList.toggle('hidden',active==='home');
+  bar.classList.toggle('hidden',active==='home'||!!document.getElementById('territory-live-arena'));
   bar.querySelectorAll('button[data-screen]').forEach(b=>{
     b.classList.toggle('active',b.dataset.screen===active);
   });
@@ -88,6 +88,17 @@ function routeHomeAction(a){
   if(a==='redgems')return info('🔴 Красные алмазы','Особая премиальная валюта. Раздел готов к подключению магазина.');
   if(a==='energy')return info('⚡ Энергия','Энергия расходуется на игровые действия и восстанавливается со временем.');
   if(a==='chapter')return go('map');
+  if(a==='trophy')return info('🏆 Трофеи','Раздел трофеев героя.');
+  if(a==='mail')return info('✉️ Почта','Почтовый ящик героя.');
+  if(a==='settings')return info('⚙️ Настройки','Настройки игры.');
+  if(a==='events')return info('🎉 События','Игровые события и временные активности.');
+  if(a==='daily')return info('🎁 Ежедневная награда','Ежедневные награды.');
+  if(a==='invite')return info('👥 Пригласить друзей','Приглашение друзей в игру.');
+  if(a==='sea')return info('🌊 Морской набор','Раздел морского набора.');
+  if(a==='trials')return info('🏹 Испытания','Раздел испытаний.');
+  if(a==='capture')return info('🏰 Захват улиц','Раздел захвата улиц.');
+  if(a==='honor')return info('🏅 Почётные звания','Почётные звания героя.');
+  if(a==='blessing')return info('✨ Благословение','Благословение героя.');
   if(a==='speed')return info('⏩ Скорость боя','Кнопка скорости боя.');
   if(a==='auto'){
     const s=window.TerritoryStore?.state;
@@ -122,9 +133,9 @@ function init(){
   document.addEventListener('click',e=>{
     const back=e.target.closest('[data-back],[data-home]');
     if(back){e.preventDefault();go('home');return;}
-    const home=e.target.closest('[data-home-action]');
+    const home=e.target.closest('#home [data-home-action]');
     if(home){e.preventDefault();e.stopPropagation();routeHomeAction(home.dataset.homeAction);return;}
-    const action=e.target.closest('[data-action]');
+    const action=e.target.closest('#home.active [data-action]');
     if(action){e.preventDefault();e.stopPropagation();routeHomeAction(action.dataset.action);return;}
     const modalAction=e.target.closest('[data-modal-action]');
     if(modalAction){

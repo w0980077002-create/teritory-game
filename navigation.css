@@ -28,7 +28,7 @@
   background:url("./territory-bottom-nav-original-exact-v2.png") center bottom/100% 100% no-repeat;
   pointer-events:none;
 }
-.global-nav.hidden{display:grid}
+.global-nav.hidden{display:none!important}
 .global-nav button{
   position:relative;
   z-index:2;
@@ -76,3 +76,6 @@
 
 /* Arena uses the same canonical navigation; reserve its full height. */
 .arena-battle{padding-bottom:var(--territory-nav-h)!important;}
+
+/* Canonical navigation owns the bottom bar. The legacy Arena-local bar stays in the DOM only for compatibility and never receives taps. */
+.arena-bottom-nav{display:none!important;pointer-events:none!important}
