@@ -11,10 +11,12 @@ const items=[['home','Город'],['inventory','Инвентарь'],['hero','�
 let originalShow=null;
 
 function isCombat(){
-  return !!document.querySelector('#runnerScreen,.pve-battle.show,.arena-modal.arena-in-battle.show,#territory-live-arena');
+  return !!document.querySelector('#runnerScreen,.pve-battle.show,.arena-modal.show,#territory-live-arena');
 }
 function activeId(){
   const raw=document.body.dataset.screen||'home';
+  if(document.querySelector('#runnerScreen,.pve-battle.show'))return 'battle';
+  if(document.querySelector('#territory-live-arena,.arena-modal.show'))return 'arena';
   return aliases[raw]||raw||'home';
 }
 function cleanupArenaDuplicate(){
@@ -65,7 +67,7 @@ function go(id,push=true){
     return;
   }
   if(id==='home')closeOverlays();
-  else document.getElementById('territory-live-arena')?.remove();
+  else if(id!=='battle'&&id!=='arena')closeOverlays();
   originalShow?.(id);
   if(push)history.pushState({screen:id},'','#'+id);
   sync();
