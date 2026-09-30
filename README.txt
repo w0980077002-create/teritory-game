@@ -1,19 +1,22 @@
-TERRITORY — ARENA FIX
+TERRITORY CLIENT FINAL CUMULATIVE PATCH — AUTH / RE-ENTRY / FULL AUTHORITY CHAIN
 
-Source:
-- arena.js: current Arena file from the GitHub main branch at the time of audit.
-- follower-arena.js: current GitHub file, fixed.
+Based on verified Fix 16 cumulative client patch.
 
-Root cause fixed:
-The old follower-arena.js installed a MutationObserver on document.body. Its callback called decorate(), which modified follower DOM nodes. Those DOM mutations triggered the observer again, creating a feedback loop and freezing the browser when an Arena battle was rendered.
+Included cumulative fixes:
+- Telegram auth bridge is loaded by index.html.
+- Server hydration is guarded: applying authoritative state cannot immediately trigger a write-back.
+- Re-entry/visibility refresh is throttled and pulls authoritative server state.
+- PvE authority + elixir transcript trace.
+- Server-authoritative consumable purchases.
+- Server-authoritative forge upgrade/salvage.
+- Server-authoritative daily/weekly/story/achievement rewards.
+- Server-authoritative world/NPC reward claims.
+- Live Arena bridge and follower/Arena protection.
+- ForgeV2 opens the real forge UI instead of the legacy fake level-up action.
 
-Fix:
-- Removed the MutationObserver loop.
-- Arena's existing render() already calls window.FollowerArena.decorate() after rebuilding the battle DOM, so the observer was unnecessary.
-- Added small change guards in syncWrap() so repeated decorate() calls do not write unchanged text.
+No battle formulas were changed in this patch.
 
 IMPORTANT:
-This is an ARENA FIX package, not a full mirror of the GitHub repository. Upload/replace ONLY these two files in the existing repository root:
-  arena.js
-  follower-arena.js
-Do not delete the other project files.
+This is a cumulative OVERLAY patch. Upload/replace only the files in this ZIP in the existing client repository.
+Do not delete other project files.
+Server package must be deployed separately.
