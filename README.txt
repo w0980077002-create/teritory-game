@@ -1,22 +1,20 @@
-TERRITORY CLIENT FINAL CUMULATIVE PATCH — AUTH / RE-ENTRY / FULL AUTHORITY CHAIN
+TERRITORY CLIENT FIX 17 — TELEGRAM PROFILE UI
 
-Based on verified Fix 16 cumulative client patch.
+Patch overlay for the current client.
 
-Included cumulative fixes:
-- Telegram auth bridge is loaded by index.html.
-- Server hydration is guarded: applying authoritative state cannot immediately trigger a write-back.
-- Re-entry/visibility refresh is throttled and pulls authoritative server state.
-- PvE authority + elixir transcript trace.
-- Server-authoritative consumable purchases.
-- Server-authoritative forge upgrade/salvage.
-- Server-authoritative daily/weekly/story/achievement rewards.
-- Server-authoritative world/NPC reward claims.
-- Live Arena bridge and follower/Arena protection.
-- ForgeV2 opens the real forge UI instead of the legacy fake level-up action.
+Adds:
+- Telegram photo, name, @username and Telegram ID on the Home screen.
+- Same identity data on the Hero screen.
+- Tap the Home identity card to open a full profile popup.
+- Copy Telegram ID button.
 
-No battle formulas were changed in this patch.
+Data source:
+- Uses the authoritative profile already hydrated by territory-telegram-auth-pass54.js.
+- Falls back to Telegram WebApp initDataUnsafe only when needed for display.
 
-IMPORTANT:
-This is a cumulative OVERLAY patch. Upload/replace only the files in this ZIP in the existing client repository.
-Do not delete other project files.
-Server package must be deployed separately.
+No changes to combat, economy, progression, purchases, PvE or Arena math.
+
+Upload these files to the client repository:
+- territory-telegram-profile-ui-17.js
+- add the script tag to index.html after territory-session-guard-16.js:
+  <script src="territory-telegram-profile-ui-17.js"></script>
