@@ -19,7 +19,7 @@ function sync(){
   qsa('.arena-bottom-nav').forEach(x=>x.remove());
   const live=qs('#territoryLiveNav'); if(live)live.style.display='none';
   const bar=qs('#territoryNav');
-  const combat=!!qs('.pve-battle.show,.arena-modal.show,#territory-live-arena');
+  const combat=!!qs('#runnerScreen,.pve-battle.show,.arena-modal.show,#territory-live-arena');
   if(bar&&combat)bar.classList.remove('hidden');
 }
 function modal(title,text,action){
@@ -50,7 +50,7 @@ async function openMail(){
       return '<article class="hero-card rc-mail-card"><b>'+escapeHtml(x.subject||'Сообщение')+'</b>'+
         '<p>'+escapeHtml(x.body||'')+'</p>'+
         '<small>🪙 '+Number(x.coins||0)+' · 💎 '+Number(x.gems||0)+'</small>'+
-        '<button class="gold-btn wide" data-mail-claim="'+escapeHtml(x.id||'')+'" '+(claimed?'disabled':'')+'>'+
+        '<button class="gold-btn wide" data-mail-claim="'+escapeHtml(x.mail_id||x.id||'')+'" '+(claimed?'disabled':'')+'>'+
         (claimed?'✓ Получено':'ЗАБРАТЬ')+'</button></article>';
     }).join('')+'</div><button class="dark-btn wide" data-rc-close>ЗАКРЫТЬ</button>';
     b.querySelectorAll('[data-mail-claim]').forEach(btn=>btn.addEventListener('click',async()=>{
