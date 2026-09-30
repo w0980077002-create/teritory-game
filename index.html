@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="pve-battle.css">
 <link rel="stylesheet" href="follower-arena.css">
 <link rel="stylesheet" href="forge-v2.css">
+<link rel="stylesheet" href="territory-complete-pass-2026-09-30.css">
 </head>
 <body>
 <main id="app">
@@ -21,7 +22,7 @@
 <section id="hero" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🪖 Герой</h1></header><div class="hero-card"><div class="avatar">🪓</div><h2 id="heroName">Игрок</h2><p id="heroLevel">Lv. 1 · VIP 0</p></div><div class="stat-grid"><div class="stat">❤️ HP <b id="heroHp">100</b></div><div class="stat">⚔️ Сила <b>127</b></div><div class="stat">🛡️ Защита <b>99</b></div><div class="stat">💨 Ловкость <b>102</b></div></div></section>
 <section id="quests" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>📜 Квесты</h1></header><div class="hero-card"><h2>Путь воина</h2><p>Продолжай PvE-путь. Прогресс главы: <span id="questProgress">0%</span></p><button class="gold-btn" onclick="window.HomeRebuild?.startRunner?.(false)">⚔️ В бой</button></div></section>
 <section id="games" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🎲 Игры</h1></header><div class="hero-card"><h2>Кубики</h2><div id="board" class="grid"></div><div style="padding:12px"><button class="gold-btn" id="roll">🎲 Бросить · <span data-dice>10</span></button><p id="rollLog">Готово.</p></div></div></section>
-<section id="shop" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🛒 Магазин / Кузница</h1><span class="wallet">🪙 <span data-coins>0</span></span></header><div class="tabs"><button class="active">Эликсиры</button><button>Оружие</button><button>Броня</button><button>Боевые</button></div><div id="shopGrid" class="grid"></div></section>
+<section id="shop" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🛒 Лавка</h1><span class="wallet">🪙 <span data-coins>0</span></span></header><div class="tabs"><button class="active">Эликсиры</button><button>Оружие</button><button>Броня</button><button>Боевые</button><button>Аксессуары</button></div><div id="shopGrid" class="grid"></div></section>
 <section id="clan" class="screen panel"><header class="panel-head"><button data-back>‹</button><h1>🚩 Клан</h1></header><div class="hero-card"><div class="avatar">🚩</div><h2>Северный клан</h2><p>Раздел подготовлен под следующий этап.</p></div></section>
 </main>
 <div id="modal" class="modal"><div class="modal-card"><button id="modalClose" class="modal-close">×</button><div id="modalBody"></div></div></div>
@@ -37,6 +38,7 @@
 <script src="home-rebuild.js"></script>
 <script src="home-life.js"></script>
 <script src="navigation.js"></script>
+<script src="territory-complete-pass-2026-09-30.js"></script>
 <script src="territory-telegram-auth-pass54.js"></script>
 <script src="territory-consumable-shop-authority.js"></script>
 <script src="territory-pve-elixir-trace-09.js"></script>

@@ -1,0 +1,128 @@
+/* TERRITORY COMPLETE PASS — visual integration */
+.territory-home-stone{
+  left:52%;
+  top:84%;
+  width:8%;
+  height:5%;
+  z-index:35;
+  background:transparent!important;
+  color:#f0cf91;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  text-shadow:0 2px 4px #000;
+  font-size:7px;
+  font-weight:1000;
+}
+.territory-home-stone-face{font-size:15px;filter:drop-shadow(0 2px 3px #000)}
+.territory-home-stone b{font-size:7px;color:#fff}
+.territory-home-stone:after{content:"";position:absolute;inset:4px;border:1px solid rgba(232,199,107,.28);border-radius:8px;background:rgba(4,12,18,.35);z-index:-1}
+
+.territory-battle-stone-pill{
+  position:absolute;
+  right:8px;
+  top:4px;
+  z-index:200;
+  border:1px solid rgba(232,199,107,.4);
+  border-radius:9px;
+  background:rgba(4,12,18,.78);
+  color:#f0cf91;
+  padding:5px 8px;
+  font-weight:900;
+  font-size:8px;
+  touch-action:manipulation;
+}
+.runner-ui .territory-battle-stone-pill{position:relative;top:auto;right:auto;margin-left:auto;pointer-events:auto}
+
+body.territory-arena-combat #territoryNav{
+  display:grid!important;
+  z-index:130000!important;
+}
+body.territory-arena-combat .arena-bottom-nav{display:none!important}
+
+.territory-shop-tabs{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:5px;
+  padding:8px;
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:#07131b;
+}
+.territory-shop-tabs button{
+  min-width:0;
+  border:1px solid #314854;
+  border-radius:9px;
+  background:#0d1b25;
+  color:#cbd4d8;
+  padding:8px 3px;
+  font-size:8px;
+  font-weight:900;
+}
+.territory-shop-tabs button.active{
+  border-color:#e8c76b;
+  background:#4b361c;
+  color:#f0cf91;
+}
+.territory-shop-grid{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:7px!important;
+  padding:8px!important;
+}
+.territory-shop-card{
+  display:grid;
+  grid-template-columns:48px 1fr auto;
+  gap:9px;
+  align-items:center;
+  padding:9px;
+  border:1px solid rgba(232,199,107,.2);
+  border-radius:12px;
+  background:linear-gradient(180deg,#12212b,#0a151c);
+  color:#eef3f5;
+}
+.tsc-icon{font-size:29px;text-align:center}
+.tsc-copy b{display:block;font-size:11px}
+.tsc-copy p{margin:3px 0;font-size:8px;opacity:.62}
+.tsc-copy small{font-size:10px;color:#f0cf91;font-weight:900}
+.territory-shop-card button{
+  border:1px solid #c59e4d;
+  border-radius:8px;
+  background:linear-gradient(#e5c56a,#9c711f);
+  color:#171107;
+  padding:8px 9px;
+  font-size:8px;
+  font-weight:1000;
+}
+
+.territory-stone-modal{color:#eef3f5}
+.territory-stone-modal header{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.territory-stone-modal header small{font-size:7px;color:#9fb0ba}
+.territory-stone-modal h2{margin:2px 0;color:#e8c76b}
+.territory-stone-modal header strong{font-size:24px;color:#fff}
+.territory-stone-modal p{font-size:10px;opacity:.72}
+.tsm-sources{display:grid;gap:6px}
+.tsm-sources article{padding:9px;border:1px solid #263d4b;border-radius:10px;background:#0d1b25}
+.tsm-sources b,.tsm-sources span{display:block}
+.tsm-sources b{font-size:10px}
+.tsm-sources span{font-size:8px;opacity:.6;margin:3px 0 7px}
+.tsm-sources button,.tsm-real button{
+  border:1px solid #c59e4d;border-radius:8px;background:#3a2a18;color:#f0cf91;padding:7px 9px;font-size:8px;font-weight:900
+}
+.territory-stone-modal h3{margin:11px 0 6px;font-size:11px;color:#e8c76b}
+.tsm-packs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.tsm-pack{border:1px solid #344a56;border-radius:10px;background:#0d1b25;color:#fff;padding:8px 3px}
+.tsm-pack span,.tsm-pack b,.tsm-pack small{display:block}
+.tsm-pack span{font-size:22px}.tsm-pack b{font-size:12px}.tsm-pack small{font-size:7px;color:#e8c76b;margin-top:2px}
+.tsm-real{padding:9px;border:1px solid #263d4b;border-radius:10px;background:#0d1b25}
+.tsm-real small{display:block;margin-top:5px;font-size:7px;opacity:.48}
+.tsm-demo{margin-top:9px;padding:8px;border:1px dashed #8b6a34;border-radius:9px;color:#e8c76b;font-size:7px}
+
+@media(max-width:390px){
+  .territory-home-stone{left:52%;width:8.2%}
+  .territory-shop-tabs{grid-template-columns:repeat(3,1fr)}
+  .territory-shop-card{grid-template-columns:40px 1fr auto}
+  .territory-shop-card button{padding:7px 6px;font-size:7px}
+}
