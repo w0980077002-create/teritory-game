@@ -1,4 +1,4 @@
-/* Territory RELEASE CANDIDATE 03 — player utility integration
+/* Territory RELEASE CANDIDATE 05 — player utility integration
    Keeps existing engines intact and connects the home utility actions to the
    server systems that already exist. Replace territory-release-candidate-01.js
    with this file.
