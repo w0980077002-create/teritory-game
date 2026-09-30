@@ -1,12 +1,8 @@
-TERRITORY CLIENT FIX 18 — TELEGRAM PROFILE
-Surgical overlay for the current client.
+TERRITORY — ARENA FIX
 
-REPLACE:
-- index.html
-- add territory-telegram-profile-ui-18.js
+Replace these 2 files in the existing Game folder:
+1) navigation.js
+2) territory-live-arena-bridge.js
 
-This explicitly loads the profile UI script. It reads the already-authoritative
-Telegram identity hydrated by territory-telegram-auth-pass54.js and displays:
-photo, name, username, Telegram ID on Home and Hero.
-
-No server/economy/PvE/Arena/combat changes.
+This is for the Telegram game path. Arena requires Telegram authentication.
+The fix removes the broken load-order issue in the live bridge, keeps the main bottom navigation visually identical inside Arena, sends the selected attack zone, and makes the chat use the server protocol.
