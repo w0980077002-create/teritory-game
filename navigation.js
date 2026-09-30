@@ -1,42 +1,65 @@
-/* Territory Navigation FIX 04 — canonical navigation */
+/* Territory Navigation PASS 02
+   Canonical bottom navigation: original home-master artwork + transparent hit areas.
+   No emoji/CSS recreation of the visual buttons.
+*/
 (function(){
 'use strict';
+
 const aliases={market:'shop',casino:'games',districts:'quests',profile:'hero',roadmap:'map'};
 const items=[['home','Город'],['inventory','Инвентарь'],['hero','Герой'],['battle','Бой'],['quests','Квесты'],['games','Игры'],['clan','Клан']];
 let originalShow=null;
 
-function isCombat(){return !!document.querySelector('#runnerScreen,.pve-battle.show,.arena-modal.arena-in-battle.show,#territory-live-arena');}
-function activeId(){return aliases[document.body.dataset.screen||'home']||document.body.dataset.screen||'home';}
-function removeArenaNav(){document.querySelectorAll('.arena-bottom-nav').forEach(x=>x.remove());}
+function isCombat(){
+  return !!document.querySelector('#runnerScreen,.pve-battle.show,.arena-modal.arena-in-battle.show,#territory-live-arena');
+}
+function activeId(){
+  return aliases[document.body.dataset.screen||'home']||document.body.dataset.screen||'home';
+}
+function cleanupArenaDuplicate(){
+  document.querySelectorAll('.arena-bottom-nav').forEach(el=>el.remove());
+}
 function sync(){
-  removeArenaNav();
-  const bar=document.getElementById('territoryNav'); if(!bar)return;
+  const bar=document.getElementById('territoryNav');
+  cleanupArenaDuplicate();
+  if(!bar)return;
   const active=activeId();
-  /* Home already has the exact original navigation baked into home-master.png. */
   bar.classList.toggle('hidden',active==='home');
-  bar.querySelectorAll('button[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===active));
+  bar.querySelectorAll('button[data-screen]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.screen===active);
+  });
 }
 function closeOverlays(){
   try{window.PvEFlow?.stop?.()}catch(_){}
   try{window.ArenaGame?.close?.()}catch(_){}
   document.querySelectorAll('.pve-battle.show').forEach(x=>x.classList.remove('show'));
-  document.querySelectorAll('.arena-modal.show').forEach(x=>{x.classList.remove('show');x.setAttribute('aria-hidden','true')});
+  document.querySelectorAll('.arena-modal.show').forEach(x=>{
+    x.classList.remove('show');x.setAttribute('aria-hidden','true');
+  });
   document.querySelector('#runnerScreen')?.remove();
   document.getElementById('territory-live-arena')?.remove();
 }
 function go(id,push=true){
   id=aliases[id]||id||'home';
-  if(id==='battle'){window.HomeRebuild?.startRunner?.();sync();return;}
+  if(id==='battle'){
+    window.HomeRebuild?.startRunner?.();
+    sync();
+    return;
+  }
   if(id==='arena'){
     closeOverlays();
-    if(window.TerritoryTelegramAuth?.state==='authenticated'&&window.TerritoryLiveArena?.open)window.TerritoryLiveArena.open();
-    else window.ArenaGame?.open?.();
-    sync();return;
+    if(window.TerritoryTelegramAuth?.state==='authenticated'&&window.TerritoryLiveArena?.open)
+      window.TerritoryLiveArena.open();
+    else
+      window.ArenaGame?.open?.();
+    sync();
+    return;
   }
   if(id==='forge'){
-    originalShow?.('shop');window.ForgeV2?.open?.();
+    originalShow?.('shop');
+    window.ForgeV2?.open?.();
     if(push)history.pushState({screen:'shop'},'','#shop');
-    sync();return;
+    sync();
+    return;
   }
   if(id==='home')closeOverlays();
   else document.getElementById('territory-live-arena')?.remove();
@@ -45,14 +68,16 @@ function go(id,push=true){
   sync();
 }
 function info(title,text,action){
-  const m=document.getElementById('modal'),b=document.getElementById('modalBody');if(!m||!b)return;
+  const m=document.getElementById('modal'),b=document.getElementById('modalBody');
+  if(!m||!b)return;
   b.innerHTML='<h2>'+title+'</h2><p>'+text+'</p>'+
     (action?'<button class="gold-btn wide" data-modal-action="'+action+'">ОТКРЫТЬ</button>':'')+
     '<button class="dark-btn wide" data-modal-ok>ЗАКРЫТЬ</button>';
   m.classList.add('show');
 }
 function routeHomeAction(a){
-  const map={battle:'battle',arena:'arena',map:'map',forge:'forge',shop:'shop',inventory:'inventory',hero:'hero',quests:'quests',games:'games',clan:'clan'};
+  const map={battle:'battle',arena:'arena',map:'map',forge:'forge',shop:'shop',
+    inventory:'inventory',hero:'hero',quests:'quests',games:'games',clan:'clan'};
   if(a==='home')return go('home');
   if(map[a])return go(map[a]);
   if(/^gear[1-6]$/.test(a))return go('inventory');
@@ -66,22 +91,34 @@ function routeHomeAction(a){
   if(a==='speed')return info('⏩ Скорость боя','Кнопка скорости боя.');
   if(a==='auto'){
     const s=window.TerritoryStore?.state;
-    if(s){s.auto=!Boolean(s.auto);window.TerritoryStore?.saveNow?.();return info('🔄 Автобой',s.auto?'Автобой включён.':'Автобой выключен.');}
+    if(s){
+      s.auto=!Boolean(s.auto);
+      window.TerritoryStore?.saveNow?.();
+      return info('🔄 Автобой',s.auto?'Автобой включён.':'Автобой выключен.');
+    }
   }
 }
 function mount(){
   if(document.getElementById('territoryNav'))return;
   const bar=document.createElement('nav');
-  bar.id='territoryNav';bar.className='global-nav';bar.setAttribute('aria-label','Основная навигация');
-  bar.innerHTML='<img class="territory-nav-art" src="./territory-bottom-nav-original-exact-v2.png" alt="" aria-hidden="true">'+
-    items.map(x=>'<button type="button" data-screen="'+x[0]+'" aria-label="'+x[1]+'"><span>'+x[1]+'</span></button>').join('');
+  bar.id='territoryNav';
+  bar.className='global-nav';
+  bar.setAttribute('aria-label','Основная навигация');
+  bar.innerHTML=items.map(x=>
+    `<button type="button" data-screen="${x[0]}" aria-label="${x[1]}"><span>${x[1]}</span></button>`
+  ).join('');
   document.body.appendChild(bar);
-  bar.addEventListener('click',e=>{const b=e.target.closest('button[data-screen]');if(b)go(b.dataset.screen);});
+  bar.addEventListener('click',e=>{
+    const b=e.target.closest('button[data-screen]');
+    if(b)go(b.dataset.screen);
+  });
 }
 function init(){
-  originalShow=window.showScreen;mount();
+  originalShow=window.showScreen;
+  mount();
   window.showScreen=function(id){go(id,true)};
   if(window.TerritoryUI)window.TerritoryUI.show=window.showScreen;
+
   document.addEventListener('click',e=>{
     const back=e.target.closest('[data-back],[data-home]');
     if(back){e.preventDefault();go('home');return;}
@@ -89,20 +126,29 @@ function init(){
     if(home){e.preventDefault();e.stopPropagation();routeHomeAction(home.dataset.homeAction);return;}
     const action=e.target.closest('[data-action]');
     if(action){e.preventDefault();e.stopPropagation();routeHomeAction(action.dataset.action);return;}
-    const ma=e.target.closest('[data-modal-action]');
-    if(ma){e.preventDefault();document.getElementById('modal')?.classList.remove('show');routeHomeAction(ma.dataset.modalAction);return;}
-    const ok=e.target.closest('[data-modal-ok]');
-    if(ok)document.getElementById('modal')?.classList.remove('show');
+    const modalAction=e.target.closest('[data-modal-action]');
+    if(modalAction){
+      e.preventDefault();
+      document.getElementById('modal')?.classList.remove('show');
+      routeHomeAction(modalAction.dataset.modalAction);
+      return;
+    }
+    const modalOk=e.target.closest('[data-modal-ok]');
+    if(modalOk){document.getElementById('modal')?.classList.remove('show');return;}
   },true);
+
   window.addEventListener('territory:screen',sync);
   window.addEventListener('territory:state-changed',sync);
   window.addEventListener('popstate',e=>{
     const id=aliases[e.state?.screen||location.hash.slice(1)||'home']||'home';
-    if(id==='arena')go('arena',false); else if(!isCombat())originalShow?.(id);
+    if(id==='arena')go('arena',false);
+    else if(!isCombat())originalShow?.(id);
     sync();
   });
-  new MutationObserver(removeArenaNav).observe(document.body,{childList:true,subtree:true});
-  history.replaceState({screen:activeId()},'',location.hash||'#home');sync();
+
+  new MutationObserver(()=>cleanupArenaDuplicate()).observe(document.body,{childList:true,subtree:true});
+  history.replaceState({screen:activeId()},'',location.hash||'#home');
+  sync();
 }
 window.TerritoryNavigation={go,sync,info};
 document.addEventListener('DOMContentLoaded',init);
