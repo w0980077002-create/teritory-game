@@ -103,3 +103,16 @@
 .battle-zone-controls button,.battle-command-row button,.combat-item-slot,.arena-bottom-nav button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .viking-fallback{position:absolute;left:50%;bottom:0;transform:translateX(-50%);font-size:110px;line-height:1;filter:drop-shadow(0 10px 8px #000)}
 .arena-modal.arena-in-battle .battle-stage{background-image:linear-gradient(#0002,#0005),url('./arena-night-approved.png');background-size:cover;background-position:center 54%}
+
+/* ARENA FINAL INPUT SAFETY 2026-09-30: keep battle controls above visual layers and fully touchable. */
+.arena-in-battle .battle-zone-controls,
+.arena-in-battle .battle-command-row,
+.arena-in-battle .combat-loadout-strip,
+.arena-in-battle .battle-chat-wrap{pointer-events:auto;}
+.arena-in-battle .battle-zone-controls button,
+.arena-in-battle .battle-command-row button,
+.arena-in-battle .combat-item-slot,
+.arena-in-battle .battle-chat-toggle,
+.arena-in-battle .chat-compose button,
+.arena-in-battle .arena-bottom-nav button{position:relative;z-index:150;pointer-events:auto;-webkit-tap-highlight-color:transparent;}
+.arena-in-battle .battle-stage{touch-action:manipulation;}

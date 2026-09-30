@@ -76,7 +76,7 @@
         <div class="combat-effects" data-effects></div>
       </div>
       <div class="battle-command-row"><span class="tactic-mini">2 🛡️ + 1 ⚔️</span><button type="button" class="command-auto" data-autobattle-toggle><span>↻</span><small>${b.auto?'АВТО ✓':'АВТО'}</small></button><button type="button" class="command-hit" data-execute-attack disabled>⚔️ УДАР</button><button type="button" class="command-surrender" data-surrender>Сдаться</button><button type="button" class="command-exit" data-exit-battle>Выйти</button><strong data-cooldown>Готов</strong></div>
-      ${combatBar()}<div class="battle-chat-wrap"><button type="button" class="battle-chat-toggle" data-chat-toggle>💬 История и чат <span>⌄</span></button><div class="battle-chat collapsed" data-chat>${chatHtml()}</div></div>
+      ${combatBar()}<div class="battle-chat-wrap"><button type="button" class="battle-chat-toggle" data-chat-toggle>💬 История и чат <span>⌄</span></button><div class="battle-chat collapsed" data-chat>${chatHtml()}</div></div>${bottomNav()}
     </div>`;
     bindBattleControls();sync();
     window.FollowerArena?.decorate?.();
@@ -94,23 +94,35 @@
   function stopTimer(){if(arenaBattle?.timer){clearInterval(arenaBattle.timer);arenaBattle.timer=null;}}
   function bindBattleControls(){
     const r=root();if(!r?.body)return;
-    const bind=(selector,fn)=>{
-      r.body.querySelectorAll(selector).forEach(el=>{
-        el.onclick=(e)=>{e.preventDefault();e.stopPropagation();fn(el,e);};
-      });
+    const dispatch=(t)=>{
+      if(!t||!r.body.contains(t))return false;
+      if(t.dataset.defenseZone){selectDefense(t.dataset.defenseZone);return true;}
+      if(t.dataset.attackZone){selectAttack(t.dataset.attackZone);return true;}
+      if(t.dataset.executeAttack){executeAttack();return true;}
+      if(t.dataset.autobattleToggle){toggleAuto();return true;}
+      if(t.dataset.combatSlot&&!t.disabled){useSlot(t.dataset.combatSlot);return true;}
+      if(t.dataset.gear){chooseGear(t.dataset.gear);return true;}
+      if(t.dataset.surrender){finish(false);return true;}
+      if(t.dataset.exitBattle){exitBattle();return true;}
+      if(t.dataset.chatToggle){toggleChat(t);return true;}
+      if(t.dataset.chatSend){sendChat();return true;}
+      if(t.dataset.arenaNav){navigateArena(t.dataset.arenaNav);return true;}
+      return false;
     };
-    bind('[data-defense-zone]',el=>selectDefense(el.dataset.defenseZone));
-    bind('[data-attack-zone]',el=>selectAttack(el.dataset.attackZone));
-    bind('[data-execute-attack]',()=>executeAttack());
-    bind('[data-autobattle-toggle]',()=>toggleAuto());
-    bind('[data-combat-slot]',el=>useSlot(el.dataset.combatSlot));
-    bind('[data-gear]',el=>chooseGear(el.dataset.gear));
-    bind('[data-surrender]',()=>finish(false));
-    bind('[data-exit-battle]',()=>exitBattle());
-    bind('[data-chat-toggle]',el=>toggleChat(el));
-    bind('[data-chat-send]',()=>sendChat());
-    bind('[data-arena-nav]',el=>navigateArena(el.dataset.arenaNav));
-    bind('[data-arena-hub]',()=>openHub());
+    if(r.body.dataset.controlsBound==='1')return;
+    r.body.dataset.controlsBound='1';
+    let lastPointerTarget=null,lastPointerAt=0;
+    r.body.addEventListener('pointerup',e=>{
+      const t=e.target.closest?.('button');if(!t)return;
+      lastPointerTarget=t;lastPointerAt=Date.now();
+      if(e.cancelable)e.preventDefault();
+      dispatch(t);
+    },{passive:false});
+    r.body.addEventListener('click',e=>{
+      const t=e.target.closest?.('button');if(!t)return;
+      if(t===lastPointerTarget&&Date.now()-lastPointerAt<700){e.preventDefault();return;}
+      dispatch(t);
+    });
   }
 
   function selectDefense(z){
@@ -172,8 +184,8 @@
   function finish(win){
     if(!arenaBattle||arenaBattle.ended)return;
     arenaBattle.ended=true;stopTimer();
-    const s=S();s.hp=Math.max(0,Math.min(s.maxHp,arenaBattle.player.hp));s.arena.battles++;
-    if(win){s.arena.wins++;s.arena.rating+=25;s.coins+=50;s.exp+=20;arenaBattle.logs.push('🏆 Победа!');}
+    const s=S();s.hp=Math.max(0,Math.min(Number(s.maxHp)||arenaBattle.player.maxHp,arenaBattle.player.hp));s.arena=s.arena||{rating:1000,wins:0,losses:0,battles:0,combatSlotsUnlocked:3,loadout:'crit'};s.arena.battles++;
+    if(win){s.arena.wins++;s.arena.rating+=25;s.coins=(Number(s.coins)||0)+50;window.TerritoryStore?.addXp?.(20);arenaBattle.logs.push('🏆 Победа!');}
     else{s.arena.losses++;s.arena.rating=Math.max(0,s.arena.rating-20);arenaBattle.logs.push('☠️ Поражение.');}
     save();render();sync();
   }
@@ -193,7 +205,7 @@
   function chooseGear(slot){if(!arenaBattle||arenaBattle.ended)return;const keys=Object.keys(styles),i=keys.indexOf(arenaBattle.player.style),next=keys[(i+1)%keys.length];arenaBattle.player.style=next;arenaBattle.logs.push(`👕 ${slot}: ${styles[next].name}`);render();}
   function toggleChat(t){const box=root()?.body.querySelector('[data-chat]');if(!box)return;const open=box.classList.toggle('collapsed')===false;t.setAttribute('aria-expanded',String(open));}
   function sendChat(){const i=$('[data-chat-input]');if(!i?.value.trim()||!arenaBattle)return;arenaBattle.chat.push({name:me().name,text:i.value.trim()});i.value='';render();root()?.body.querySelector('[data-chat]')?.classList.remove('collapsed');}
-  function navigateArena(id){const map={home:'home',inventory:'inventory',hero:'hero',game:'games',quests:'quests',clan:'clan'};const target=map[id]||'home';root()?.modal.classList.remove('show');stopTimer();arenaBattle=null;window.TerritoryNavigation?.go?.(target); }
+  function navigateArena(id){root()?.modal.classList.remove('show');stopTimer();arenaBattle=null;const map={home:'home',inventory:'inventory',hero:'hero',game:'games',quests:'quests',clan:'clan'};if(window.TerritoryNavigation?.go)window.TerritoryNavigation.go(map[id]||'home');else window.showScreen?.(map[id]||'home');}
   function exitBattle(){stopTimer();arenaBattle=null;openHub();}
   document.addEventListener('click',e=>{
     const t=e.target.closest?.('button');if(!t)return;
