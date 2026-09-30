@@ -1,4 +1,4 @@
-/* TERRITORY COMPLETE PASS — 2026-09-30
+/* TERRITORY COMPLETE PASS — 2026-09-30 / PASS 2
  * Integration layer for:
  * - visible Battle Stones button
  * - guest/demo battle-stone access on Render
