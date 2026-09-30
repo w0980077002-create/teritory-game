@@ -8,12 +8,25 @@ async function startSession(chapter,stage,boss){
  const s=S(),bonusBefore=Number(s.battleStonesBonus)||0,baseBefore=Number(s.battleStones)||0;
  const r=await A.api('/api/pve/start',{method:'POST',body:JSON.stringify({chapter,stage,boss:!!boss})});session={id:r.session_id,nonce:r.nonce,seed:r.seed,chapter:Number(chapter)||1,stage:Number(stage)||1,boss:!!boss};window.TerritoryPveTranscript08?.setSession?.(session);window.__territoryLastPveSessionId=session.id;
  if(r.state){const e={coins:s.coins,gems:s.gems,redGems:s.redGems};Object.assign(s,r.state);s.coins=e.coins;s.gems=e.gems;s.redGems=e.redGems;save()}
- // Legacy PvE engine still consumes one stone locally. Give that one token back after the server consumed it.
  if(bonusBefore>0)s.battleStonesBonus=(Number(s.battleStonesBonus)||0)+1;else if(baseBefore>0)s.battleStones=(Number(s.battleStones)||0)+1;save();return true;
 }
-async function completeSession(){if(!session||finishing)return;finishing=true;try{const r=await A.api('/api/pve/complete',{method:'POST',body:JSON.stringify({session_id:session.id})});const e={coins:S().coins,gems:S().gems,redGems:S().redGems};if(r.state)Object.assign(S(),r.state);if(r.player){S().coins=Number(r.player.coins)||0;S().gems=Number(r.player.gems)||0;S().redGems=Number(r.player.red_gems)||0;S().profile=S().profile||{};S().profile.vip=Number(r.player.vip)||0}else{S().coins=e.coins;S().gems=e.gems;S().redGems=e.redGems}save();session=null}catch(e){console.warn('[Territory] PvE authority completion failed:',e.message||e)}finally{finishing=false}}
+async function completeSession(){
+ if(!session||finishing)return false;
+ finishing=true;
+ try{
+  const r=await A.api('/api/pve/complete',{method:'POST',body:JSON.stringify({session_id:session.id})});
+  const e={coins:S().coins,gems:S().gems,redGems:S().redGems};
+  if(r.state)Object.assign(S(),r.state);
+  if(r.player){S().coins=Number(r.player.coins)||0;S().gems=Number(r.player.gems)||0;S().redGems=Number(r.player.red_gems)||0;S().profile=S().profile||{};S().profile.vip=Number(r.player.vip)||0}
+  else{S().coins=e.coins;S().gems=e.gems;S().redGems=e.redGems}
+  save();session=null;window.TerritoryPveTranscript08?.setSession?.(null);return r;
+ }catch(e){
+  console.warn('[Territory] PvE authority completion failed:',e.message||e);
+  throw e;
+ }finally{finishing=false}
+}
 function wrapStarts(){if(!window.PvEBattle||window.PvEBattle.__authorityWrapped04)return;const os=window.PvEBattle.start,ob=window.PvEBattle.startBoss;window.PvEBattle.start=async function(stage){const s=S();try{await startSession(s.currentChapter||1,stage||s.chapterStage||1,false)}catch(e){console.warn('[Territory] battle rejected:',e.message||e);return false}const ok=os(stage);if(ok===false){console.warn('[Territory] legacy battle start failed after server session creation');}return ok};window.PvEBattle.startBoss=async function(){const s=S();try{await startSession(s.currentChapter||1,4,true)}catch(e){console.warn('[Territory] boss rejected:',e.message||e);return false}return ob()};window.PvEBattle.__authorityWrapped04=true}
-function observe(){const s=S(),chapter=Number(s.currentChapter)||1,progress=Number(s.chapterProgress)||0,boss=!!s.chapterBossDefeated;if(lastChapter===null){lastChapter=chapter;lastProgress=progress;lastBoss=boss;return}if(session&&!finishing&&(progress>lastProgress||chapter>lastChapter||boss!==lastBoss))completeSession();lastChapter=chapter;lastProgress=progress;lastBoss=boss}
+function observe(){const s=S(),chapter=Number(s.currentChapter)||1,progress=Number(s.chapterProgress)||0,boss=!!s.chapterBossDefeated;if(lastChapter===null){lastChapter=chapter;lastProgress=progress;lastBoss=boss;return}if(session&&!finishing&&(progress>lastProgress||chapter>lastChapter||boss!==lastBoss))completeSession().catch(()=>{});lastChapter=chapter;lastProgress=progress;lastBoss=boss}
 function loadTranscript(){const src='territory-pve-authority-01d.js';if(!document.querySelector(`script[src="${src}"]`)){const sc=document.createElement('script');sc.src=src;document.body.appendChild(sc)}}
 function boot(){loadTranscript();wrapStarts();setInterval(()=>{wrapStarts();observe()},350)}boot();window.TerritoryPveAuthorityComplete08={startSession,completeSession};
 })();
