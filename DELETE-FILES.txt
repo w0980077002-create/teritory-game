@@ -1,0 +1,12 @@
+DELETE-FILES.txt
+
+Дополнительных удалений в этом PASS нет.
+
+ЗАМЕНИТЬ:
+navigation.js
+navigation.css
+
+ДОБАВИТЬ:
+territory-bottom-nav-original-exact-v2.png
+
+Не удалять home-master.png, arena.js или arena.css.

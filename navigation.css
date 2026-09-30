@@ -1,12 +1,78 @@
-/* Territory touch calibration v3. Based on the supplied 689x1536 screenshot; game viewport begins below Telegram chrome. */
-:root{--nav-gold:#e8c76b}.global-nav{position:fixed;left:0;right:0;bottom:0;width:100%;height:68px;z-index:130000;display:grid;grid-template-columns:repeat(7,1fr);background:linear-gradient(#162b38,#07111a);border-top:1px solid #806332;box-shadow:0 -8px 24px #0009}.global-nav.hidden{display:none}.global-nav button{min-width:0;border:0;border-right:1px solid #263b47;background:transparent;color:#d5dce0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.global-nav button.active{color:var(--nav-gold);background:#49351b55}.global-nav span{font-size:21px;line-height:1}.global-nav b{font-size:9px;line-height:1.1}
-.home-reference-host{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#07131b}.home-reference-image{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;object-position:center top;display:block;pointer-events:none}.home-hit-layer{position:absolute;inset:0;z-index:30;pointer-events:none}.home-hit{position:absolute;display:block;border:0;background:transparent;box-shadow:none;padding:0;margin:0;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.home-hit:focus{outline:2px solid #e8c76b55}
-/* top resource strip */.home-hit.top{top:0;height:4.7%}.home-hit.profile{left:0;width:27%}.home-hit.coins{left:27%;width:19%}.home-hit.gems{left:46%;width:19%}.home-hit.redgems{left:65%;width:15%}.home-hit.trophy{left:80%;width:8.5%}.home-hit.mail{left:88.5%;width:7.2%}.home-hit.settings{left:95.7%;width:4.3%}.home-hit.energy{left:27%;top:4.7%;width:33%;height:4.2%}
-/* side menu rows */.home-hit.left,.home-hit.right{width:16%;height:7.1%}.home-hit.left{left:0}.home-hit.right{right:0}.home-hit.side1{top:10.5%}.home-hit.side2{top:18.2%}.home-hit.side3{top:25.9%}.home-hit.side4{top:33.2%}.home-hit.side5{top:40.8%}
-/* chapter */.home-hit.chapter{left:25%;right:25%;top:8.8%;height:8.0%}
-/* equipment row: six visible slots */.home-hit.gear{top:68.3%;height:8.4%}.home-hit.g1{left:19%;width:10%}.home-hit.g2{left:29.5%;width:10%}.home-hit.g3{left:40%;width:10%}.home-hit.g4{left:50.5%;width:10%}.home-hit.g5{left:61%;width:10%}.home-hit.g6{left:71.5%;width:10%}
-/* consumables row */.home-hit.elixir{top:77.1%;height:7.3%;width:15.5%}.home-hit.e1{left:1%}.home-hit.e2{left:17%}.home-hit.e3{left:33%}.home-hit.e4{left:49%}.home-hit.locked{top:77.1%;height:7.3%;width:14%}.home-hit.l1{left:66%}.home-hit.l2{left:81%}.home-hit.l3{left:90%}
-/* chapter task and four square controls */.home-hit.speed{left:62%;top:84.0%;width:9%;height:5.0%}.home-hit.auto{left:71.5%;top:84.0%;width:9%;height:5.0%}.home-hit.honor{left:81%;top:84.0%;width:9%;height:5.0%}.home-hit.blessing{left:90.5%;top:84.0%;width:9%;height:5.0%}
-/* task strip */.home-hit.chapter-task{left:0;top:84%;width:60%;height:5%}
-/* bottom nav */.home-hit.bottom{bottom:0;height:9.3%;width:14.285%}.home-hit.bottom.b1{left:0}.home-hit.bottom.b2{left:14.285%}.home-hit.bottom.b3{left:28.57%}.home-hit.bottom.b4{left:42.855%}.home-hit.bottom.b5{left:57.14%}.home-hit.bottom.b6{left:71.425%}.home-hit.bottom.b7{left:85.71%}
-@media(max-width:390px){.global-nav{height:62px}.global-nav span{font-size:18px}.global-nav b{font-size:8px}}
+/* Territory Navigation PASS 02
+   Visual source: territory-bottom-nav-original-exact-v2.png
+   The artwork is the original home-master bottom navigation crop.
+*/
+:root{--territory-nav-h:max(78px,min(188px,21.684vw));--nav-gold:#e8c76b}
+
+.global-nav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  width:100%;
+  height:min(188px,21.684vw);
+  min-height:78px;
+  z-index:130000;
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  background:transparent;
+  overflow:visible;
+  pointer-events:none;
+  isolation:isolate;
+}
+.global-nav::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background:url("./territory-bottom-nav-original-exact-v2.png") center bottom/100% 100% no-repeat;
+  pointer-events:none;
+}
+.global-nav.hidden{display:grid}
+.global-nav button{
+  position:relative;
+  z-index:2;
+  min-width:0;
+  min-height:100%;
+  border:0;
+  background:transparent;
+  color:transparent;
+  padding:0;
+  margin:0;
+  pointer-events:auto;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.global-nav button:focus-visible{
+  outline:2px solid #e8c76b;
+  outline-offset:-3px;
+}
+.global-nav button span{
+  position:absolute;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  clip-path:inset(50%);
+  white-space:nowrap;
+}
+.home-reference-host{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#07131b}
+.home-reference-image{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;object-position:center top;display:block;pointer-events:none}
+.home-hit-layer{position:absolute;inset:0;z-index:30;pointer-events:none}
+.home-hit{position:absolute;display:block;border:0;background:transparent;box-shadow:none;padding:0;margin:0;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.home-hit:focus{outline:2px solid #e8c76b55}
+.home-hit.top{top:0;height:4.7%}.home-hit.profile{left:0;width:27%}.home-hit.coins{left:27%;width:19%}.home-hit.gems{left:46%;width:19%}.home-hit.redgems{left:65%;width:15%}.home-hit.trophy{left:80%;width:8.5%}.home-hit.mail{left:88.5%;width:7.2%}.home-hit.settings{left:95.7%;width:4.3%}.home-hit.energy{left:27%;top:4.7%;width:33%;height:4.2%}
+.home-hit.left,.home-hit.right{width:16%;height:7.1%}.home-hit.left{left:0}.home-hit.right{right:0}.home-hit.side1{top:10.5%}.home-hit.side2{top:18.2%}.home-hit.side3{top:25.9%}.home-hit.side4{top:33.2%}.home-hit.side5{top:40.8%}
+.home-hit.chapter{left:25%;right:25%;top:8.8%;height:8.0%}
+.home-hit.gear{top:68.3%;height:8.4%}.home-hit.g1{left:19%;width:10%}.home-hit.g2{left:29.5%;width:10%}.home-hit.g3{left:40%;width:10%}.home-hit.g4{left:50.5%;width:10%}.home-hit.g5{left:61%;width:10%}.home-hit.g6{left:71.5%;width:10%}
+.home-hit.elixir{top:77.1%;height:7.3%;width:15.5%}.home-hit.e1{left:1%}.home-hit.e2{left:17%}.home-hit.e3{left:33%}.home-hit.e4{left:49%}.home-hit.locked{top:77.1%;height:7.3%;width:14%}.home-hit.l1{left:66%}.home-hit.l2{left:81%}.home-hit.l3{left:90%}
+.home-hit.speed{left:62%;top:84.0%;width:9%;height:5.0%}.home-hit.auto{left:71.5%;top:84.0%;width:9%;height:5.0%}.home-hit.honor{left:81%;top:84.0%;width:9%;height:5.0%}.home-hit.blessing{left:90.5%;top:84.0%;width:9%;height:5.0%}
+.home-hit.chapter-task{left:0;top:84%;width:60%;height:5%}
+.home-hit.bottom{bottom:0;height:9.3%;width:14.285%}.home-hit.bottom.b1{left:0}.home-hit.bottom.b2{left:14.285%}.home-hit.bottom.b3{left:28.57%}.home-hit.bottom.b4{left:42.855%}.home-hit.bottom.b5{left:57.14%}.home-hit.bottom.b6{left:71.425%}.home-hit.bottom.b7{left:85.71%}
+
+@media(max-width:390px){
+  .global-nav{height:min(188px,21.684vw);min-height:72px}
+}
+
+/* Arena uses the same canonical navigation; reserve its full height. */
+.arena-battle{padding-bottom:var(--territory-nav-h)!important;}
