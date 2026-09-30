@@ -1,41 +1,32 @@
-TERRITORY RELEASE CANDIDATE 01
+TERRITORY PvE PASS 01 — ONE COMPLETE PACKAGE
 
-BASE: current main branch inspected on 2026-10-01.
+This is ONE package for the next upload. Do not upload the old one-file PvE fix separately.
 
-THIS PACKAGE CHANGES ONLY THE NAVIGATION/OVERLAY INTEGRATION.
-It deliberately does not rewrite the existing PvE, Arena, economy or server engines.
+Replace these files in the ROOT of teritory-game:
+  index.html
+  navigation.js
+  navigation.css
+  territory-release-candidate-01.js
+  territory-pve-authority-01d.js
 
-REPLACE on GitHub:
-1) navigation.js
-2) navigation.css
-3) territory-bottom-nav-original-exact-v2.png
+Add:
+  territory-pve-authority-fix-01.js
+  territory-bottom-nav-original-exact-v2.png
 
-ADD to the repo:
-4) territory-release-candidate-01.js
+The index.html in this package already contains:
+  <script src="territory-pve-authority-fix-01.js"></script>
 
-INDEX.HTML:
-Add this script AFTER territory-telegram-profile-ui-18.js:
-<script src="territory-release-candidate-01.js"></script>
+Do NOT delete any existing PvE files.
+Do NOT change other files manually for this pass.
 
-WHY:
-- fixes the 50%-left navigation displacement caused by clean-game.css transform
-- keeps one canonical seven-button bar on non-home screens
-- removes Arena's legacy duplicate bottom bar
-- removes the cloned Live Arena nav
-- keeps the canonical bar visible on Arena hub AND Arena combat
-- keeps the canonical bar visible during PvE combat
-- makes the active button follow the actual open Arena/PvE overlay
-- prevents normal navigation from leaving an old Arena/PvE overlay underneath
+Purpose:
+- keep the canonical bottom navigation package intact;
+- complete PvE server session before local continuation advances chapter/stage;
+- wait for the PvE action transcript queue before completion;
+- apply the server-issued loot/state after completion so local random loot is not retained;
+- preserve the existing combat UI/math and normal navigation.
 
-DO NOT DELETE any other game file for this package.
+After upload test:
+Chapter -> Stage 1 -> win -> loot -> equip/keep -> Continue -> Stage 2 -> 50% -> 75% -> 100% -> Boss -> chapter reward -> next chapter.
 
-VALIDATION performed:
-- node --check navigation.js: PASS
-- node --check territory-release-candidate-01.js: PASS
-- navigation.css explicitly resets left/right/width/max-width/transform/margin
-- the package is based on the current GitHub main state, not the old 16:25 restore point.
-
-IMPORTANT:
-This is the first RELEASE-CANDIDATE integration pass, not a claim that Telegram Stars,
-server-side social chat/clans/mail, production deployment, or 240 chapters of content
-are already production-complete. Those are separate remaining systems.
+If anything is wrong, stop and report what happened before changing more files.

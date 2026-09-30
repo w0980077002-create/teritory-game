@@ -77,20 +77,3 @@
 .arena-bottom-nav{display:none!important;pointer-events:none!important}
 /* Live Arena uses the same global bar instead of cloning a second copy. */
 #territoryLiveNav{display:none!important;pointer-events:none!important}
-
-
-/* Territory RC05 — canonical PvE bottom navigation
-   The PvE battle engine contains an old internal 5-item footer.
-   The game now has one canonical 7-item bottom navigation, so the legacy
-   footer must never be visible or receive pointer events.
-*/
-.pve-battle .bottom > .nav{
-  display:none!important;
-  pointer-events:none!important;
-}
-.pve-battle .bottom{
-  padding-bottom:var(--territory-nav-h)!important;
-}
-.pve-battle{
-  padding-bottom:var(--territory-nav-h)!important;
-}

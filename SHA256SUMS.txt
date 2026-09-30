@@ -1,5 +1,8 @@
-46c9e1ccab698987b506a381af75d2986599896103c0f3c1cf2c71ae941c398e  index.html
-ce5fa45dd00a43c731ae0c64c394d561baeca6d6fae93b20594da197792a88f8  navigation.js
-256d3eab0533c2bf998f02a031a454b39f52b5e13f3fe088b2603a5eb558350b  navigation.css
-913826043f65ac0f8195200c584a25217e4cd8738c997d18b9fb40c061c30f58  territory-release-candidate-01.js
-05c0455da8d8071cb1fb19ef52fe4817e8834a6740bc26dc593f035c9cabdffd  territory-bottom-nav-original-exact-v2.png
+a4403ea97a681d3849095c3439eae7a514510795f2f4536571900da1fe92b027  /mnt/data/TERRITORY-PVE-PASS-01/README-APPLY.txt
+46c9e1ccab698987b506a381af75d2986599896103c0f3c1cf2c71ae941c398e  /mnt/data/TERRITORY-PVE-PASS-01/index.html
+256d3eab0533c2bf998f02a031a454b39f52b5e13f3fe088b2603a5eb558350b  /mnt/data/TERRITORY-PVE-PASS-01/navigation.css
+ce5fa45dd00a43c731ae0c64c394d561baeca6d6fae93b20594da197792a88f8  /mnt/data/TERRITORY-PVE-PASS-01/navigation.js
+05c0455da8d8071cb1fb19ef52fe4817e8834a6740bc26dc593f035c9cabdffd  /mnt/data/TERRITORY-PVE-PASS-01/territory-bottom-nav-original-exact-v2.png
+2748f5cd003d28ff0e47036e64c10bb50d3a7ea1eb5530660f08c04130703b92  /mnt/data/TERRITORY-PVE-PASS-01/territory-pve-authority-01d.js
+9258da141feee0e8c5bd4e2cb86cc33a5b1d3d7ddf892a9fc08045550e35b4ff  /mnt/data/TERRITORY-PVE-PASS-01/territory-pve-authority-fix-01.js
+54d13fd6c6bf6d2a077584f079ce37ae4e751a4f47d79b1c5d60cea7d8f33882  /mnt/data/TERRITORY-PVE-PASS-01/territory-release-candidate-01.js
