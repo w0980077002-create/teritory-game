@@ -76,7 +76,7 @@
         <div class="combat-effects" data-effects></div>
       </div>
       <div class="battle-command-row"><span class="tactic-mini">2 🛡️ + 1 ⚔️</span><button type="button" class="command-auto" data-autobattle-toggle><span>↻</span><small>${b.auto?'АВТО ✓':'АВТО'}</small></button><button type="button" class="command-hit" data-execute-attack disabled>⚔️ УДАР</button><button type="button" class="command-surrender" data-surrender>Сдаться</button><button type="button" class="command-exit" data-exit-battle>Выйти</button><strong data-cooldown>Готов</strong></div>
-      ${combatBar()}<div class="battle-chat-wrap"><button type="button" class="battle-chat-toggle" data-chat-toggle>💬 История и чат <span>⌄</span></button><div class="battle-chat collapsed" data-chat>${chatHtml()}</div></div>${bottomNav()}
+      ${combatBar()}<div class="battle-chat-wrap"><button type="button" class="battle-chat-toggle" data-chat-toggle>💬 История и чат <span>⌄</span></button><div class="battle-chat collapsed" data-chat>${chatHtml()}</div></div>
     </div>`;
     bindBattleControls();sync();
     window.FollowerArena?.decorate?.();
@@ -94,25 +94,23 @@
   function stopTimer(){if(arenaBattle?.timer){clearInterval(arenaBattle.timer);arenaBattle.timer=null;}}
   function bindBattleControls(){
     const r=root();if(!r?.body)return;
-    if(r.body.dataset.controlsBound==='1')return;
-    r.body.dataset.controlsBound='1';
-
-    r.body.addEventListener('click',e=>{
-      const t=e.target.closest('button');
-      if(!t||!r.body.contains(t))return;
-
-      if(t.dataset.defenseZone){selectDefense(t.dataset.defenseZone);}
-      else if(t.dataset.attackZone){selectAttack(t.dataset.attackZone);}
-      else if(t.dataset.executeAttack){executeAttack();}
-      else if(t.dataset.autobattleToggle){toggleAuto();}
-      else if(t.dataset.combatSlot){useSlot(t.dataset.combatSlot);}
-      else if(t.dataset.gear){chooseGear(t.dataset.gear);}
-      else if(t.dataset.surrender){finish(false);}
-      else if(t.dataset.exitBattle){exitBattle();}
-      else if(t.dataset.chatToggle){toggleChat(t);}
-      else if(t.dataset.chatSend){sendChat();}
-      else if(t.dataset.arenaNav){navigateArena(t.dataset.arenaNav);}
-    });
+    const bind=(selector,fn)=>{
+      r.body.querySelectorAll(selector).forEach(el=>{
+        el.onclick=(e)=>{e.preventDefault();e.stopPropagation();fn(el,e);};
+      });
+    };
+    bind('[data-defense-zone]',el=>selectDefense(el.dataset.defenseZone));
+    bind('[data-attack-zone]',el=>selectAttack(el.dataset.attackZone));
+    bind('[data-execute-attack]',()=>executeAttack());
+    bind('[data-autobattle-toggle]',()=>toggleAuto());
+    bind('[data-combat-slot]',el=>useSlot(el.dataset.combatSlot));
+    bind('[data-gear]',el=>chooseGear(el.dataset.gear));
+    bind('[data-surrender]',()=>finish(false));
+    bind('[data-exit-battle]',()=>exitBattle());
+    bind('[data-chat-toggle]',el=>toggleChat(el));
+    bind('[data-chat-send]',()=>sendChat());
+    bind('[data-arena-nav]',el=>navigateArena(el.dataset.arenaNav));
+    bind('[data-arena-hub]',()=>openHub());
   }
 
   function selectDefense(z){
@@ -195,7 +193,7 @@
   function chooseGear(slot){if(!arenaBattle||arenaBattle.ended)return;const keys=Object.keys(styles),i=keys.indexOf(arenaBattle.player.style),next=keys[(i+1)%keys.length];arenaBattle.player.style=next;arenaBattle.logs.push(`👕 ${slot}: ${styles[next].name}`);render();}
   function toggleChat(t){const box=root()?.body.querySelector('[data-chat]');if(!box)return;const open=box.classList.toggle('collapsed')===false;t.setAttribute('aria-expanded',String(open));}
   function sendChat(){const i=$('[data-chat-input]');if(!i?.value.trim()||!arenaBattle)return;arenaBattle.chat.push({name:me().name,text:i.value.trim()});i.value='';render();root()?.body.querySelector('[data-chat]')?.classList.remove('collapsed');}
-  function navigateArena(id){root()?.modal.classList.remove('show');const map={home:'home',inventory:'inventory',hero:'hero',game:'casino',quests:'districts',clan:'districts'};window.showScreen?.(map[id]||'home');}
+  function navigateArena(id){const map={home:'home',inventory:'inventory',hero:'hero',game:'games',quests:'quests',clan:'clan'};const target=map[id]||'home';root()?.modal.classList.remove('show');stopTimer();arenaBattle=null;window.TerritoryNavigation?.go?.(target); }
   function exitBattle(){stopTimer();arenaBattle=null;openHub();}
   document.addEventListener('click',e=>{
     const t=e.target.closest?.('button');if(!t)return;

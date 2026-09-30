@@ -1,8 +1,12 @@
-TERRITORY — ARENA FIX
+TERRITORY — Arena Fix 1
 
-Replace these 2 files in the existing Game folder:
-1) navigation.js
-2) territory-live-arena-bridge.js
+Это не новый проект и не отдельная игра. Это два файла для замены в ТЕКУЩЕЙ папке Game из GitHub.
 
-This is for the Telegram game path. Arena requires Telegram authentication.
-The fix removes the broken load-order issue in the live bridge, keeps the main bottom navigation visually identical inside Arena, sends the selected attack zone, and makes the chat use the server protocol.
+Исправлено:
+1. Боевые кнопки Арены получают прямые обработчики после каждого перерендера: авто, удар, сдаться, выйти, расходники, экипировка, чат и возврат.
+2. Нижняя самодельная навигация Arena удалена. Используется общая навигация игры.
+3. Переходы из Arena идут через TerritoryNavigation, а не через старый showScreen.
+4. В index.html добавлен cache-bust для arena.js.
+5. Live Arena bridge больше не грузится дважды: он будет загружен Telegram-auth скриптом только после авторизации.
+
+Важно: серверный общий чат Live Arena здесь НЕ притворяется исправленным. Текущий сервер не обрабатывает message type=chat; это отдельная серверная работа.
