@@ -14,6 +14,8 @@ async function completeSession(){
  if(!session||finishing)return false;
  finishing=true;
  try{
+  // Never race /api/pve/complete against the queued server transcript.
+  await window.TerritoryPveTranscript08?.flush?.();
   const r=await A.api('/api/pve/complete',{method:'POST',body:JSON.stringify({session_id:session.id})});
   const e={coins:S().coins,gems:S().gems,redGems:S().redGems};
   if(r.state)Object.assign(S(),r.state);
