@@ -1,4 +1,4 @@
-TERRITORY PvE PASS 02 — ONE COMPLETE PACKAGE
+TERRITORY PvE PASS 03 — ONE COMPLETE PACKAGE
 
 This is ONE package. Do not upload the old PASS 01 fix separately.
 
@@ -33,3 +33,6 @@ TEST AFTER UPLOAD:
 6. Guest/demo PvE: Continue still follows the original local flow.
 
 If anything is wrong, stop before changing more files and report exactly which button/screen failed.
+
+
+PASS 03: исправляет ложное продолжение PvE после ошибки /api/pve/complete и не проглатывает ошибку транскрипта PvE.

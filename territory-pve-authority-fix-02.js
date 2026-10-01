@@ -32,7 +32,8 @@ async function finishAndContinue(button){
  const beforeChapter=Number(s.currentChapter)||1;
  busy=true;button.disabled=true;
  try{
-  await A.completeSession();
+  const completed=await A.completeSession();
+  if(!completed)throw new Error('Сервер не подтвердил завершение PvE-боя');
   equipServerLoot();
   const after=state(),chapter=Number(after.currentChapter)||beforeChapter,progress=Math.max(0,Number(after.chapterProgress)||0),nextStage=Math.max(1,Math.min(4,Number(after.chapterStage)||1));
   try{window.PvEBattle?.close?.(true)}catch(_){}
