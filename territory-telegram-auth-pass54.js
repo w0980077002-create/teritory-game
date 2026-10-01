@@ -1,18 +1,224 @@
-/* Territory — FOUNDATION-COMPLETE-04 Telegram identity + server state bridge. */
+/* Territory — TELEGRAM IDENTITY PASS 01.
+   Telegram Mini App identity is mandatory for the real game.
+   Server state is authoritative; anonymous local state is never auto-imported. */
 (function(){
-'use strict';if(window.TerritoryTelegramAuth?.foundationComplete07)return;
-const STORE_KEY='territory_store_v1',SERVER_KEY='territory_server_url_v1',tg=()=>window.Telegram?.WebApp||null;
-function serverUrl(){return String(window.TERRITORY_SERVER_URL||localStorage.getItem(SERVER_KEY)||'https://territory-sdolars-server.w0660077702.workers.dev').replace(/\/$/,'')}
-function localState(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||'null')}catch(_){return null}}
-function safeState(s){if(!s||typeof s!=='object')return null;const x={...s};for(const k of ['coins','gems','redGems','profile','pve','currentChapter','chapterStage','chapterProgress','chapterBossUnlocked','chapterBossDefeated','chapterCompleted','battleStones','battleStonesBonus','battleStonesDate','battleStonesCap','level','xp','xpNext','inventoryItems','lootFound','forge','totalChaptersCompleted','chapterRewardsClaimed'])delete x[k];x.level=Math.max(1,Number(s.level)||1);x.xp=Math.max(0,Number(s.xp)||0);x.xpNext=Math.max(1,Number(s.xpNext)||100);x.hp=Math.max(0,Number(s.hp)||0);x.maxHp=Math.max(1,Number(s.maxHp)||100);x.energy=Math.max(0,Number(s.energy)||0);x.maxEnergy=Math.max(1,Number(s.maxEnergy)||100);x.equipment=Array.isArray(s.equipment)?s.equipment.slice(0,7):[];x.inventoryItems=Array.isArray(s.inventoryItems)?s.inventoryItems.slice(0,100):[];x.followers=s.followers||{};x.activeFollower=s.activeFollower||null;x.consumables=s.consumables||{};x.forge=s.forge||{};x.arena=s.arena||{};x.daily=s.daily||{};x.weekly=s.weekly||{};x.story=s.story||{};x.auto=!!s.auto;x.pos=Math.max(0,Number(s.pos)||0);x.dice=Math.max(0,Number(s.dice)||0);return x}
-function meaningful(s){return !!s&&(Number(s.level||1)>1||Number(s.xp||0)>0||(Array.isArray(s.inventoryItems)&&s.inventoryItems.length>0)||(Array.isArray(s.equipment)&&s.equipment.some(Boolean)))}
-async function api(path,options){const w=tg(),headers=Object.assign({'content-type':'application/json','x-telegram-init-data':w?.initData||''},options?.headers||{}),r=await fetch(serverUrl()+path,Object.assign({},options||{},{headers})),d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||('HTTP '+r.status));return d}
-function apply(player,state){const S=window.TerritoryStore?.state;if(!S)return;if(player){S.profile=S.profile||{};S.profile.displayName=player.first_name||player.username||'Игрок';S.profile.username=player.username||'';S.profile.telegramId=String(player.telegram_id||'');S.profile.photoUrl=player.photo_url||'';S.profile.vip=Math.max(0,Number(player.vip)||0);S.level=Math.max(1,Number(player.level)||1);S.xp=Math.max(0,Number(player.xp)||0);S.xpNext=Math.max(1,Number(player.xp_next)||100);S.hp=Math.max(0,Number(player.hp)||0);S.maxHp=Math.max(1,Number(player.max_hp)||100);S.coins=Math.max(0,Number(player.coins)||0);S.gems=Math.max(0,Number(player.gems)||0);S.redGems=Math.max(0,Number(player.red_gems)||0)}if(state){const e={coins:S.coins,gems:S.gems,redGems:S.redGems};Object.assign(S,state);S.coins=e.coins;S.gems=e.gems;S.redGems=e.redGems;S.profile=S.profile||{};S.profile.level=S.level}window.TerritoryStore?.saveNow?.('foundation-complete07-load')}
+'use strict';
+if(window.TerritoryTelegramAuth?.identityPass01)return;
+
+const STORE_KEY='territory_store_v1';
+const SERVER_KEY='territory_server_url_v1';
+const tg=()=>window.Telegram?.WebApp||null;
+
+function serverUrl(){
+  return String(
+    window.TERRITORY_SERVER_URL ||
+    localStorage.getItem(SERVER_KEY) ||
+    'https://territory-sdolars-server.w0660077002.workers.dev'
+  ).replace(/\/$/,'');
+}
+function localState(){
+  try{return JSON.parse(localStorage.getItem(STORE_KEY)||'null')}catch(_){return null}
+}
+function safeState(s){
+  if(!s||typeof s!=='object')return null;
+  const x={...s};
+  for(const k of ['coins','gems','redGems','profile','pve','currentChapter','chapterStage',
+    'chapterProgress','chapterBossUnlocked','chapterBossDefeated','chapterCompleted',
+    'battleStones','battleStonesBonus','battleStonesDate','battleStonesCap','level','xp',
+    'xpNext','inventoryItems','lootFound','forge','totalChaptersCompleted',
+    'chapterRewardsClaimed']) delete x[k];
+  x.level=Math.max(1,Number(s.level)||1);
+  x.xp=Math.max(0,Number(s.xp)||0);
+  x.xpNext=Math.max(1,Number(s.xpNext)||100);
+  x.hp=Math.max(0,Number(s.hp)||0);
+  x.maxHp=Math.max(1,Number(s.maxHp)||100);
+  x.energy=Math.max(0,Number(s.energy)||0);
+  x.maxEnergy=Math.max(1,Number(s.maxEnergy)||100);
+  x.equipment=Array.isArray(s.equipment)?s.equipment.slice(0,7):[];
+  x.inventoryItems=Array.isArray(s.inventoryItems)?s.inventoryItems.slice(0,100):[];
+  x.followers=s.followers||{};
+  x.activeFollower=s.activeFollower||null;
+  x.consumables=s.consumables||{};
+  x.forge=s.forge||{};
+  x.arena=s.arena||{};
+  x.daily=s.daily||{};
+  x.weekly=s.weekly||{};
+  x.story=s.story||{};
+  x.auto=!!s.auto;
+  x.pos=Math.max(0,Number(s.pos)||0);
+  x.dice=Math.max(0,Number(s.dice)||0);
+  return x;
+}
+async function api(path,options){
+  const w=tg();
+  const initData=w?.initData||'';
+  if(!initData) throw new Error('Telegram initData отсутствует — открой игру через Telegram Mini App');
+  const headers=Object.assign(
+    {'content-type':'application/json','x-telegram-init-data':initData},
+    options?.headers||{}
+  );
+  const r=await fetch(serverUrl()+path,Object.assign({},options||{},{headers}));
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||('HTTP '+r.status));
+  return d;
+}
+function apply(player,state){
+  const S=window.TerritoryStore?.state;
+  if(!S)return;
+  if(player){
+    S.profile=S.profile||{};
+    S.profile.displayName=player.first_name||player.username||'Игрок';
+    S.profile.username=player.username||'';
+    S.profile.telegramId=String(player.telegram_id||'');
+    S.profile.photoUrl=player.photo_url||'';
+    S.profile.vip=Math.max(0,Number(player.vip)||0);
+    S.level=Math.max(1,Number(player.level)||1);
+    S.xp=Math.max(0,Number(player.xp)||0);
+    S.xpNext=Math.max(1,Number(player.xp_next)||100);
+    S.hp=Math.max(0,Number(player.hp)||0);
+    S.maxHp=Math.max(1,Number(player.max_hp)||100);
+    S.coins=Math.max(0,Number(player.coins)||0);
+    S.gems=Math.max(0,Number(player.gems)||0);
+    S.redGems=Math.max(0,Number(player.red_gems)||0);
+  }
+  if(state){
+    const e={coins:S.coins,gems:S.gems,redGems:S.redGems};
+    Object.assign(S,state);
+    // Economy remains server-authoritative.
+    S.coins=e.coins; S.gems=e.gems; S.redGems=e.redGems;
+    S.profile=S.profile||{};
+    S.profile.level=S.level;
+  }
+  window.TerritoryStore?.saveNow?.('telegram-identity-pass01-load');
+}
 let syncTimer=0,syncing=false,hydrating=false,lastRefresh=0;
-async function pushState(force){if(hydrating||window.TerritoryTelegramAuth.state!=='authenticated'||syncing)return;const state=safeState(localState());if(!state)return;clearTimeout(syncTimer);if(!force){syncTimer=setTimeout(()=>pushState(true),1200);return}syncing=true;try{const d=await api('/api/state',{method:'POST',body:JSON.stringify({state})});if(d.player)await hydrate(d.player,d.state||null);window.TerritoryTelegramAuth.lastSyncError=''}catch(e){window.TerritoryTelegramAuth.lastSyncError=e.message||String(e)}finally{syncing=false}}
-async function hydrate(player,state){hydrating=true;try{apply(player,state)}finally{hydrating=false}}
-async function refresh(){if(window.TerritoryTelegramAuth.state!=='authenticated'||syncing)return null;const t=Date.now();if(t-lastRefresh<1500)return null;lastRefresh=t;try{const d=await api('/api/player');await hydrate(d.player,d.state||null);return d}catch(e){window.TerritoryTelegramAuth.lastSyncError=e.message||String(e);return null}}
-async function authenticate(){const w=tg();if(!w||!w.initData){window.TerritoryTelegramAuth.state='guest';return{ok:false,guest:true}}try{w.ready();w.expand?.();let auth=await api('/api/player');const local=localState();if(meaningful(local)&&auth.player?.legacy_imported===false&&auth.player?.has_server_progress===false){await api('/api/migrate',{method:'POST',body:JSON.stringify({state:local})});auth=await api('/api/player')}await hydrate(auth.player,auth.state||null);window.TerritoryTelegramAuth.state='authenticated';window.TerritoryTelegramAuth.player=auth.player;window.TerritoryTelegramAuth.refreshEconomy=async()=>{const d=await api('/api/economy');await hydrate({coins:d.economy?.coins,gems:d.economy?.gems,red_gems:d.economy?.red_gems,vip:d.economy?.vip},null);return d};setTimeout(()=>{for(const src of ['territory-pve-authority-01c.js','territory-live-arena-bridge.js']){if(!document.querySelector(`script[src="${src}"]`)){const sc=document.createElement('script');sc.src=src;document.body.appendChild(sc)}}},0);return auth}catch(e){window.TerritoryTelegramAuth.state='error';window.TerritoryTelegramAuth.error=e.message||String(e);return{ok:false,error:e}}}
-window.TerritoryTelegramAuth=Object.assign(window.TerritoryTelegramAuth||{},{foundationComplete07:true,state:'idle',player:null,error:null,lastSyncError:'',authenticate,refresh, pushState,setServerUrl(v){localStorage.setItem(SERVER_KEY,String(v||''))},getServerUrl:serverUrl,api});
-window.addEventListener('territory:state-changed',()=>{if(!hydrating)pushState(false)});function boot(){setTimeout(authenticate,250)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+
+async function pushState(force){
+  if(hydrating||window.TerritoryTelegramAuth.state!=='authenticated'||syncing)return;
+  const state=safeState(localState());
+  if(!state)return;
+  clearTimeout(syncTimer);
+  if(!force){syncTimer=setTimeout(()=>pushState(true),1200);return}
+  syncing=true;
+  try{
+    const d=await api('/api/state',{method:'POST',body:JSON.stringify({state})});
+    if(d.player)await hydrate(d.player,d.state||null);
+    window.TerritoryTelegramAuth.lastSyncError='';
+  }catch(e){
+    window.TerritoryTelegramAuth.lastSyncError=e.message||String(e);
+    window.dispatchEvent(new CustomEvent('territory:sync-error',{detail:e.message||String(e)}));
+  }finally{syncing=false}
+}
+async function hydrate(player,state){
+  hydrating=true;
+  try{apply(player,state)}
+  finally{hydrating=false}
+}
+async function refresh(){
+  if(window.TerritoryTelegramAuth.state!=='authenticated'||syncing)return null;
+  const t=Date.now();
+  if(t-lastRefresh<1500)return null;
+  lastRefresh=t;
+  try{
+    const d=await api('/api/player');
+    await hydrate(d.player,d.state||null);
+    return d;
+  }catch(e){
+    window.TerritoryTelegramAuth.lastSyncError=e.message||String(e);
+    return null;
+  }
+}
+async function waitForTelegram(timeout=4000){
+  const started=Date.now();
+  while(Date.now()-started<timeout){
+    if(window.Telegram?.WebApp)return window.Telegram.WebApp;
+    await new Promise(r=>setTimeout(r,100));
+  }
+  return tg();
+}
+async function authenticate(){
+  const w=await waitForTelegram();
+  if(!w){
+    window.TerritoryTelegramAuth.state='guest';
+    window.TerritoryTelegramAuth.error='Telegram WebApp API не загружен';
+    window.dispatchEvent(new CustomEvent('territory:telegram-auth-failed',{detail:{reason:'telegram-api'}}));
+    return{ok:false,guest:true};
+  }
+  try{
+    w.ready();
+    w.expand?.();
+    const initData=w.initData||'';
+    if(!initData){
+      window.TerritoryTelegramAuth.state='guest';
+      window.TerritoryTelegramAuth.error='Telegram initData отсутствует';
+      window.dispatchEvent(new CustomEvent('territory:telegram-auth-failed',{detail:{reason:'init-data'}}));
+      return{ok:false,guest:true};
+    }
+
+    // IMPORTANT: never migrate anonymous/local progress automatically.
+    // The first authenticated account on this device must start from its
+    // own server record. This prevents one Telegram account inheriting
+    // another account's localStorage progress.
+    const auth=await api('/api/player');
+    await hydrate(auth.player,auth.state||null);
+
+    window.TerritoryTelegramAuth.state='authenticated';
+    window.TerritoryTelegramAuth.player=auth.player;
+    window.TerritoryTelegramAuth.error=null;
+    window.TerritoryTelegramAuth.lastSyncError='';
+
+    window.TerritoryTelegramAuth.refreshEconomy=async()=>{
+      const d=await api('/api/economy');
+      await hydrate({
+        coins:d.economy?.coins,
+        gems:d.economy?.gems,
+        red_gems:d.economy?.red_gems,
+        vip:d.economy?.vip
+      },null);
+      return d;
+    };
+
+    window.dispatchEvent(new CustomEvent('territory:telegram-authenticated',{detail:{
+      telegramId:String(auth.player?.telegram_id||''),
+      player:auth.player
+    }}));
+
+    setTimeout(()=>{
+      for(const src of ['territory-pve-authority-01c.js','territory-live-arena-bridge.js']){
+        if(!document.querySelector(`script[src="${src}"]`)){
+          const sc=document.createElement('script');
+          sc.src=src;
+          document.body.appendChild(sc);
+        }
+      }
+    },0);
+
+    return auth;
+  }catch(e){
+    window.TerritoryTelegramAuth.state='error';
+    window.TerritoryTelegramAuth.error=e.message||String(e);
+    window.dispatchEvent(new CustomEvent('territory:telegram-auth-failed',{detail:{reason:'server',message:window.TerritoryTelegramAuth.error}}));
+    return{ok:false,error:e};
+  }
+}
+
+window.TerritoryTelegramAuth=Object.assign(window.TerritoryTelegramAuth||{},{
+  identityPass01:true,
+  state:'idle',
+  player:null,
+  error:null,
+  lastSyncError:'',
+  authenticate,
+  refresh,
+  pushState,
+  setServerUrl(v){localStorage.setItem(SERVER_KEY,String(v||''))},
+  getServerUrl:serverUrl,
+  api
+});
+
+window.addEventListener('territory:state-changed',()=>{if(!hydrating)pushState(false)});
+
+function boot(){setTimeout(authenticate,50)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+else boot();
 })();
