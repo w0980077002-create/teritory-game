@@ -1,1 +1,2 @@
-bbc394d0fd39678191d43dbe1fe32ea1fddbad1d0094ab1cf74235087e900d19  RESET-ALL-PLAYERS.sql
+34b7d60d034e40e361df788a4a5e4f9ccea652f8431b170af27c632d1dd74a1d  /mnt/data/territory_once/README.txt
+9b9ab5ef0f297c22982323533251620c498ef9ecbd0bd56ee7d0e110514ecac5  /mnt/data/territory_once/RESET-NEW-GAME-ONCE.sql
