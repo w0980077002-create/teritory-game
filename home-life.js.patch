@@ -1,9 +1,0 @@
---- home-life.js
-+++ home-life.js
-@@
- function init(){
-- bind();bindBattleBridge();bindPvEAutoBridge();paint();
-+ bindBattleBridge();bindPvEAutoBridge();paint();
-@@
--function legacyInit(){bind();paint();setInterval(paint,1500);}
-+function legacyInit(){paint();setInterval(paint,1500);}
