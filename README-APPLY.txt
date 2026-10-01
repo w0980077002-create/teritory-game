@@ -1,23 +1,39 @@
-TERRITORY — TELEGRAM IDENTITY + PERSISTENCE PASS 01
+TERRITORY — TELEGRAM IDENTITY PASS 02
 
-Что исправлено:
-1. Добавлен официальный telegram-web-app.js в HEAD до игровых скриптов.
-2. Telegram initData теперь обязателен для реального режима.
-3. Сервер получает x-telegram-init-data на каждом запросе.
-4. Убрана автоматическая миграция localStorage в новый Telegram-аккаунт.
-   Это критично: аккаунт дочери не должен получить прогресс твоего Telegram.
-5. После Telegram auth серверное состояние загружается первым и становится источником истины.
-6. При ошибке auth игра показывает понятный экран входа вместо фальшивого "Игрок".
-7. После успешной auth отправляется событие territory:telegram-authenticated.
-8. Существующие серверные PvE/Arena bridges продолжают подключаться только после auth.
+WHY
+The previous Telegram identity patch failed too early when Telegram.WebApp.initData was temporarily empty. This pass fixes the bootstrap without changing gameplay/navigation.
 
-ВАЖНО:
-- Ничего из этого пакета не надо собирать вручную.
-- Заливать на GitHub нужно содержимое этого ZIP с заменой одноимённых файлов.
-- Старые файлы не удалять по догадке.
-- После загрузки тестируем отдельно два Telegram-аккаунта.
+CHANGES
+1. territory-telegram-auth-pass54.js -> Identity Pass 02.
+   - waits up to 15 seconds for Telegram WebApp + signed initData;
+   - calls WebApp.ready()/expand() during the wait;
+   - reads WebApp.initData first;
+   - falls back to the tgWebAppData launch payload from URL hash/query when the SDK has not exposed it yet;
+   - sends the raw signed payload unchanged to the server for HMAC validation;
+   - never trusts initDataUnsafe as authentication;
+   - keeps server state authoritative;
+   - never auto-imports anonymous local progress into a Telegram account;
+   - reports platform/version diagnostics only if signed initData is genuinely unavailable.
 
-ТЕСТ:
-A) Telegram #1 -> имя + username + Telegram ID -> сыграть -> выйти -> снова войти -> прогресс остался.
-B) Telegram #2 -> другой ID -> новый отдельный игрок -> сыграть -> выйти -> снова войти -> его прогресс остался.
-C) Проверить, что A и B не видят состояние друг друга.
+2. index.html
+   - cache-busts the auth and gate scripts with ?v=20261001-02 so Telegram WebView cannot keep the old JavaScript cached.
+
+3. territory-telegram-gate-01.js
+   - unchanged logic, only cache-busted from index.html.
+
+UPLOAD
+Replace/upload these three files as one coherent pass:
+- index.html
+- territory-telegram-auth-pass54.js
+- territory-telegram-gate-01.js
+
+Do NOT modify BotFather.
+Do NOT delete other game files for this pass.
+Do NOT manually assemble files.
+
+TEST
+1. Open the game from @TeritoryGameBot -> Open App.
+2. It must show the real Telegram player name/username/ID, not "Игрок / ID не получен".
+3. Close and reopen: the same server progress must remain.
+4. Test a second Telegram account: it must get a separate player/progress.
+5. If auth still fails, send the exact error screen; it will now include a more useful platform/version diagnostic instead of the old generic message.

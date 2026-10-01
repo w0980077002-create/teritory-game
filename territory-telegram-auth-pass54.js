@@ -1,9 +1,9 @@
-/* Territory — TELEGRAM IDENTITY PASS 01.
-   Telegram Mini App identity is mandatory for the real game.
+/* Territory — TELEGRAM IDENTITY PASS 02.
+   Robust Telegram Mini App identity bootstrap.
    Server state is authoritative; anonymous local state is never auto-imported. */
 (function(){
 'use strict';
-if(window.TerritoryTelegramAuth?.identityPass01)return;
+if(window.TerritoryTelegramAuth?.identityPass02)return;
 
 const STORE_KEY='territory_store_v1';
 const SERVER_KEY='territory_server_url_v1';
@@ -49,10 +49,36 @@ function safeState(s){
   x.dice=Math.max(0,Number(s.dice)||0);
   return x;
 }
+function rawInitData(w){
+  const direct=String(w?.initData||'');
+  if(direct)return direct;
+  // Telegram's WebApp SDK normally exposes initData directly. If the SDK
+  // arrives late or a client has not copied the hash into WebApp.initData yet,
+  // recover the same signed raw payload from the launch URL. It is still sent
+  // unchanged to the server for HMAC validation.
+  for(const raw of [String(location.hash||''),String(location.search||'')]){
+    try{
+      const q=raw.replace(/^#/,'').replace(/^\?/,'');
+      const v=new URLSearchParams(q).get('tgWebAppData');
+      if(v)return v;
+    }catch(_){}
+  }
+  return '';
+}
+function authSnapshot(w){
+  return {
+    platform:String(w?.platform||''),
+    version:String(w?.version||''),
+    hasWebApp:!!w,
+    hasInitData:!!rawInitData(w),
+    hasUnsafeUser:!!w?.initDataUnsafe?.user,
+    userId:String(w?.initDataUnsafe?.user?.id||'')
+  };
+}
 async function api(path,options){
   const w=tg();
-  const initData=w?.initData||'';
-  if(!initData) throw new Error('Telegram initData отсутствует — открой игру через Telegram Mini App');
+  const initData=rawInitData(w);
+  if(!initData) throw new Error('Telegram signed initData не получен');
   const headers=Object.assign(
     {'content-type':'application/json','x-telegram-init-data':initData},
     options?.headers||{}
@@ -128,31 +154,37 @@ async function refresh(){
     return null;
   }
 }
-async function waitForTelegram(timeout=4000){
+async function waitForTelegram(timeout=15000){
   const started=Date.now();
   while(Date.now()-started<timeout){
-    if(window.Telegram?.WebApp)return window.Telegram.WebApp;
-    await new Promise(r=>setTimeout(r,100));
+    const w=tg();
+    if(w){
+      try{w.ready();w.expand?.()}catch(_){}
+      if(rawInitData(w))return w;
+    }
+    await new Promise(r=>setTimeout(r,150));
   }
   return tg();
 }
 async function authenticate(){
   const w=await waitForTelegram();
   if(!w){
-    window.TerritoryTelegramAuth.state='guest';
+    window.TerritoryTelegramAuth.state='error';
     window.TerritoryTelegramAuth.error='Telegram WebApp API не загружен';
-    window.dispatchEvent(new CustomEvent('territory:telegram-auth-failed',{detail:{reason:'telegram-api'}}));
-    return{ok:false,guest:true};
+    window.dispatchEvent(new CustomEvent('territory:telegram-auth-failed',{detail:{reason:'telegram-api',message:window.TerritoryTelegramAuth.error}}));
+    return{ok:false,error:new Error(window.TerritoryTelegramAuth.error)};
   }
   try{
     w.ready();
     w.expand?.();
-    const initData=w.initData||'';
+    const initData=rawInitData(w);
     if(!initData){
-      window.TerritoryTelegramAuth.state='guest';
-      window.TerritoryTelegramAuth.error='Telegram initData отсутствует';
-      window.dispatchEvent(new CustomEvent('territory:telegram-auth-failed',{detail:{reason:'init-data'}}));
-      return{ok:false,guest:true};
+      const snap=authSnapshot(w);
+      window.TerritoryTelegramAuth.state='error';
+      window.TerritoryTelegramAuth.error='Telegram не передал подписанные initData ('+snap.platform+' / '+snap.version+').';
+      window.TerritoryTelegramAuth.diagnostics=snap;
+      window.dispatchEvent(new CustomEvent('territory:telegram-auth-failed',{detail:{reason:'init-data',message:window.TerritoryTelegramAuth.error,diagnostics:snap}}));
+      return{ok:false,error:new Error(window.TerritoryTelegramAuth.error)};
     }
 
     // IMPORTANT: never migrate anonymous/local progress automatically.
@@ -203,6 +235,7 @@ async function authenticate(){
 }
 
 window.TerritoryTelegramAuth=Object.assign(window.TerritoryTelegramAuth||{},{
+  identityPass02:true,
   identityPass01:true,
   state:'idle',
   player:null,
