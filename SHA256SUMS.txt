@@ -1,1 +1,4 @@
-4e198f52d31f7791e0f8f04e87615a843b3482c390ffa9d5b8faa4e4502c436c  territory-telegram-auth-pass54.js
+9ad881bd06d218cd12cb0b96d387c1f0beb2ff41407ec5014fe73bf01939deda  index.html
+5fb0f6ff713e8fab3f83452ed3c1681fe7c578e20d1faad9b016a62f75881c7c  territory-live-home-hud-01.js
+65d53ccdf000d80c66099e5acd4ce8160e4587efd786b9a0f3f2e15407fe8d25  territory-live-home-hud-01.css
+0a4628ced5936816398de75ba8e2b66db814f39a3557b2b9d04dabc235c25f3b  README-LIVE-HOME-HUD-PASS-01.md
