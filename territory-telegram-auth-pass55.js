@@ -8,7 +8,7 @@ if(window.TerritoryTelegramAuth?.foundationComplete08)return;
 const STORE_KEY='territory_store_v1';
 const SERVER_KEY='territory_server_url_v1';
 const tg=()=>window.Telegram?.WebApp||null;
-const serverUrl=()=>String(window.TERRITORY_SERVER_URL||localStorage.getItem(SERVER_KEY)||'https://territory-sdolars-server.w06600777002.workers.dev').replace(/\/$/,'');
+const serverUrl=()=>String(window.TERRITORY_SERVER_URL||localStorage.getItem(SERVER_KEY)||'https://territory-sdolars-server.w0660077702.workers.dev').replace(/\/$/,'');
 function localState(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||'null')}catch(_){return null}}
 function safeState(s){
   if(!s||typeof s!=='object')return null;
