@@ -1,0 +1,39 @@
+/* TERRITORY — CANONICAL HOME CSS
+   One visual Home. No second Home renderer and no floating VIP badge.
+*/
+#home.territory-home-screen{position:absolute;inset:0;overflow:hidden;background:#07131b}
+.territory-home{position:absolute;inset:0;overflow:hidden;background:#07131b}
+.territory-home-art{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;pointer-events:none}
+.territory-home-live{position:absolute;inset:0;z-index:40;pointer-events:none;font-family:Arial,sans-serif;font-weight:900;text-shadow:0 2px 2px #000,0 0 4px #000}
+.territory-home-live .live{position:absolute;display:flex;align-items:center;justify-content:center;white-space:nowrap;color:#fff}
+/* Small opaque replacements hide the demo numbers while preserving the original panels. */
+.live-level,.live-vip{left:16%;width:10.7%;height:3%;background:linear-gradient(180deg,#122633,#0b1a24);border-radius:2px}
+.live-level{top:3.75%;font-size:clamp(10px,2.5vw,21px)}
+.live-vip{top:6.2%;font-size:clamp(9px,2.2vw,18px);color:#f3d36f!important}
+.live-coins,.live-gems,.live-red{top:1.45%;height:4.1%;border-radius:5px;background:linear-gradient(180deg,#0c4774,#073354)}
+.live-coins{left:33.9%;width:7.0%;font-size:clamp(10px,2.7vw,22px);color:#ffe3a5!important}
+.live-gems{left:51.0%;width:7.0%;font-size:clamp(10px,2.7vw,22px);color:#e4f4ff!important}
+.live-red{left:71.1%;width:4.2%;font-size:clamp(10px,2.7vw,22px);color:#ffd1da!important}
+.live-energy-top{left:40.0%;top:4.7%;width:13.0%;height:4.7%;font-size:clamp(10px,2.6vw,21px);background:linear-gradient(180deg,#0ba83a,#057b2b);border-radius:5px}
+.live-chapter{left:28.5%;top:9.35%;width:44%;height:4.5%;font-size:clamp(10px,2.7vw,22px);background:linear-gradient(180deg,#bd6f31,#8e481f);border-radius:9px;color:#ffe7b0!important}
+.live-xp{left:28.5%;top:64.55%;width:30%;height:4.7%;font-size:clamp(9px,2.3vw,18px);background:linear-gradient(180deg,#078d34,#005f25);border-radius:3px}
+.live-bottom-level{left:59.5%;top:64.55%;width:15%;height:4.7%;font-size:clamp(10px,2.4vw,19px);background:#17232a;border-radius:4px;color:#f4df9f!important}
+.live-hp{left:3.8%;top:70.0%;width:17.8%;height:3.4%;font-size:clamp(10px,2.7vw,22px);background:linear-gradient(180deg,#d90d0d,#9b0000);border-radius:48%}
+.live-energy{left:80.0%;top:70.0%;width:16.5%;height:3.4%;font-size:clamp(10px,2.7vw,22px);background:linear-gradient(180deg,#168ff0,#0750b4);border-radius:48%}
+.live-eq{top:75%;height:3.5%;width:10.8%;font-size:clamp(8px,2vw,16px);background:#171a1eaa;border-radius:3px;color:#f6e3ad!important}
+.live-eq.e1{left:20.1%}.live-eq.e2{left:31.7%}.live-eq.e3{left:43.3%}.live-eq.e4{left:54.9%}.live-eq.e5{left:66.5%}.live-eq.e6{left:78.1%}
+.live-cons{top:80.6%;height:3.8%;width:12.3%;font-size:clamp(8px,2vw,16px);background:#12181dcc;border-radius:3px}
+.live-cons.c1{left:.7%}.live-cons.c2{left:13.4%}.live-cons.c3{left:26.1%}.live-cons.c4{left:38.8%}
+.live-progress{left:39%;top:85.8%;width:8%;height:4%;font-size:clamp(8px,2vw,16px);background:#b86c2e;border-radius:4px}
+.territory-home-hit-layer{position:absolute;inset:0;z-index:50;pointer-events:none}
+.home-hit{position:absolute;display:block;border:0;background:transparent;box-shadow:none;padding:0;margin:0;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.home-hit:focus-visible{outline:2px solid #e8c76b55;outline-offset:-2px}
+.home-hit.top{top:0;height:4.7%}.home-hit.profile{left:0;width:27%}.home-hit.coins{left:27%;width:19%}.home-hit.gems{left:46%;width:19%}.home-hit.redgems{left:65%;width:15%}.home-hit.trophy{left:80%;width:8.5%}.home-hit.mail{left:88.5%;width:7.2%}.home-hit.settings{left:95.7%;width:4.3%}
+.home-hit.energy{left:27%;top:4.7%;width:33%;height:4.2%}
+.home-hit.left,.home-hit.right{width:16%;height:7.1%}.home-hit.left{left:0}.home-hit.right{right:0}.home-hit.side1{top:10.5%}.home-hit.side2{top:18.2%}.home-hit.side3{top:25.9%}.home-hit.side4{top:33.2%}.home-hit.side5{top:40.8%}
+.home-hit.chapter{left:25%;right:25%;top:8.8%;height:8%}
+.home-hit.gear{top:68.3%;height:8.4%}.home-hit.g1{left:19%;width:10%}.home-hit.g2{left:29.5%;width:10%}.home-hit.g3{left:40%;width:10%}.home-hit.g4{left:50.5%;width:10%}.home-hit.g5{left:61%;width:10%}.home-hit.g6{left:71.5%;width:10%}
+.home-hit.elixir{top:77.1%;height:7.3%;width:15.5%}.home-hit.e1{left:1%}.home-hit.e2{left:17%}.home-hit.e3{left:33%}.home-hit.e4{left:49%}.home-hit.locked{top:77.1%;height:7.3%;width:14%}.home-hit.l1{left:66%}.home-hit.l2{left:81%}.home-hit.l3{left:90%}
+.home-hit.speed{left:62%;top:84%;width:9%;height:5%}.home-hit.auto{left:71.5%;top:84%;width:9%;height:5%}.home-hit.honor{left:81%;top:84%;width:9%;height:5%}.home-hit.blessing{left:90.5%;top:84%;width:9%;height:5%}
+.home-hit.bottom{bottom:0;height:12.25%;width:14.285714%}.home-hit.bottom.b1{left:0}.home-hit.bottom.b2{left:14.285714%}.home-hit.bottom.b3{left:28.571428%}.home-hit.bottom.b4{left:42.857142%}.home-hit.bottom.b5{left:57.142856%}.home-hit.bottom.b6{left:71.42857%}.home-hit.bottom.b7{left:85.714284%}
+@media(max-width:390px){.territory-home-live .live{font-weight:800}}
