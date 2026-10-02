@@ -1,0 +1,88 @@
+/* TERRITORY — HOME LAYER FOUNDATION 02
+   Safe responsive/depth layer.
+   Do not move existing hit zones here.
+*/
+
+#home.territory-home-screen .territory-home{
+  --home-depth-background: 1;
+  --home-depth-entities: 10;
+  --home-depth-ui: 100;
+  --home-depth-hits: 120;
+}
+
+/* Background stays completely passive. */
+#home.territory-home-screen .territory-home-background-layer{
+  z-index: var(--home-depth-background);
+  pointer-events:none;
+}
+
+/* Gameplay characters live above the art and below UI/hit targets. */
+#home.territory-home-screen .territory-home-entity-layer{
+  z-index: var(--home-depth-entities);
+  pointer-events:none;
+}
+
+/* UI remains the authoritative interactive layer. */
+#home.territory-home-screen .territory-home-ui-layer{
+  z-index: var(--home-depth-ui);
+  pointer-events:none;
+}
+
+#home.territory-home-screen .territory-home-hit-layer{
+  z-index: var(--home-depth-hits);
+}
+
+/* Prevent accidental selection/dragging of future character PNGs. */
+#home.territory-home-screen .territory-home-entity{
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-user-drag:none;
+  touch-action:none;
+  will-change:transform;
+}
+
+/* Stable anchor boxes. These are deliberately conservative so the
+   first real transparent PNGs can be dropped in without rewriting UI. */
+#home.territory-home-screen .territory-home-entity.hero{
+  left:29%;
+  bottom:17%;
+  width:30%;
+  max-height:70%;
+}
+
+#home.territory-home-screen .territory-home-entity.follower{
+  left:5%;
+  bottom:16%;
+  width:18%;
+  max-height:55%;
+}
+
+#home.territory-home-screen .territory-home-entity.enemy-1{
+  right:25%;
+  bottom:17%;
+  width:23%;
+  max-height:60%;
+}
+
+#home.territory-home-screen .territory-home-entity.enemy-2{
+  right:4%;
+  bottom:17%;
+  width:21%;
+  max-height:60%;
+}
+
+/* On narrow screens keep the entities inside the playable viewport. */
+@media (max-width: 420px){
+  #home.territory-home-screen .territory-home-entity.hero{width:29%}
+  #home.territory-home-screen .territory-home-entity.follower{width:17%}
+  #home.territory-home-screen .territory-home-entity.enemy-1{width:22%}
+  #home.territory-home-screen .territory-home-entity.enemy-2{width:20%}
+}
+
+/* Reduced motion remains safe. */
+@media (prefers-reduced-motion:reduce){
+  #home.territory-home-screen .territory-home-entity{
+    transition:none!important;
+    animation:none!important;
+  }
+}
