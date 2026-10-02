@@ -1,0 +1,23 @@
+/* TERRITORY — LIVE HOME HUD 02
+   Covers the baked demo numbers inside home-master.png and replaces them with
+   server-authoritative values. Art/buttons remain untouched.
+*/
+.territory-live-home-hud-02{position:absolute;inset:0;z-index:60;pointer-events:none;overflow:hidden;font-family:Arial,sans-serif;font-weight:900;color:#fff;text-shadow:0 2px 2px #000,0 0 4px #000}
+.territory-live-home-hud-02 .live{position:absolute;display:flex;align-items:center;justify-content:center;box-sizing:border-box;white-space:nowrap;overflow:hidden}
+.territory-live-home-hud-02 .patch{position:absolute;box-sizing:border-box;background:rgba(7,17,27,.97);border-radius:4px}
+.live02-level{left:16.6%;top:4.0%;width:11.8%;height:2.4%;font-size:clamp(9px,2.2vw,18px)}
+.live02-vip{left:16.5%;top:6.5%;width:12%;height:2.5%;font-size:clamp(8px,2vw,17px);color:#f1d27b}
+.live02-profile-p1{left:16.0%;top:3.6%;width:13.0%;height:2.8%}
+.live02-profile-p2{left:16.0%;top:6.25%;width:13.0%;height:3.0%}
+.live02-coins-p{left:33.6%;top:2.0%;width:9.0%;height:3.0%}.live02-coins{left:34.0%;top:2.1%;width:8.7%;height:2.7%;font-size:clamp(10px,2.4vw,20px);color:#ffe0a0}
+.live02-gems-p{left:48.6%;top:2.0%;width:7.5%;height:3.0%}.live02-gems{left:49.0%;top:2.1%;width:7.0%;height:2.7%;font-size:clamp(10px,2.4vw,20px);color:#d8ecff}
+.live02-red-p{left:65.7%;top:2.0%;width:7.4%;height:3.0%}.live02-red{left:66.1%;top:2.1%;width:6.7%;height:2.7%;font-size:clamp(10px,2.4vw,20px);color:#ffb2c3}
+.live02-energy-p{left:34.5%;top:5.45%;width:21.5%;height:3.0%}.live02-energy{left:34.7%;top:5.6%;width:20.8%;height:2.8%;font-size:clamp(10px,2.5vw,21px)}
+.live02-chapter-p{left:30.0%;top:11.25%;width:40.0%;height:5.2%;background:rgba(28,19,10,.95)}.live02-chapter{left:30.5%;top:11.8%;width:39.6%;height:4.5%;font-size:clamp(10px,2.7vw,23px);color:#ffe4a0}
+.live02-xp-p{left:29.0%;top:65.55%;width:35.0%;height:3.0%}.live02-xp{left:29.5%;top:65.8%;width:34.4%;height:2.7%;font-size:clamp(9px,2.2vw,18px);color:#f2f5d2}.live02-bottom-level{left:66.2%;top:65.3%;width:10.2%;height:3.8%;font-size:clamp(9px,2.2vw,18px);color:#f3e3ac}
+.live02-hp-p{left:4.0%;top:70.15%;width:16.0%;height:4.7%}.live02-hp{left:4.0%;top:70.4%;width:17.0%;height:4.8%;font-size:clamp(10px,2.7vw,23px)}
+.live02-bottom-energy-p{left:80.5%;top:70.15%;width:16.2%;height:4.5%}.live02-bottom-energy{left:80.4%;top:70.5%;width:16.6%;height:4.5%;font-size:clamp(10px,2.5vw,22px)}
+.live02-eq-p{top:74.75%;height:2.8%;background:rgba(10,8,8,.92);border-radius:3px}.live02-eq{top:74.9%;width:11.0%;height:2.6%;font-size:clamp(8px,1.9vw,16px);color:#f6e3ad}.live02-eq.e1{left:21.0%;width:11%}.live02-eq.e2{left:32.8%;width:11%}.live02-eq.e3{left:44.7%;width:11%}.live02-eq.e4{left:56.5%;width:11%}.live02-eq.e5{left:68.3%;width:11%}.live02-eq.e6{left:80.1%;width:11%}
+.live02-cons-p{top:80.85%;height:2.8%;background:rgba(8,10,12,.92);border-radius:3px}.live02-cons{top:80.9%;width:12%;height:2.6%;font-size:clamp(8px,1.9vw,16px)}.live02-cons.c1{left:1%}.live02-cons.c2{left:13.8%}.live02-cons.c3{left:26.6%}.live02-cons.c4{left:39.4%}
+.live02-progress-p{left:22.2%;top:86.15%;width:28.6%;height:3.2%;background:rgba(7,12,15,.94);border-radius:4px}.live02-progress{left:22%;top:86.3%;width:29%;height:3%;font-size:clamp(8px,1.9vw,16px);justify-content:flex-end}
+@media(max-width:390px){.live02-level,.live02-vip{font-size:9px}.live02-coins,.live02-gems,.live02-red,.live02-energy,.live02-bottom-energy{font-size:10px}.live02-chapter{font-size:10px}.live02-hp{font-size:11px}.live02-eq,.live02-cons,.live02-progress{font-size:8px}}
