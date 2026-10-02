@@ -1,0 +1,107 @@
+/* Territory Home — Layer Foundation 01
+   1) background
+   2) entities
+   3) UI/HUD
+   The background can be replaced without changing UI coordinates.
+*/
+
+#home.territory-home-screen,
+#home.territory-home-screen .territory-home{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  isolation:isolate;
+  background:#07131b;
+}
+
+.territory-home-background-layer{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  overflow:hidden;
+  pointer-events:none;
+}
+
+.territory-home-background{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:fill;
+  object-position:center top;
+  pointer-events:none;
+}
+
+.territory-home-entity-layer{
+  position:absolute;
+  inset:0;
+  z-index:10;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+.territory-home-entity{
+  position:absolute;
+  display:block;
+  object-fit:contain;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+/* Stable entity anchors. */
+.territory-home-entity.hero{
+  left:29%;
+  bottom:17%;
+  width:30%;
+}
+
+.territory-home-entity.follower{
+  left:5%;
+  bottom:16%;
+  width:18%;
+}
+
+.territory-home-entity.enemy-1{
+  right:25%;
+  bottom:17%;
+  width:23%;
+}
+
+.territory-home-entity.enemy-2{
+  right:4%;
+  bottom:17%;
+  width:21%;
+}
+
+.territory-home-ui-layer{
+  position:absolute;
+  inset:0;
+  z-index:100;
+  pointer-events:none;
+}
+
+.territory-home-ui-layer button,
+.territory-home-hit-layer,
+.territory-home-hit-layer button{
+  pointer-events:auto;
+}
+
+.territory-home-hit-layer{
+  position:absolute;
+  inset:0;
+  z-index:120;
+}
+
+.territory-home-ui-layer .territory-home-live{
+  z-index:110;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .territory-home-background,
+  .territory-home-entity{
+    animation:none!important;
+    transition:none!important;
+  }
+}
