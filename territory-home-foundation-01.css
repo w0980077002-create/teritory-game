@@ -1,0 +1,7 @@
+/* Territory — Home Foundation PASS 01 */
+.territory-home-mail-list{display:grid;gap:10px;max-height:58vh;overflow:auto;margin:10px 0}
+.territory-home-mail-card{padding:12px;border:1px solid rgba(232,199,107,.24);border-radius:14px;background:linear-gradient(145deg,#152b38,#0a171f)}
+.territory-home-mail-card b{display:block;color:#e8c76b;font-size:13px}
+.territory-home-mail-card p{margin:7px 0;color:#c5d0d6;font-size:11px;line-height:1.4}
+.territory-home-mail-card small{display:block;color:#8fa0aa;font-size:10px;margin-bottom:8px}
+.territory-home-mail-card button{width:100%}

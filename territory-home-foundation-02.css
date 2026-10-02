@@ -1,0 +1,16 @@
+/* Territory Home Foundation PASS 02 */
+#home [data-home-action="auto"][data-active="1"],
+#home [data-home-action="speed"][data-speed="2"]{
+  outline:1px solid rgba(232,199,107,.65);
+  filter:brightness(1.12);
+}
+#home [data-home-action="auto"][data-active="1"]::after{
+  content:"ON";
+  position:absolute;
+  right:4%;
+  top:4%;
+  font-size:6px;
+  font-weight:1000;
+  color:#f0cf91;
+  text-shadow:0 1px 3px #000;
+}
